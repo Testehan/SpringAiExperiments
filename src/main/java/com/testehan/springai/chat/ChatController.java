@@ -5,6 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 public class ChatController {
 
@@ -15,7 +17,7 @@ public class ChatController {
     }
 
     @GetMapping("/api/generate")
-    public String generate(@RequestParam(value = "message", defaultValue = "Tell me a Short fact about Romania") String message){
-        return "Hi romania";
+    public Map generate(@RequestParam(value = "message", defaultValue = "Tell me a Short fact about Romania") String message){
+        return Map.of("generated", chatClient.call(message));
     }
 }
