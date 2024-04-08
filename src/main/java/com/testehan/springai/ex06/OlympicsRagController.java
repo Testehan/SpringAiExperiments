@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class OlympicsController {
+public class OlympicsRagController {
 
     private final ChatClient chatClient;
     private final VectorStore vectorStore;
@@ -25,7 +25,7 @@ public class OlympicsController {
     @Value("classpath:/prompts/rag-prompt-template.txt")
     private Resource ragPromptTemplate;
 
-    public OlympicsController(ChatClient chatClient, VectorStore vectorStore) {
+    public OlympicsRagController(ChatClient chatClient, VectorStore vectorStore) {
         this.chatClient = chatClient;
         this.vectorStore = vectorStore;
     }

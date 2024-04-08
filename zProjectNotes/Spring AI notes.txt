@@ -1,2 +1,11 @@
 ex 06 contains an example with RAG - Retrieval Augmented Generation...see also
     "02 - retrieval augmented generation.png"
+
+ex 07 contains an example with Stuffing the prompt with data so that the LLM has extra information to know how
+    to answer...see also "01 - stuffing the promp with data.png"
+
+TODO    Dr. Mark Pollack, lead of the new Spring AI project
+        https://www.youtube.com/watch?v=0P8UU5vkvI8
+
+TODO    Spring into the AI Era: A Practical Exploration for Developers (Workshop)
+        https://www.youtube.com/watch?v=QWgiOoB4OOU
