@@ -1,0 +1,2 @@
+ex 06 contains an example with RAG - Retrieval Augmented Generation...see also
+    "02 - retrieval augmented generation.png"
