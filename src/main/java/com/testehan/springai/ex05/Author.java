@@ -1,4 +1,4 @@
-package com.testehan.springai.output;
+package com.testehan.springai.ex05;
 
 import java.util.List;
 

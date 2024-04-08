@@ -1,4 +1,4 @@
-package com.testehan.springai.chat;
+package com.testehan.springai.ex01;
 
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;

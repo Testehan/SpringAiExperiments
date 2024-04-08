@@ -1,4 +1,4 @@
-package com.testehan.springai.prompt;
+package com.testehan.springai.ex03;
 
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
