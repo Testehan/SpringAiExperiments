@@ -17,22 +17,24 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-public class OlympicsRagController {
+public class ImmobiliareRagController {
 
     private final ChatClient chatClient;
-    private final VectorStore olympicsVectorStore;
+    // i think that in the case of an actual usecase, one would need multiple vectore stores,
+    // as in a vector store per city-type-type...for ex "london-apartment-rents" or "london-house-sells"
+    private final VectorStore immobiliareVectorStore;
 
     @Value("classpath:/prompts/rag-prompt-template.txt")
     private Resource ragPromptTemplate;
 
-    public OlympicsRagController(ChatClient chatClient, VectorStore olympicsVectorStore) {
+    public ImmobiliareRagController(ChatClient chatClient, VectorStore immobiliareVectorStore) {
         this.chatClient = chatClient;
-        this.olympicsVectorStore = olympicsVectorStore;
+        this.immobiliareVectorStore = immobiliareVectorStore;
     }
 
-    @GetMapping("/api/faq")
-    public String faq(@RequestParam(value = "message", defaultValue = "How can I buy tickets for the Olympic Games Paris 2024") String message) {
-        List<Document> similarDocuments = olympicsVectorStore.similaritySearch(SearchRequest.query(message).withTopK(2));
+    @GetMapping("/api/immobiliare")
+    public String faq(@RequestParam(value = "message", defaultValue = "What are some apartments for sale in Marasti?") String message) {
+        List<Document> similarDocuments = immobiliareVectorStore.similaritySearch(SearchRequest.query(message).withTopK(2));
         List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
 
         PromptTemplate promptTemplate = new PromptTemplate(ragPromptTemplate);

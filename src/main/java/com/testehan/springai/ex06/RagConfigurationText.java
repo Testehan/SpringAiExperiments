@@ -17,7 +17,7 @@ import java.util.List;
 // RAG - Retrieval Augmented Generation.. see notes for more info
 
 @Configuration
-public class RagConfiguration {
+public class RagConfigurationText {
 
     // location on your machine where this vector store will be stored. The vectore store is used to send
     // better prompts (prompts with more context) to the LLM
@@ -28,7 +28,9 @@ public class RagConfiguration {
     private Resource faq;
 
     @Bean
-    SimpleVectorStore simpleVectorStore(EmbeddingClient embeddingClient) {
+    SimpleVectorStore olympicsVectorStore(EmbeddingClient embeddingClient) {
+        // (from the documentation) SimpleVectorStore - A simple implementation of persistent vector storage,
+        // good for educational purposes.
         var simpleVectorStore = new SimpleVectorStore(embeddingClient);
         var vectorStoreFile = new File(vectorStorePath);
         if (vectorStoreFile.exists()) {
