@@ -1,4 +1,4 @@
-package com.testehan.springai.ex06;
+package com.testehan.springai.immobiliare;
 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.ai.chat.ChatClient;
@@ -30,6 +30,7 @@ public class ImmobiliareRagController {
     // TODO Yes, this is not how it would work in a real app...but this is good enough for a prototype
     // purpose of this map is to hold a list of assistant (LLM) and user messages for each session;
     // in a serious app one would use spring session and either Redis or the DB to save the conversation state i think
+    // see my SpringSessionRedisExperiments repo for ex
     private static Map<String, List<Message>> conversations = new HashMap();
 
     @Value("classpath:/prompts/rag-prompt-template.txt")
@@ -55,6 +56,7 @@ public class ImmobiliareRagController {
             promptParameters.put("input", message);
             promptParameters.put("documents", String.join("\n", contentList));
             Prompt prompt = promptTemplate.create(promptParameters);
+//            Prompt promptWithFunctions = new Prompt(prompt.getContents(), OpenAiChatOptions.builder().withFunction("apartmentsFunction").build());
 
             assistantResponse = chatClient.call(prompt).getResult().getOutput();
 
@@ -67,6 +69,7 @@ public class ImmobiliareRagController {
             conversations.get(session.getId()).addAll(newUserMessage.getInstructions());
 
             Prompt promptToSend = new Prompt(conversations.get(session.getId()));
+//            Prompt promptWithFunctions = new Prompt(promptToSend.getContents(), OpenAiChatOptions.builder().withFunction("apartmentsFunction").build());
             assistantResponse = chatClient.call(promptToSend).getResult().getOutput();
             conversations.get(session.getId()).add(assistantResponse);
         }
