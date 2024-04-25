@@ -1,4 +1,4 @@
-package com.testehan.springai.ex06;
+package com.testehan.springai.immobiliare.configuration;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingClient;
@@ -32,12 +32,9 @@ public class RagConfigurationJson {
             simpleVectorStore.load(vectorStoreFile);
         } else {
             System.out.println("Vector Store File Does Not Exist, load documents");
-            JsonReader jsonReader = new JsonReader(immobiliareData);
+            JsonReader jsonReader = new JsonReader(immobiliareData,new ImmobiliareMetadataGenerator(),"id","name","location","shortDescription","price","surface","noOfRooms","floor","tags");
             List<Document> documents = jsonReader.get();
-            // TODO I think these lines of code are only needed when you are dealing with a large text file, not with json
-//            TextSplitter textSplitter = new TokenTextSplitter();
-//            List<Document> splitDocuments = textSplitter.apply(documents);
-//            simpleVectorStore.add(splitDocuments);
+
             simpleVectorStore.add(documents);
             simpleVectorStore.save(vectorStoreFile);
         }

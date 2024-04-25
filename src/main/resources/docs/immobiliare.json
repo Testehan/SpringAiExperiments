@@ -1,7 +1,9 @@
 [
   {
+    "id": "1",
     "name": "Detached 3-room apartment for sale in Marasti neighborhood with balcony",
-    "shortDescription": "Ideally located close to FSEGA Faculty, this 3 bedroom detached apartment offers the perfect opportunity for those looking for convenience. With a generous balcony, it is a perfect space to enjoy the fresh air and the enchanting view. Fully furnished and equipped, this apartment is ready to welcome you with open arms, offering you all the necessary comforts for a life full of well-being. In addition, benefiting from the proximity to restaurants and bus stops, it ensures that you have everything you need close at hand. An opportunity to invest in a perfectly located home in one of the most sought after areas in the city.",
+    "location": "Cluj-Napoca Marasti",
+    "shortDescription": "Ideally located close to FSEGA Faculty, this 3 bedroom detached apartment offers the perfect opportunity for those looking for convenience.",
     "price": 182000,
     "surface": 65,
     "noOfRooms": 3,
@@ -12,8 +14,10 @@
     ]
   },
   {
+    "id": "2",
     "name": "1-room apartment, 38 sqm, intermediate floor, southwest orientation, for sale in Marasti",
-    "shortDescription": "Blitz offers for sale a 1-room apartment located in an extremely easy and attractive area for rent, offering tenants the opportunity to have a 1-2 minute walk to public transport, 5 minutes from commercial spaces Kaufland, Lidl , Leroy Merlin, 15 minutes' walk to Iulius Mall, offices, educational centers as well as many other facilities.\n\nIf you appreciate peace and natural light, the southern positioning of the apartment on the upper floor 6 out of 7, you will be delighted!\n\nThe useful surface of 38 useful square meters is divided separately into the entrance hall, bedroom, kitchen and bathroom. The balcony is generous, open and on the best orientation: southwest!\n\nThe block was completed in 2017, built to good standards, the ultimate comfort being ensured by its own heating plant and 10 cm external insulation.\n\nTogether with the apartment you can purchase an outdoor parking space with CF for the price of 7000 euros.\n\nThe apartment is offered for sale furnished and equipped. For more details or to schedule a viewing, we will be happy to help you!",
+    "location": "Cluj-Napoca Marasti",
+    "shortDescription": "We offer for sale a 1-room apartment located in an extremely easy and attractive area for rent, offering tenants the opportunity to have a 1-2 minute walk to public transport, 5 minutes from commercial spaces Kaufland, Lidl , Leroy Merlin, 15 minutes' walk to Iulius Mall, offices, educational centers as well as many other facilities.",
     "price": 99000,
     "surface": 38,
     "noOfRooms": 1,
@@ -24,8 +28,10 @@
     ]
   },
   {
+    "id": "3",
     "name": "Apartment at the house, Andrei Muresanu, 220 sqm total, garden",
-    "shortDescription": "We offer for sale, in exclusive representation and without commission from the buyer, an apartment in the house (duplex), with a total area of 220 square meters on Jozsef Attila street no. 49 in the Andrei Muresanu neighborhood, Cluj-Napoca.\n\nThe apartment, part of a house with 2 apartments (duplex), is divided as follows:\n- Mezzanine/Ground floor: garage 28 sqm, cellar 26 sqm;\n- Upper ground floor: kitchen, living room 28 sqm, service toilet, pantry, hall, access to the garden;\n- Floor: 2 rooms of 14 and 20 square meters, bathroom with glass, hall;\n- Loft/Attic: open space 56 sq m, height over 3 m;\nThe two big assets of this property are, first of all, the area, only 1.8km from the center (16 min walk), located on a street with almost non-existent car traffic, set back from the main traffic arteries, which serves only the riversiders. Secondly, the first thing we notice when entering the house is the height of the ceilings (2.6m) and the large windows specific to interwar constructions.\nThe house was built on a 500 square meter plot at the end of the 70s on a concrete structure with 30cm brick masonry. Recently, the building was renovated and thermally insulated with a system based on 15cm polystyrene. The floors, including the one on the bridge as well as the stairs, are made of concrete. As for the interior finishes, we can say that they are \"classic\", but the solid wood parquet in very good condition stands out. The high attic (56 square meters) is prepared for the attic, resulting in at least one extra generous room.\nOf course, the house benefits from all the utilities, and the heating is done by its own gas boiler. The electrical installation is based on copper and does not need to be replaced.\nThe legal situation is clear, payment by credit is also accepted.\nGiven the generous area as well as the location, this property lends itself to a family that values both the tranquility of everyday life and accessibility.\nPlease watch the presentation video, the virtual tour, and for additional information, do not hesitate to contact us.",
+    "location": "Cluj-Napoca Andrei Muresanu",
+    "shortDescription": "With a total area of 220 square meters on Jozsef Attila street no. 49 in the Andrei Muresanu neighborhood, Cluj-Napoca.The apartment, part of a house with 2 apartments (duplex), is divided as follows:- Mezzanine/Ground floor: garage 28 sqm, cellar 26 sqm; - Upper ground floor: kitchen, living room 28 sqm, service toilet, pantry, hall, access to the garden; - Floor: 2 rooms of 14 and 20 square meters, bathroom with glass, hall; - Loft/Attic: open space 56 sq m, height over 3 m; The two big assets of this property are, first of all, the area, only 1.8km from the center (16 min walk), located on a street with almost non-existent car traffic, set back from the main traffic arteries, which serves only the riversiders.",
     "price": 379000,
     "surface": 106,
     "noOfRooms": 3,
@@ -36,8 +42,10 @@
     ]
   },
   {
-    "name": "3-room apartment, detached, 74 sqm, Piata Unirii area",
-    "shortDescription": "Blitz offers for sale a 3-room apartment, fully furnished and equipped in the Piata Unirii area. The apartment has a usable area of 74 sqm, its own central heating system, divided as follows: kitchen, 2 bedrooms, a large living room and a bathroom. Due to this compartmentalization and the facilities it has, it is an excellent option for renting as a hotel, but also for a family. There is also the possibility of an attic and the construction of two bedrooms and a bathroom. We look forward to seeing you!",
+    "id": "4",
+    "name": "3-room apartment, 74 sqm, Piata Unirii area",
+    "location": "Cluj-Napoca center Piata Unirii",
+    "shortDescription": "The apartment has own central heating system, divided as follows: kitchen, 2 bedrooms, a large living room and a bathroom. Due to this compartmentalization and the facilities it has, it is an excellent option for renting as a hotel, but also for a family.",
     "price": 390000,
     "surface": 74,
     "noOfRooms": 3,

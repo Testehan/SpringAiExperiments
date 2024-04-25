@@ -3,7 +3,9 @@ package com.testehan.springai.immobiliare;
 import java.util.List;
 
 public record Apartment(
+        String id,
         String name,
+        String location,
         String shortDescription,
         Long price,
         Integer surface,
