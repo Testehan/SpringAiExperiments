@@ -1,4 +1,4 @@
-package com.testehan.springai.immobiliare;
+package com.testehan.springai.immobiliare.model;
 
 import java.util.List;
 

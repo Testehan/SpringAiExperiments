@@ -13,7 +13,7 @@ import java.util.function.Function;
 public class ApartmentRentService implements Function<ApartmentRentService.Request, ApartmentRentService.Response> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonClassDescription("Get the weather in location")    // Get apartment information TODO Think about this description
+    @JsonClassDescription("Get the weather in location")
     public record Request(
             @JsonProperty(required = true, value = "message") @JsonPropertyDescription("The city and state") String message) {
     }

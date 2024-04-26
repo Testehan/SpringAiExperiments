@@ -5,12 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -20,15 +16,9 @@ import java.util.function.Function;
 @Component
 public class ApartmentSaleService implements Function<ApartmentSaleService.Request, ApartmentSaleService.Response> {
 
-    private final ChatClient chatClient;
-
     private final VectorStore immobiliareVectorStore;
 
-    @Value("classpath:/prompts/rag-prompt-template-apartments-sale.txt")
-    private Resource ragPromptTemplate;
-
-    public ApartmentSaleService(ChatClient chatClient, VectorStore immobiliareVectorStore) {
-        this.chatClient = chatClient;
+    public ApartmentSaleService(VectorStore immobiliareVectorStore) {
         this.immobiliareVectorStore = immobiliareVectorStore;
     }
 
@@ -39,89 +29,47 @@ public class ApartmentSaleService implements Function<ApartmentSaleService.Reque
             @JsonProperty(value = "price") @JsonPropertyDescription("The price") Long price,
             @JsonProperty(value = "surface") @JsonPropertyDescription("The surface") Integer surface) {
     }
-                        // todo response should be "Apartments information"
+    // todo response should be "Apartments information"
     public record Response(List<String> information) {
     }
-
-//    @Override
-//    public Response apply(Request request) {
-//
-//        // todo maybe here i can just query a database...
-//        var location = request.location();
-//        var filtersMap = extractFilters(request);
-//
-//        FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
-//        StringBuilder sb = new StringBuilder();
-//        for (Map.Entry<String, Object> entry : filtersMap.entrySet()){
-//            String operation = " == ";//getOperation(entry);
-//            sb.append(entry.getKey());
-//            sb.append(operation);
-//            sb.append(entry.getValue());
-//            sb.append(" AND ");
-//        }
-//
-//
-//        if (!Strings.isBlank(location)) {
-//
-//            List<Document> similarDocuments = immobiliareVectorStore.similaritySearch(SearchRequest.query(location).withTopK(2));
-//            List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
-//
-//
-//
-//
-////            PromptTemplate promptTemplate = new PromptTemplate(ragPromptTemplate);
-////            Map<String, Object> promptParameters = new HashMap<>();
-////            promptParameters.put("location", location);
-////            promptParameters.put("documents", String.join("\n", contentList));
-////
-////            var outputParser = new BeanOutputParser<>(Apartments.class);
-////            String format = outputParser.getFormat();
-////            Apartments apartmentsFromVector = outputParser.parse(String.join("", contentList));
-////            System.out.println("format = " + format);
-////            promptParameters.put("format", format);
-////
-////            Prompt prompt = promptTemplate.create(promptParameters);
-////
-////            Generation generation = chatClient.call(prompt).getResult();
-////            Apartments apartments = outputParser.parse(generation.getOutput().getContent());
-//
-//            return new Response(contentList);
-//        } else {
-//            return new Response(new ArrayList<>());
-//        }
-//
-//    }
 
     @Override
     public Response apply(Request request) {
 
+        var query = getQueryFromRequest(request);
+        if (!Strings.isBlank(query)) {
+
+            List<Document> similarDocuments = immobiliareVectorStore.similaritySearch(query);
+            // TODO the reason why the call from below fails, is because the implementation SimpleVectorStore does
+            // not provide the functionality to filter metadata ..As the documentation says,
+            // "SimpleVectorStore - A simple implementation of persistent vector storage, good for educational purposes."
+            // so before getting into production, one would need to research a proper vectorestore
+//            FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
+//            Filter.Expression location = filterBuilder.eq("location", request.location).build();
+//            List<Document> similarDocuments = immobiliareVectorStore.similaritySearch(SearchRequest.defaults().withFilterExpression(location).withTopK(2));
+
+
+            List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
+            return new Response(contentList);
+        } else {
+            return new Response(new ArrayList<>());
+        }
+
+    }
+
+    private String getQueryFromRequest(Request request) {
         var filtersMap = extractFilters(request);
 
-        FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
-        filterBuilder.eq("location",request.location);
-
         StringBuilder sb = new StringBuilder();
+        var operation = " is ";
         for (Map.Entry<String, Object> entry : filtersMap.entrySet()){
-            String operation = " == ";//getOperation(entry);
             sb.append(entry.getKey());
             sb.append(operation);
             sb.append("'" + entry.getValue() + "'");
             sb.append(" AND ");
         }
 
-        var query = sb.toString();
-        if (!Strings.isBlank(query)) {
-
-            List<Document> similarDocuments = immobiliareVectorStore.similaritySearch(query);
-//            List<Document> similarDocuments = immobiliareVectorStore.similaritySearch(SearchRequest.defaults().withFilterExpression(query).withTopK(2));
-            List<String> contentList = similarDocuments.stream().map(Document::getContent).toList();
-
-
-            return new Response(contentList);
-        } else {
-            return new Response(new ArrayList<>());
-        }
-
+        return sb.toString();
     }
 
     private Map<String, Object> extractFilters(Request request){

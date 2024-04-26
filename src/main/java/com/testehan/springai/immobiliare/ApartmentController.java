@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare;
 
+import com.testehan.springai.immobiliare.model.Apartments;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.ChatResponse;
