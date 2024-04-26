@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare;
 
 import com.testehan.springai.immobiliare.model.Apartments;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.ai.chat.ChatClient;
 import org.springframework.ai.chat.ChatResponse;
@@ -30,30 +31,6 @@ public class ApartmentController {
         this.chatClient = chatClient;
     }
 
-    @GetMapping()
-    public Apartments getApartmentsByLocation(@RequestParam(value = "location", required = false) String location) {
-        if (!Strings.isBlank(location)) {
-
-            var outputParser = new BeanOutputParser<>(Apartments.class);
-            String format = outputParser.getFormat();
-            System.out.println("format = " + format);
-
-            var promptMessage = """
-                    Generate a list of apartments from location {location}.
-                    {format}
-                    """;
-
-            PromptTemplate promptTemplate = new PromptTemplate(promptMessage, Map.of("location", location, "format", format));
-            Prompt prompt = promptTemplate.create();
-
-            Generation generation = chatClient.call(prompt).getResult();
-            Apartments apartments = outputParser.parse(generation.getOutput().getContent());
-            return apartments;
-        } else {
-            return new Apartments(new ArrayList<>());
-        }
-    }
-
     @GetMapping("/location")
     public String weather(@RequestParam(value = "message") String message) {
 
@@ -71,7 +48,7 @@ public class ApartmentController {
     }
 
     @GetMapping("/sale")
-    public Apartments apartmentsForSale(@RequestParam(value = "message") String message) {
+    public Apartments apartmentsForSale(HttpSession session, @RequestParam(value = "message") String message) {
 
         if (!Strings.isBlank(message)) {
 

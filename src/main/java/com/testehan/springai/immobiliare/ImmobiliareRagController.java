@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.testehan.springai.immobiliare.State.*;
+
 @RestController
 public class ImmobiliareRagController {
 
@@ -26,12 +28,6 @@ public class ImmobiliareRagController {
     // i think that in the case of an actual usecase, one would need multiple vectore stores,
     // as in a vector store per city-type-type...for ex "london-apartment-rents" or "london-house-sells"
     private final VectorStore immobiliareVectorStore;
-
-    // TODO Yes, this is not how it would work in a real app...but this is good enough for a prototype
-    // purpose of this map is to hold a list of assistant (LLM) and user messages for each session;
-    // in a serious app one would use spring session and either Redis or the DB to save the conversation state i think
-    // see my SpringSessionRedisExperiments repo for ex
-    private static Map<String, List<Message>> conversations = new HashMap();
 
     @Value("classpath:/prompts/rag-prompt-template.txt")
     private Resource ragPromptTemplate;

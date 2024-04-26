@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonClassDescription;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
+import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -18,8 +19,11 @@ public class ApartmentSaleService implements Function<ApartmentSaleService.Reque
 
     private final VectorStore immobiliareVectorStore;
 
-    public ApartmentSaleService(VectorStore immobiliareVectorStore) {
+    private final HttpSession session;
+
+    public ApartmentSaleService(VectorStore immobiliareVectorStore, HttpSession session) {
         this.immobiliareVectorStore = immobiliareVectorStore;
+        this.session = session;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

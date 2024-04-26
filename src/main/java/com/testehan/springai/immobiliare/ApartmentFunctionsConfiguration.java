@@ -30,8 +30,9 @@ public class ApartmentFunctionsConfiguration {
     }
 
     @Bean
-    @Description("Get apartments for sale based on provided criteria")
+    @Description("Get all apartments for sale based on provided criteria")
     public Function<ApartmentSaleService.Request, ApartmentSaleService.Response> apartmentsSaleFunction() {
         return apartmentSaleService;
     }
+
 }
