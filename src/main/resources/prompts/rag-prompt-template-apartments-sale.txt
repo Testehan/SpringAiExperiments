@@ -1,7 +1,0 @@
-Generate a list of apartments for sale from location {location} using the information from the DOCUMENTS section documents {documents}
-{format}
-
-DOCUMENTS:
-{documents}
-
-

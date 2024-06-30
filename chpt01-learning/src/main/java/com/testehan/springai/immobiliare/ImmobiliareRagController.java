@@ -6,6 +6,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.document.Document;
+import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.testehan.springai.immobiliare.State.*;
+import static com.testehan.springai.immobiliare.State.conversations;
 
 @RestController
 public class ImmobiliareRagController {
@@ -29,7 +30,7 @@ public class ImmobiliareRagController {
     // as in a vector store per city-type-type...for ex "london-apartment-rents" or "london-house-sells"
     private final VectorStore immobiliareVectorStore;
 
-    @Value("classpath:/prompts/rag-prompt-template.txt")
+    @Value("classpath:/prompts/rag-prompt-template-apartments-sale.txt")
     private Resource ragPromptTemplate;
 
     public ImmobiliareRagController(ChatClient chatClient, VectorStore immobiliareVectorStore) {
@@ -51,10 +52,13 @@ public class ImmobiliareRagController {
             Map<String, Object> promptParameters = new HashMap<>();
             promptParameters.put("input", message);
             promptParameters.put("documents", String.join("\n", contentList));
+            promptParameters.put("userEmail","dante@yahoo.com");
             Prompt prompt = promptTemplate.create(promptParameters);
-//            Prompt promptWithFunctions = new Prompt(prompt.getContents(), OpenAiChatOptions.builder().withFunction("apartmentsFunction").build());
+            Prompt promptWithFunctions =
+                    new Prompt(prompt.getContents(),
+                            OpenAiChatOptions.builder().withFunction("emailApartmentsFunction").build());
 
-            assistantResponse = chatClient.call(prompt).getResult().getOutput();
+            assistantResponse = chatClient.call(promptWithFunctions).getResult().getOutput();
 
             List<Message> conversationStart = new ArrayList<>();
             conversationStart.addAll(prompt.getInstructions());
@@ -65,8 +69,10 @@ public class ImmobiliareRagController {
             conversations.get(session.getId()).addAll(newUserMessage.getInstructions());
 
             Prompt promptToSend = new Prompt(conversations.get(session.getId()));
-//            Prompt promptWithFunctions = new Prompt(promptToSend.getContents(), OpenAiChatOptions.builder().withFunction("apartmentsFunction").build());
-            assistantResponse = chatClient.call(promptToSend).getResult().getOutput();
+            Prompt promptWithFunctions =
+                    new Prompt(promptToSend.getContents(),
+                            OpenAiChatOptions.builder().withFunction("emailApartmentsFunction").build());
+            assistantResponse = chatClient.call(promptWithFunctions).getResult().getOutput();
             conversations.get(session.getId()).add(assistantResponse);
         }
 

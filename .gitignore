@@ -31,3 +31,4 @@ build/
 
 ### VS Code ###
 .vscode/
+/chpt02-MongoDBAtlasVectorSearch/src/main/resources/.env

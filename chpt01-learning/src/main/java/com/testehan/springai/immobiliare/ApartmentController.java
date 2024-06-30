@@ -31,6 +31,7 @@ public class ApartmentController {
         this.chatClient = chatClient;
     }
 
+    // TODO this was written for demonstration pursposes ...it can be removed in the future..
     @GetMapping("/location")
     public String weather(@RequestParam(value = "message") String message) {
 

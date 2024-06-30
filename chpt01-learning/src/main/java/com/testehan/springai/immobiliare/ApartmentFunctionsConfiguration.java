@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare;
 
 import com.testehan.springai.immobiliare.functions.ApartmentRentService;
 import com.testehan.springai.immobiliare.functions.ApartmentSaleService;
+import com.testehan.springai.immobiliare.functions.EmailApartmentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,12 +13,13 @@ import java.util.function.Function;
 @Configuration
 public class ApartmentFunctionsConfiguration {
 
-
     @Autowired
     private ApartmentRentService apartmentRentService;
 
     @Autowired
     private ApartmentSaleService apartmentSaleService;
+    @Autowired
+    private EmailApartmentsService emailApartmentsService;
 
     @Bean
     @Description("Get weather in location")     //  todo think about a better description when dealing with apartments
@@ -34,5 +36,13 @@ public class ApartmentFunctionsConfiguration {
     public Function<ApartmentSaleService.Request, ApartmentSaleService.Response> apartmentsSaleFunction() {
         return apartmentSaleService;
     }
+
+    @Bean
+    @Description("Send me an email with the apartments information")
+    public Function<EmailApartmentsService.Request, EmailApartmentsService.Response> emailApartmentsFunction() {
+        return emailApartmentsService;
+    }
+
+
 
 }
