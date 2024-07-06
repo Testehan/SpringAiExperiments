@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+    <table id="items" th:fragment="items">
+        <tbody>
+            <tr th:each="item : ${items}">
+                <td>[[${item.title}]]</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <script src="https://unpkg.com/htmx.org@1.9.12" ></script>
+
+</head>
+<body>
+    <style>
+        @import "https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.2.2/css/bootstrap.min.css";
+    </style>
+
+    <h1>Movies</h1>
+
+    <br />
+    <br />
+    <form hx-get="/movies/semantic-search2"
+          hx-target="#items"
+          hx-swap="outerHTML"
+          hx-on::after-request="this.reset()"  >
+        <label for="plotDescription">Tell me about the movie: </label>
+        <input type="text" name="plotDescription" id="plotDescription" />
+        <button type="submit">Search</button>
+
+    </form>
+
+
+    <table th:replace="~{fragments/items :: items}"></table>
+
+
+</body>
+</html>
