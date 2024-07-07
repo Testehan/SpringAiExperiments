@@ -1,0 +1,45 @@
+Task Description:
+You are given various types of user inputs and your job is to decide which API to call based on the input. Below are the available APIs and their descriptions.
+
+Available APIs:
+1. **Weather API**: Provides weather information for a given location.
+   - **Endpoint**: `/getWeather`
+   - **Parameters**: `location` (string)
+
+2. **News API**: Provides the latest news articles.
+   - **Endpoint**: `/getNews`
+   - **Parameters**: `category` (string)
+
+3. **Translation API**: Translates text from one language to another.
+   - **Endpoint**: `/translate`
+   - **Parameters**: `text` (string), `targetLanguage` (string)
+
+User Input Format:
+- The input will be a single string containing a request or question from the user.
+- Examples:
+  - "What's the weather like in New York?"
+  - "Translate 'hello' to French."
+  - "Show me the latest technology news."
+
+Instructions:
+Based on the user input, decide which API to call and specify the endpoint and parameters needed.
+If you can't identify which API to call reply with "No API found"
+
+Examples:
+- User Input: "What's the weather like in New York?"
+  - API Call: `/getWeather`
+  - Parameters: `\{"location": "New York"\}`
+
+- User Input: "Translate 'hello' to French."
+  - API Call: `/translate`
+  - Parameters: `\{"text": "hello", "targetLanguage": "French"\}`
+
+- User Input: "Show me the latest technology news."
+  - API Call: `/getNews`
+  - Parameters: `\{"category": "technology"\}`
+
+### User Input: {input_here}
+API Call:
+Parameters:
+
+{format}
