@@ -1,0 +1,76 @@
+Task Description:
+You are given various types of user inputs and your job is to decide which API to call based on the input. Below are the available APIs and their descriptions.
+
+Available APIs:
+1. **Not relevant API**: If the information provided is not relevant to real estate renting or buying.
+   - **Endpoint**: `/getNotRelevantPrompt`
+   - **Parameters**: `message` (string)
+
+2. **Sale or rent API**: Determines if the user wants to rent or buy an apartment.
+   - **Endpoint**: `/getRentOrBuy`
+   - **Parameters**: `message` (string)
+
+3. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called.
+   - **Endpoint**: `/getCity`
+   - **Parameters**: `message` (string)
+
+4. **Apartments for sale API**: Provides a list of apartments for sale based on the information provided by the user.
+   - **Endpoint**: `/getApartmentsForSale`
+   - **Parameters**: `message` (string)
+
+5. **Apartments for rent API**:  Provides a list of apartments that can be rented based on the information provided by the user.
+   - **Endpoint**: `/getApartmentsForRent`
+   - **Parameters**: `message` (string)
+
+User Input Format:
+- The input will be a single string containing a request or question from the user.
+- Examples:
+  - "I want to buy an apartment"
+  - "I want to rent an apartment"
+  - "I am interested in Bucharest."
+  - "Bucharest"
+  - "I am looking for an apartment in Marasti, with a price range between 100000 and 150000 euro."
+  - "I am looking for an apartment in Marasti, that has about 70 square meters."
+
+Instructions:
+Based on the user input, decide which API to call and specify the endpoint and parameters needed.
+If you can't identify which API to call reply with "No API found"
+
+Examples:
+- User Input: "Tell me a dad joke"
+  - API Call: `/getNotRelevantPrompt`
+  - Parameters: `\{"message": "Tell me a dad joke"\}`
+
+- User Input: "What is the biggest WW2 military operation"
+  - API Call: `/getNotRelevantPrompt`
+  - Parameters: `\{"message": "What is the biggest WW2 military operation"\}`
+
+- User Input: "I want to buy an apartment"
+  - API Call: `/getRentOrBuy`
+  - Parameters: `\{"message": "buy"\}`
+
+- User Input: "I want to rent"
+  - API Call: `/getRentOrBuy`
+  - Parameters: `\{"message": "rent"\}`
+
+- User Input: "buy"
+  - API Call: `/getRentOrBuy`
+  - Parameters: `\{"message": "buy"\}`
+
+- User Input: "Cluj"
+  - API Call: `/getCity`
+  - Parameters: `\{"message": "Cluj"\}`
+
+- User Input: "I want to search in Bucharest"
+  - API Call: `/getCity`
+  - Parameters: `\{"message": "Bucharest"\}`
+
+- User Input: "Show me the latest technology news."
+  - API Call: `/getNews`
+  - Parameters: `\{"category": "technology"\}`
+
+### User Input: {input_here}
+API Call:
+Parameters:
+
+{format}
