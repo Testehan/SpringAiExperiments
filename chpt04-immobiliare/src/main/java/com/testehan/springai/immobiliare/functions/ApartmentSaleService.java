@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.testehan.springai.immobiliare.service.ApartmentService;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.ai.document.Document;
@@ -25,12 +24,9 @@ public class ApartmentSaleService implements Function<ApartmentSaleService.Reque
 
     private final HttpSession session;
 
-    private final ApartmentService apartmentService;
-
-    public ApartmentSaleService(VectorStore immobiliareVectorStore, HttpSession session, ApartmentService apartmentService) {
+    public ApartmentSaleService(VectorStore immobiliareVectorStore, HttpSession session) {
         this.immobiliareVectorStore = immobiliareVectorStore;
         this.session = session;
-        this.apartmentService = apartmentService;
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
