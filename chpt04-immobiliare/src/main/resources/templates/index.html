@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -15,6 +15,9 @@
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-4 h-full overflow-auto">
+            <div class="mb-8">
+                <p class="mt-4 h-full overflow-auto" th:text="${initialMessage}"></p>
+            </div>
 
         </div>
         <div class="">

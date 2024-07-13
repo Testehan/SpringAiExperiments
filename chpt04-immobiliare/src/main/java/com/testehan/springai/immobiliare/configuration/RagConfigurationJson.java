@@ -1,8 +1,5 @@
 package com.testehan.springai.immobiliare.configuration;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.reader.JsonReader;
@@ -44,9 +41,4 @@ public class RagConfigurationJson {
         return simpleVectorStore;
     }
 
-    @Bean
-    ChatClient chatClient(ChatClient.Builder builder){
-        return builder.defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
-                .build();
-    }
 }

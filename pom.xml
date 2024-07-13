@@ -20,10 +20,12 @@
 	<modules>
 		<module>chpt01-learning</module>
 		<module>chpt02-MongoDBAtlasVectorSearch</module>
+		<module>chpt03-chat-gpt</module>
+		<module>chpt04-immobiliare</module>
 	</modules>
 	<properties>
 		<java.version>17</java.version>
-		<spring-ai.version>0.8.1</spring-ai.version>
+		<spring-ai.version>1.0.0-M1</spring-ai.version>
 	</properties>
 
 	<dependencies>

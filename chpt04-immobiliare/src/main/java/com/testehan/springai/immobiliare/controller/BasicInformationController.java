@@ -15,17 +15,19 @@ public class BasicInformationController {
     }
 
     @GetMapping("/api/getRentOrBuy")
-    public void getRentOrBuy(HttpSession session,
+    public String getRentOrBuy(HttpSession session,
                              @RequestParam(value = "message") String message) {
 
         session.setAttribute("rentOrBuy",message);
+        return "Which city are you interested in ?";
     }
 
     @GetMapping("/api/getCity")
-    public void getCity(HttpSession session,
+    public String getCity(HttpSession session,
                         @RequestParam(value = "message") String message) {
 
         session.setAttribute("city",message);
+        return "I understand. Give me more details about the location you are searching for";
     }
 
 }
