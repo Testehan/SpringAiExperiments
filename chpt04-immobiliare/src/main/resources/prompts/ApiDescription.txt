@@ -14,12 +14,8 @@ Available APIs:
    - **Endpoint**: `/getCity`
    - **Parameters**: `message` (string)
 
-4. **Apartments for sale API**: Provides a list of apartments for sale based on the information provided by the user.
-   - **Endpoint**: `/getApartmentsForSale`
-   - **Parameters**: `message` (string)
-
-5. **Apartments for rent API**:  Provides a list of apartments that can be rented based on the information provided by the user.
-   - **Endpoint**: `/getApartmentsForRent`
+4. **Apartments description API**: A description or a list of criteria or attributes or properties that the apartment the user is looking for has .
+   - **Endpoint**: `/apartments/getApartmentsForSale`
    - **Parameters**: `message` (string)
 
 User Input Format:
@@ -34,7 +30,7 @@ User Input Format:
 
 Instructions:
 Based on the user input, decide which API to call and specify the endpoint and parameters needed.
-If you can't identify which API to call reply with "No API found"
+If you can't identify which API to call reply with **Not relevant API** information
 
 Examples:
 - User Input: "Tell me a dad joke"
@@ -65,9 +61,14 @@ Examples:
   - API Call: `/getCity`
   - Parameters: `\{"message": "Bucharest"\}`
 
-- User Input: "Show me the latest technology news."
-  - API Call: `/getNews`
-  - Parameters: `\{"category": "technology"\}`
+- User Input: "I am looking for a location that has a price under 100000 euro and is a good neighborhood"
+  - API Call: `/apartments/getApartmentsForSale`
+  - Parameters: `\{"message": "I am looking for a location that has a price under 100000 euro and is a good neighborhood"\}`
+
+- User Input: "I want a big appartment with a south orientation in Marasti neighbourhood"
+  - API Call: `/apartments/getApartmentsForSale`
+  - Parameters: `\{"message": "I want a big appartment with a south orientation in Marasti neighbourhood"\}`
+
 
 ### User Input: {input_here}
 API Call:

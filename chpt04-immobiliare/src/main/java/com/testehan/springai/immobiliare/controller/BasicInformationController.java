@@ -18,6 +18,7 @@ public class BasicInformationController {
     public String getRentOrBuy(HttpSession session,
                              @RequestParam(value = "message") String message) {
 
+        // TODO Dan: the next attribute is never really used ..maybe it can be removed in the future
         session.setAttribute("rentOrBuy",message);
         return "Which city are you interested in ?";
     }
@@ -26,6 +27,7 @@ public class BasicInformationController {
     public String getCity(HttpSession session,
                         @RequestParam(value = "message") String message) {
 
+        // TODO Dan: the next attribute is never really used ..maybe it can be removed in the future
         session.setAttribute("city",message);
         return "I understand. Give me more details about the location you are searching for";
     }

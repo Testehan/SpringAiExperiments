@@ -32,11 +32,6 @@ public class ChatController {
     @HxRequest
     @PostMapping("/api/chat")
     public HtmxResponse generate(@RequestParam String message, Model model) {
-        log.info("User Message: {}", message);
-//        String response = chatClient.prompt()
-//                .user(message)
-//                .call()
-//                .content();
 
         String response = apiService.getChatResponse(message);
 

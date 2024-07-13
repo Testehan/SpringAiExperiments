@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -26,25 +25,8 @@ public class ApartmentController {
         this.chatClient = chatClient;
     }
 
-    // what i am trying to do with this method is to have the possibility that from one REST endpoint
-    // to let the LLM decide which function to call based obviously on the user input
-    // TODO Sau continui cu abordarea asta, sau poti vedea alta varianta, in clasa ApiController,
-    // unde folosesc un fisier pt a descrie APIs supportate de backend, si in fct de ce scrie userul,
-    // se determina care API ar fi mai potrivit.
-    @GetMapping("/decide")
-    public String decide(@RequestParam(value = "message") String message) {
-        Prompt prompt = new Prompt(message);
-
-        ChatResponse response = chatClient.prompt()
-                .user(prompt.getContents())
-                .functions("apartmentsFunction","apartmentsSaleFunction","emailApartmentsFunction")
-                .call().chatResponse();
-
-        return response.getResult().getOutput().getContent();
-    }
-
-    @GetMapping("/sale")
-    public Apartments apartmentsForSale(HttpSession session, @RequestParam(value = "message") String message) {
+    @GetMapping("/getApartmentsForSale")
+    public String apartmentsForSale(HttpSession session, @RequestParam(value = "message") String message) {
 
         if (!Strings.isBlank(message)) {
 
@@ -66,12 +48,18 @@ public class ApartmentController {
                     .call().chatResponse();
 
             Apartments apartments = outputParser.parse(response.getResult().getOutput().getContent());
-            return apartments;
+            return apartments.toString();
         } else {
-            return new Apartments(new ArrayList<>());
+            return "No apartments were found for the given search criteria";
         }
 
+    }
 
+    // TODO right now, in the ApiDescription file this endpoint is not described..all apartment descriptions go to
+    // the apartmentsForSale method
+    @GetMapping("/getApartmentsForRent")
+    public String apartmentsForRent(@RequestParam(value = "message") String message) {
+        return "No apartments for rent for now";
     }
 
 }

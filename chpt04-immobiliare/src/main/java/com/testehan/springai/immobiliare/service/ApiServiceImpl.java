@@ -26,7 +26,6 @@ public class ApiServiceImpl implements ApiService{
 
 
         String response = restTemplate.getForObject(builder.toUriString(), String.class);
-
         return response;
     }
 }
