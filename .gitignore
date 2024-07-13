@@ -32,3 +32,4 @@ build/
 ### VS Code ###
 .vscode/
 /chpt02-MongoDBAtlasVectorSearch/src/main/resources/.env
+/chpt04-immobiliare/src/main/resources/.env

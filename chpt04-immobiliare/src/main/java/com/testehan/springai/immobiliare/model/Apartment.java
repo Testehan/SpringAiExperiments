@@ -11,5 +11,6 @@ public record Apartment(
         Integer surface,
         Integer noOfRooms,
         String floor,
-        List<String> tags)  {
+        List<String> tags,
+        List<String> images)  {
 }
