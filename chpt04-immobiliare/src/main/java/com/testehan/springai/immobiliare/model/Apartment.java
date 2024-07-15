@@ -18,7 +18,8 @@ public record Apartment(
         List<String> tags,
         List<String> images,
 
-        List<Double> plot_embedding)  {
+        List<Double> plot_embedding,
+        Double score)  {
 
     public String getApartmentInfoToEmbedd(){
         return name + "\n" +
@@ -44,6 +45,8 @@ public record Apartment(
                 ", floor='" + floor + '\'' +
                 ", tags=" + tags +
                 ", images=" + images +
+                ", score=" + score +
+
                 '}';
     }
 }

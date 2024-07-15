@@ -10,6 +10,7 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.Apartments;
+import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.util.Strings;
@@ -41,10 +42,13 @@ public class ApartmentController {
     private final ChatClient chatClient;
     private final OpenAiService openAiService;
 
-    public ApartmentController(ChatClient chatClient, OpenAiService openAiService)
+    private final ApartmentService apartmentService;
+
+    public ApartmentController(ChatClient chatClient, OpenAiService openAiService, ApartmentService apartmentService)
     {
         this.chatClient = chatClient;
         this.openAiService = openAiService;
+        this.apartmentService = apartmentService;
     }
 
     @GetMapping("/getApartmentsForSale")
@@ -80,8 +84,8 @@ public class ApartmentController {
     // TODO right now, in the ApiDescription file this endpoint is not described..all apartment descriptions go to
     // the apartmentsForSale method
     @GetMapping("/getApartmentsForRent")
-    public String apartmentsForRent(@RequestParam(value = "message") String message) {
-        return "No apartments for rent for now";
+    public List<Apartment> apartmentsForRent(@RequestParam(value = "message") String message) {
+        return apartmentService.getApartmentsSemanticSearch(message);
     }
 
     // the service will be used to create the embeddings for the apartments
