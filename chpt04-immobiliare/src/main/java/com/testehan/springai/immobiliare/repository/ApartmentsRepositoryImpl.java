@@ -1,8 +1,9 @@
 package com.testehan.springai.immobiliare.repository;
 
-import com.google.gson.Gson;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.search.VectorSearchOptions;
 import com.testehan.springai.immobiliare.model.Apartment;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,7 @@ import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.search.SearchPath.fieldPath;
+import static com.mongodb.client.model.search.VectorSearchOptions.vectorSearchOptions;
 import static java.util.Arrays.asList;
 
 @Repository
@@ -37,28 +39,28 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         // provide higher accuracy, but it will also give some latency hits..
         int limit = 5;
 
-        // right now we only include the vector search, but you can include more (i guess more fields to verify etc)
-        // but this will take longer to compute and it will get you better results
+
+        // TODO if you want to add more filters, remember that you must modify the existing index in MongoAtlas, and add the
+        // fields there.
+        // also you can see here all sorts of filering options :
+        // https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
+        Bson criteria = Filters.and(Filters.gt("surface", 65));
+        VectorSearchOptions options = vectorSearchOptions().filter(criteria);
+
         List<Bson> pipeline = asList(
                 vectorSearch(
                         fieldPath("plot_embedding"),
                         embedding,
                         indexName,
                         numCandidates,
-                        limit),
-                project(
-                        fields(exclude("_id"), include("name"), include("shortDescription"),
-                                metaVectorSearchScore("score"))));
+                        limit,
+                        options),
 
-        getApartmentCollection().aggregate(pipeline).forEach(doc -> System.out.println(doc.toString()));
+                project(fields( exclude("plot_embedding"), metaVectorSearchScore("score")))
+        );
 
         List<Apartment> apartments = new ArrayList<>();
-        Gson gson = new Gson();
-        for (Bson b : pipeline){
-            String json = b.toBsonDocument().toJson();
-            Apartment apartment = gson.fromJson(json, Apartment.class);
-            apartments.add(apartment);
-        }
+        getApartmentCollection().aggregate(pipeline).spliterator().forEachRemaining(a->apartments.add(a));
 
         return apartments;
     }
