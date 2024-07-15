@@ -52,8 +52,16 @@ public class ApartmentController {
         this.apartmentService = apartmentService;
     }
 
+    @GetMapping("/getApartments")
+    public List<Apartment> getApartments(@RequestParam(value = "message") String message, HttpSession session) {
+        var rentOrSale = (String) session.getAttribute("rentOrSale");
+        var city = session.getAttribute("city");
+
+        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), message);
+    }
+
     @GetMapping("/getApartmentsForSale")
-    public String apartmentsForSale(HttpSession session, @RequestParam(value = "message") String message) {
+    public String apartmentsForSale(@RequestParam(value = "message") String message) {
 
         if (!Strings.isBlank(message)) {
 
