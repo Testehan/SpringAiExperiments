@@ -1,9 +1,13 @@
 package com.testehan.springai.immobiliare.model;
 
+import org.bson.codecs.pojo.annotations.BsonProperty;
+import org.bson.types.ObjectId;
+
 import java.util.List;
 
 public record Apartment(
-        String id,
+        @BsonProperty("_id")
+        ObjectId _id,
         String name,
         String location,
         String shortDescription,
@@ -30,7 +34,7 @@ public record Apartment(
     @Override
     public String toString() {
         return "Apartment{" +
-                "id='" + id + '\'' +
+                "id='" + _id + '\'' +
                 ", name='" + name + '\'' +
                 ", location='" + location + '\'' +
                 ", shortDescription='" + shortDescription + '\'' +

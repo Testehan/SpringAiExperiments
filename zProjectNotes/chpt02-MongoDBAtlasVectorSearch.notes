@@ -1,0 +1,50 @@
+Semantic Search with Spring Boot: Building a Java-Powered Search Engine with Atlas Vector Search
+    https://www.youtube.com/watch?v=iKwuvuTxxK0
+    https://www.mongodb.com/developer/products/atlas/java-spring-boot-vector-search/?utm_campaign=devrel&utm_source=youtube&utm_medium=organic_social&utm_content=iKwuvuTxxK0&utm_term=jay.javed
+
+    https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/
+        Dan very nice article about the whole vector search
+            "To perform vector search on your data in Atlas, you must create an Atlas Vector Search index. Atlas Vector
+            Search indexes are separate from your other database indexes and are used to efficiently retrieve documents
+            that contain vector embeddings at query-time. In your Atlas Vector Search index definition, you index the
+            fields in your collection that contain your embeddings to enable vector search against those fields.
+            You can also pre-filter your data by indexing any boolean, date, numeric, objectId, and string fields in
+            your collection that you want to run your Atlas Vector Search queries against. Filtering your data narrows
+            the scope of your search and ensures that certain vector embeddings aren't considered for comparison."
+
+1. When creating a DB in https://cloud.mongodb.com/, you can load dummy data..And this dummy data contains several
+    categories:
+        - airbnb dummy data
+        - movies
+        - restaurants
+        etc
+    So an easy way to start developing things with dummy data
+
+2. What is important to us is sample_mflix.embedded_movies which contains in the movie nodes, a field called
+    plot_embedding which is an Array with a length of 1536, that contains those embedding numbers.
+
+!!!!!
+3. We have set up a property  <mongodb.version>4.11.0</mongodb.version>
+    This will force your Spring Boot API to use the 4.11.0 version of the MongoDB Java drivers
+    Feel free to use a more up to date version in order to make use of some of the most up to date features, such as
+    the vectorSearch() method. You will also notice that throughout this application we use the MongoDB
+    Java Reactive Streams. This is because we are creating an asynchronous API. AI operations like generating
+    embeddings can be compute-intensive and time-consuming. An asynchronous API allows these tasks to be processed in
+    the background, freeing up the system to handle other requests or operations simultaneously.
+
+
+DONE Vezi cum functioneaza partea de thymeleaf + reactive in proiectul
+        spring-reactive-experiments
+    si adapteaza metoda din performSemanticSearch2...sau gaseste o solutie...probabil ca problema e ca
+    nu merge abordarea cu folosirea fragmentelor
+
+    Problema era ca aveam si dependinta de mai jos pusa...si webflux...si era nevoie doar de webflux
+                <dependency>-->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-web</artifactId>-->
+        <!--        </dependency>
+
+
+
+
+

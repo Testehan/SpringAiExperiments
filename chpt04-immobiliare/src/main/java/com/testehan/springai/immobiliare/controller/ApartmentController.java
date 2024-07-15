@@ -2,16 +2,25 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Updates;
+import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.Apartments;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import jakarta.servlet.http.HttpSession;
 import org.apache.logging.log4j.util.Strings;
+import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -86,6 +95,9 @@ public class ApartmentController {
     @Value("classpath:/docs/immobiliare.json")
     private Resource immobiliareData;
 
+    @Autowired
+    private MongoDatabase mongoDatabase;
+
     // todo this is temprorary here because i want to trigger the execution of the code when rest call is made
     @GetMapping("/testEmbeddings")
     public String testEmbeddings() {
@@ -93,12 +105,35 @@ public class ApartmentController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             List<Apartment> apartments = mapper.readValue(new File(immobiliareData.getURI()), new TypeReference<List<Apartment>>() {});
-            for (Apartment a : apartments){
-                var apartmentInfoToEmbedd = a.getApartmentInfoToEmbedd();
+
+            MongoCollection<Document> collection = mongoDatabase.getCollection("apartments");
+
+            for (Document document : collection.find()){
+                ObjectId id = document.getObjectId("_id");
+                String json = document.toJson();
+                // Create Gson instance
+                Gson gson = new Gson();
+                // Convert JSON string to POJO
+                Apartment apartment = gson.fromJson(json, Apartment.class);
+
+                var apartmentInfoToEmbedd = apartment.getApartmentInfoToEmbedd();
                 System.out.println(apartmentInfoToEmbedd);
+
                 var mono = openAiService.createEmbedding(apartmentInfoToEmbedd);
-                System.out.println(mono.block().stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
+                List<Double> embeddings = mono.block();
+                System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
+
+                UpdateResult result =collection.updateOne(
+                        Filters.eq("_id", id),
+                        Updates.set("plot_embedding", embeddings)
+                );
+
+                System.out.println("Modified elements " + result.getModifiedCount());
+                System.out.println("Matched elements " + result.getMatchedCount());
+
             }
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
