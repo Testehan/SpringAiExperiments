@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
@@ -12,6 +13,7 @@ public record Apartment(
         String location,
         String shortDescription,
         Long price,
+        PropertyType propertyType,
         Integer surface,
         Integer noOfRooms,
         String floor,
@@ -21,6 +23,7 @@ public record Apartment(
         List<Double> plot_embedding,
         Double score)  {
 
+    @JsonIgnore
     public String getApartmentInfoToEmbedd(){
         return name + "\n" +
                 "The apartment is located in: " + location + ". " +
@@ -40,6 +43,7 @@ public record Apartment(
                 ", location='" + location + '\'' +
                 ", shortDescription='" + shortDescription + '\'' +
                 ", price=" + price +
+                ", propertyType" + propertyType +
                 ", surface=" + surface +
                 ", noOfRooms=" + noOfRooms +
                 ", floor='" + floor + '\'' +

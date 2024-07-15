@@ -5,6 +5,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.search.VectorSearchOptions;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.PropertyType;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
 
@@ -32,7 +33,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public List<Apartment> findApartmentsByVector(List<Double> embedding) {
+    public List<Apartment> findApartmentsByVector(PropertyType propertyType, List<Double> embedding) {
         String indexName = "vector_index";
         int numCandidates = 100;  // how many neighbours it will use when doing the nearest neighbour search; it should be
         // higher than the limit we set below...higher numbers of this variable will
@@ -44,7 +45,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         // fields there.
         // also you can see here all sorts of filering options :
         // https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
-        Bson criteria = Filters.and(Filters.gt("surface", 65));
+        Bson criteria = Filters.and(Filters.eq("propertyType", propertyType));
         VectorSearchOptions options = vectorSearchOptions().filter(criteria);
 
         List<Bson> pipeline = asList(

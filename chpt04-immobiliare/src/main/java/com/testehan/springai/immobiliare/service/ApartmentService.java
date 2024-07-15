@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,8 @@ public class ApartmentService {
         this.embedder = embedder;
     }
 
-    public List<Apartment> getApartmentsSemanticSearch(String apartmentDescription) {
+    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String apartmentDescription) {
         var embedding = embedder.createEmbedding(apartmentDescription).block();
-        return apartmentsRepository.findApartmentsByVector(embedding);
+        return apartmentsRepository.findApartmentsByVector(propertyType, embedding);
     }
 }

@@ -10,6 +10,7 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.Apartments;
+import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import jakarta.servlet.http.HttpSession;
@@ -85,7 +86,7 @@ public class ApartmentController {
     // the apartmentsForSale method
     @GetMapping("/getApartmentsForRent")
     public List<Apartment> apartmentsForRent(@RequestParam(value = "message") String message) {
-        return apartmentService.getApartmentsSemanticSearch(message);
+        return apartmentService.getApartmentsSemanticSearch(PropertyType.rent, message);
     }
 
     // the service will be used to create the embeddings for the apartments
