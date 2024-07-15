@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -25,15 +26,15 @@ public class ChatController {
 
     @GetMapping("")
     public String home(Model model) {
-        model.addAttribute("initialMessage", "Hi..do you want to rent or buy an apartment?");
+        model.addAttribute("initialMessage", "Hi..are you interested in apartments for rent or sale ?");
         return "index";
     }
 
     @HxRequest
     @PostMapping("/api/chat")
-    public HtmxResponse generate(@RequestParam String message, Model model) {
+    public HtmxResponse generate(@RequestParam String message, HttpSession session, Model model) {
 
-        String response = apiService.getChatResponse(message);
+        String response = apiService.getChatResponse(session, message);
 
         model.addAttribute("response",response);
         model.addAttribute("message",message);

@@ -43,7 +43,7 @@ public record Apartment(
                 ", location='" + location + '\'' +
                 ", shortDescription='" + shortDescription + '\'' +
                 ", price=" + price +
-                ", propertyType" + propertyType +
+                ", propertyType=" + propertyType +
                 ", surface=" + surface +
                 ", noOfRooms=" + noOfRooms +
                 ", floor='" + floor + '\'' +
