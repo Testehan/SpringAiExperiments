@@ -2,13 +2,18 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.RestCall;
+import com.testehan.springai.immobiliare.model.ResultsResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+
+import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
+
+
 
 @Service
 public class ApiServiceImpl implements ApiService{
@@ -25,7 +30,7 @@ public class ApiServiceImpl implements ApiService{
     @Autowired HttpSession session;
 
     @Override
-    public String getChatResponse(String message) {
+    public ResultsResponse getChatResponse(String message) {
         RestCall restCall = immobiliareApiService.whichApiToCall(message);
 
         var url = "http://localhost:8080/api" + restCall.apiCall();
@@ -46,15 +51,23 @@ public class ApiServiceImpl implements ApiService{
         }
 
         String response = restTemplate.getForObject(builder.toUriString(), String.class);
-        return response;
+        return new ResultsResponse(response, new ArrayList<>());
     }
 
-    private String getApartments(String message) {
+    private ResultsResponse getApartments(String message) {
         var rentOrSale = (String) session.getAttribute("rentOrSale");
         var city = session.getAttribute("city");
         var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), message);
-        return (apartments.size() > 0) ? apartments.stream().map(Object::toString).collect(Collectors.joining(", "))
-                : "No apartments found with the given criteria. Please provide another description or type 'restart' to start from the beginning.";
+
+        ResultsResponse response;
+
+        if (apartments.size() > 0) {
+            response = new ResultsResponse(M04_APARTMENTS_FOUND, apartments);
+        } else {
+            response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
+        }
+
+        return response;
     }
 
     private void restartConversation() {

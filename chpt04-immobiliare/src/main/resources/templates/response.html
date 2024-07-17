@@ -11,4 +11,26 @@
     <div class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
     <p class="mt-4 h-full overflow-auto" th:text="${response}">Response</p>
 </div>
+
+<div th:fragment="responseFragmentWithApartments" class="mb-8">
+    <div class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
+    <p class="mt-4 h-full overflow-auto" th:text="${response}">Response</p>
+
+    <div th:each="apartment : ${apartments}" class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
+        <img class="w-full h-48 object-cover" src="https://example.com/image.jpg" alt="Apartment Image">
+        <div class="p-6">
+            <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
+            <p class="text-gray-600 mt-2">Location: [[${apartment.location}]]</p>
+            <p class="text-gray-600 mt-2">[[${apartment.shortDescription}]]</p>
+            <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
+            <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
+            <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
+            <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>
+            <p class="text-gray-600 mt-2">Tags: <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#family</span><span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#investment</span></p>
+        </div>
+    </div>
+
+</div>
+
+
 </body>

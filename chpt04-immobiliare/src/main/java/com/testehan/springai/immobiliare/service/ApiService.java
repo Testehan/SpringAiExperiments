@@ -1,6 +1,9 @@
 package com.testehan.springai.immobiliare.service;
 
+
+import com.testehan.springai.immobiliare.model.ResultsResponse;
+
 public interface ApiService {
 
-    String getChatResponse(String message);
+    ResultsResponse getChatResponse(String message);
 }

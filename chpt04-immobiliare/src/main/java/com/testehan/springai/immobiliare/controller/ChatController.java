@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.constants.PromptConstants;
+import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -35,14 +36,25 @@ public class ChatController {
     @PostMapping("/api/chat")
     public HtmxResponse generate(@RequestParam String message, HttpSession session, Model model) {
 
-        String response = apiService.getChatResponse(message);
+        ResultsResponse response = apiService.getChatResponse(message);
 
-        model.addAttribute("response",response);
-        model.addAttribute("message",message);
+        if (response.containsApartments()){
+            model.addAttribute("message",message);
+            model.addAttribute("response",response.message());
+            model.addAttribute("apartments",response.apartments());
 
-        return HtmxResponse.builder()
-                .view("response :: responseFragment")
-                .build();
+            return HtmxResponse.builder()
+                    .view("response :: responseFragmentWithApartments")
+                    .build();
+        } else {
+
+            model.addAttribute("message",message);
+            model.addAttribute("response",response.message());
+
+            return HtmxResponse.builder()
+                    .view("response :: responseFragment")
+                    .build();
+        }
     }
 
 }
