@@ -17,7 +17,17 @@
     <p class="mt-4 h-full overflow-auto" th:text="${response}">Response</p>
 
     <div th:each="apartment : ${apartments}" class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
-        <img class="w-full h-48 object-cover" src="https://example.com/image.jpg" alt="Apartment Image">
+<!--        <img class="w-full h-48 object-cover" th:src="@{${apartment.images[0}}" alt="Apartment Image">-->
+        <div class="flex justify-center mb-4">
+            <div th:each="image, iterStat : ${apartment.images}">
+
+                <div class="flex justify-center">
+                    <img id="displayedImage" class="w-1/2 h-auto" th:src="@{${image}}" alt="Image">
+                </div>
+
+            </div>
+        </div>
+
         <div class="p-6">
             <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
             <p class="text-gray-600 mt-2">Location: [[${apartment.location}]]</p>
@@ -26,9 +36,13 @@
             <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
             <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
             <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>
-            <p class="text-gray-600 mt-2">Tags: <span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#family</span><span class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#investment</span></p>
+
+            <p class="text-gray-600 mt-2">Tags:
+                <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
+            </p>
         </div>
     </div>
+
 
 </div>
 
