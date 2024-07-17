@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -26,7 +27,7 @@ public class ChatController {
 
     @GetMapping("")
     public String home(Model model) {
-        model.addAttribute("initialMessage", "Hi..are you interested in apartments for rent or sale ?");
+        model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
         return "index";
     }
 

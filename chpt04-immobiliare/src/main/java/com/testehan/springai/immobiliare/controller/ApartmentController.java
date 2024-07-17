@@ -90,13 +90,6 @@ public class ApartmentController {
 
     }
 
-    // TODO right now, in the ApiDescription file this endpoint is not described..all apartment descriptions go to
-    // the apartmentsForSale method
-    @GetMapping("/getApartmentsForRent")
-    public List<Apartment> apartmentsForRent(@RequestParam(value = "message") String message) {
-        return apartmentService.getApartmentsSemanticSearch(PropertyType.rent, message);
-    }
-
     // the service will be used to create the embeddings for the apartments
     @GetMapping("/getEmbedding")
     public String getEmbedding(@RequestParam(value = "message") String message) {
