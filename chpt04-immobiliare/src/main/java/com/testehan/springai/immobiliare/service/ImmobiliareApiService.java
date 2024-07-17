@@ -32,7 +32,6 @@ public class ImmobiliareApiService {
 
         var outputParser = new BeanOutputConverter<>(RestCall.class);
         String format = outputParser.getFormat();
-        System.out.println("format = " + format);
 
         PromptTemplate promptTemplate = new PromptTemplate(ragPromptTemplate);
         Map<String, Object> promptParameters = new HashMap<>();

@@ -35,7 +35,7 @@ public class ChatController {
     @PostMapping("/api/chat")
     public HtmxResponse generate(@RequestParam String message, HttpSession session, Model model) {
 
-        String response = apiService.getChatResponse(session, message);
+        String response = apiService.getChatResponse(message);
 
         model.addAttribute("response",response);
         model.addAttribute("message",message);

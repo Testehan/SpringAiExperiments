@@ -104,7 +104,6 @@ public class ApartmentController {
     @Autowired
     private MongoDatabase mongoDatabase;
 
-    // todo this is temprorary here because i want to trigger the execution of the code when rest call is made
     @GetMapping("/testEmbeddings")
     public String testEmbeddings() {
 

@@ -1,9 +1,10 @@
 package com.testehan.springai.immobiliare.controller;
 
-import com.testehan.springai.immobiliare.constants.PromptConstants;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
 
 @RestController
 public class BasicInformationController {
@@ -11,24 +12,24 @@ public class BasicInformationController {
     @GetMapping("/api/getNotRelevantPrompt")
     public String notRelevantPrompt(@RequestParam(value = "message") String message) {
 
-       return String.format("The prompt provided is not relevant for this application. Try and provide something related to real estate");
+       return M00_IRELEVANT_PROMPT;
     }
 
     @GetMapping("/api/restart")
     public String restart(@RequestParam(value = "message") String message) {
 
-        return String.format(PromptConstants.M01_INITIAL_MESSAGE);
+        return M01_INITIAL_MESSAGE;
     }
 
     @GetMapping("/api/getRentOrBuy")
     public String getRentOrBuy(@RequestParam(value = "message") String message) {
-        return "Which city are you interested in ?";
+        return M02_CITY;
     }
 
     @GetMapping("/api/getCity")
     public String getCity(@RequestParam(value = "message") String message) {
 
-        return "I understand. Give me more details about the location you are searching for";
+        return M03_DETAILS;
     }
 
 }

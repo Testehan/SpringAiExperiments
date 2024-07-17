@@ -22,8 +22,6 @@ import java.util.Map;
 public class ImmobiliareRagController {
 
     private final ChatClient chatClient;
-    // TODO i think that in the case of an actual usecase, one would need multiple vectore stores,
-    // as in a vector store per city-type-type...for ex "london-apartment-rents" or "london-house-sells"
     private final VectorStore immobiliareVectorStore;
 
     @Value("classpath:/prompts/rag-prompt-template-apartments-sale.txt")

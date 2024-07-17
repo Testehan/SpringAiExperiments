@@ -22,8 +22,10 @@ public class ApiServiceImpl implements ApiService{
     @Autowired
     private ApartmentService apartmentService;
 
+    @Autowired HttpSession session;
+
     @Override
-    public String getChatResponse(HttpSession session, String message) {
+    public String getChatResponse(String message) {
         RestCall restCall = immobiliareApiService.whichApiToCall(message);
 
         var url = "http://localhost:8080/api" + restCall.apiCall();
@@ -31,23 +33,40 @@ public class ApiServiceImpl implements ApiService{
                 .queryParam("message",  restCall.message());
 
 
+        // TODO Yeah i know this is ugly...but i have to figure out a better way of keeping track of session data when
+        // making another rest call, or some other approach, as when i make a rest call from the code, the session
+        // in the endpoint will be different, and so the values set above will not be present
+        // Once security part is introduced in the app, this will be handled :
+        // https://stackoverflow.com/questions/76590383/how-to-configure-resttemplate-to-use-browsers-session-for-api-call
         switch (restCall.apiCall()) {
-            case "/getRentOrBuy" : { session.setAttribute("rentOrSale", restCall.message()); break;}
-            case "/getCity" : {session.setAttribute("city", restCall.message()); break; }
-            case "/restart" : {session.setAttribute("rentOrSale", ""); session.setAttribute("city", ""); break; }
-            case "/apartments/getApartments" :{
-                // TODO Yeah i know this is ugly...but i have to figure out a better way of keeping track of session data when
-                // making another rest call, or some other approach, as i i make a rest call from the code, the session
-                // in the endpoint will be different, and so the values set above will not be present
-                var rentOrSale = (String) session.getAttribute("rentOrSale");
-                var city = session.getAttribute("city");
-                var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), message);
-                return (apartments.size() > 0) ? apartments.stream().map(Object::toString).collect(Collectors.joining(", "))
-                        : "No apartments found with the given criteria. Please provide another description or type 'restart' to start from the beginning.";
-            }
+            case "/getRentOrBuy" : { setRentOrBuy(restCall); break;}
+            case "/getCity" : { setCity(restCall); break; }
+            case "/restart" : { restartConversation(); break; }
+            case "/apartments/getApartments" :{ return getApartments(message); }
         }
 
         String response = restTemplate.getForObject(builder.toUriString(), String.class);
         return response;
+    }
+
+    private String getApartments(String message) {
+        var rentOrSale = (String) session.getAttribute("rentOrSale");
+        var city = session.getAttribute("city");
+        var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), message);
+        return (apartments.size() > 0) ? apartments.stream().map(Object::toString).collect(Collectors.joining(", "))
+                : "No apartments found with the given criteria. Please provide another description or type 'restart' to start from the beginning.";
+    }
+
+    private void restartConversation() {
+        session.setAttribute("rentOrSale", "");
+        session.setAttribute("city", "");
+    }
+
+    private void setCity(RestCall restCall) {
+        session.setAttribute("city", restCall.message());
+    }
+
+    private void setRentOrBuy(RestCall restCall) {
+        session.setAttribute("rentOrSale", restCall.message());
     }
 }
