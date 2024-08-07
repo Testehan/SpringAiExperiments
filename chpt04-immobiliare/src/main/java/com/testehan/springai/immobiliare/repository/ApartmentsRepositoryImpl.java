@@ -33,7 +33,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public List<Apartment> findApartmentsByVector(PropertyType propertyType, List<Double> embedding) {
+    public List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, List<Double> embedding) {
         String indexName = "vector_index";
         int numCandidates = 100;  // how many neighbours it will use when doing the nearest neighbour search; it should be
         // higher than the limit we set below...higher numbers of this variable will
@@ -45,7 +45,8 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         // fields there.
         // also you can see here all sorts of filering options :
         // https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
-        Bson criteria = Filters.and(Filters.eq("propertyType", propertyType));
+        Bson criteria = Filters.and(Filters.eq("propertyType", propertyType),
+                Filters.eq("city", city));
         VectorSearchOptions options = vectorSearchOptions().filter(criteria);
 
         List<Bson> pipeline = asList(

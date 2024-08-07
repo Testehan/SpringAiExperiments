@@ -10,7 +10,8 @@ public record Apartment(
         @BsonProperty("_id")
         ObjectId _id,
         String name,
-        String location,
+        String city,
+        String area,
         String shortDescription,
         Long price,
         PropertyType propertyType,
@@ -26,7 +27,7 @@ public record Apartment(
     @JsonIgnore
     public String getApartmentInfoToEmbedd(){
         return name + "\n" +
-                "The apartment is located in: " + location + ". " +
+                "The apartment is located in the city " + city + ", area or neighbourhood " + area +
                 shortDescription +
                 "It has a surface of " + surface + " square meters." +
                 "The price is " + price + " euro. " +
@@ -40,7 +41,8 @@ public record Apartment(
         return "Apartment{" +
                 "id='" + _id + '\'' +
                 ", name='" + name + '\'' +
-                ", location='" + location + '\'' +
+                ", city='" + city + '\'' +
+                ", area='" + area + '\'' +
                 ", shortDescription='" + shortDescription + '\'' +
                 ", price=" + price +
                 ", propertyType=" + propertyType +

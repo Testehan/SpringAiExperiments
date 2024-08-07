@@ -39,9 +39,9 @@ public class ApartmentController {
     @GetMapping("/getApartments")
     public List<Apartment> getApartments(@RequestParam(value = "message") String message, HttpSession session) {
         var rentOrSale = (String) session.getAttribute("rentOrSale");
-        var city = session.getAttribute("city");
+        var city = (String)  session.getAttribute("city");
 
-        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), message);
+        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city, message);
     }
 
     // the service will be used to create the embeddings for the apartments
