@@ -55,9 +55,11 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse getApartments(String message) {
+        var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(message);
+
         var rentOrSale = (String) session.getAttribute("rentOrSale");
         var city = (String) session.getAttribute("city");
-        var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city, message);
+        var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, message);
 
         ResultsResponse response;
 

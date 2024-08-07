@@ -7,7 +7,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import jakarta.servlet.http.HttpSession;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,8 +40,10 @@ public class ApartmentController {
     public List<Apartment> getApartments(@RequestParam(value = "message") String message, HttpSession session) {
         var rentOrSale = (String) session.getAttribute("rentOrSale");
         var city = (String)  session.getAttribute("city");
-
-        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city, message);
+// todo i think this endpoint can be removed entirely; if needed one would need to make an aditional call to openai to extract
+        // apartment object from provided message description
+//        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city, message);
+        return new ArrayList<>();
     }
 
     // the service will be used to create the embeddings for the apartments

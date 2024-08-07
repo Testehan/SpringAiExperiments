@@ -18,8 +18,8 @@ public class ApartmentService {
         this.embedder = embedder;
     }
 
-    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, String apartmentDescription) {
+    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, Apartment apartment, String apartmentDescription) {
         var embedding = embedder.createEmbedding(apartmentDescription).block();
-        return apartmentsRepository.findApartmentsByVector(propertyType, city, embedding);
+        return apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
     }
 }

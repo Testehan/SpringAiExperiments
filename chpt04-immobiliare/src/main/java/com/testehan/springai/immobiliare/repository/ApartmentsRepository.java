@@ -6,5 +6,5 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import java.util.List;
 
 public interface ApartmentsRepository {
-    List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, List<Double> embedding);
+    List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, Apartment apartment, List<Double> embedding);
 }

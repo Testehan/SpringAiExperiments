@@ -1,16 +1,19 @@
 package com.testehan.springai.immobiliare.repository;
 
+import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.search.VectorSearchOptions;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
+import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
@@ -33,7 +36,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, List<Double> embedding) {
+    public List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, Apartment apartment, List<Double> embedding) {
         String indexName = "vector_index";
         int numCandidates = 100;  // how many neighbours it will use when doing the nearest neighbour search; it should be
         // higher than the limit we set below...higher numbers of this variable will
@@ -45,9 +48,24 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         // fields there.
         // also you can see here all sorts of filering options :
         // https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
-        Bson criteria = Filters.and(Filters.eq("propertyType", propertyType),
-                Filters.eq("city", city));
-        VectorSearchOptions options = vectorSearchOptions().filter(criteria);
+
+        List<Bson> filters = new ArrayList<>();
+        filters.add(Filters.eq("propertyType", propertyType));
+        filters.add(Filters.or(Filters.eq("city", city),
+                Filters.eq("city",city.toLowerCase()),
+                Filters.eq("city",city.toUpperCase())));
+
+        // optional filters depending on user input
+        if (Objects.nonNull(apartment.surface())){   // TODO MAYBE WE SHOULD USE % OF value given by user ..like 10% ..want to show apartments with a surface +/- 5 square meters
+            filters.add(Filters.and(Filters.gte("surface", apartment.surface() - 5),Filters.lte("surface", apartment.surface() + 5))); //
+        }
+
+        Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
+
+        // todo this is for debugging purposes
+        System.out.println("Combined Filter: " + combinedFilters.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()).toJson());
+
+        VectorSearchOptions options = vectorSearchOptions().filter(combinedFilters);
 
         List<Bson> pipeline = asList(
                 vectorSearch(
