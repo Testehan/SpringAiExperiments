@@ -10,6 +10,7 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +25,8 @@ import static java.util.Arrays.asList;
 
 @Repository
 public class ApartmentsRepositoryImpl implements ApartmentsRepository{
+
+    private static final double PERCENTAGE_INTERVAL = 0.1;  //10%
 
     private final MongoDatabase mongoDatabase;
 
@@ -53,11 +56,17 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         filters.add(Filters.eq("propertyType", propertyType));
         filters.add(Filters.or(Filters.eq("city", city),
                 Filters.eq("city",city.toLowerCase()),
-                Filters.eq("city",city.toUpperCase())));
+                Filters.eq("city",city.toUpperCase()),
+                Filters.eq("city", StringUtils.capitalize(city))));
 
         // optional filters depending on user input
-        if (Objects.nonNull(apartment.surface())){   // TODO MAYBE WE SHOULD USE % OF value given by user ..like 10% ..want to show apartments with a surface +/- 5 square meters
-            filters.add(Filters.and(Filters.gte("surface", apartment.surface() - 5),Filters.lte("surface", apartment.surface() + 5))); //
+        if (Objects.nonNull(apartment.surface()) && apartment.surface()>0){
+            filters.add(Filters.and(Filters.gte("surface", getMinValue(apartment.surface())),
+                    Filters.lte("surface", getMaxValue(apartment.surface()))));
+        }
+        if (Objects.nonNull(apartment.price()) && apartment.price()>0){
+            filters.add(Filters.and(Filters.gte("price", getMinValue(apartment.price())),
+                    Filters.lte("price", getMaxValue(apartment.price()))));
         }
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
@@ -83,5 +92,13 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         getApartmentCollection().aggregate(pipeline).spliterator().forEachRemaining(a->apartments.add(a));
 
         return apartments;
+    }
+
+    private static long getMinValue(Integer value) {
+        return value - Math.round(value * PERCENTAGE_INTERVAL);
+    }
+
+    private static long getMaxValue(Integer value) {
+        return value + Math.round(value * PERCENTAGE_INTERVAL);
     }
 }

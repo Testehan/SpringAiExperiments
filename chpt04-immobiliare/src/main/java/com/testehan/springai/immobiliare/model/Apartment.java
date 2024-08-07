@@ -13,7 +13,7 @@ public record Apartment(
         String city,
         String area,
         String shortDescription,
-        Long price,
+        Integer price,
         PropertyType propertyType,
         Integer surface,
         Integer noOfRooms,
@@ -25,7 +25,7 @@ public record Apartment(
         Double score)  {
 
     public Apartment(@BsonProperty("_id")
-                     ObjectId _id, String name, String city, String area, String shortDescription, Long price, PropertyType propertyType, Integer surface, Integer noOfRooms, String floor, List<String> tags, List<String> images, List<Double> plot_embedding, Double score) {
+                     ObjectId _id, String name, String city, String area, String shortDescription,  Integer price, PropertyType propertyType, Integer surface, Integer noOfRooms, String floor, List<String> tags, List<String> images, List<Double> plot_embedding, Double score) {
         this._id = _id;
         this.name = name;
         this.city = city;
@@ -43,7 +43,7 @@ public record Apartment(
     }
 
     public Apartment(@BsonProperty("_id")
-                     ObjectId _id, String name, String city, String area, String shortDescription, Long price, String propertyType, Integer surface, Integer noOfRooms, String floor, List<String> tags, List<String> images, List<Double> plot_embedding, Double score) {
+                     ObjectId _id, String name, String city, String area, String shortDescription, Integer price, String propertyType, Integer surface, Integer noOfRooms, String floor, List<String> tags, List<String> images, List<Double> plot_embedding, Double score) {
 
 
         this(_id, name, city, area, shortDescription , price, PropertyType.fromString(propertyType), surface, noOfRooms, floor, tags , images, plot_embedding, score);
