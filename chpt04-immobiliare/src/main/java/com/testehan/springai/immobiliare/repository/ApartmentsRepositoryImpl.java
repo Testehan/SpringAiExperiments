@@ -106,7 +106,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         if (apartment != null) {
             return apartment;
         } else {
-            throw new NoSuchElementException("Document not found");
+                throw new NoSuchElementException("Apartment not found");
         }
     }
 

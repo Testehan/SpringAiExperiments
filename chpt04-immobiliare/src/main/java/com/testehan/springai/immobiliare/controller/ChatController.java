@@ -1,6 +1,5 @@
 package com.testehan.springai.immobiliare.controller;
 
-import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
@@ -11,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -24,12 +22,6 @@ public class ChatController {
 
     public ChatController(ApiService apiService) {
         this.apiService = apiService;
-    }
-
-    @GetMapping("")
-    public String home(Model model) {
-        model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
-        return "index";
     }
 
     @HxRequest
