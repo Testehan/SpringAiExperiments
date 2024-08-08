@@ -9,14 +9,12 @@ import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +42,13 @@ public class ApartmentController {
         // apartment object from provided message description
 //        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city, message);
         return new ArrayList<>();
+    }
+
+    @GetMapping("/getContact/{apartmentId}")
+    @HxRequest
+    public String getContact(@PathVariable(value = "apartmentId") String apartmentId) {
+        // todo read from mongoDB the contact of the apartment
+        return apartmentId;
     }
 
     // the service will be used to create the embeddings for the apartments
