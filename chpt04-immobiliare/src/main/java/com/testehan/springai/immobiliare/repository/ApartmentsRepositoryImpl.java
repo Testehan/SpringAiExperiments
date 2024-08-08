@@ -9,11 +9,13 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 
 import static com.mongodb.client.model.Aggregates.project;
@@ -92,6 +94,20 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         getApartmentCollection().aggregate(pipeline).spliterator().forEachRemaining(a->apartments.add(a));
 
         return apartments;
+    }
+
+    @Override
+    public Apartment findApartmentById(final String apartmentId) {
+
+        var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
+        ObjectId objectId = new ObjectId(apartmentId);
+        var apartment = mongoCollection.find(new Document("_id", objectId)).first();
+
+        if (apartment != null) {
+            return apartment;
+        } else {
+            throw new NoSuchElementException("Document not found");
+        }
     }
 
     private static long getMinValue(Integer value) {

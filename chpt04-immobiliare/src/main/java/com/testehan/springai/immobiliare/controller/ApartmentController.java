@@ -47,8 +47,8 @@ public class ApartmentController {
     @GetMapping("/getContact/{apartmentId}")
     @HxRequest
     public String getContact(@PathVariable(value = "apartmentId") String apartmentId) {
-        // todo read from mongoDB the contact of the apartment
-        return apartmentId;
+        var apartment = apartmentService.findApartmentById(apartmentId);
+        return "Contact: " + apartment.contact();
     }
 
     // the service will be used to create the embeddings for the apartments

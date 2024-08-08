@@ -22,4 +22,8 @@ public class ApartmentService {
         var embedding = embedder.createEmbedding(apartmentDescription).block();
         return apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
     }
+
+    public Apartment findApartmentById(String apartmentId) {
+        return apartmentsRepository.findApartmentById(apartmentId);
+    }
 }
