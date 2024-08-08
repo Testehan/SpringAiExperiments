@@ -22,7 +22,7 @@
                 <div th:each="image, iterStat : ${apartment.images}">
 
                     <div class="flex justify-center">
-                        <img id="displayedImage" class="w-1/2 h-auto" th:src="@{${image}}" alt="Image">
+                        <img id="displayedImage" class="w-1/2 h-auto" th:src="@{${image}}" alt="" onerror="this.onerror=null; this.src='https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'" />
                     </div>
 
                 </div>
