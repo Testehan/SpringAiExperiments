@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.text-dan-favorite-red {
+  --tw-text-opacity: 1;
+  color: rgb(252 32 3/ var(--tw-text-opacity));
+}
