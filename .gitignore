@@ -36,3 +36,4 @@ build/
 
 ### Frontend ###
 /chpt04-immobiliare/src/main/frontend/node_modules/
+/chpt04-immobiliare/src/main/resources/secrets.properties

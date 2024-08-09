@@ -8,8 +8,42 @@
     <title>ChatGPT Clone</title>
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
     <link th:href="@{/main.css}" rel="stylesheet" />
+
+<!--    <meta name="_csrf" th:content="${_csrf.token}" />-->
+<!--    <meta name="_csrf_header" th:content="${_csrf.headerName}" />-->
 </head>
-<body class="h-screen bg-gray-100">
+
+<!--<script th:inline="javascript">-->
+<!--    /*<![CDATA[*/-->
+
+<!--    document.body.addEventListener('htmx:configRequest', (event) => {-->
+<!--      const csrfHeader = /*[[${_csrf.headerName}]]*/ 'X-Sample-CSRF-Header';-->
+<!--      const csrfToken = /*[[${_csrf.token}]]*/ 'sample-csrf-token';-->
+
+<!--      event.detail.headers[csrfHeader] = csrfToken;-->
+<!--    });-->
+
+<!--    /*]]>*/-->
+<!--</script>-->
+
+<!--<script>-->
+<!--    document.addEventListener("htmx:configRequest", function (evt) {-->
+
+<!--        console.log("ciuciucaaaa");-->
+<!--        evt.detail.headers["accept"] = "text/html-partial";-->
+
+<!--          if (evt.detail.verb !== "get") {-->
+<!--            const csrfHeaderName = document-->
+<!--              .querySelector("meta[name='_csrf_header']")-->
+<!--              .getAttribute("content");-->
+<!--            evt.detail.headers[csrfHeaderName] = document-->
+<!--              .querySelector("meta[name='_csrf']")-->
+<!--              .getAttribute("content");-->
+<!--          }-->
+<!--});-->
+<!--</script>-->
+
+<body class="h-screen bg-gray-100" >
 <div class="flex h-full">
 
     <!-- Main Content -->

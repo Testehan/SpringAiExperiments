@@ -56,10 +56,12 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         List<Bson> filters = new ArrayList<>();
         filters.add(Filters.eq("propertyType", propertyType));
-        filters.add(Filters.or(Filters.eq("city", city),
-                Filters.eq("city",city.toLowerCase()),
-                Filters.eq("city",city.toUpperCase()),
-                Filters.eq("city", StringUtils.capitalize(city))));
+        if (Objects.nonNull(city)){
+            filters.add(Filters.or(Filters.eq("city", city),
+                    Filters.eq("city",city.toLowerCase()),
+                    Filters.eq("city",city.toUpperCase()),
+                    Filters.eq("city", StringUtils.capitalize(city))));
+        }
 
         // optional filters depending on user input
         if (Objects.nonNull(apartment.surface()) && apartment.surface()>0){

@@ -7,12 +7,10 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.ArrayList;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
-
 
 
 @Service
@@ -33,9 +31,12 @@ public class ApiServiceImpl implements ApiService{
     public ResultsResponse getChatResponse(String message) {
         RestCall restCall = immobiliareApiService.whichApiToCall(message);
 
-        var url = "http://localhost:8080/api" + restCall.apiCall();
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
-                .queryParam("message",  restCall.message());
+        // TODO Aici ar trebui sa adaug cumva login data sau un token ca sa se poata face call-ul...
+        // altfel redirectioneaza catre login page si nu merge..
+
+//        var url = "http://localhost:8080/api" + restCall.apiCall();
+//        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
+//                .queryParam("message",  restCall.message());
 
 
         // TODO Yeah i know this is ugly...but i have to figure out a better way of keeping track of session data when
@@ -44,15 +45,29 @@ public class ApiServiceImpl implements ApiService{
         // Once security part is introduced in the app, this will be handled :
         // https://stackoverflow.com/questions/76590383/how-to-configure-resttemplate-to-use-browsers-session-for-api-call
         switch (restCall.apiCall()) {
-            case "/getRentOrBuy" : { setRentOrBuy(restCall); break;}
-            case "/getCity" : { setCity(restCall); break; }
-            case "/restart" : { restartConversation(); break; }
+            case "/getRentOrBuy" : { return setRentOrBuy(restCall);}
+            case "/getCity" : { return setCity(restCall); }
+            case "/restart" : { return restartConversation(); }
             case "/apartments/getApartments" :{ return getApartments(message); }
         }
 
-        String response = restTemplate.getForObject(builder.toUriString(), String.class);
-        return new ResultsResponse(response, new ArrayList<>());
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setBearerAuth(getToken()); // Set the authorization header with Bearer token
+
+//        HttpEntity<Void> entity = new HttpEntity<>(headers);
+//        String response = restTemplate.getForObject(builder.toUriString(), String.class, entity);
+        return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
     }
+
+//    public static String getToken() {
+//        DefaultOidcUser token = null;
+//        var authentication = SecurityContextHolder.getContext().getAuthentication();
+//        if (authentication != null) {
+//            token = (DefaultOidcUser)(((OAuth2AuthenticationToken) authentication).getPrincipal());
+//            return token.getIdToken().getTokenValue();
+//        }
+//        return "invalid_token";
+//    }
 
     private ResultsResponse getApartments(String message) {
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(message);
@@ -72,16 +87,20 @@ public class ApiServiceImpl implements ApiService{
         return response;
     }
 
-    private void restartConversation() {
+    private ResultsResponse restartConversation() {
         session.setAttribute("rentOrSale", "");
         session.setAttribute("city", "");
+        return new ResultsResponse(M01_INITIAL_MESSAGE, new ArrayList<>());
+
     }
 
-    private void setCity(RestCall restCall) {
+    private ResultsResponse setCity(RestCall restCall) {
         session.setAttribute("city", restCall.message());
+        return new ResultsResponse(M03_DETAILS, new ArrayList<>());
     }
 
-    private void setRentOrBuy(RestCall restCall) {
+    private ResultsResponse setRentOrBuy(RestCall restCall) {
         session.setAttribute("rentOrSale", restCall.message());
+        return new ResultsResponse(M02_CITY, new ArrayList<>());
     }
 }
