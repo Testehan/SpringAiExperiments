@@ -6,7 +6,6 @@ import com.testehan.springai.immobiliare.model.ResultsResponse;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 
@@ -20,9 +19,6 @@ public class ApiServiceImpl implements ApiService{
     private ImmobiliareApiService immobiliareApiService;
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private ApartmentService apartmentService;
 
     @Autowired HttpSession session;
@@ -30,14 +26,6 @@ public class ApiServiceImpl implements ApiService{
     @Override
     public ResultsResponse getChatResponse(String message) {
         RestCall restCall = immobiliareApiService.whichApiToCall(message);
-
-        // TODO Aici ar trebui sa adaug cumva login data sau un token ca sa se poata face call-ul...
-        // altfel redirectioneaza catre login page si nu merge..
-
-//        var url = "http://localhost:8080/api" + restCall.apiCall();
-//        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(url)
-//                .queryParam("message",  restCall.message());
-
 
         // TODO Yeah i know this is ugly...but i have to figure out a better way of keeping track of session data when
         // making another rest call, or some other approach, as when i make a rest call from the code, the session
@@ -51,23 +39,8 @@ public class ApiServiceImpl implements ApiService{
             case "/apartments/getApartments" :{ return getApartments(message); }
         }
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setBearerAuth(getToken()); // Set the authorization header with Bearer token
-
-//        HttpEntity<Void> entity = new HttpEntity<>(headers);
-//        String response = restTemplate.getForObject(builder.toUriString(), String.class, entity);
         return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
     }
-
-//    public static String getToken() {
-//        DefaultOidcUser token = null;
-//        var authentication = SecurityContextHolder.getContext().getAuthentication();
-//        if (authentication != null) {
-//            token = (DefaultOidcUser)(((OAuth2AuthenticationToken) authentication).getPrincipal());
-//            return token.getIdToken().getTokenValue();
-//        }
-//        return "invalid_token";
-//    }
 
     private ResultsResponse getApartments(String message) {
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(message);
