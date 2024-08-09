@@ -30,7 +30,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
     private static final double PERCENTAGE_INTERVAL = 0.1;  //10%
 
-    private final MongoDatabase mongoDatabase;
+    private MongoDatabase mongoDatabase;
 
     public ApartmentsRepositoryImpl(MongoDatabase mongoDatabase) {
         this.mongoDatabase = mongoDatabase;
