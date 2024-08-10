@@ -1,6 +1,6 @@
 package com.testehan.springai.immobiliare.security;
 
-import com.testehan.springai.immobiliare.model.auth.Customer;
+import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -10,10 +10,10 @@ import java.util.Collection;
 // This is the "principal" object used in the html files
 public class CustomerUserDetails implements UserDetails {
 
-    private Customer customer;
+    private ImmobiliareUser immobiliareUser;
 
-    public CustomerUserDetails(Customer customer) {
-        this.customer = customer;
+    public CustomerUserDetails(ImmobiliareUser customer) {
+        this.immobiliareUser = customer;
     }
 
     @Override
@@ -23,12 +23,12 @@ public class CustomerUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return customer.password();
+        return immobiliareUser.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return customer.email();
+        return immobiliareUser.getEmail();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class CustomerUserDetails implements UserDetails {
         return true;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public ImmobiliareUser getImmobiliareUser() {
+        return immobiliareUser;
     }
 }

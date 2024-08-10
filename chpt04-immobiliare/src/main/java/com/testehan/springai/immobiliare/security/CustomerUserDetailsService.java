@@ -1,7 +1,7 @@
 package com.testehan.springai.immobiliare.security;
 
 
-import com.testehan.springai.immobiliare.repository.CustomerRepository;
+import com.testehan.springai.immobiliare.repository.ImmobiliareUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -13,11 +13,11 @@ import java.util.Objects;
 public class CustomerUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private ImmobiliareUserRepository immobiliareUserRepository;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        var customer = customerRepository.findByEmail(email);
+        var customer = immobiliareUserRepository.findUserByEmail(email);
         if (Objects.nonNull(customer)) {
             return new CustomerUserDetails(customer);
         } else {

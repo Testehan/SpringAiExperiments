@@ -25,7 +25,7 @@ public class MainController {
 		if (authentication==null || authentication instanceof AnonymousAuthenticationToken) {
 			return "login";
 		} else {
-			return "redirect:/";	// to homepage
+			return "index";	// to homepage
 		}
 	}
 }
