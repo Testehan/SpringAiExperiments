@@ -7,6 +7,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
+
 @Configuration
 public class SecurityConfig {
 
@@ -20,13 +22,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(CsrfConfigurer::disable);
-        http.oauth2Login( oauth2Login -> oauth2Login
-//                .loginPage("/login")
+
+        http.authorizeHttpRequests(req -> req
+                .requestMatchers(antMatcher("/css/**")).permitAll()
+                .requestMatchers(antMatcher("/images/**")).permitAll()
+                .anyRequest().authenticated())
+            .oauth2Login( oauth2Login -> oauth2Login
+                .loginPage("/login")
+                .permitAll()
                 .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                         .userService(customerOAuth2UserService)
                 )
                 .successHandler(oAuth2LoginSuccessHandler));
-        http.authorizeHttpRequests(c -> c.anyRequest().authenticated());
 
         return http.build();
     }
