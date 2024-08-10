@@ -1,19 +1,10 @@
 <!doctype html>
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>ChatGPT Clone</title>
-    <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
-    <link th:href="@{/css/main.css}" rel="stylesheet" />
-    <link rel="shortcut icon" type="image/png" th:href="@{/images/favicon.ico}"/>
+
+<head th:replace="~{fragments :: page_head('none')}" />
 
 <!--    <meta name="_csrf" th:content="${_csrf.token}" />-->
 <!--    <meta name="_csrf_header" th:content="${_csrf.headerName}" />-->
-</head>
-
 <!--<script>-->
 <!--    document.addEventListener("htmx:configRequest", function (evt) {-->
 
