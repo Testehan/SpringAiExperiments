@@ -30,7 +30,7 @@ public class MainController {
 	}
 
 	@GetMapping("/favourites")
-	public String favourites(Model model) {
+	public String favourites(Model model, Authentication authentication) {
 		model.addAttribute("apartments", apartmentService.getFavouriteApartments());
 		return "favourites";
 	}

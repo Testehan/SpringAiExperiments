@@ -64,13 +64,13 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         }
 
         // optional filters depending on user input
-        if (Objects.nonNull(apartment.surface()) && apartment.surface()>0){
-            filters.add(Filters.and(Filters.gte("surface", getMinValue(apartment.surface())),
-                    Filters.lte("surface", getMaxValue(apartment.surface()))));
+        if (Objects.nonNull(apartment.getSurface()) && apartment.getSurface()>0){
+            filters.add(Filters.and(Filters.gte("surface", getMinValue(apartment.getSurface())),
+                    Filters.lte("surface", getMaxValue(apartment.getSurface()))));
         }
-        if (Objects.nonNull(apartment.price()) && apartment.price()>0){
-            filters.add(Filters.and(Filters.gte("price", getMinValue(apartment.price())),
-                    Filters.lte("price", getMaxValue(apartment.price()))));
+        if (Objects.nonNull(apartment.getPrice()) && apartment.getPrice()>0){
+            filters.add(Filters.and(Filters.gte("price", getMinValue(apartment.getPrice())),
+                    Filters.lte("price", getMaxValue(apartment.getPrice()))));
         }
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);

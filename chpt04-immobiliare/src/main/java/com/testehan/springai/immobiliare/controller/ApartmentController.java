@@ -7,6 +7,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpSession;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -27,11 +29,13 @@ public class ApartmentController {
     private final OpenAiService openAiService;
 
     private final ApartmentService apartmentService;
+    private final UserService userService;
 
-    public ApartmentController(OpenAiService openAiService, ApartmentService apartmentService)
+    public ApartmentController(OpenAiService openAiService, ApartmentService apartmentService, UserService userService)
     {
         this.openAiService = openAiService;
         this.apartmentService = apartmentService;
+        this.userService = userService;
     }
 
     @GetMapping("/getApartments")
@@ -48,12 +52,12 @@ public class ApartmentController {
     @HxRequest
     public String getContact(@PathVariable(value = "apartmentId") String apartmentId) {
         var apartment = apartmentService.findApartmentById(apartmentId);
-        return "Contact: " + apartment.contact();
+        return "Contact: " + apartment.getContact();
     }
 
     @GetMapping("/favourite/{apartmentId}")
     @HxRequest
-    public String favourite(@PathVariable(value = "apartmentId") String apartmentId) {
+    public String favourite(@PathVariable(value = "apartmentId") String apartmentId, Authentication authentication) {
         // todo add this apartment id to the list of the users favourite
 //        var apartment = apartmentService.findApartmentById(apartmentId);
         return "&hearts;";
