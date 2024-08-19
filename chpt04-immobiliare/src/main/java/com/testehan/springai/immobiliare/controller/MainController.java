@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 public class MainController {
 
 
-	@GetMapping("")
-	public String home(Model model) {
-		model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
+	@GetMapping("/")
+	public String index(Model model) {
 		return "index";
+	}
+
+	@GetMapping("/chat")
+	public String chat(Model model) {
+		model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
+		return "chat";
 	}
 
 	@GetMapping("/login")
