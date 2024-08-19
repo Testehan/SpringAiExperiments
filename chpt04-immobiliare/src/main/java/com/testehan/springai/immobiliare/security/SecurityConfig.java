@@ -24,6 +24,7 @@ public class SecurityConfig {
         http.csrf(CsrfConfigurer::disable);
 
         http.authorizeHttpRequests(req -> req
+                .requestMatchers(antMatcher("/")).permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/images/**")).permitAll()
                 .anyRequest().authenticated())
