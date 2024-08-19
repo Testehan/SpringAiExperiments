@@ -51,6 +51,15 @@ public class ApartmentController {
         return "Contact: " + apartment.contact();
     }
 
+    @GetMapping("/favourite/{apartmentId}")
+    @HxRequest
+    public String favourite(@PathVariable(value = "apartmentId") String apartmentId) {
+        // todo add this apartment id to the list of the users favourite
+//        var apartment = apartmentService.findApartmentById(apartmentId);
+        return "&hearts;";
+    }
+
+
     // the service will be used to create the embeddings for the apartments
     @GetMapping("/getEmbedding")
     public String getEmbedding(@RequestParam(value = "message") String message) {
