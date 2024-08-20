@@ -35,7 +35,7 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
     @Override
     public void updateAuthenticationType(ObjectId id, AuthenticationType authenticationType) {
         MongoCollection<Document> collection = mongoDatabase.getCollection("users");
-        UpdateResult result =collection.updateOne(
+        UpdateResult result = collection.updateOne(
                 Filters.eq("_id", id),
                 Updates.set("authenticationType", authenticationType)
         );
@@ -52,5 +52,23 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
 
         // Insert the document
         collection.insertOne(document);
+    }
+
+    @Override
+    public void update(ImmobiliareUser user) {
+        MongoCollection<Document> collection = mongoDatabase.getCollection("users");
+
+        // Filter to find the document to update
+        Document filter = new Document("_id", user.getId());
+
+        // Update multiple fields
+        Document update = new Document("$set",
+                new Document("name", user.getName())
+                        .append("email", user.getEmail())
+                        .append("password", user.getPassword())
+                        .append("authenticationType", user.getAuthenticationType())
+                        .append("favourites",user.getFavourites()));
+
+        UpdateResult result = collection.updateOne(filter, update);
     }
 }

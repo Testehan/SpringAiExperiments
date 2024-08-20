@@ -19,8 +19,12 @@ public class UserService {
 
     public void updateAuthenticationType(ImmobiliareUser user, AuthenticationType authenticationType){
         if (!user.getAuthenticationType().equals(authenticationType)) {
-            immobiliareUserRepository.updateAuthenticationType(user.get_id(), authenticationType);
+            immobiliareUserRepository.updateAuthenticationType(user.getId(), authenticationType);
         }
+    }
+
+    public void updateUser(ImmobiliareUser user){
+        immobiliareUserRepository.update(user);
     }
 
     public ImmobiliareUser getImmobiliareUserByEmail(String email){

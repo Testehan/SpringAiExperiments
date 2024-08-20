@@ -1,12 +1,13 @@
 package com.testehan.springai.immobiliare.model.auth;
 
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
+
+import java.util.List;
 
 public class ImmobiliareUser {
 
-    @BsonProperty("_id")
-    ObjectId _id;
+//    @BsonProperty("_id")
+    ObjectId id;
 
     private String email;
 
@@ -16,8 +17,14 @@ public class ImmobiliareUser {
 
     private AuthenticationType authenticationType;
 
-    public ObjectId get_id() {
-        return _id;
+    private List<String> favourites;
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -50,5 +57,13 @@ public class ImmobiliareUser {
 
     public void setAuthenticationType(AuthenticationType authenticationType) {
         this.authenticationType = authenticationType;
+    }
+
+    public List<String> getFavourites() {
+        return favourites;
+    }
+
+    public void setFavourites(List<String> favourites) {
+        this.favourites = favourites;
     }
 }

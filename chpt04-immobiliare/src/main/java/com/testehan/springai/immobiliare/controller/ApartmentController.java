@@ -16,6 +16,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -58,9 +59,21 @@ public class ApartmentController {
     @GetMapping("/favourite/{apartmentId}")
     @HxRequest
     public String favourite(@PathVariable(value = "apartmentId") String apartmentId, Authentication authentication) {
+        String result;
         // todo add this apartment id to the list of the users favourite
 //        var apartment = apartmentService.findApartmentById(apartmentId);
-        return "&hearts;";
+        String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
+
+        var user = userService.getImmobiliareUserByEmail(userEmail);
+        if (!user.getFavourites().contains(apartmentId)){
+            user.getFavourites().add(apartmentId);
+            result = "&hearts;";
+        } else {
+            user.getFavourites().remove(apartmentId);
+            result = "Save to Favourites";
+        }
+        userService.updateUser(user);
+        return result;
     }
 
 

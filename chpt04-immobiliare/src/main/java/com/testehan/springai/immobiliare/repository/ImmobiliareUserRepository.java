@@ -10,4 +10,6 @@ public interface ImmobiliareUserRepository {
     void updateAuthenticationType(ObjectId id, AuthenticationType authenticationType);
 
     void save(ImmobiliareUser user);
+
+    void update(ImmobiliareUser user);
 }
