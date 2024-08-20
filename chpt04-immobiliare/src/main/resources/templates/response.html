@@ -45,17 +45,19 @@
                 </p>
 
                 <p th:id="'contactResult' + ${status.count}" class="text-red-500 font-bold mt-2">
-                    <button class="text-blue-500 underline hover:text-blue-700"
-                            th:hx-swap = "outerHTML"
-                            th:hx-get="@{/api/apartments/getContact/{apartmentId}(apartmentId=${apartment.id})}"  >
-                        Show contact
-                    </button>
+                    <span class="flex justify-between">
+                        <button class="text-blue-500 hover:text-blue-700"
+                                th:hx-swap = "outerHTML"
+                                th:hx-get="@{/api/apartments/getContact/{apartmentId}(apartmentId=${apartment.id})}"  >
+                            Show contact
+                        </button>
 
-                    <button class="text-blue-500 underline hover:text-blue-700"
-                            th:hx-swap = "outerHTML"
-                            th:hx-get="@{/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"  >
-                        Save to Favourites
-                    </button>
+                        <button class="text-blue-500 hover:text-blue-700"
+                                th:hx-swap = "innerHTML"
+                                th:hx-get="@{/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"  >
+                            Save to Favourites
+                        </button>
+                    </span>
                 </p>
             </div>
         </div>

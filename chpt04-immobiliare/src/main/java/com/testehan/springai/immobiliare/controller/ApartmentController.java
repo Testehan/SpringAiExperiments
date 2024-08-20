@@ -60,8 +60,6 @@ public class ApartmentController {
     @HxRequest
     public String favourite(@PathVariable(value = "apartmentId") String apartmentId, Authentication authentication) {
         String result;
-        // todo add this apartment id to the list of the users favourite
-//        var apartment = apartmentService.findApartmentById(apartmentId);
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
         var user = userService.getImmobiliareUserByEmail(userEmail);
