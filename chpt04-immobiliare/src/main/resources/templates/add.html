@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: page_head('none')}" />
+
+<body class="h-screen bg-gray-100" >
+
+<head th:replace="~{navigation :: header_menu}" />
+
+<div class="flex h-[80%]">
+
+    <!-- Main Content -->
+    <main class="flex flex-col bg-white p-4 w-full max-w-full">
+        <h1>Add a new apartment</h1>
+
+        <form class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md" action="/add-apartment" method="POST" th:object="${apartment}">
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
+                <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none  
+ focus:shadow-outline" th:field="*{name}">
+            </div>
+            <div class="mb-4">
+                <label for="address" class="block text-gray-700 font-bold mb-2">City:</label>
+                <input type="text" id="address" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none  
+ focus:shadow-outline" th:field="*{city}">
+            </div>
+            <div class="mb-4">
+                <label for="price" class="block text-gray-700 font-bold mb-2">Area:</label>
+                <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
+                <textarea id="description"
+                          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                          th:field="*{shortDescription}"></textarea>
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+
+                    Add Apartment
+                </button>
+            </div>
+        </form>
+
+    </main>
+</div>
+</body>

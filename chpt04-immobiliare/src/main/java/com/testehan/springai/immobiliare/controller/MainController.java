@@ -67,7 +67,11 @@ public class MainController {
 
 	@GetMapping("/add")
 	public String add(Model model) {
-		return "index";
+
+		var apartment = new Apartment();
+		model.addAttribute("apartment", apartment);
+
+		return "add";
 	}
 
 	@GetMapping("/help")
