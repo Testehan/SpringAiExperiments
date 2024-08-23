@@ -24,10 +24,11 @@ public class SecurityConfig {
         http.csrf(CsrfConfigurer::disable);
 
         http.authorizeHttpRequests(req -> req
-                .requestMatchers(antMatcher("/")).permitAll()
+                .requestMatchers("/chat","/favourites","/add").authenticated()
+                .requestMatchers("/","/help","/blog","/contact").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/images/**")).permitAll()
-                .anyRequest().authenticated())
+                )
             .oauth2Login( oauth2Login -> oauth2Login
                 .loginPage("/login")
                 .permitAll()

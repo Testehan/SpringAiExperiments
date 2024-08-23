@@ -64,4 +64,24 @@ public class MainController {
 			return "index";	// to homepage
 		}
 	}
+
+	@GetMapping("/add")
+	public String add(Model model) {
+		return "index";
+	}
+
+	@GetMapping("/help")
+	public String help(Model model) {
+		return "index";
+	}
+
+	@GetMapping("/blog")
+	public String blog(Model model) {
+		return "index";
+	}
+
+	@GetMapping("/contact")
+	public String contact(Model model) {
+		return "index";
+	}
 }
