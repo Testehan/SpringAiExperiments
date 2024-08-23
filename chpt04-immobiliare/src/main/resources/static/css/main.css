@@ -683,6 +683,10 @@ video {
   width: 1.5rem;
 }
 
+.w-\[80\%\] {
+  width: 80%;
+}
+
 .w-full {
   width: 100%;
 }

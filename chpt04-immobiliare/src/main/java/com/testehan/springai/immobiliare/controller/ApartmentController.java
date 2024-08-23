@@ -74,6 +74,12 @@ public class ApartmentController {
         return result;
     }
 
+    @PostMapping("/save")
+    public String saveApartment(Apartment apartment){
+        System.out.println(apartment.toString());
+        return "index";
+    }
+
 
     // the service will be used to create the embeddings for the apartments
     @GetMapping("/getEmbedding")

@@ -13,7 +13,7 @@
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <h1>Add a new apartment</h1>
 
-        <form class="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md" action="/add-apartment" method="POST" th:object="${apartment}">
+        <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" th:object="${apartment}">
             <div class="mb-4">
                 <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
                 <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none  
@@ -25,8 +25,8 @@
  focus:shadow-outline" th:field="*{city}">
             </div>
             <div class="mb-4">
-                <label for="price" class="block text-gray-700 font-bold mb-2">Area:</label>
-                <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+                <label for="area" class="block text-gray-700 font-bold mb-2">Area / Neighbourhood:</label>
+                <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
@@ -34,9 +34,28 @@
                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                           th:field="*{shortDescription}"></textarea>
             </div>
+            <div class="mb-4">
+                <label for="price" class="block text-gray-700 font-bold mb-2">Price:</label>
+                <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+            </div>
+            <div class="mb-4">
+                <label for="surface" class="block text-gray-700 font-bold mb-2">Surface:</label>
+                <input type="number" id="surface" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+            </div>
+            <div class="mb-4">
+                <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">Number of rooms:</label>
+                <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+            </div>
+            <div class="mb-4">
+                <label for="floor" class="block text-gray-700 font-bold mb-2">Floor:</label>
+                <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+            </div>
+            <div class="mb-4">
+                <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>
+                <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+            </div>
             <div class="flex items-center justify-between">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-
                     Add Apartment
                 </button>
             </div>
