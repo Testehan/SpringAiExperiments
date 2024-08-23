@@ -36,7 +36,7 @@ public class Apartment {
     @JsonIgnore
     public String getApartmentInfoToEmbedd(){
         return name + "\n" +
-                "The apartment is located in the city " + city + ", area or neighbourhood " + area +
+                "The apartment is located in the city " + city + ", area or neighbourhood " + area + ". " +
                 shortDescription +
                 "It has a surface of " + surface + " square meters." +
                 "The price is " + price + " euro. " +

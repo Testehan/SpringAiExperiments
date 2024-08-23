@@ -9,4 +9,6 @@ public interface ApartmentsRepository {
     List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, Apartment apartment, List<Double> embedding);
 
     Apartment findApartmentById(String apartmentId);
+
+    void saveApartment(Apartment apartment);
 }

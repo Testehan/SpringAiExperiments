@@ -7,6 +7,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
@@ -76,7 +77,18 @@ public class ApartmentController {
 
     @PostMapping("/save")
     public String saveApartment(Apartment apartment){
+        apartment.setPropertyType(PropertyType.rent);       // TODO in the future make this configurable and selectable from the form
         System.out.println(apartment.toString());
+
+        var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
+        System.out.println(apartmentInfoToEmbed);
+
+        var mono = openAiService.createEmbedding(apartmentInfoToEmbed);
+        List<Double> embeddings = mono.block();
+        System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
+        apartment.setPlot_embedding(embeddings);
+
+        apartmentService.saveApartment(apartment);
         return "index";
     }
 

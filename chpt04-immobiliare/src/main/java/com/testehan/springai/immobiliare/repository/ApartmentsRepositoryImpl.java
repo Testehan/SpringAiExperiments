@@ -10,6 +10,7 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -30,10 +31,13 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
     private static final double PERCENTAGE_INTERVAL = 0.1;  //10%
 
-    private MongoDatabase mongoDatabase;
+    private final MongoDatabase mongoDatabase;
 
-    public ApartmentsRepositoryImpl(MongoDatabase mongoDatabase) {
+    private final MongoTemplate mongoTemplate;
+
+    public ApartmentsRepositoryImpl(MongoDatabase mongoDatabase, MongoTemplate mongoTemplate) {
         this.mongoDatabase = mongoDatabase;
+        this.mongoTemplate = mongoTemplate;
     }
 
     private MongoCollection<Apartment> getApartmentCollection() {
@@ -110,6 +114,11 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         } else {
                 throw new NoSuchElementException("Apartment not found");
         }
+    }
+
+    @Override
+    public void saveApartment(Apartment apartment) {
+        mongoTemplate.save(apartment, "apartments");
     }
 
     private static long getMinValue(Integer value) {

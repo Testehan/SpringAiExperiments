@@ -27,4 +27,8 @@ public class ApartmentService {
         return apartmentsRepository.findApartmentById(apartmentId);
     }
 
+    public void saveApartment(Apartment apartment){
+        apartmentsRepository.saveApartment(apartment);
+    }
+
 }
