@@ -39,6 +39,9 @@
                         <p class="text-gray-600 mt-2">Tags:
                             <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
                         </p>
+                        <br />
+                        <p class="text-gray-600 mt-2">Creation time: [[${apartment.getCreationDateTimeFormatted}]]</p>
+                        <p class="text-gray-600 mt-2">Last update time: [[${apartment.getLastUpdateDateTimeFormatted}]]</p>
 
                         <p th:id="'contactResult' + ${status.count}" class="text-red-500 font-bold mt-2">
                             <span class="flex justify-between">

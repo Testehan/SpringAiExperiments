@@ -20,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,16 +79,17 @@ public class ApartmentController {
     @PostMapping("/save")
     public String saveApartment(Apartment apartment){
         apartment.setPropertyType(PropertyType.rent);       // TODO in the future make this configurable and selectable from the form
-        System.out.println(apartment.toString());
-
+        apartment.setCreationDateTime(LocalDateTime.now());
+        apartment.setLastUpdateDateTime(LocalDateTime.now());
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
-        System.out.println(apartmentInfoToEmbed);
 
         var mono = openAiService.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
         System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
         apartment.setPlot_embedding(embeddings);
+// TODO this method should also update the user that created the appartment, so that he can only create one apartment
 
+        // TODO Add pictures to an apartment
         apartmentService.saveApartment(apartment);
         return "index";
     }

@@ -7,7 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,6 +32,8 @@ public class Apartment {
     private List<String> images;
 
     private String contact;
+    private LocalDateTime creationDateTime;
+    private LocalDateTime lastUpdateDateTime;
 
     private List<Double> plot_embedding;
     private Double score;
@@ -64,5 +69,25 @@ public class Apartment {
                 ", score=" + score +
 
                 '}';
+    }
+
+    public String getCreationDateTimeFormatted(){
+        if (Objects.nonNull(creationDateTime)) {
+            DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateCustom = creationDateTime.format(customFormatter);
+            return formattedDateCustom;
+        } else {
+            return "";
+        }
+    }
+
+    public String getLastUpdateDateTimeFormatted(){
+        if (Objects.nonNull(lastUpdateDateTime)) {
+            DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String formattedDateCustom = lastUpdateDateTime.format(customFormatter);
+            return formattedDateCustom;
+        } else {
+            return "";
+        }
     }
 }

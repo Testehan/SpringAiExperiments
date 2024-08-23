@@ -39,7 +39,7 @@
         <div class="">
             <form id="chatForm"
                   class="w-full"
-                  hx-post="/api/chat"
+                  hx-post="/chat"
                   hx-swap="beforeend"
                   hx-target="#response-container"
                   hx-on="htmx:afterRequest: document.getElementById('message').value = '';">

@@ -25,7 +25,7 @@ public class ChatController {
     }
 
     @HxRequest
-    @PostMapping("/api/chat")
+    @PostMapping("/chat")
     public HtmxResponse generate(@RequestParam String message, HttpSession session, Model model) {
 
         ResultsResponse response = apiService.getChatResponse(message);
