@@ -71,6 +71,7 @@ public class MainController {
 		var apartment = new Apartment();
 		// todo for now the list of cities available for posting properties is hardcoded here
 		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
+		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 		model.addAttribute("apartment", apartment);
 
 		return "add";

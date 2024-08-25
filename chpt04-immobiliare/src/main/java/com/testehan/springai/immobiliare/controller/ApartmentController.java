@@ -7,7 +7,6 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
@@ -21,6 +20,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,9 +78,12 @@ public class ApartmentController {
 
     @PostMapping("/save")
     public String saveApartment(Apartment apartment){
-        apartment.setPropertyType(PropertyType.rent);       // TODO in the future make this configurable and selectable from the form
-        apartment.setCreationDateTime(LocalDateTime.now());
-        apartment.setLastUpdateDateTime(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateCustom = now.format(customFormatter);
+
+        apartment.setCreationDateTime(formattedDateCustom);
+        apartment.setLastUpdateDateTime(formattedDateCustom);
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
 
         var mono = openAiService.createEmbedding(apartmentInfoToEmbed);

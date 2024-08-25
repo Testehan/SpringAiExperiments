@@ -33,6 +33,15 @@
                 <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
             </div>
             <div class="mb-4">
+                <label for="propertyType" class="block text-gray-700 font-bold mb-2">Property Type:</label>
+                <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+ focus:shadow-outline">
+                    <th:block th:each="propertyType: ${listPropertyTypes}">
+                        <option th:value="${propertyType}">[[${propertyType}]]</option>
+                    </th:block>
+                </select>
+            </div>
+            <div class="mb-4">
                 <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
                 <textarea id="description"
                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -56,7 +65,7 @@
             </div>
             <div class="mb-4">
                 <label for="tags" class="block text-gray-700 font-bold mb-2">Tags:</label>
-                <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{tags}">
+                <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}">
             </div>
             <div class="mb-4">
                 <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>

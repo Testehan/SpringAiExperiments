@@ -7,8 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,8 +30,8 @@ public class Apartment {
     private List<String> images;
 
     private String contact;
-    private LocalDateTime creationDateTime;
-    private LocalDateTime lastUpdateDateTime;
+    private String creationDateTime;
+    private String lastUpdateDateTime;
 
     private List<Double> plot_embedding;
     private Double score;
@@ -71,27 +69,20 @@ public class Apartment {
                 '}';
     }
 
-    public String getCreationDateTimeFormatted(){
-        if (Objects.nonNull(creationDateTime)) {
-            DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateCustom = creationDateTime.format(customFormatter);
-            return formattedDateCustom;
-        } else {
-            return "";
-        }
-    }
-
-    public String getLastUpdateDateTimeFormatted(){
-        if (Objects.nonNull(lastUpdateDateTime)) {
-            DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            String formattedDateCustom = lastUpdateDateTime.format(customFormatter);
-            return formattedDateCustom;
-        } else {
-            return "";
-        }
-    }
-
-    public void setTags(String tags){
+    public void setTagsWithSplit(String tags){
         this.tags = List.of(tags.split(" "));
     }
+
+    public String getTagsWithSplit(){
+        StringBuilder result = new StringBuilder();
+        if (Objects.nonNull(tags)) {
+            for (String element : this.tags) {
+                result.append(element).append(", ");
+            }
+            return result.toString().substring(0, result.length() - 2);
+        } else {
+            return "";
+        }
+    }
+
 }
