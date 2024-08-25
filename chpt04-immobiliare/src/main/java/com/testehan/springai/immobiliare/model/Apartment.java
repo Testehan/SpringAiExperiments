@@ -90,4 +90,8 @@ public class Apartment {
             return "";
         }
     }
+
+    public void setTags(String tags){
+        this.tags = List.of(tags.split(" "));
+    }
 }
