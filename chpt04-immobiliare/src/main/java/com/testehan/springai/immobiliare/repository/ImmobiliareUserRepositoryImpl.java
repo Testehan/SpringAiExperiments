@@ -67,7 +67,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("email", user.getEmail())
                         .append("password", user.getPassword())
                         .append("authenticationType", user.getAuthenticationType())
-                        .append("favourites",user.getFavourites()));
+                        .append("favourites",user.getFavourites())
+                        .append("maxNumberOfListedApartments",user.getMaxNumberOfListedApartments()));
 
         UpdateResult result = collection.updateOne(filter, update);
     }

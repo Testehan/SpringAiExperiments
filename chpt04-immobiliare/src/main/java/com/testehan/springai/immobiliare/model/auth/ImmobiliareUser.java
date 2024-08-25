@@ -26,4 +26,6 @@ public class ImmobiliareUser {
 
     private List<String> favourites;
 
+    private int maxNumberOfListedApartments;
+
 }
