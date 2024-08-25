@@ -69,6 +69,8 @@ public class MainController {
 	public String add(Model model) {
 
 		var apartment = new Apartment();
+		// todo for now the list of cities available for posting properties is hardcoded here
+		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
 		model.addAttribute("apartment", apartment);
 
 		return "add";
