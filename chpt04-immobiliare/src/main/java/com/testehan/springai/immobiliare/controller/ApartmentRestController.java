@@ -19,22 +19,20 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/apartments")
-public class ApartmentController {
+public class ApartmentRestController {
 
     private final OpenAiService openAiService;
 
     private final ApartmentService apartmentService;
     private final UserService userService;
 
-    public ApartmentController(OpenAiService openAiService, ApartmentService apartmentService, UserService userService)
+    public ApartmentRestController(OpenAiService openAiService, ApartmentService apartmentService, UserService userService)
     {
         this.openAiService = openAiService;
         this.apartmentService = apartmentService;
@@ -76,28 +74,6 @@ public class ApartmentController {
         return result;
     }
 
-    @PostMapping("/save")
-    public String saveApartment(Apartment apartment){
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateCustom = now.format(customFormatter);
-
-        apartment.setCreationDateTime(formattedDateCustom);
-        apartment.setLastUpdateDateTime(formattedDateCustom);
-        var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
-
-        var mono = openAiService.createEmbedding(apartmentInfoToEmbed);
-        List<Double> embeddings = mono.block();
-        System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
-        apartment.setPlot_embedding(embeddings);
-// TODO this method should also update the user that created the appartment, so that he can only create one apartment
-
-        // TODO Add pictures to an apartment
-        apartmentService.saveApartment(apartment);
-        return "index";
-    }
-
-
     // the service will be used to create the embeddings for the apartments
     @GetMapping("/getEmbedding")
     public String getEmbedding(@RequestParam(value = "message") String message) {
@@ -129,7 +105,7 @@ public class ApartmentController {
             List<Double> embeddings = mono.block();
             System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
 
-            UpdateResult result =collection.updateOne(
+            UpdateResult result = collection.updateOne(
                     Filters.eq("_id", id),
                     Updates.set("plot_embedding", embeddings)
             );
