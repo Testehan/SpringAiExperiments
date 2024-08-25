@@ -25,7 +25,7 @@ public class SecurityConfig {
 
         http.authorizeHttpRequests(req -> req
                 .requestMatchers("/chat","/favourites","/add","/api/apartments/**").authenticated()
-                .requestMatchers("/","/help","/blog","/contact").permitAll()
+                .requestMatchers("/","/help","/blog","/contact", "/error").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/images/**")).permitAll()
                 )
