@@ -4,6 +4,9 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
+import com.testehan.springai.immobiliare.util.AmazonS3Util;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
@@ -11,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,15 +29,19 @@ public class ApartmentController {
     private final ApartmentService apartmentService;
     private final UserService userService;
 
-    public ApartmentController(OpenAiService openAiService, ApartmentService apartmentService, UserService userService)
+    private final ResourceLoader resourceLoader;
+
+    public ApartmentController(OpenAiService openAiService, ApartmentService apartmentService, UserService userService,
+                               ResourceLoader resourceLoader)
     {
         this.openAiService = openAiService;
         this.apartmentService = apartmentService;
         this.userService = userService;
+        this.resourceLoader = resourceLoader;
     }
 
     @PostMapping("/save")
-    public String saveApartment(Apartment apartment, Authentication authentication, RedirectAttributes redirectAttributes){
+    public String saveApartment(Apartment apartment, Authentication authentication, RedirectAttributes redirectAttributes) throws FileNotFoundException {
 
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
@@ -52,8 +60,12 @@ public class ApartmentController {
             System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
             apartment.setPlot_embedding(embeddings);
 
-            // TODO Add pictures to an apartment
+            // TODO Add pictures to an apartment. Right now a dummy pic is uploaded to S3...
             apartmentService.saveApartment(apartment);
+
+            AmazonS3Util.createAmazomS3();
+
+            AmazonS3Util.uploadFile("uploadDir", "filename", getImage());
 
             user.setMaxNumberOfListedApartments(user.getMaxNumberOfListedApartments() - 1);
             userService.updateUser(user);
@@ -65,6 +77,16 @@ public class ApartmentController {
         }
 
 
+    }
+
+    // TODO this is just for a small test...to be removed in the future
+    private InputStream getImage() {
+        try {
+            Resource resource = resourceLoader.getResource("classpath:/static/images/logo.png");
+            return resource.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
