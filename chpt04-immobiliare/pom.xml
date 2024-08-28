@@ -21,7 +21,21 @@
 
         <node.version>v20.16.0</node.version>
         <npm.version>10.8.1</npm.version>
+
+        <amazon.aws.version>2.21.0</amazon.aws.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>bom</artifactId>
+                <version>${amazon.aws.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -88,6 +102,12 @@
             <groupId>me.paulschwarz</groupId>
             <artifactId>spring-dotenv</artifactId>
             <version>3.0.0</version>
+        </dependency>
+
+        <!-- for S3 related code -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
         </dependency>
 
     </dependencies>
