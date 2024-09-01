@@ -44,6 +44,7 @@ public class ImmobiliareApiService {
         Prompt prompt = promptTemplate.create(promptParameters);
 
         assistantResponse = chatClient.prompt()
+//                .advisors(new SimpleLoggerAdvisor())      // todo when you need debugging req and resp from LLM
                 .user(prompt.getContents())
                 .call().chatResponse();
 
