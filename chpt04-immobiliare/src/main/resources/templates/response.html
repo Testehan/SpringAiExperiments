@@ -7,14 +7,14 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
 <body>
-<div th:fragment="responseFragment" class="mb-8">
-    <div class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
-    <p class="mt-4 h-full overflow-auto" th:text="${response}">Response</p>
+<div th:fragment="responseFragment" class="mb-2">
+    <div th:unless="${message == null || message.isEmpty()}" class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
+    <p th:unless="${response == null || response.isEmpty()}" class="h-full overflow-auto" th:text="${response}">Response</p>
 </div>
 
-<div th:fragment="responseFragmentWithApartments" class="mb-8">
-    <div class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
-    <p class="mt-4 h-full overflow-auto" th:text="${response}">Response</p>
+<div th:fragment="responseFragmentWithApartments" class="mb-2">
+    <div th:unless="${message == null || message.isEmpty()}" class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
+    <p th:unless="${response == null || response.isEmpty()}" class="h-full overflow-auto" th:text="${response}">Response</p>
 
     <div class="columns-2">
         <div th:each="apartment, status : ${apartments}" class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">

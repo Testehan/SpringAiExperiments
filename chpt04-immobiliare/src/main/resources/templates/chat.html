@@ -22,6 +22,16 @@
 <!--});-->
 <!--</script>-->
 
+<script>
+    function handleAfterRequest(event) {
+        console.log("before");
+        let userMessage = document.getElementById('message').value;
+        console.log("after");
+        document.getElementById('message').value = '';
+        htmx.ajax('POST', '/respond', {target: '#response-container', swap: 'beforeend', values: {message: userMessage}});
+    }
+</script>
+
 <body class="h-screen bg-gray-100" >
 
 <head th:replace="~{navigation :: header_menu}" />
@@ -31,18 +41,18 @@
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-4 h-full overflow-auto">
-            <div class="mb-8">
-                <p class="mt-4 h-full overflow-auto" th:text="${initialMessage}"></p>
+            <div class="mb-2">
+                <p class="h-full overflow-auto" th:text="${initialMessage}"></p>
             </div>
 
         </div>
         <div class="">
             <form id="chatForm"
                   class="w-full"
-                  hx-post="/chat"
+                  hx-put="/message"
                   hx-swap="beforeend"
                   hx-target="#response-container"
-                  hx-on="htmx:afterRequest: document.getElementById('message').value = '';">
+                  hx-on="htmx:afterRequest: handleAfterRequest(event)">
 
                 <div class="flex items-center bg-gray-200 rounded-full p-2 shadow-md">
 
