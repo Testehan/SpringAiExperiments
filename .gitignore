@@ -38,3 +38,4 @@ build/
 /chpt04-immobiliare/src/main/frontend/node_modules/
 /chpt04-immobiliare/src/main/resources/secrets.properties
 /chpt04-immobiliare/src/main/resources/AWS-login.txt
+/chpt05-llama3/src/main/resources/secrets.properties
