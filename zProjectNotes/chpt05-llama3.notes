@@ -1,0 +1,7 @@
+Before running this project, make sure that Llama 3 is running locally:
+    ollama run llama3.1
+
+This ollama tool can be used to run all sorts of models locally. Right now i just installed
+llama3.1, the smallest version of it, which occupies like 4 GB of space on the hard drive.
+On https://ollama.com/library you can find many other models that you can install locally using
+the ollama CLI tool, just by running something similar to "ollama run llama3.1"
