@@ -6,6 +6,12 @@ llama3.1, the smallest version of it, which occupies like 4 GB of space on the h
 On https://ollama.com/library you can find many other models that you can install locally using
 the ollama CLI tool, just by running something similar to "ollama run llama3.1"
 
+    ollama list
+        - this will list all models downloaded locally
+
+    ollama rm codellama:13b
+        - this will remove the model with the given name
+
 Obviously if you want to interact locally with an LLM is a non command line approach, (for example
 when asking for code snippets, having them displayed in the terminal sucks as code is not formmated
 etc...) So for this problem, there is a free tool to use, https://openwebui.com/,
@@ -17,3 +23,5 @@ I used the below command to create a docker container that runs open-webui:
 
 So when you want to access webui in the browser, make sure that the container open-webui is running.
 You will need to log into with your yahoo email and the same email for password.
+Keep in mind that this needs a lot of resources, and you will need to stop a lot of apps on the laptop
+if you want to have this run in a smooth / usable way.
