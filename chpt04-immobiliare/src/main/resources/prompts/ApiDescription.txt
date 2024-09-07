@@ -2,10 +2,6 @@ Task Description:
 You are given various types of user inputs and your job is to decide which API to call based on the input. Below are the available APIs and their descriptions.
 
 Available APIs:
-1. **Not relevant API**: If the information provided is not relevant to real estate renting or buying.
-   - **Endpoint**: `/getNotRelevantPrompt`
-   - **Parameters**: `message` (string)
-
 2. **Sale or rent API**: Determines if the user wants to rent or buy an apartment. If the user mentions buy or sale then your reply must be "sale".
    - **Endpoint**: `/getRentOrBuy`
    - **Parameters**: `message` (string)
@@ -20,6 +16,10 @@ Available APIs:
 
 5. **Restart API**: Restarts the conversation.
    - **Endpoint**: `/restart`
+   - **Parameters**: `message` (string)
+
+6. **Last option API**: If the user has requests that are not covered by the other APIs consider this as the default API.
+   - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
 User Input Format:
@@ -38,11 +38,11 @@ If you can't identify which API to call reply with **Not relevant API** informat
 
 Examples:
 - User Input: "Tell me a dad joke"
-  - API Call: `/getNotRelevantPrompt`
+  - API Call: `/default`
   - Parameters: `\{"message": "Tell me a dad joke"\}`
 
 - User Input: "What is the biggest WW2 military operation"
-  - API Call: `/getNotRelevantPrompt`
+  - API Call: `/default`
   - Parameters: `\{"message": "What is the biggest WW2 military operation"\}`
 
 - User Input: "buy"
