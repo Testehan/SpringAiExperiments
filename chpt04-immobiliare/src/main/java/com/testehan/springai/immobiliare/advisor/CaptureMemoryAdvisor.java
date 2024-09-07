@@ -54,7 +54,7 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
                     retryTemplate.execute((RetryCallback<Boolean, Throwable>) context -> extractMemoryIfPossible(request,adviseContext));
 
                 } catch (Throwable t) {
-                    logger.error("We several times to extract a memory but something is not workin. ", t);
+                    logger.error("We several times to extract a memory but something is not working. ", t);
                 }
             }
         };
