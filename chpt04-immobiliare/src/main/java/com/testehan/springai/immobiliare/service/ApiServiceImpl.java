@@ -1,15 +1,29 @@
 package com.testehan.springai.immobiliare.service;
 
+import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
+import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.RestCall;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
 import jakarta.servlet.http.HttpSession;
+import lombok.val;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
+import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
 
 @Service
@@ -21,7 +35,20 @@ public class ApiServiceImpl implements ApiService{
     @Autowired
     private ApartmentService apartmentService;
 
-    @Autowired HttpSession session;
+    @Autowired
+    private HttpSession session;
+
+    @Autowired
+    private ChatModel chatmodel;
+
+    @Autowired
+    private VectorStore vectorStore;
+
+    @Autowired
+    private Executor executor;
+
+    @Autowired
+    private ConversationSession conversationSession;
 
     @Override
     public ResultsResponse getChatResponse(String message) {
@@ -37,6 +64,7 @@ public class ApiServiceImpl implements ApiService{
             case "/getCity" : { return setCity(restCall); }
             case "/restart" : { return restartConversation(); }
             case "/apartments/getApartments" :{ return getApartments(message); }
+            case "/default" : return respondToUserMessage(conversationSession,message);
         }
 
         return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
@@ -60,6 +88,7 @@ public class ApiServiceImpl implements ApiService{
         return response;
     }
 
+    // TODO this should also REMOVE from vectore store all information related to the user
     private ResultsResponse restartConversation() {
         session.setAttribute("rentOrSale", "");
         session.setAttribute("city", "");
@@ -76,4 +105,44 @@ public class ApiServiceImpl implements ApiService{
         session.setAttribute("rentOrSale", restCall.message());
         return new ResultsResponse(M02_CITY, new ArrayList<>());
     }
+
+    private ChatClient createNewChatClient(ConversationSession conversationSession){
+        return ChatClient
+                .builder(chatmodel)
+                .defaultAdvisors(
+                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
+                        new CaptureMemoryAdvisor(  vectorStore, chatmodel, executor),
+                        new QuestionAnswerAdvisor(
+                                vectorStore,
+                                SearchRequest.defaults().withSimilarityThreshold(.8)
+                        ),
+                        new SimpleLoggerAdvisor()
+                        )
+//                .defaultSystem()        // conversationSession.promptResource()
+                .build();
+    }
+
+    private ResultsResponse respondToUserMessage(ConversationSession conversationSession, String userMessage) {
+
+        val chatResponse = createNewChatClient(conversationSession)
+                .prompt()
+                .advisors (new Consumer<ChatClient.AdvisorSpec>() {
+                    @Override
+                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
+                        advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationSession.getConversationId());
+                    }
+                })
+                .advisors(new Consumer<ChatClient.AdvisorSpec>() {
+                    @Override
+                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
+                        advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
+                    }
+                })
+            .user(userMessage)
+                .call()
+                .chatResponse();
+
+        return new ResultsResponse(chatResponse.getResult().getOutput().getContent(), new ArrayList<>());
+    }
+
 }
