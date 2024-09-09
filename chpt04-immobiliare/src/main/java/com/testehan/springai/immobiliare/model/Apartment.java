@@ -48,6 +48,17 @@ public class Apartment {
                 "Additional keywords for this apartment are " + tags;
     }
 
+    @JsonIgnore
+    public String getApartmentInfo(){
+        return "The apartment called \"" + name + "\" is located in the city " + city + ", area or neighbourhood " + area + ". " +
+                shortDescription +
+                "It has a surface of " + surface + " square meters." +
+                "The price is " + price + " euro. " +
+                "Number of rooms is " + noOfRooms + ". " +
+                "Located at floor " + floor + ". " +
+                "Additional keywords for this apartment are " + tags;
+    }
+
     @Override
     public String toString() {
         return "Apartment{" +
