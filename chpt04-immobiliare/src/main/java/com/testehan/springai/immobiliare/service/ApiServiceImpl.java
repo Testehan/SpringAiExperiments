@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
+import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.RestCall;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
@@ -12,12 +13,19 @@ import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -64,7 +72,7 @@ public class ApiServiceImpl implements ApiService{
             case "/getCity" : { return setCity(restCall); }
             case "/restart" : { return restartConversation(); }
             case "/apartments/getApartments" :{ return getApartments(message); }
-            case "/default" : return respondToUserMessage(conversationSession,message);
+            case "/default" : return respondToUserMessage(message);
         }
 
         return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
@@ -80,7 +88,8 @@ public class ApiServiceImpl implements ApiService{
         ResultsResponse response;
 
         if (apartments.size() > 0) {
-            response = new ResultsResponse(M04_APARTMENTS_FOUND, apartments);
+            var apartmentsFoundMessage = getApartmentsFoundMessage(apartments);
+            response = new ResultsResponse(apartmentsFoundMessage, apartments);
         } else {
             response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
         }
@@ -88,10 +97,33 @@ public class ApiServiceImpl implements ApiService{
         return response;
     }
 
+    private String getApartmentsFoundMessage(List<Apartment> apartments) {
+        Resource resource = new ClassPathResource("prompts/apartments_found.txt");
+
+        PromptTemplate promptTemplate = new PromptTemplate(resource);
+        Map<String, Object> promptParameters = new HashMap<>();
+        promptParameters.put("apartmentsFound", formatApartmentsFound(apartments));
+        Prompt prompt = promptTemplate.create(promptParameters);
+
+        return respondToUserMessage(prompt.getContents()).message();
+
+    }
+
+    private String formatApartmentsFound(List<Apartment> apartments) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Apartment apartment : apartments){
+            stringBuilder.append("Apartment " + apartment.getId() + " :" + apartment.getApartmentInfo() + "\n");
+        }
+
+        return stringBuilder.toString();
+    }
+
     // TODO this should also REMOVE from vectore store all information related to the user
     private ResultsResponse restartConversation() {
         session.setAttribute("rentOrSale", "");
         session.setAttribute("city", "");
+        conversationSession.getChatMemory().clear(conversationSession.getConversationId());
+//        vectorStore.delete()
         return new ResultsResponse(M01_INITIAL_MESSAGE, new ArrayList<>());
 
     }
@@ -106,13 +138,13 @@ public class ApiServiceImpl implements ApiService{
         return new ResultsResponse(M02_CITY, new ArrayList<>());
     }
 
-    private ChatClient createNewChatClient(ConversationSession conversationSession){
+    private ChatClient createNewChatClient(){
         return ChatClient
                 .builder(chatmodel)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
                         new CaptureMemoryAdvisor(  vectorStore, chatmodel, executor),
-                        new QuestionAnswerAdvisor(
+                        new QuestionAnswerAdvisor(      // this is an advisor to be used when you need RAG
                                 vectorStore,
                                 SearchRequest.defaults().withSimilarityThreshold(.8)
                         ),
@@ -122,9 +154,9 @@ public class ApiServiceImpl implements ApiService{
                 .build();
     }
 
-    private ResultsResponse respondToUserMessage(ConversationSession conversationSession, String userMessage) {
+    private ResultsResponse respondToUserMessage(String userMessage) {
 
-        val chatResponse = createNewChatClient(conversationSession)
+        val chatResponse = createNewChatClient()
                 .prompt()
                 .advisors (new Consumer<ChatClient.AdvisorSpec>() {
                     @Override
@@ -144,5 +176,6 @@ public class ApiServiceImpl implements ApiService{
 
         return new ResultsResponse(chatResponse.getResult().getOutput().getContent(), new ArrayList<>());
     }
+
 
 }
