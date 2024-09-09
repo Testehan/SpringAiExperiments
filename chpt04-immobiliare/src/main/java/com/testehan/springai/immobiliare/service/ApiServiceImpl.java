@@ -2,10 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.PropertyType;
-import com.testehan.springai.immobiliare.model.RestCall;
-import com.testehan.springai.immobiliare.model.ResultsResponse;
+import com.testehan.springai.immobiliare.model.*;
 import lombok.val;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -58,19 +55,14 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public ResultsResponse getChatResponse(String message) {
-        RestCall restCall = immobiliareApiService.whichApiToCall(message);
+        ServiceCall serviceCall = immobiliareApiService.whichApiToCall(message);
 
-        // TODO Yeah i know this is ugly...but i have to figure out a better way of keeping track of session data when
-        // making another rest call, or some other approach, as when i make a rest call from the code, the session
-        // in the endpoint will be different, and so the values set above will not be present
-        // Once security part is introduced in the app, this will be handled :
-        // https://stackoverflow.com/questions/76590383/how-to-configure-resttemplate-to-use-browsers-session-for-api-call
-        switch (restCall.apiCall()) {
-            case "/getRentOrBuy" : { return setRentOrBuy(restCall);}
-            case "/getCity" : { return setCity(restCall); }
-            case "/restart" : { return restartConversation(); }
-            case "/apartments/getApartments" :{ return getApartments(message); }
-            case "/default" : return respondToUserMessage(message);
+        switch (serviceCall.apiCall()) {
+            case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
+            case SET_CITY : { return setCity(serviceCall); }
+            case GET_APARTMENTS:{ return getApartments(message); }
+            case RESTART_CONVERSATION : { return restartConversation(); }
+            case DEFAULT : return respondToUserMessage(message);
         }
 
         return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
@@ -126,13 +118,13 @@ public class ApiServiceImpl implements ApiService{
 
     }
 
-    private ResultsResponse setCity(RestCall restCall) {
-        conversationSession.setCity(restCall.message());
+    private ResultsResponse setCity(ServiceCall serviceCall) {
+        conversationSession.setCity(serviceCall.message());
         return new ResultsResponse(M03_DETAILS, new ArrayList<>());
     }
 
-    private ResultsResponse setRentOrBuy(RestCall restCall) {
-        conversationSession.setRentOrSale(restCall.message());
+    private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
+        conversationSession.setRentOrSale(serviceCall.message());
         return new ResultsResponse(M02_CITY, new ArrayList<>());
     }
 

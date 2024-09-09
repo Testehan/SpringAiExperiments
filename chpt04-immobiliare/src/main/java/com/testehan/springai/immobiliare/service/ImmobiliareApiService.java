@@ -2,7 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.RestCall;
+import com.testehan.springai.immobiliare.model.ServiceCall;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -30,11 +30,11 @@ public class ImmobiliareApiService {
         this.chatClient = chatClient;
     }
 
-    public RestCall whichApiToCall(String message) {
+    public ServiceCall whichApiToCall(String message) {
 
         ChatResponse assistantResponse;
 
-        var outputParser = new BeanOutputConverter<>(RestCall.class);
+        var outputParser = new BeanOutputConverter<>(ServiceCall.class);
         String format = outputParser.getFormat();
 
         PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionFile);
@@ -48,8 +48,8 @@ public class ImmobiliareApiService {
                 .user(prompt.getContents())
                 .call().chatResponse();
 
-        RestCall restCall = outputParser.parse(assistantResponse.getResult().getOutput().getContent());
-        return restCall;
+        ServiceCall serviceCall = outputParser.parse(assistantResponse.getResult().getOutput().getContent());
+        return serviceCall;
     }
 
     public Apartment extractApartmentInformationFromProvidedDescription(String apartmentDescription) {
