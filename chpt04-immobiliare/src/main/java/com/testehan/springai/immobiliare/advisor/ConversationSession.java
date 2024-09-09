@@ -16,6 +16,9 @@ public class ConversationSession {
 
     private ChatMemory chatMemory;
     private Authentication authentication;
+    private String city;
+    private String rentOrSale;
+
 
     public ConversationSession(ChatMemory chatMemory) {
         this.chatMemory = chatMemory;
@@ -34,5 +37,21 @@ public class ConversationSession {
     public String getConversationId(){
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
         return userEmail;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getRentOrSale() {
+        return rentOrSale;
+    }
+
+    public void setRentOrSale(String rentOrSale) {
+        this.rentOrSale = rentOrSale;
     }
 }

@@ -6,7 +6,6 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.RestCall;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.val;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
@@ -17,7 +16,6 @@ import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -37,26 +35,26 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @Service
 public class ApiServiceImpl implements ApiService{
 
-    @Autowired
     private ImmobiliareApiService immobiliareApiService;
 
-    @Autowired
     private ApartmentService apartmentService;
 
-    @Autowired
-    private HttpSession session;
-
-    @Autowired
     private ChatModel chatmodel;
 
-    @Autowired
     private VectorStore vectorStore;
 
-    @Autowired
     private Executor executor;
 
-    @Autowired
     private ConversationSession conversationSession;
+
+    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService, ChatModel chatmodel, VectorStore vectorStore, Executor executor, ConversationSession conversationSession) {
+        this.immobiliareApiService = immobiliareApiService;
+        this.apartmentService = apartmentService;
+        this.chatmodel = chatmodel;
+        this.vectorStore = vectorStore;
+        this.executor = executor;
+        this.conversationSession = conversationSession;
+    }
 
     @Override
     public ResultsResponse getChatResponse(String message) {
@@ -81,8 +79,8 @@ public class ApiServiceImpl implements ApiService{
     private ResultsResponse getApartments(String message) {
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(message);
 
-        var rentOrSale = (String) session.getAttribute("rentOrSale");
-        var city = (String) session.getAttribute("city");
+        var rentOrSale = conversationSession.getRentOrSale();
+        var city = conversationSession.getCity();
         var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, message);
 
         ResultsResponse response;
@@ -120,8 +118,8 @@ public class ApiServiceImpl implements ApiService{
 
     // TODO this should also REMOVE from vectore store all information related to the user
     private ResultsResponse restartConversation() {
-        session.setAttribute("rentOrSale", "");
-        session.setAttribute("city", "");
+        conversationSession.setRentOrSale("");
+        conversationSession.setCity("");
         conversationSession.getChatMemory().clear(conversationSession.getConversationId());
 //        vectorStore.delete()
         return new ResultsResponse(M01_INITIAL_MESSAGE, new ArrayList<>());
@@ -129,12 +127,12 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse setCity(RestCall restCall) {
-        session.setAttribute("city", restCall.message());
+        conversationSession.setCity(restCall.message());
         return new ResultsResponse(M03_DETAILS, new ArrayList<>());
     }
 
     private ResultsResponse setRentOrBuy(RestCall restCall) {
-        session.setAttribute("rentOrSale", restCall.message());
+        conversationSession.setRentOrSale(restCall.message());
         return new ResultsResponse(M02_CITY, new ArrayList<>());
     }
 
