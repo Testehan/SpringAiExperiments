@@ -2,10 +2,18 @@
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
 <head th:replace="~{fragments :: page_head('none')}" />
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}" ></script>
+<script th:src="@{/js/apartment_form_images.js}"></script>
+<script type="text/javascript">
+    MAX_FILE_SIZE=5000000       //5 MB
 
+    // because we can't use thymeleaf in js code, we declare this variable here, and use it in product_form.js
+    defaultThumbnailImageSrc = "[[@{/images/image-thumbnail.png}]]"
+
+</script>
 <body class="h-screen bg-gray-100" >
 
-<head th:replace="~{navigation :: header_menu}" />
+<div th:replace="~{navigation :: header_menu}" />
 
 <div class="flex h-[80%]">
 
@@ -13,7 +21,7 @@
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <h1>Add a new apartment</h1>
 
-        <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" th:object="${apartment}">
+        <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
             <div class="mb-4">
                 <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
                 <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
@@ -71,6 +79,20 @@
                 <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>
                 <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}">
             </div>
+            <div class="mb-4" id="apartmentImages">
+                <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages}">
+                    <div th:id="'imageHeader'+${numberOfExistingImages}"><label>Image no [[${numberOfExistingImages + 1}]]</label></div>
+                    <div class="m-2">
+                        <img th:id="'imageThumbnail'+${numberOfExistingImages}" alt="Image preview" class="img-fluid"
+                             th:src="@{/images/image-thumbnail.png}"/>
+                    </div>
+                    <div>
+                        <input type="file" name="apartmentImages" accept="image/png, image/jpeg" />
+                    </div>
+                </div>
+
+            </div>
+
             <div class="flex items-center justify-between">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Add Apartment
