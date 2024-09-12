@@ -132,6 +132,18 @@
             <version>2.10.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>jquery</artifactId>
+            <version>3.4.1</version>
+        </dependency>
+        <!-- This project provides a means to locate assets (for example javascript files) within WebJars.
+        So it is needed for using the the previous 2 libraries from what I understand-->
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>webjars-locator-core</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/api/apartments/**").authenticated()
                 .requestMatchers("/","/help","/blog","/contact", "/error").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
+                .requestMatchers(antMatcher("/js/**")).permitAll()
+                .requestMatchers(antMatcher("/webjars/**")).permitAll()
                 .requestMatchers(antMatcher("/images/**")).permitAll()
                 )
             .oauth2Login( oauth2Login -> oauth2Login
