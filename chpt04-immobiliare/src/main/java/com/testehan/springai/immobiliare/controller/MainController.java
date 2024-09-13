@@ -73,6 +73,8 @@ public class MainController {
 		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 		model.addAttribute("apartment", apartment);
+		model.addAttribute("numberOfExistingImages", 0);
+
 
 		return "add";
 	}

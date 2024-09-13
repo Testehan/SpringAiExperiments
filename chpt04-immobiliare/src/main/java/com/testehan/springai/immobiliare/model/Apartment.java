@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -27,7 +28,7 @@ public class Apartment {
     private Integer noOfRooms;
     private String floor;
     private List<String> tags;
-    private List<String> images;
+    private List<String> images = new ArrayList<>();
 
     private String contact;
     private String creationDateTime;

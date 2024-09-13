@@ -1,20 +1,23 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.constants.AmazonS3Constants;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.io.*;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -41,7 +44,8 @@ public class ApartmentController {
     }
 
     @PostMapping("/save")
-    public String saveApartment(Apartment apartment, Authentication authentication, RedirectAttributes redirectAttributes) throws FileNotFoundException {
+    public String saveApartment(Apartment apartment, Authentication authentication, RedirectAttributes redirectAttributes,
+                                @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
 
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
@@ -60,12 +64,9 @@ public class ApartmentController {
             System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
             apartment.setPlot_embedding(embeddings);
 
-            // TODO Add pictures to an apartment. Right now a dummy pic is uploaded to S3...
             apartmentService.saveApartment(apartment);
-
-            AmazonS3Util.createAmazomS3();
-
-            AmazonS3Util.uploadFile("uploadDir", "filename", getImage());
+            saveUploadedImages(apartment, apartmentImages);
+            apartmentService.saveApartment(apartment);
 
             user.setMaxNumberOfListedApartments(user.getMaxNumberOfListedApartments() - 1);
             userService.updateUser(user);
@@ -79,15 +80,18 @@ public class ApartmentController {
 
     }
 
-    // TODO this is just for a small test...to be removed in the future
-    private InputStream getImage() {
-        try {
-            Resource resource = resourceLoader.getResource("classpath:/static/images/logo.png");
-            return resource.getInputStream();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void saveUploadedImages(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
+        if (apartmentImages.length>0) {
+            var uploadDirExtras = "apartment-images/" + apartment.getId();
+            for (MultipartFile extraImage : apartmentImages) {
+                if (extraImage.isEmpty()) continue;
+
+                String filename = StringUtils.cleanPath(extraImage.getOriginalFilename());
+                AmazonS3Util.uploadFile(uploadDirExtras, filename, extraImage.getInputStream());
+
+                apartment.getImages().add(AmazonS3Constants.S3_BASE_URI+uploadDirExtras+filename);
+            }
         }
     }
-
 
 }
