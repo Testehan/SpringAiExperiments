@@ -82,14 +82,14 @@ public class ApartmentController {
 
     private void saveUploadedImages(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
         if (apartmentImages.length>0) {
-            var uploadDirExtras = "apartment-images/" + apartment.getId();
+            var uploadDir = "apartment-images/" + apartment.getId();
             for (MultipartFile extraImage : apartmentImages) {
                 if (extraImage.isEmpty()) continue;
 
                 String filename = StringUtils.cleanPath(extraImage.getOriginalFilename());
-                AmazonS3Util.uploadFile(uploadDirExtras, filename, extraImage.getInputStream());
+                AmazonS3Util.uploadFile(uploadDir, filename, extraImage.getInputStream());
 
-                apartment.getImages().add(AmazonS3Constants.S3_BASE_URI+uploadDirExtras+filename);
+                apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
             }
         }
     }
