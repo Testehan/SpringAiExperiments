@@ -44,7 +44,6 @@ public class ImmobiliareApiService {
         Prompt prompt = promptTemplate.create(promptParameters);
 
         assistantResponse = chatClient.prompt()
-//                .advisors(new SimpleLoggerAdvisor())      // todo when you need debugging req and resp from LLM
                 .user(prompt.getContents())
                 .call().chatResponse();
 
@@ -72,20 +71,5 @@ public class ImmobiliareApiService {
         Apartment apartment = outputParser.parse(assistantResponse.getResult().getOutput().getContent());
         return apartment;
     }
-
-    // what i am trying to do with this method is to have the possibility that from one REST endpoint
-    // to let the LLM decide which function to call based obviously on the user input
-    // maybe this is a better approach than to use the whichApiToCall from above approach ?
-//    @GetMapping("/decide")
-//    public String decide(@RequestParam(value = "message") String message) {
-//        Prompt prompt = new Prompt(message);
-//
-//        ChatResponse response = chatClient.prompt()
-//                .user(prompt.getContents())
-//                .functions("apartmentsFunction","apartmentsSaleFunction","emailApartmentsFunction")
-//                .call().chatResponse();
-//
-//        return response.getResult().getOutput().getContent();
-//    }
 
 }

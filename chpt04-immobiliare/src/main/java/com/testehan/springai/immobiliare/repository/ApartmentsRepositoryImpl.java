@@ -79,7 +79,6 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
 
-        // todo this is for debugging purposes
         System.out.println("Combined Filter: " + combinedFilters.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()).toJson());
 
         VectorSearchOptions options = vectorSearchOptions().filter(combinedFilters);

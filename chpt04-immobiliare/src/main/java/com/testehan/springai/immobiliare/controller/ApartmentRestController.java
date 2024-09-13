@@ -11,7 +11,6 @@ import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
-import jakarta.servlet.http.HttpSession;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,16 +35,6 @@ public class ApartmentRestController {
         this.openAiService = openAiService;
         this.apartmentService = apartmentService;
         this.userService = userService;
-    }
-
-    @GetMapping("/getApartments")
-    public List<Apartment> getApartments(@RequestParam(value = "message") String message, HttpSession session) {
-        var rentOrSale = (String) session.getAttribute("rentOrSale");
-        var city = (String)  session.getAttribute("city");
-// todo i think this endpoint can be removed entirely; if needed one would need to make an aditional call to openai to extract
-        // apartment object from provided message description
-//        return apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city, message);
-        return new ArrayList<>();
     }
 
     @GetMapping("/getContact/{apartmentId}")
