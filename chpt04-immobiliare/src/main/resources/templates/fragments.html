@@ -17,11 +17,11 @@
 
 <div th:fragment="apartments_list(favouriteButtonStartMessage)">
     <div th:each="apartment, status : ${apartments}" class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
-        <div class="flex justify-center mb-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center">
             <div th:each="image, iterStat : ${apartment.images}">
 
-                <div class="flex justify-center">
-                    <img id="displayedImage" class="w-1/2 h-auto" th:src="@{${image}}" alt="" onerror="this.onerror=null; this.src='https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'" />
+                <div class="overflow-hidden rounded-lg shadow-lg">
+                    <img class="w-full h-auto object-cover cursor-pointer" th:src="@{${image}}" onclick="openLightbox(this.src)" alt="" onerror="this.onerror=null; this.src='https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'">
                 </div>
 
             </div>
@@ -60,6 +60,26 @@
             </p>
         </div>
     </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" style="display: none;" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50" onclick="closeLightbox()">
+        <span class="absolute top-4 right-4 text-white text-3xl cursor-pointer" onclick="closeLightbox()">&times;</span>
+        <img id="lightbox-img" class="max-w-full max-h-full rounded-lg shadow-lg" />
+    </div>
+
+    <script>
+        // Open the lightbox with the clicked image
+        function openLightbox(src) {
+            document.getElementById('lightbox-img').src = src;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        // Close the lightbox
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+    </script>
+
 </div>
 
 </body>
