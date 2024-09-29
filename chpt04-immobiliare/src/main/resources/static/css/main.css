@@ -679,6 +679,10 @@ video {
   height: 1.5rem;
 }
 
+.h-8 {
+  height: 2rem;
+}
+
 .h-\[80\%\] {
   height: 80%;
 }
@@ -709,6 +713,10 @@ video {
 
 .w-6 {
   width: 1.5rem;
+}
+
+.w-8 {
+  width: 2rem;
 }
 
 .w-\[80\%\] {
@@ -1077,6 +1085,16 @@ video {
   color: rgb(252 32 3/ var(--tw-text-opacity));
 }
 
+#sendMessageButton {
+  display: none;
+}
+
+#message:valid {
+  ~ #sendMessageButton {
+    display: block;
+  }
+}
+
 .hover\:bg-blue-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(29 78 216 / var(--tw-bg-opacity));
@@ -1217,15 +1235,5 @@ video {
 @media (min-width: 1024px) {
   .lg\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-#sendMessageButton {
-  display: none;
-}
-
-#message:valid {
-  ~ #sendMessageButton {
-    display: block;
   }
 }
