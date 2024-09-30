@@ -4,12 +4,13 @@ import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @CrossOrigin
@@ -45,8 +46,14 @@ public class ChatController {
 
     // Add a user message to model but don't ask to respond to it. This enables us to update the UI quickly.
     @HxRequest
-    @PutMapping("/message")
-    public HtmxResponse addUserMessage(@RequestParam String message, Model model) {
+    @PostMapping("/message")
+    public HtmxResponse addUserMessage(@RequestParam(required = false) String message,
+                                       @RequestParam(required = false) MultipartFile audioFile,
+                                       Model model) {
+        if (StringUtils.isEmpty(message)){
+            // TODO means that we need to process the audioFile to extract de text
+            message = "Processing of the audio file needs to be performed to extract text";
+        }
         model.addAttribute("message",message);
         return HtmxResponse.builder()
                 .view("response :: responseFragment")
