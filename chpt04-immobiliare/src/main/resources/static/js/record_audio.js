@@ -26,6 +26,9 @@ $(document).ready(function () {
                 audioInput[0].files = dataTransfer.files;
 
                 audioChunks = [];  // Clear the chunks
+
+                 $("#sendMessageButton").click();   // send request once recording stops
+                 $('#message').attr('required', true);
             });
         });
 
@@ -33,10 +36,11 @@ $(document).ready(function () {
     $("#recordVoiceButton").on('click', function() {
         if (mediaRecorder.state === "inactive") {
             mediaRecorder.start();
-            this.textContent = "Recording...";
+            this.textContent = "Recording";
         } else {
             mediaRecorder.stop();
-            this.textContent = "Record Voice";
+            this.textContent = "Stopped";
+            $("#message").removeAttr("required");
         }
     });
 });
