@@ -8,13 +8,12 @@
 </head>
 <body>
 <div th:fragment="responseFragment" class="mb-2">
-    <div th:unless="${message == null || message.isEmpty()}" class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
-    <p th:unless="${response == null || response.isEmpty()}" class="h-full overflow-auto" th:text="${response}">Response</p>
+    <div th:unless="${message == null || message.isEmpty()}" class="inline-block bg-slate-100 rounded-lg p-2 ml-auto userMessage" th:text="${message}">Message</div>
+    <p th:unless="${response == null || response.isEmpty()}" class="h-full overflow-auto assistantResponse" th:text="${response}">Response</p>
 </div>
 
 <div th:fragment="responseFragmentWithApartments" class="mb-2">
-    <div th:unless="${message == null || message.isEmpty()}" class="inline-block bg-slate-100 rounded-lg p-2 ml-auto" th:text="${message}">Message</div>
-    <p th:unless="${response == null || response.isEmpty()}" class="h-full overflow-auto" th:text="${response}">Response</p>
+    <p th:unless="${response == null || response.isEmpty()}" class="h-full overflow-auto assistantResponse" th:text="${response}">Response</p>
 
     <div class="columns-2">
         <div th:replace="~{fragments :: apartments_list('Save to Favourites')}" />
