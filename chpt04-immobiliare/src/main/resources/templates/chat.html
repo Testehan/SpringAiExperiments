@@ -22,15 +22,29 @@
 <!--});-->
 <!--</script>-->
 
+<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}" ></script>
 <script>
     function handleAfterRequest(event) {
-        let userMessage = document.getElementById('message').value;
+        let userMessage = $('#response-container div:last').text();
+        console.log(userMessage);
+        // document.getElementById('message').value;
         document.getElementById('message').value = '';
         htmx.ajax('POST', '/respond', {target: '#response-container', swap: 'beforeend', values: {message: userMessage}});
     }
+
+    $(document).ready(function(){
+        $(document).bind('htmx:load', function(evt) {
+            if ((evt.target.parentNode.id === 'response-container') && (evt.target.children[0].className.includes("userMessage"))) {
+                console.log("loaded message");
+                handleAfterRequest(event);
+            }
+        });
+    });
+
+
 </script>
-<script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}" ></script>
 <script th:src="@{/js/chat_history.js}"></script>
+<script th:src="@{/js/record_audio.js}"></script>
 
 <body class="h-screen bg-gray-100" >
 
@@ -48,22 +62,23 @@
         </div>
         <div class="">
             <form id="chatForm"
+                  enctype="multipart/form-data"
                   class="w-full"
-                  hx-put="/message"
+                  hx-post="/message"
                   hx-swap="beforeend"
-                  hx-target="#response-container"
-                  hx-on="htmx:afterRequest: handleAfterRequest(event)">
+                  hx-target="#response-container">
 
                 <div class="flex items-center bg-gray-200 rounded-full p-2 shadow-md">
 
-                    <input id="message" name="message" required pattern="[a-zA-Z0-9\\s\.\';,-]+" class="bg-gray-200 outline-none text-gray-700 rounded-full py-2 px-4 w-full" type="text" placeholder="Message Immobil AI" autocomplete="off">
+                    <input id="message" name="message" required pattern="[a-zA-Z0-9\\s\.\';,-]+" class="bg-gray-200 outline-none text-gray-700 rounded-full py-2 px-4 w-full" type="text" placeholder="Message Immobil AI" autocomplete="off" />
+                    <input type="file" id="audioFile" name="audioFile" style="display: none;"   />
 
                     <button id="sendMessageButton" hx-indicator="#spinner" type="submit" class="w-8 h-8 bg-gray-300 hover:bg-gray-400 text-gray-600 rounded-full p-2 ml-2">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
                         </svg>
                     </button>
-                    <button id="recordVoiceButton" hx-indicator="#spinner" type="submit" class="w-8 h-8 bg-gray-300 hover:bg-gray-400 text-gray-600 rounded-full p-2 ml-2">
+                    <button id="recordVoiceButton" hx-indicator="#spinner" type="button" class="w-8 h-8 bg-gray-300 hover:bg-gray-400 text-gray-600 rounded-full p-2 ml-2">
                         <img src="/images/microphone.svg"/>
                     </button>
 
