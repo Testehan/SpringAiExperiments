@@ -23,28 +23,10 @@
 <!--</script>-->
 
 <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}" ></script>
-<script>
-    function handleAfterRequest(event) {
-        let userMessage = $('#response-container div:last').text();
-        console.log(userMessage);
-        // document.getElementById('message').value;
-        document.getElementById('message').value = '';
-        htmx.ajax('POST', '/respond', {target: '#response-container', swap: 'beforeend', values: {message: userMessage}});
-    }
 
-    $(document).ready(function(){
-        $(document).bind('htmx:load', function(evt) {
-            if ((evt.target.parentNode.id === 'response-container') && (evt.target.children[0].className.includes("userMessage"))) {
-                console.log("loaded message");
-                handleAfterRequest(event);
-            }
-        });
-    });
-
-
-</script>
 <script th:src="@{/js/chat_history.js}"></script>
 <script th:src="@{/js/chat_record_audio.js}"></script>
+<script th:src="@{/js/chat_general.js}"></script>
 
 <body class="h-screen bg-gray-100" >
 
