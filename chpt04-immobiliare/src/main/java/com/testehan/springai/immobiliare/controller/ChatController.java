@@ -5,6 +5,11 @@ import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
+import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -17,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 public class ChatController {
 
     private final ApiService apiService;
+    private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
 
-    public ChatController(ApiService apiService) {
+    public ChatController(ApiService apiService, OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel) {
         this.apiService = apiService;
+        this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
     }
 
     @HxRequest
@@ -51,8 +58,16 @@ public class ChatController {
                                        @RequestParam(required = false) MultipartFile audioFile,
                                        Model model) {
         if (StringUtils.isEmpty(message)){
-            // TODO means that we need to process the audioFile to extract de text
-            message = "Processing of the audio file needs to be performed to extract text";
+            OpenAiAudioApi.TranscriptResponseFormat responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
+
+            OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+                    .withLanguage("en")
+                    .withTemperature(0f)
+                    .withResponseFormat(responseFormat)
+                    .build();
+            AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(audioFile.getResource(), transcriptionOptions);
+            AudioTranscriptionResponse response = openAiAudioTranscriptionModel.call(transcriptionRequest);
+            message = response.getResult().getOutput();
         }
         model.addAttribute("message",message);
         return HtmxResponse.builder()
