@@ -36,10 +36,10 @@ $(document).ready(function () {
     $("#recordVoiceButton").on('click', function() {
         if (mediaRecorder.state === "inactive") {
             mediaRecorder.start();
-            this.textContent = "Recording";
+            $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );
         } else {
             mediaRecorder.stop();
-            this.textContent = "Stopped";
+            $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
             $("#message").removeAttr("required");
         }
     });
