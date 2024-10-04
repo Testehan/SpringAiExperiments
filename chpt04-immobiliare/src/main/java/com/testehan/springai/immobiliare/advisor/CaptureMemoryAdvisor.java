@@ -2,13 +2,14 @@ package com.testehan.springai.immobiliare.advisor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.AdvisedRequest;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.RequestResponseAdvisor;
+import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.core.Ordered;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
@@ -81,6 +82,12 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
 
         logger.info("Ignoring useless memory: {}", memoryResponse);
         return false;
+    }
+
+    // Advisors with lower order values are executed first
+    @Override
+    public int getOrder() {
+        return Ordered.HIGHEST_PRECEDENCE;
     }
 
     private record MemoryResponse(String content, boolean useful){

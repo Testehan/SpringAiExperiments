@@ -1,6 +1,6 @@
 package com.testehan.springai.immobiliare.advisor;
 
-import org.springframework.ai.chat.client.AdvisedRequest;
+import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
 import org.springframework.ai.chat.messages.Message;
 
 import java.util.List;
