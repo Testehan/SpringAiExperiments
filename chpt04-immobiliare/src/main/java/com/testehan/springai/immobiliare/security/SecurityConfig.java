@@ -24,7 +24,7 @@ public class SecurityConfig {
         http.csrf(CsrfConfigurer::disable);
 
         http.authorizeHttpRequests(req -> req
-                .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/api/apartments/**").authenticated()
+                .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/api/apartments/**","/actuator/**").authenticated()
                 .requestMatchers("/","/help","/blog","/contact", "/error").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
