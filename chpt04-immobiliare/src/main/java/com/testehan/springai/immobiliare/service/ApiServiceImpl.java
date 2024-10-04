@@ -17,12 +17,10 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
@@ -70,18 +68,23 @@ public class ApiServiceImpl implements ApiService{
         return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
     }
 
-    private ResultsResponse getApartments(String message) {
-        var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(message);
+    private ResultsResponse getApartments(String description) {
+        var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 
         var rentOrSale = conversationSession.getRentOrSale();
         var city = conversationSession.getCity();
-        var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, message);
+        var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
         ResultsResponse response;
 
         if (apartments.size() > 0) {
-            var apartmentsFoundMessage = getApartmentsFoundMessage(apartments);
-            response = new ResultsResponse(apartmentsFoundMessage, apartments);
+            var bestMatchingApartmentIds = getBestMatchingApartmentIds(apartments, description);
+            Set<String> idsToFilter = Arrays.stream(bestMatchingApartmentIds.split(","))
+                    .collect(Collectors.toSet());
+            apartments =  apartments.stream()
+                    .filter(item -> idsToFilter.contains(item.getId().toString()))
+                    .collect(Collectors.toList());
+            response = new ResultsResponse(M04_APARTMENTS_FOUND, apartments);
         } else {
             response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
         }
@@ -89,12 +92,13 @@ public class ApiServiceImpl implements ApiService{
         return response;
     }
 
-    private String getApartmentsFoundMessage(List<Apartment> apartments) {
+    private String getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
         var resource = new ClassPathResource("prompts/apartments_found.txt");
 
         var promptTemplate = new PromptTemplate(resource);
         Map<String, Object> promptParameters = new HashMap<>();
         promptParameters.put("apartmentsFound", formatApartmentsFound(apartments));
+        promptParameters.put("description", description);
         var prompt = promptTemplate.create(promptParameters);
 
         return respondToUserMessage(prompt.getContents()).message();
