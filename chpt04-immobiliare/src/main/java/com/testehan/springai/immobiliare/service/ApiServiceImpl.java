@@ -73,18 +73,22 @@ public class ApiServiceImpl implements ApiService{
 
         var rentOrSale = conversationSession.getRentOrSale();
         var city = conversationSession.getCity();
-        var apartments = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
+        var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
         ResultsResponse response;
 
-        if (apartments.size() > 0) {
-            var bestMatchingApartmentIds = getBestMatchingApartmentIds(apartments, description);
+        if (apartmentsFromSemanticSearch.size() > 0) {
+            var bestMatchingApartmentIds = getBestMatchingApartmentIds(apartmentsFromSemanticSearch, description);
             Set<String> idsToFilter = Arrays.stream(bestMatchingApartmentIds.split(","))
                     .collect(Collectors.toSet());
-            apartments =  apartments.stream()
+            var apartmentsFromLLM=  apartmentsFromSemanticSearch.stream()
                     .filter(item -> idsToFilter.contains(item.getId().toString()))
                     .collect(Collectors.toList());
-            response = new ResultsResponse(M04_APARTMENTS_FOUND, apartments);
+            if (apartmentsFromLLM.size()>0) {
+                response = new ResultsResponse(M04_APARTMENTS_FOUND, apartmentsFromLLM);
+            } else {
+                response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
+            }
         } else {
             response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
         }
