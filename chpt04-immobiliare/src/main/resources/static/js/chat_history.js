@@ -35,7 +35,7 @@ $(document).ready(function () {
             }
         } else if (event.key === 'Enter') {
             storeInput(messageInput[0].value);
-            $("#sendMessageButton").click();
+//            $("#sendMessageButton").click();
         }
     });
 });
