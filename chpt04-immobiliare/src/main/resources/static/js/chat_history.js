@@ -1,9 +1,12 @@
-// Array to store user inputs
+// Array to store user inputs. Keep in mind that this stores only text messages. If in the future we want to extend
+// the functionality to include voice messages, then we would need to add messages to messageInputHistory when they
+// are added in the response container (extract message from let userMessage = $('#response-container div:last').text();
+// because that contains both text and voice messages)
 let messageInputHistory = [];
-let historyIndex = -1; // Index to keep track of the current position in history
+let historyIndex = -1;
 
-// Function to store the input in history
-function storeInput(input) {
+
+function storeInputInHistory(input) {
     if (input.trim() !== "") {
         messageInputHistory.push(input);
         historyIndex = messageInputHistory.length; // Reset index to one beyond the latest input
@@ -12,6 +15,9 @@ function storeInput(input) {
 
 $(document).ready(function () {
     var messageInput = $("#message");
+    $('#sendMessageButton').click(function() {
+        storeInputInHistory(messageInput[0].value);
+    });
 
     // Event listener for detecting key presses
     messageInput.on("keydown", function(event) {
@@ -34,8 +40,7 @@ $(document).ready(function () {
                 messageInput[0].value = '';
             }
         } else if (event.key === 'Enter') {
-            storeInput(messageInput[0].value);
-//            $("#sendMessageButton").click();
+            storeInputInHistory(messageInput[0].value);
         }
     });
 });
