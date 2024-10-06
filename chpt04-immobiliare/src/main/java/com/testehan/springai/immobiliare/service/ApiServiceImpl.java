@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
+import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
@@ -129,7 +130,8 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse setCity(ServiceCall serviceCall) {
         conversationSession.setCity(serviceCall.message());
-        return new ResultsResponse(M03_DETAILS, new ArrayList<>());
+        var user = conversationSession.getImmobiliareUser();
+        return new ResultsResponse(String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()), new ArrayList<>());
     }
 
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {

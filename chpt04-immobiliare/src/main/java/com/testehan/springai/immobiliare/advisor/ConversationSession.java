@@ -39,6 +39,9 @@ public class ConversationSession {
     }
 
     public void setCity(String city) {
+        var user = getImmobiliareUser();
+        user.setCity(city);
+        userService.updateUser(user);
         this.city = city;
     }
 
@@ -47,6 +50,9 @@ public class ConversationSession {
     }
 
     public void setRentOrSale(String rentOrSale) {
+        var user = getImmobiliareUser();
+        user.setPropertyType(rentOrSale);
+        userService.updateUser(user);
         this.rentOrSale = rentOrSale;
     }
 

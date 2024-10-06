@@ -39,7 +39,7 @@ public class MainController {
 		} else if (StringUtils.isEmpty(user.getCity())){
 			model.addAttribute("initialMessage", PromptConstants.M02_CITY);
 		} else {
-			model.addAttribute("initialMessage", PromptConstants.M03_DETAILS);
+			model.addAttribute("initialMessage", String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()));
 		}
 		return "chat";
 	}
