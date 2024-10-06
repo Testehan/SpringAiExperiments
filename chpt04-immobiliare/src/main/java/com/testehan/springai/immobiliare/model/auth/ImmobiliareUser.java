@@ -32,4 +32,6 @@ public class ImmobiliareUser {
 
     private String propertyType;
 
+    private String lastPropertyDescription;
+
 }

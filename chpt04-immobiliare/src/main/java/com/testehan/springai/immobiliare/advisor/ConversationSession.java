@@ -18,6 +18,7 @@ public class ConversationSession {
     private final UserService userService;
     private String city;
     private String rentOrSale;
+    private String lastPropertyDescription;
 
 
     public ConversationSession(ChatMemory chatMemory, UserService userService) {
@@ -54,6 +55,17 @@ public class ConversationSession {
         user.setPropertyType(rentOrSale);
         userService.updateUser(user);
         this.rentOrSale = rentOrSale;
+    }
+
+    public String getLastPropertyDescription() {
+        return lastPropertyDescription;
+    }
+
+    public void setLastPropertyDescription(String lastPropertyDescription) {
+        var user = getImmobiliareUser();
+        user.setLastPropertyDescription(lastPropertyDescription);
+        userService.updateUser(user);
+        this.lastPropertyDescription = lastPropertyDescription;
     }
 
     public ImmobiliareUser getImmobiliareUser() {

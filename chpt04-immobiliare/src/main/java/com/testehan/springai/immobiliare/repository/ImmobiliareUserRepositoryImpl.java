@@ -70,7 +70,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("favourites",user.getFavourites())
                         .append("maxNumberOfListedApartments",user.getMaxNumberOfListedApartments())
                         .append("city", user.getCity())
-                        .append("propertyType",user.getPropertyType()));
+                        .append("propertyType",user.getPropertyType())
+                        .append("lastPropertyDescription",user.getLastPropertyDescription()));
 
         UpdateResult result = collection.updateOne(filter, update);
     }

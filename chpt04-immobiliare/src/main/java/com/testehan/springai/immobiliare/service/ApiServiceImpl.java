@@ -70,6 +70,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse getApartments(String description) {
+        conversationSession.setLastPropertyDescription(description);
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 
         var rentOrSale = conversationSession.getRentOrSale();
