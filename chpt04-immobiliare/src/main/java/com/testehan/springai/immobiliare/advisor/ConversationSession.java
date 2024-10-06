@@ -1,5 +1,7 @@
 package com.testehan.springai.immobiliare.advisor;
 
+import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.security.UserService;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,13 +15,15 @@ public class ConversationSession {
 
     private ChatMemory chatMemory;
     private Authentication authentication;
+    private final UserService userService;
     private String city;
     private String rentOrSale;
 
 
-    public ConversationSession(ChatMemory chatMemory) {
+    public ConversationSession(ChatMemory chatMemory, UserService userService) {
         this.chatMemory = chatMemory;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
+        this.userService = userService;
     }
 
     public ChatMemory getChatMemory() {
@@ -27,8 +31,7 @@ public class ConversationSession {
     }
 
     public String getConversationId(){
-        String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
-        return userEmail;
+        return getImmobiliareUser().getEmail();
     }
 
     public String getCity() {
@@ -45,5 +48,11 @@ public class ConversationSession {
 
     public void setRentOrSale(String rentOrSale) {
         this.rentOrSale = rentOrSale;
+    }
+
+    public ImmobiliareUser getImmobiliareUser() {
+        String userEmail = ((OAuth2AuthenticatedPrincipal) authentication.getPrincipal()).getAttribute("email");
+        var user = userService.getImmobiliareUserByEmail(userEmail);
+        return user;
     }
 }

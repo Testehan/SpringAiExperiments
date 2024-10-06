@@ -28,4 +28,8 @@ public class ImmobiliareUser {
 
     private int maxNumberOfListedApartments;
 
+    private String city;
+
+    private String propertyType;
+
 }

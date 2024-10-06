@@ -1,13 +1,12 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +19,11 @@ import java.util.List;
 public class MainController {
 
 	private final ApartmentService apartmentService;
-	private final UserService userService;
+	private final ConversationSession conversationSession;
 
-	public MainController(ApartmentService apartmentService, UserService userService) {
+	public MainController(ApartmentService apartmentService, ConversationSession conversationSession) {
 		this.apartmentService = apartmentService;
-		this.userService = userService;
+		this.conversationSession = conversationSession;
 	}
 
 	@GetMapping("/")
@@ -34,15 +33,20 @@ public class MainController {
 
 	@GetMapping("/chat")
 	public String chat(Model model) {
-		model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
+		var user = conversationSession.getImmobiliareUser();
+		if (StringUtils.isEmpty(user.getPropertyType())) {
+			model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
+		} else if (StringUtils.isEmpty(user.getCity())){
+			model.addAttribute("initialMessage", PromptConstants.M02_CITY);
+		} else {
+			model.addAttribute("initialMessage", PromptConstants.M03_DETAILS);
+		}
 		return "chat";
 	}
 
 	@GetMapping("/favourites")
-	public String favourites(Model model, Authentication authentication) {
-		String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
-
-		var user = userService.getImmobiliareUserByEmail(userEmail);
+	public String favourites(Model model) {
+		var user = conversationSession.getImmobiliareUser();
 		List<Apartment> apartments = new ArrayList<>();
 		for (String apartmentId : user.getFavourites()){
 			if (!StringUtils.isEmpty(apartmentId)) {
