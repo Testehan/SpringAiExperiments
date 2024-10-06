@@ -34,4 +34,6 @@ public class ImmobiliareUser {
 
     private String lastPropertyDescription;
 
+    private Integer searchesAvailable;      // a way to limit user usage of the app
+
 }

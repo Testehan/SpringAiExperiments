@@ -25,6 +25,8 @@ public class ConversationSession {
         this.chatMemory = chatMemory;
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         this.userService = userService;
+        this.city = getImmobiliareUser().getCity();
+        this.rentOrSale = getImmobiliareUser().getPropertyType();
     }
 
     public ChatMemory getChatMemory() {

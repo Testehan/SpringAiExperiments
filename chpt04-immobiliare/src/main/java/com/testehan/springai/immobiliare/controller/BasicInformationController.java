@@ -12,7 +12,7 @@ public class BasicInformationController {
     @GetMapping("/api/getNotRelevantPrompt")
     public String notRelevantPrompt(@RequestParam(value = "message") String message) {
 
-       return M00_IRELEVANT_PROMPT;
+       return M00_IRRELEVANT_PROMPT;
     }
 
     @GetMapping("/api/restart")

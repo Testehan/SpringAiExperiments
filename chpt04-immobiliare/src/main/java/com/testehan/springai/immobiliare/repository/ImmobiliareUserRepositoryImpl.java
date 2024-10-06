@@ -71,7 +71,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("maxNumberOfListedApartments",user.getMaxNumberOfListedApartments())
                         .append("city", user.getCity())
                         .append("propertyType",user.getPropertyType())
-                        .append("lastPropertyDescription",user.getLastPropertyDescription()));
+                        .append("lastPropertyDescription",user.getLastPropertyDescription())
+                        .append("searchesAvailable",user.getSearchesAvailable()));
 
         UpdateResult result = collection.updateOne(filter, update);
     }

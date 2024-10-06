@@ -66,7 +66,7 @@ public class ApiServiceImpl implements ApiService{
             case DEFAULT : return respondToUserMessage(message);
         }
 
-        return new ResultsResponse(M00_IRELEVANT_PROMPT, new ArrayList<>());
+        return new ResultsResponse(M00_IRRELEVANT_PROMPT, new ArrayList<>());
     }
 
     private ResultsResponse getApartments(String description) {
