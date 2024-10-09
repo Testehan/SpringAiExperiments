@@ -15,6 +15,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +45,7 @@ public class ApiServiceImpl implements ApiService{
     private ConversationSession conversationSession;
     private ConversationService conversationService;
 
-    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService, ChatModel chatmodel, VectorStore vectorStore, Executor executor, ConversationSession conversationSession, ConversationService conversationService) {
+    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService, ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor, ConversationSession conversationSession, ConversationService conversationService) {
         this.immobiliareApiService = immobiliareApiService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;

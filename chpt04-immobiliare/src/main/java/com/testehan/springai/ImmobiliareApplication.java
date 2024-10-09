@@ -2,6 +2,7 @@ package com.testehan.springai;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /*
 	Below is the approach when letting the LLM use the functions defined
@@ -23,6 +24,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 */
 
 @SpringBootApplication
+@EnableScheduling
 public class ImmobiliareApplication {
 
 	public static void main(String[] args) {
