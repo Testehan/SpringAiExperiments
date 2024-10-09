@@ -1,21 +1,24 @@
 package com.testehan.springai.immobiliare.configuration;
 
+import com.testehan.springai.immobiliare.security.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 @Component
 public class ScheduledTasks {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
 
-    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+    private final UserService userService;
 
-    @Scheduled(fixedRate = 5000)
+    public ScheduledTasks(UserService userService){
+        this.userService = userService;
+    }
+
+    @Scheduled(cron = "0 00 12 * * ?")
     public void reportCurrentTime() {
-        log.info("The time is now {}", dateFormat.format(new Date()));
+        userService.resetSearchesAvailable();
+        log.info("The user searches available was reset");
     }
 }

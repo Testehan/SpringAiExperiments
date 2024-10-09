@@ -76,4 +76,15 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
 
         UpdateResult result = collection.updateOne(filter, update);
     }
+
+    @Override
+    public void resetSearchesAvailable() {
+        MongoCollection<Document> collection = mongoDatabase.getCollection("users");
+        Document filter = Document.parse("{}"); // should update all users
+
+        Document update = new Document("$set", new Document("searchesAvailable",10));
+
+        collection.updateMany(filter,update);
+
+    }
 }

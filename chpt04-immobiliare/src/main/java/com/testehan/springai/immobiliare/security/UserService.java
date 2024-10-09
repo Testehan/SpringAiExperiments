@@ -31,6 +31,10 @@ public class UserService {
         return immobiliareUserRepository.findUserByEmail(email);
     }
 
+    public void resetSearchesAvailable(){
+        immobiliareUserRepository.resetSearchesAvailable();
+    }
+
 
     public void addNewCustomerAfterOAuth2Login(String name, String email, AuthenticationType authenticationType) {
         var user = new ImmobiliareUser();

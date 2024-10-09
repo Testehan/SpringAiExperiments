@@ -12,4 +12,6 @@ public interface ImmobiliareUserRepository {
     void save(ImmobiliareUser user);
 
     void update(ImmobiliareUser user);
+
+    void resetSearchesAvailable();
 }
