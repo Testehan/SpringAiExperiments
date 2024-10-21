@@ -93,6 +93,15 @@ public class MainController {
 		return "index";
 	}
 
+	@GetMapping("/profile")
+	public String profile(Model model) {
+		model.addAttribute("user",conversationSession.getImmobiliareUser());
+		// todo for now the list of cities available for posting properties is hardcoded here
+		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
+		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
+		return "profile";
+	}
+
 	@GetMapping("/contact")
 	public String contact(Model model) {
 		return "index";
