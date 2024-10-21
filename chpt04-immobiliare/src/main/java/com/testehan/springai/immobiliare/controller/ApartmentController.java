@@ -6,10 +6,19 @@ import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
-import org.springframework.core.io.ResourceLoader;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.model.Media;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +30,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -31,16 +41,15 @@ public class ApartmentController {
 
     private final ApartmentService apartmentService;
     private final UserService userService;
-
-    private final ResourceLoader resourceLoader;
+    private final ChatModel chatModel ;
 
     public ApartmentController(OpenAiService openAiService, ApartmentService apartmentService, UserService userService,
-                               ResourceLoader resourceLoader)
+                               ChatModel chatModel)
     {
         this.openAiService = openAiService;
         this.apartmentService = apartmentService;
         this.userService = userService;
-        this.resourceLoader = resourceLoader;
+        this.chatModel = chatModel;
     }
 
     @PostMapping("/save")
@@ -66,6 +75,7 @@ public class ApartmentController {
 
             apartmentService.saveApartment(apartment);
             saveUploadedImages(apartment, apartmentImages);
+            generateMetadata(apartmentImages);
             apartmentService.saveApartment(apartment);
 
             user.setMaxNumberOfListedApartments(user.getMaxNumberOfListedApartments() - 1);
@@ -92,6 +102,18 @@ public class ApartmentController {
                 apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
             }
         }
+    }
+
+    private Map<String, Object> generateMetadata(MultipartFile[] apartmentImages) throws IOException {
+        ChatClient chatClient = ChatClient.builder(chatModel).build();
+        ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
+        Resource image = new InputStreamResource(apartmentImages[0].getInputStream());
+        Message userMessage = new UserMessage("describe the image", List.of(new Media(MimeTypeUtils.parseMimeType(apartmentImages[0].getContentType()), image)));
+        Message systemMessage = new SystemMessage("describe the image");
+        chatClientRequest.messages(List.of(systemMessage, userMessage));
+        Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<Map<String, Object>>() {});
+//        LOG.info("Successfully generated image metadata for content item with id {} and property {}: {}", request.id, request.property, result);
+        return result;
     }
 
 }
