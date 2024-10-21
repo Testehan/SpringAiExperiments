@@ -29,6 +29,7 @@ public class Apartment {
     private String floor;
     private List<String> tags;
     private List<String> images = new ArrayList<>();
+    private String imagesGeneratedDescription;
 
     private String contact;
     private String creationDateTime;

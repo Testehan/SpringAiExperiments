@@ -79,7 +79,7 @@ public class ApartmentService {
 
         saveApartment(apartment);
         saveUploadedImages(apartment, apartmentImages);
-        generateMetadata(apartmentImages);
+        generateImageMetadata(apartment,apartmentImages);
         saveApartment(apartment);
 
         user.setMaxNumberOfListedApartments(user.getMaxNumberOfListedApartments() - 1);
@@ -100,19 +100,29 @@ public class ApartmentService {
         }
     }
 
-    private Map<String, Object> generateMetadata(MultipartFile[] apartmentImages) throws IOException {
-        ChatClient chatClient = ChatClient.builder(chatModel).build();
-        ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
-        Resource image = new InputStreamResource(apartmentImages[0].getInputStream());
-        Message userMessage = new UserMessage(
-                userPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()),
-                List.of(new Media(MimeTypeUtils.parseMimeType(apartmentImages[0].getContentType()), image))
-        );
-        Message systemMessage = new SystemMessage(systemPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()));
-        chatClientRequest.messages(List.of(systemMessage, userMessage));
-        Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {});
-//        LOG.info("Successfully generated image metadata for content item with id {} and property {}: {}", request.id, request.property, result);
-        return result;
+    private void generateImageMetadata(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
+        if (apartmentImages.length>0) {
+
+            ChatClient chatClient = ChatClient.builder(chatModel).build();
+            ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            for (MultipartFile image : apartmentImages) {
+                if (image.isEmpty()) continue;
+
+                Resource imageResource = new InputStreamResource(image.getInputStream());
+                Message userMessage = new UserMessage(
+                        userPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()),
+                        List.of(new Media(MimeTypeUtils.parseMimeType(image.getContentType()), imageResource))
+                );
+                Message systemMessage = new SystemMessage(systemPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()));
+                chatClientRequest.messages(List.of(systemMessage, userMessage));
+                Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {
+                });
+                stringBuilder.append(result.get("description"));
+            }
+            apartment.setImagesGeneratedDescription(stringBuilder.toString());
+        }
     }
 
 }
