@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -95,7 +96,10 @@ public class MainController {
 
 	@GetMapping("/profile")
 	public String profile(Model model) {
-		model.addAttribute("user",conversationSession.getImmobiliareUser());
+		var user = conversationSession.getImmobiliareUser();
+		UserProfile userProfile = new UserProfile(user.getEmail(),user.getCity(),user.getPropertyType(),user.getLastPropertyDescription());
+
+		model.addAttribute("user", userProfile);
 		// todo for now the list of cities available for posting properties is hardcoded here
 		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
