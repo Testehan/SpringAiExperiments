@@ -47,7 +47,8 @@ public class Apartment {
                 "The price is " + price + " euro. " +
                 "Number of rooms is " + noOfRooms + ". " +
                 "Located at floor " + floor + ". " +
-                "Additional keywords for this apartment are " + tags;
+                "Additional keywords for this apartment are " + tags + ". " +
+                "Description of provided images: " + imagesGeneratedDescription;
     }
 
     @JsonIgnore
@@ -58,7 +59,8 @@ public class Apartment {
                 "The price is " + price + " euro. " +
                 "Number of rooms is " + noOfRooms + ". " +
                 "Located at floor " + floor + ". " +
-                "Additional keywords for this apartment are " + tags;
+                "Additional keywords for this apartment are " + tags + ". " +
+                "Description of provided images: " + imagesGeneratedDescription;
     }
 
     @Override

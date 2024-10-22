@@ -70,16 +70,17 @@ public class ApartmentService {
 
         apartment.setCreationDateTime(formattedDateCustom);
         apartment.setLastUpdateDateTime(formattedDateCustom);
-        var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
 
+        saveApartment(apartment);
+        saveUploadedImages(apartment, apartmentImages);
+        generateImageMetadata(apartment, apartmentImages);
+
+        var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
         var mono = embedder.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
         System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
         apartment.setPlot_embedding(embeddings);
 
-        saveApartment(apartment);
-        saveUploadedImages(apartment, apartmentImages);
-        generateImageMetadata(apartment,apartmentImages);
         saveApartment(apartment);
 
         user.setMaxNumberOfListedApartments(user.getMaxNumberOfListedApartments() - 1);
