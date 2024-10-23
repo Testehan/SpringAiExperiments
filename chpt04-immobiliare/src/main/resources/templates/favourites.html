@@ -7,11 +7,14 @@
 
 <head th:replace="~{navigation :: header_menu}" />
 
-<div class="flex h-[80%]">
+<div class="flex h-[90%] pt-16">
 
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-4 h-full overflow-auto">
+            <div th:if="${apartments.isEmpty()}">
+                You have no favourite properties.
+            </div>
             <div class="columns-2">
                 <div th:replace="~{fragments :: apartments_list('&hearts;')}" />
             </div>

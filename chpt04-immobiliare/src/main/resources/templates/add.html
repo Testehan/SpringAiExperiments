@@ -15,91 +15,91 @@
 
 <div th:replace="~{navigation :: header_menu}" />
 
-<div class="flex h-[80%]">
+<div class="flex h-[90%] pt-16">
 
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
-        <h1>Add a new apartment</h1>
+        <div class="flex-1 mb-4 p-4 h-full overflow-auto">
+            <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
+                <div class="mb-4">
+                    <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
+                    <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+     focus:shadow-outline" th:field="*{name}" placeholder="Think of a title that best describes your listing" />
+                </div>
+                <div class="mb-4">
+                    <label for="city" class="block text-gray-700 font-bold mb-2">City:</label>
+                    <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+     focus:shadow-outline">
+                        <th:block th:each="city: ${listCities}">
+                            <option th:value="${city}">[[${city}]]</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="area" class="block text-gray-700 font-bold mb-2">Area / Neighbourhood:</label>
+                    <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+                </div>
+                <div class="mb-4">
+                    <label for="propertyType" class="block text-gray-700 font-bold mb-2">Property Type:</label>
+                    <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+     focus:shadow-outline">
+                        <th:block th:each="propertyType: ${listPropertyTypes}">
+                            <option th:value="${propertyType}">[[${propertyType}]]</option>
+                        </th:block>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
+                    <textarea id="description"
+                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                              th:field="*{shortDescription}"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="price" class="block text-gray-700 font-bold mb-2">Price:</label>
+                    <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{price}">
+                </div>
+                <div class="mb-4">
+                    <label for="surface" class="block text-gray-700 font-bold mb-2">Surface:</label>
+                    <input type="number" id="surface" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{surface}">
+                </div>
+                <div class="mb-4">
+                    <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">Number of rooms:</label>
+                    <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{noOfRooms}">
+                </div>
+                <div class="mb-4">
+                    <label for="floor" class="block text-gray-700 font-bold mb-2">Floor:</label>
+                    <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}">
+                </div>
+                <div class="mb-4">
+                    <label for="tags" class="block text-gray-700 font-bold mb-2">Tags:</label>
+                    <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}">
+                </div>
+                <div class="mb-4">
+                    <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>
+                    <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
+                           placeholder="An email or a phone number where you can be contacted"/>
+                </div>
+                <div class="mb-4" id="apartmentImages">
+                    <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages}">
+                        <div th:id="'imageHeader'+${numberOfExistingImages}"><label>Image no [[${numberOfExistingImages + 1}]]</label></div>
+                        <div class="m-2">
+                            <img th:id="'imageThumbnail'+${numberOfExistingImages}" alt="Image preview" class="img-fluid"
+                                 th:src="@{/images/image-thumbnail.png}"/>
+                        </div>
+                        <div>
+                            <input type="file" name="apartmentImages" accept="image/png, image/jpeg" />
+                        </div>
+                    </div>
 
-        <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
-            <div class="mb-4">
-                <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
-                <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
- focus:shadow-outline" th:field="*{name}" placeholder="Think of a title that best describes your listing" />
-            </div>
-            <div class="mb-4">
-                <label for="city" class="block text-gray-700 font-bold mb-2">City:</label>
-                <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
- focus:shadow-outline">
-                    <th:block th:each="city: ${listCities}">
-                        <option th:value="${city}">[[${city}]]</option>
-                    </th:block>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="area" class="block text-gray-700 font-bold mb-2">Area / Neighbourhood:</label>
-                <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
-            </div>
-            <div class="mb-4">
-                <label for="propertyType" class="block text-gray-700 font-bold mb-2">Property Type:</label>
-                <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
- focus:shadow-outline">
-                    <th:block th:each="propertyType: ${listPropertyTypes}">
-                        <option th:value="${propertyType}">[[${propertyType}]]</option>
-                    </th:block>
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
-                <textarea id="description"
-                          class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                          th:field="*{shortDescription}"></textarea>
-            </div>
-            <div class="mb-4">
-                <label for="price" class="block text-gray-700 font-bold mb-2">Price:</label>
-                <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{price}">
-            </div>
-            <div class="mb-4">
-                <label for="surface" class="block text-gray-700 font-bold mb-2">Surface:</label>
-                <input type="number" id="surface" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{surface}">
-            </div>
-            <div class="mb-4">
-                <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">Number of rooms:</label>
-                <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{noOfRooms}">
-            </div>
-            <div class="mb-4">
-                <label for="floor" class="block text-gray-700 font-bold mb-2">Floor:</label>
-                <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}">
-            </div>
-            <div class="mb-4">
-                <label for="tags" class="block text-gray-700 font-bold mb-2">Tags:</label>
-                <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}">
-            </div>
-            <div class="mb-4">
-                <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>
-                <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
-                       placeholder="An email or a phone number where you can be contacted"/>
-            </div>
-            <div class="mb-4" id="apartmentImages">
-                <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages}">
-                    <div th:id="'imageHeader'+${numberOfExistingImages}"><label>Image no [[${numberOfExistingImages + 1}]]</label></div>
-                    <div class="m-2">
-                        <img th:id="'imageThumbnail'+${numberOfExistingImages}" alt="Image preview" class="img-fluid"
-                             th:src="@{/images/image-thumbnail.png}"/>
-                    </div>
-                    <div>
-                        <input type="file" name="apartmentImages" accept="image/png, image/jpeg" />
-                    </div>
                 </div>
 
-            </div>
-
-            <div class="flex items-center justify-between">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Add Apartment
-                </button>
-            </div>
-        </form>
+                <div class="flex items-center justify-between">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Add Apartment
+                    </button>
+                </div>
+            </form>
+        </div>
 
     </main>
 </div>

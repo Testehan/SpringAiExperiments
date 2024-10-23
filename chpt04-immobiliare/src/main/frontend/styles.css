@@ -16,3 +16,45 @@
     display: block;
   }
 }
+
+.menu-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.menu-button-container {
+    position: fixed;
+    top: 20px; /* Adjust the top position as needed */
+    right: 20px; /* Adjust the right position as needed */
+    z-index: 1000; /* Set a higher z-index value */
+}
+
+.menu-items-vertical {
+    flex-direction: column;
+    display: flex;
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .menu-items-vertical {
+        flex-direction: column;
+    }
+
+    #menuItems {
+        position: fixed;
+        top: 60px;
+        right: 20px;
+        z-index: 1000; /* Adjust the z-index value as needed */
+        border-radius: 0.375rem;
+        border: 1px solid rgb(156 163 175);
+        padding:3px;
+        background:white;
+    }
+}
+
+@media (min-width: 768px) {
+    .menu-container {
+        flex-direction: row;
+    }
+}

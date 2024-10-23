@@ -17,9 +17,6 @@
 <body>
 
 <div th:fragment="apartments_list(favouriteButtonStartMessage)">
-    <div th:if="${apartments.isEmpty()}">
-        You have no favourite properties.
-    </div>
     <div th:each="apartment, status : ${apartments}" class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center">
             <div th:each="image, iterStat : ${apartment.images}">

@@ -32,13 +32,13 @@
 
 <head th:replace="~{navigation :: header_menu}" />
 
-<div class="flex h-[80%]">
+<div class="flex h-[90%] pt-16">
 
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-4 h-full overflow-auto">
             <div class="mb-2">
-                <p class="h-full overflow-auto" th:text="${initialMessage}"></p>
+                <p class="inline-block bg-slate-50 rounded-lg p-2 ml-auto" th:text="${initialMessage}"></p>
             </div>
 
         </div>
@@ -55,7 +55,7 @@
 
                 <div class="flex items-center bg-gray-200 rounded-full p-2 shadow-md">
 
-                    <input id="message" name="message" required pattern="[a-zA-Z0-9\\s\.\';,-]+" class="bg-gray-200 outline-none text-gray-700 rounded-full py-2 px-4 w-full" type="text" placeholder="Message Immobil AI" autocomplete="off" />
+                    <input id="message" name="message" required pattern="[a-zA-Z0-9\\s\.\';,-]+" class="bg-gray-200 outline-none text-gray-700 rounded-full py-2 px-4 w-full" type="text" placeholder="Message Imobil AI" autocomplete="off" />
                     <input type="file" id="audioFile" name="audioFile" style="display: none;"   />
 
                     <button id="sendMessageButton" hx-indicator="#spinner" type="submit" class="w-8 h-8 bg-gray-300 hover:bg-gray-400 text-gray-600 rounded-full p-2 ml-2">
@@ -66,8 +66,6 @@
                     <button id="recordVoiceButton" hx-indicator="#spinner" type="button" class="w-8 h-8 bg-gray-300 hover:bg-gray-400 text-gray-600 rounded-full p-2 ml-2">
                         <img id="recordMicrophone" src="/images/microphone.svg"/>
                     </button>
-
-
 
                 </div>
             </form>
