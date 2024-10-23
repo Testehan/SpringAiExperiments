@@ -37,6 +37,11 @@ public class ApartmentController {
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
         var user = userService.getImmobiliareUserByEmail(userEmail);
+        if (apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())){ // make sure that only owners can edit the ap
+            redirectAttributes.addFlashAttribute("errorMessage","ERROR: You can't make this edit!");
+            return "redirect:/error";
+        }
+
         if (user.getMaxNumberOfListedProperties() > 0){
             apartmentService.saveApartmentAndImages(apartment, apartmentImages, user);
 

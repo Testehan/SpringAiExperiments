@@ -23,6 +23,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -82,8 +85,8 @@ public class ApartmentService {
 
         saveApartment(apartment);
         saveUploadedImages(apartment, apartmentImages);
-        generateImageMetadata(apartment, apartmentImages);
-
+//        generateImageMetadata(apartment);       // TODO how do we know if images were changed ?I THINK in the form we need to send a parameter that tells us that something changed
+//
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
         var mono = embedder.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
@@ -110,29 +113,35 @@ public class ApartmentService {
         }
     }
 
-    private void generateImageMetadata(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
-        if (apartmentImages.length>0) {
+    private void generateImageMetadata(Apartment apartment) throws IOException {
 
-            ChatClient chatClient = ChatClient.builder(chatModel).build();
-            ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
-            StringBuilder stringBuilder = new StringBuilder();
+        ChatClient chatClient = ChatClient.builder(chatModel).build();
+        ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
+        StringBuilder stringBuilder = new StringBuilder();
+        boolean imagesWereModified = false;
 
-            for (MultipartFile image : apartmentImages) {
-                if (image.isEmpty()) continue;
+        for (String apartmentImages : apartment.getImages()) {
+            URL url = new URL(apartmentImages);
+            try (InputStream inputStream = url.openStream()) {
+                imagesWereModified = true;
+                URLConnection connection = url.openConnection();
+                Resource imageResource = new InputStreamResource(inputStream);
 
-                Resource imageResource = new InputStreamResource(image.getInputStream());
                 Message userMessage = new UserMessage(
                         userPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()),
-                        List.of(new Media(MimeTypeUtils.parseMimeType(image.getContentType()), imageResource))
-                );
+                        List.of(new Media(MimeTypeUtils.parseMimeType(connection.getContentType()), imageResource))
+                );                  // todo this does not work because s3 returns content type octet stream...this migh be because of how you upload picture there...see https://stackoverflow.com/questions/30706218/why-does-file-uploaded-to-s3-have-content-type-application-octet-stream-unless-i
                 Message systemMessage = new SystemMessage(systemPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()));
                 chatClientRequest.messages(List.of(systemMessage, userMessage));
                 Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {
                 });
                 stringBuilder.append(result.get("description"));
             }
+        }
+        if (imagesWereModified) {
             apartment.setImagesGeneratedDescription(stringBuilder.toString());
         }
+
     }
 
 }

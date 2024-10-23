@@ -21,6 +21,7 @@
     <main class="flex overflow-auto bg-white p-4 w-full max-w-full">
         <div class="w-4/5 md:w-3/4 flex-1 mb-4 p-4 h-full ">
             <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
+                <input type="hidden" name="id" th:value="${apartment.id}" />
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
                     <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
@@ -79,11 +80,25 @@
                     <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
                            placeholder="An email or a phone number where you can be contacted"/>
                 </div>
+                <span>Number of existing images is : [[${numberOfExistingImages}]]</span>
                 <div class="mb-4" id="apartmentImages">
+                    <div th:each="image, status : ${apartment.images}" class="col border m-3 p-2" th:id="'divImage'+${status.index}">
+                        <div th:id="'imageHeader'+${status.index}"><label>Image no [[${status.index+1}]]</label></div>
+                        <div class="m-2">
+                            <img th:id="'imageThumbnail'+${status.index}" alt="Image preview" class="img-fluid"
+                                 th:src="${image}"/>
+                        </div>
+                        <div>
+                            <input type="hidden" name="images" th:id="'imageName'+ ${status.index}" th:value="${image}" />
+                        </div>
+                        <a name="linkRemoveImage" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            Delete
+                        </a>
+                    </div>
                     <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages}">
                         <div th:id="'imageHeader'+${numberOfExistingImages}"><label>Image no [[${numberOfExistingImages + 1}]]</label></div>
                         <div class="m-2">
-                            <img th:id="'imageThumbnail'+${numberOfExistingImages}" alt="Image preview" class="img-fluid"
+                            <img th:id="'newImageThumbnail0'" alt="Image preview" class="img-fluid"
                                  th:src="@{/images/image-thumbnail.png}"/>
                         </div>
                         <div>
@@ -91,7 +106,7 @@
                         </div>
                     </div>
 
-                    </div>
+                </div>
 
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">

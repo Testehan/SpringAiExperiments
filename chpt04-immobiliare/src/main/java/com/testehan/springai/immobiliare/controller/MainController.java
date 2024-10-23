@@ -89,15 +89,23 @@ public class MainController {
 	}
 	@GetMapping("/edit/{apartmentId}")
 	public String edit(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
-		var apartment = apartmentService.findApartmentById(apartmentId);
-		if (apartment != null) {
-			model.addAttribute("apartment", apartment);
-			model.addAttribute("numberOfExistingImages", apartment.getImages().size());
+
+		var user = conversationSession.getImmobiliareUser();
+		model.addAttribute("apartment", new Apartment());
+		model.addAttribute("numberOfExistingImages", 0);
+		model.addAttribute("buttonMessage", "Add Apartment");
+
+		if (user.getListedProperties().contains(apartmentId)) {
+			var apartment = apartmentService.findApartmentById(apartmentId);
+			if (apartment != null) {
+				model.addAttribute("apartment", apartment);
+				model.addAttribute("numberOfExistingImages", apartment.getImages().size());
+				model.addAttribute("buttonMessage", "Edit Apartment");
+			}
 		}
 
 		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
-		model.addAttribute("buttonMessage", "Edit Apartment");
 
 		var listOfProperties = conversationSession.getImmobiliareUser().getListedProperties();
 		model.addAttribute("listOfProperties", apartmentService.findApartmentsByIds(listOfProperties));

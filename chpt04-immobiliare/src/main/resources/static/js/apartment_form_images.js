@@ -3,20 +3,19 @@ var imagesCount=0;
 $(document).ready(function(){
 
     $("input[name='apartmentImages']").each(function(index){
-        imagesCount++;
-        $(this).change(function(){                       // "this" is here an input type element with name image
-             if (!checkFileSize(this)){
-                return ;
-             }
-            showImageThumbnail(this, index);
+            imagesCount++;
+            $(this).change(function(){                       // "this" is here an input type element with name image
+                 if (!checkFileSize(this)){
+                    return ;
+                 }
+                showImageThumbnail(this, index);
+            });
         });
-    });
 
     $("a[name='linkRemoveImage'").each(function(index){
         $(this).click(function(){
             removeImage(index);
         });
-
     });
 
 });
@@ -31,7 +30,7 @@ function showImageThumbnail(fileInput, index){
 
     var reader = new FileReader();
     reader.onload = function(e){
-        $("#imageThumbnail"+index).attr("src", e.target.result)
+        $("#newImageThumbnail"+index).attr("src", e.target.result)
     }
 
     reader.readAsDataURL(file);
@@ -45,10 +44,10 @@ function addExtraImageSection(index){
     // we need to increase index by 1 because index starts at 0, however in the UI you don't want the user to see text starting
     // from 0, like "Extra image 0"...so while the id of the elements can have 0, the other index locations are incremented.
     htmlExtraImage = `
-        <div class="" id="divImage${index}">
+        <div class="col border m-3 p-2" id="divImage${index}">
            <div id="imageHeader${index}"><label>Image no ${index + 1}</label></div>
            <div class="">
-               <img id="imageThumbnail${index}" alt="Image ${index + 1} preview" class="img-fluid"
+               <img id="newImageThumbnail${index}" alt="Image ${index + 1} preview" class="img-fluid"
                     src="${defaultThumbnailImageSrc}" />
            </div>
            <div>
@@ -60,15 +59,26 @@ function addExtraImageSection(index){
     `;
 
     htmlLinkRemove=`
-        <a class=""
-            href="javascript:removeImage(${index-1})"
-            title="Remove this image"></a>
+        <a class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            name='linkRemoveImage'
+            href="javascript:removeImage(${index})"
+            title="Remove this image">Delete</a>
     `;
 
     $("#apartmentImages").append(htmlExtraImage);
 
-    // we select the previous image section in order to add the remove button
-    $("#imageHeader" + (index-1)).append(htmlLinkRemove);
+    var divImagePrevious = $("#divImage" + (index-1));
+    var elementWithSpecificName = divImagePrevious.find('[name="linkRemoveImage"]');
+
+    if (elementWithSpecificName.length > 0) {
+      var divImageCurrent= $("#divImage" + index);
+       divImageCurrent.append(htmlLinkRemove);
+    } else {
+        // we select the previous image section in order to add the remove button
+        divImagePrevious.append(htmlLinkRemove);
+    }
+
+
 
     imagesCount++;
 }
