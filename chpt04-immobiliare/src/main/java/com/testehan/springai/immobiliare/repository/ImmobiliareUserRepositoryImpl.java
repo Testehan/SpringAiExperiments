@@ -48,7 +48,14 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
         Document document = new Document("name", user.getName())
                 .append("email", user.getEmail())
                 .append("password", user.getPassword())
-                .append("authenticationType", user.getAuthenticationType());
+                .append("authenticationType", user.getAuthenticationType())
+                .append("favouriteProperties",user.getFavouriteProperties())
+                .append("maxNumberOfListedProperties",user.getMaxNumberOfListedProperties())
+                .append("listedProperties",user.getListedProperties())
+                .append("city", user.getCity())
+                .append("propertyType",user.getPropertyType())
+                .append("lastPropertyDescription",user.getLastPropertyDescription())
+                .append("searchesAvailable",user.getSearchesAvailable());
 
         // Insert the document
         collection.insertOne(document);
@@ -67,8 +74,9 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("email", user.getEmail())
                         .append("password", user.getPassword())
                         .append("authenticationType", user.getAuthenticationType())
-                        .append("favourites",user.getFavourites())
-                        .append("maxNumberOfListedApartments",user.getMaxNumberOfListedApartments())
+                        .append("favouriteProperties",user.getFavouriteProperties())
+                        .append("maxNumberOfListedProperties",user.getMaxNumberOfListedProperties())
+                        .append("listedProperties",user.getListedProperties())
                         .append("city", user.getCity())
                         .append("propertyType",user.getPropertyType())
                         .append("lastPropertyDescription",user.getLastPropertyDescription())

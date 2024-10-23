@@ -31,8 +31,8 @@ public class ConversationSession {
     public ConversationSession(ChatMemory chatMemory, UserService userService, ConversationService conversationService) {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         this.userService = userService;
-        this.city = getImmobiliareUser().getCity();
-        this.rentOrSale = getImmobiliareUser().getPropertyType();
+        this.city = getImmobiliareUser() != null ? getImmobiliareUser().getCity() : null;
+        this.rentOrSale = getImmobiliareUser() != null ?  getImmobiliareUser().getPropertyType() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
         List<String> conversation = conversationService.getUserConversation(getConversationId()) ;

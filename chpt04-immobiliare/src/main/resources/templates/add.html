@@ -18,8 +18,8 @@
 <div class="flex h-[90%] pt-16">
 
     <!-- Main Content -->
-    <main class="flex flex-col bg-white p-4 w-full max-w-full">
-        <div class="flex-1 mb-4 p-4 h-full overflow-auto">
+    <main class="flex overflow-auto bg-white p-4 w-full max-w-full">
+        <div class="w-4/5 md:w-3/4 flex-1 mb-4 p-4 h-full ">
             <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
@@ -91,16 +91,26 @@
                         </div>
                     </div>
 
-                </div>
+                    </div>
 
                 <div class="flex items-center justify-between">
                     <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Add Apartment
+                        [[${buttonMessage}]]
                     </button>
                 </div>
             </form>
         </div>
+        <div class="w-1/5 md:w-1/4 p-4 ">
+            <div class="p-6 bg-white rounded-lg shadow-md">
+                <span class="block text-gray-700 font-bold mb-2">Your properties:</span>
+                <ol class="list-decimal">
+                    <li th:each="property : ${listOfProperties}">
+                        <a class="hover:underline text-gray-700" th:href="@{'/edit/'+${property.id}}">[[${#strings.substring(property.name, 0, 30)}]]...</a>
+                    </li>
+                </ol>
+            </div>
 
+        </div>
     </main>
 </div>
 </body>

@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.thymeleaf.util.StringUtils;
 
 import java.util.ArrayList;
@@ -49,7 +50,7 @@ public class MainController {
 	public String favourites(Model model) {
 		var user = conversationSession.getImmobiliareUser();
 		List<Apartment> apartments = new ArrayList<>();
-		for (String apartmentId : user.getFavourites()){
+		for (String apartmentId : user.getFavouriteProperties()){
 			if (!StringUtils.isEmpty(apartmentId)) {
 				apartments.add(apartmentService.findApartmentById(apartmentId));
 			}
@@ -79,7 +80,27 @@ public class MainController {
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 		model.addAttribute("apartment", apartment);
 		model.addAttribute("numberOfExistingImages", 0);
+		model.addAttribute("buttonMessage", "Add Apartment");
 
+		var listOfProperties = conversationSession.getImmobiliareUser().getListedProperties();
+		model.addAttribute("listOfProperties", apartmentService.findApartmentsByIds(listOfProperties));
+
+		return "add";
+	}
+	@GetMapping("/edit/{apartmentId}")
+	public String edit(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
+		var apartment = apartmentService.findApartmentById(apartmentId);
+		if (apartment != null) {
+			model.addAttribute("apartment", apartment);
+			model.addAttribute("numberOfExistingImages", apartment.getImages().size());
+		}
+
+		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
+		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
+		model.addAttribute("buttonMessage", "Edit Apartment");
+
+		var listOfProperties = conversationSession.getImmobiliareUser().getListedProperties();
+		model.addAttribute("listOfProperties", apartmentService.findApartmentsByIds(listOfProperties));
 
 		return "add";
 	}

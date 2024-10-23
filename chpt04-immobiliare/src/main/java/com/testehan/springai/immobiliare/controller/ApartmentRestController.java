@@ -51,11 +51,11 @@ public class ApartmentRestController {
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
         var user = userService.getImmobiliareUserByEmail(userEmail);
-        if (!user.getFavourites().contains(apartmentId)){
-            user.getFavourites().add(apartmentId);
+        if (!user.getFavouriteProperties().contains(apartmentId)){
+            user.getFavouriteProperties().add(apartmentId);
             result = "&hearts;";
         } else {
-            user.getFavourites().remove(apartmentId);
+            user.getFavouriteProperties().remove(apartmentId);
             result = "Save to Favourites";
         }
         userService.updateUser(user);

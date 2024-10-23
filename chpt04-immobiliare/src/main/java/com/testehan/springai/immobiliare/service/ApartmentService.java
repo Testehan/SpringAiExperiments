@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -59,6 +60,14 @@ public class ApartmentService {
         return apartmentsRepository.findApartmentById(apartmentId);
     }
 
+    public List<Apartment> findApartmentsByIds(List<String> apartmentIds){
+        List<Apartment> apartments = new ArrayList<>();
+        for (String apartmentId : apartmentIds){
+            apartments.add(findApartmentById(apartmentId));
+        }
+        return apartments;
+    }
+
     public void saveApartment(Apartment apartment){
         apartmentsRepository.saveApartment(apartment);
     }
@@ -83,7 +92,7 @@ public class ApartmentService {
 
         saveApartment(apartment);
 
-        user.setMaxNumberOfListedApartments(user.getMaxNumberOfListedApartments() - 1);
+        user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
         userService.updateUser(user);
     }
 

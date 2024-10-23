@@ -37,7 +37,7 @@ public class ApartmentController {
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
         var user = userService.getImmobiliareUserByEmail(userEmail);
-        if (user.getMaxNumberOfListedApartments() > 0){
+        if (user.getMaxNumberOfListedProperties() > 0){
             apartmentService.saveApartmentAndImages(apartment, apartmentImages, user);
 
             return "redirect:/";
