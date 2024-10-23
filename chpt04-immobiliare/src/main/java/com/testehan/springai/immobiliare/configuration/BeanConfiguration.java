@@ -37,16 +37,5 @@ public class BeanConfiguration {
         return builder.build();
     }
 
-    /*
-        FilterExpressionBuilder b = new FilterExpressionBuilder();
-
-        List<Document> results = vectorStore.similaritySearch(
-                SearchRequest.defaults()
-                        .withQuery("learn how to grow things")
-                        .withTopK(2)
-                        .withSimilarityThreshold(0.5)
-                        .withFilterExpression(b.eq("author", "A").build())
-);
-     */
 
 }

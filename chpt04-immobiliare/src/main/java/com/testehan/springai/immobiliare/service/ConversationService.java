@@ -3,6 +3,8 @@ package com.testehan.springai.immobiliare.service;
 import com.testehan.springai.immobiliare.repository.ConversationRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ConversationService {
 
@@ -15,4 +17,10 @@ public class ConversationService {
     public void deleteConversation(String user){
         conversationRepository.deleteUserConversation(user);
     }
+
+    public List<String> getUserConversation(String user){
+       return conversationRepository.getUserConversation(user);
+    }
+
+
 }

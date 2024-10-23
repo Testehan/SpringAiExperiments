@@ -2,12 +2,18 @@ package com.testehan.springai.immobiliare.advisor;
 
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.security.UserService;
+import com.testehan.springai.immobiliare.service.ConversationService;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @SessionScope
@@ -16,17 +22,22 @@ public class ConversationSession {
     private ChatMemory chatMemory;
     private Authentication authentication;
     private final UserService userService;
+    private final ConversationService conversationService;
     private String city;
     private String rentOrSale;
     private String lastPropertyDescription;
 
 
-    public ConversationSession(ChatMemory chatMemory, UserService userService) {
-        this.chatMemory = chatMemory;
+    public ConversationSession(ChatMemory chatMemory, UserService userService, ConversationService conversationService) {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         this.userService = userService;
         this.city = getImmobiliareUser().getCity();
         this.rentOrSale = getImmobiliareUser().getPropertyType();
+        this.chatMemory = chatMemory;
+        this.conversationService = conversationService;
+        List<String> conversation = conversationService.getUserConversation(getConversationId()) ;
+        List<Message> messages = conversation.stream().map(message -> new UserMessage(message)).collect(Collectors.toList());
+        chatMemory.add(getConversationId(),messages);
     }
 
     public ChatMemory getChatMemory() {
