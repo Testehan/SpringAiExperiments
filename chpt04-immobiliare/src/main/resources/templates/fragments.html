@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0">
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Immobiliare AI</title>
+    <title>Imobil AI</title>
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
     <link th:href="@{/css/main.css}" rel="stylesheet" />
     <script th:src="@{/js/navigation.js}"></script>
@@ -16,9 +16,9 @@
 
 <body>
 
-<div th:fragment="apartments_list(favouriteButtonStartMessage)">
+<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3" th:fragment="apartments_list(favouriteButtonStartMessage)">
     <div th:each="apartment, status : ${apartments}" class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10">
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 justify-center">
+        <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
             <div th:each="image, iterStat : ${apartment.images}">
 
                 <div class="overflow-hidden rounded-lg shadow-lg">

@@ -15,9 +15,8 @@
             <div th:if="${apartments.isEmpty()}">
                 You have no favourite properties.
             </div>
-            <div class="columns-2">
-                <div th:replace="~{fragments :: apartments_list('&hearts;')}" />
-            </div>
+
+            <div th:replace="~{fragments :: apartments_list('&hearts;')}" />
 
         </div>
 

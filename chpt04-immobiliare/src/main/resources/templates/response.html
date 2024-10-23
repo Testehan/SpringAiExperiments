@@ -15,9 +15,7 @@
 <div th:fragment="responseFragmentWithApartments" class="mb-2">
     <p th:unless="${response == null || response.isEmpty()}" class="inline-block bg-slate-50 rounded-lg p-2 ml-auto  assistantResponse" th:text="${response}">Response</p>
 
-    <div class="columns-2">
-        <div th:replace="~{fragments :: apartments_list('Save to Favourites')}" />
-    </div>
+    <div th:replace="~{fragments :: apartments_list('Save to Favourites')}" />
 
 
 </div>
