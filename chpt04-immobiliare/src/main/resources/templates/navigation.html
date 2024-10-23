@@ -13,8 +13,14 @@
                         <a href="/">
                             <h1 class="text-6xl text-gray-500 font-bold">Imobil AI</h1>
                         </a>
-                        <div class="flex items-center -mr-2 md:hidden">
-                            <button class="inline-flex items-center justify-center p-2 text-gray-400 bg-gray-50 rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-50"  type="button" aria-expanded="false">
+                    </div>
+                </div>
+
+                <div class="menu-container">
+                    <div class="flex items-center -mr-2 md:hidden">
+                        <div class="menu-button-container">
+                            <button id="menuButton" class="inline-flex items-center justify-center p-2 text-gray-400 bg-gray-50 rounded-md hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-50"
+                                    type="button" aria-expanded="false" onclick="toggleMenu()">
                                 <span class="sr-only">Open main menu</span>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -22,54 +28,54 @@
                             </button>
                         </div>
                     </div>
-                </div>
-                <div class="hidden md:flex md:space-x-10 list-none">
-                    <li>
-                        <a href="/chat" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="">Search</a>
-                    </li>
-                    <li>
-                        <a href="/favourites" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="">Favourites
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/add" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="">Add
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/profile" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="">Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/help" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="_blank">Help
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/blog" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="_blank">Blog
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/contact" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                           target="_blank">Contact
-                        </a>
-                    </li>
-                </div>
-                <div class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
-                    <div class="inline-flex rounded-full shadow">
-                        <a href="javascript: document.logoutForm.submit()"
-                             class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50 ">
-                            Logout
-                        </a>
+                    <div id="menuItems" class="hidden md:flex md:space-x-10 list-none">
+                        <li>
+                            <a href="/chat" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="">Search</a>
+                        </li>
+                        <li>
+                            <a href="/favourites" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="">Favourites
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/add" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="">Add
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/profile" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="">Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/help" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="_blank">Help
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/blog" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="_blank">Blog
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/contact" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               target="_blank">Contact
+                            </a>
+                        </li>
                     </div>
+                    <div class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
+                        <div class="inline-flex rounded-full shadow">
+                            <a href="javascript: document.logoutForm.submit()"
+                                 class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50 ">
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                    <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
+                        <input type="submit" value="Logout" />
+                    </form>
                 </div>
-                <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">
-                    <input type="submit" value="Logout" />
-                </form>
             </nav>
         </div>
     </div>

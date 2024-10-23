@@ -77,9 +77,13 @@ Examples:
   - API Call: `/getApartments`
   - Parameters: `\{"message": "I am looking for a location that has a price under 100000 euro and is a good neighborhood"\}`
 
-- User Input: "I want a big appartment with a south orientation in Marasti neighbourhood"
+- User Input: "I want a big apartment with a south orientation in Marasti neighbourhood"
   - API Call: `/getApartments`
   - Parameters: `\{"message": "I want a big appartment with a south orientation in Marasti neighbourhood"\}`
+
+- User Input: "i want something with bedside lamps"
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "i want something with bedside lamps"\}`
 
 - User Input: "restart"
   - API Call: `/restart`
