@@ -57,10 +57,10 @@ public class AmazonS3Util {
 
     }
 
-    public static void uploadFile(String folderName, String fileName, InputStream inputStream) {
+    public static void uploadFile(String folderName, String fileName, InputStream inputStream, String contentType) {
 
         S3Client client = createAmazomS3();
-        PutObjectRequest request = putFileInAmazonS3(folderName, fileName);
+        PutObjectRequest request = putFileInAmazonS3(folderName, fileName, contentType);
 
         try (inputStream) {
             int contentLength = inputStream.available();
@@ -71,9 +71,9 @@ public class AmazonS3Util {
         }
     }
 
-    public static PutObjectRequest putFileInAmazonS3(String folderName, String fileName) {
+    public static PutObjectRequest putFileInAmazonS3(String folderName, String fileName, String contentType) {
         PutObjectRequest request = PutObjectRequest.builder().bucket(BUCKET_NAME)
-                .key(folderName + "/" + fileName).acl("public-read").build();
+                .key(folderName + "/" + fileName).contentType(contentType).acl("public-read").build();
 
         return request;
     }

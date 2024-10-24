@@ -84,9 +84,12 @@ public class ApartmentService {
         apartment.setLastUpdateDateTime(formattedDateCustom);
 
         saveApartment(apartment);
-        saveUploadedImages(apartment, apartmentImages);
-//        generateImageMetadata(apartment);       // TODO how do we know if images were changed ?I THINK in the form we need to send a parameter that tells us that something changed
-//
+        var imagesWereUploaded = saveUploadedImages(apartment, apartmentImages);
+        var imagesWereDeleted = deleteUploadedImages(apartment);
+        if (imagesWereUploaded || imagesWereDeleted) {
+            generateImageMetadata(apartment);
+        }
+
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
         var mono = embedder.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
@@ -99,18 +102,42 @@ public class ApartmentService {
         userService.updateUser(user);
     }
 
-    private void saveUploadedImages(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
+    private boolean deleteUploadedImages(Apartment apartment) {
+        boolean imagesWereDeleted = false;
+        var uploadDir = "apartment-images/" + apartment.getId().toString();
+
+        List<String> objectKeys = AmazonS3Util.listFolder(uploadDir);
+        for (String key : objectKeys){
+            int lastIndexOfSlash = key.lastIndexOf("/");
+            var filename = key.substring(lastIndexOfSlash + 1);
+            if (apartment.getImages().stream().filter(imageURL -> {
+                int lastSlash = imageURL.lastIndexOf("/");
+                return imageURL.substring(lastSlash+1).equals(filename);
+            }).count()<1){
+                AmazonS3Util.deleteFile(key);
+                imagesWereDeleted = true;
+            }
+        }
+
+        return imagesWereDeleted;
+    }
+
+    private boolean saveUploadedImages(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
+        boolean imagesWereUploaded = false;
         if (apartmentImages.length>0) {
             var uploadDir = "apartment-images/" + apartment.getId();
             for (MultipartFile extraImage : apartmentImages) {
                 if (extraImage.isEmpty()) continue;
 
                 String filename = StringUtils.cleanPath(extraImage.getOriginalFilename());
-                AmazonS3Util.uploadFile(uploadDir, filename, extraImage.getInputStream());
+                AmazonS3Util.uploadFile(uploadDir, filename, extraImage.getInputStream(), extraImage.getContentType());
 
                 apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
             }
+
+            imagesWereUploaded = true;
         }
+        return imagesWereUploaded;
     }
 
     private void generateImageMetadata(Apartment apartment) throws IOException {
@@ -130,7 +157,7 @@ public class ApartmentService {
                 Message userMessage = new UserMessage(
                         userPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()),
                         List.of(new Media(MimeTypeUtils.parseMimeType(connection.getContentType()), imageResource))
-                );                  // todo this does not work because s3 returns content type octet stream...this migh be because of how you upload picture there...see https://stackoverflow.com/questions/30706218/why-does-file-uploaded-to-s3-have-content-type-application-octet-stream-unless-i
+                );
                 Message systemMessage = new SystemMessage(systemPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()));
                 chatClientRequest.messages(List.of(systemMessage, userMessage));
                 Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {
