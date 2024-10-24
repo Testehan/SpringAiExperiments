@@ -63,6 +63,10 @@ public class ApartmentService {
         return apartmentsRepository.findApartmentById(apartmentId);
     }
 
+    public List<Apartment> findAll(){
+        return apartmentsRepository.findAll();
+    }
+
     public List<Apartment> findApartmentsByIds(List<String> apartmentIds){
         List<Apartment> apartments = new ArrayList<>();
         for (String apartmentId : apartmentIds){

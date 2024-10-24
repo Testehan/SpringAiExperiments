@@ -116,6 +116,13 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
+    public List<Apartment> findAll() {
+        List<Apartment> apartments = new ArrayList<>();
+        getApartmentCollection().find().forEach(a -> apartments.add(a));
+        return apartments;
+    }
+
+    @Override
     public void saveApartment(Apartment apartment) {
         mongoTemplate.save(apartment, "apartments");
     }

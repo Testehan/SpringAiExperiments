@@ -10,5 +10,7 @@ public interface ApartmentsRepository {
 
     Apartment findApartmentById(String apartmentId);
 
+    List<Apartment> findAll();
+
     void saveApartment(Apartment apartment);
 }

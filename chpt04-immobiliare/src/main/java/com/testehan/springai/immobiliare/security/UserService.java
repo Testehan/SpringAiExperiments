@@ -43,6 +43,7 @@ public class UserService {
         user.setEmail(email);
         user.setAuthenticationType(authenticationType);
         user.setPassword("");
+        user.setIsAdmin("false");
 
         immobiliareUserRepository.save(user);
     }

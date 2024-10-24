@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -82,11 +83,14 @@ public class MainController {
 		model.addAttribute("numberOfExistingImages", 0);
 		model.addAttribute("buttonMessage", "Add Apartment");
 
-		var listOfProperties = conversationSession.getImmobiliareUser().getListedProperties();
-		model.addAttribute("listOfProperties", apartmentService.findApartmentsByIds(listOfProperties));
+		var user = conversationSession.getImmobiliareUser();
+		List<Apartment> listOfProperties = getListOfProperties(user);
+
+		model.addAttribute("listOfProperties", listOfProperties);
 
 		return "add";
 	}
+
 	@GetMapping("/edit/{apartmentId}")
 	public String edit(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
 
@@ -95,7 +99,7 @@ public class MainController {
 		model.addAttribute("numberOfExistingImages", 0);
 		model.addAttribute("buttonMessage", "Add Apartment");
 
-		if (user.getListedProperties().contains(apartmentId)) {
+		if (user.getListedProperties().contains(apartmentId) || user.isAdmin()) {
 			var apartment = apartmentService.findApartmentById(apartmentId);
 			if (apartment != null) {
 				model.addAttribute("apartment", apartment);
@@ -107,8 +111,8 @@ public class MainController {
 		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 
-		var listOfProperties = conversationSession.getImmobiliareUser().getListedProperties();
-		model.addAttribute("listOfProperties", apartmentService.findApartmentsByIds(listOfProperties));
+		List<Apartment> listOfProperties = getListOfProperties(user);;
+		model.addAttribute("listOfProperties", listOfProperties);
 
 		return "add";
 	}
@@ -138,5 +142,15 @@ public class MainController {
 	@GetMapping("/contact")
 	public String contact(Model model) {
 		return "index";
+	}
+
+	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
+		List<Apartment> listOfProperties;
+		if (user.isAdmin()){
+			listOfProperties = apartmentService.findAll();
+		} else{
+			listOfProperties = apartmentService.findApartmentsByIds(user.getListedProperties());
+		}
+		return listOfProperties;
 	}
 }

@@ -37,6 +37,8 @@ public class ImmobiliareUser {
 
     private Integer searchesAvailable;      // a way to limit user usage of the app
 
+    private String isAdmin;
+
     public ImmobiliareUser() {
         this.favouriteProperties = new ArrayList<>();
         this.maxNumberOfListedProperties = 1;
@@ -45,5 +47,9 @@ public class ImmobiliareUser {
         this.propertyType = "";
         this.lastPropertyDescription = "";
         this.searchesAvailable = 100;           // Todo this is for now ..in the future it will be a smaller number
+    }
+
+    public boolean isAdmin(){
+        return isAdmin.equalsIgnoreCase("true");
     }
 }
