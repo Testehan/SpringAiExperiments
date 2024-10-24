@@ -38,6 +38,8 @@ public class Apartment {
     private List<Double> plot_embedding;
     private Double score;
 
+    private boolean active;
+
     @JsonIgnore
     public String getApartmentInfoToEmbedd(){
         return name + "\n" +

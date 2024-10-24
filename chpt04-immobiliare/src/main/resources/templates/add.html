@@ -80,6 +80,11 @@
                     <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
                            placeholder="An email or a phone number where you can be contacted"/>
                 </div>
+                <div class="mb-4">
+                    <label for="active" class="block text-gray-700 font-bold mb-2">Visible to potential clients:</label>
+                    <input type="checkbox" id="active" th:field="*{active}">
+                </div>
+
                 <span>Number of existing images is : [[${numberOfExistingImages}]]</span>
                 <div class="mb-4" id="apartmentImages">
                     <div th:each="image, status : ${apartment.images}" class="col border m-3 p-2" th:id="'divImage'+${status.index}">
@@ -120,7 +125,7 @@
                 <span class="block text-gray-700 font-bold mb-2">Your properties:</span>
                 <ol class="list-decimal">
                     <li th:each="property : ${listOfProperties}">
-                        <a class="hover:underline text-gray-700" th:href="@{'/edit/'+${property.id}}">[[${#strings.substring(property.name, 0, 30)}]]...</a>
+                        <a class="hover:underline text-gray-700" th:href="@{'/edit/'+${property.id}}">[[${#strings.substring(property.name, 0, property.name.length > 30 ? 30 : property.name.length)}]]...</a>
                     </li>
                 </ol>
             </div>

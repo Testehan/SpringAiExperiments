@@ -23,12 +23,10 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public String saveApartment(UserProfile userProfile)throws IOException {
-        var user = conversationSession.getImmobiliareUser();
-        user.setCity(userProfile.city());
-        user.setPropertyType(userProfile.propertyType());
-        user.setLastPropertyDescription(userProfile.lastPropertyDescription());
-        userService.updateUser(user);
+    public String saveUserProfile(UserProfile userProfile)throws IOException {
+        conversationSession.setCity(userProfile.city());
+        conversationSession.setRentOrSale(userProfile.propertyType());
+        conversationSession.setLastPropertyDescription(userProfile.lastPropertyDescription());
 
         return "redirect:/profile";
 

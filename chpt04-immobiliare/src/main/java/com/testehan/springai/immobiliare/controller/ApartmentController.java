@@ -45,7 +45,7 @@ public class ApartmentController {
         if (user.getMaxNumberOfListedProperties() > 0){
             apartmentService.saveApartmentAndImages(apartment, apartmentImages, user);
 
-            return "redirect:/";
+            return "redirect:/add";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage","ERROR: You have reached the maximum number of listed apartments!");
             return "redirect:/error";

@@ -60,6 +60,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         List<Bson> filters = new ArrayList<>();
         filters.add(Filters.eq("propertyType", propertyType));
+        filters.add(Filters.eq("active", true));        //TODO Added this in index.. test how it works..
         if (Objects.nonNull(city)){
             filters.add(Filters.or(Filters.eq("city", city),
                     Filters.eq("city",city.toLowerCase()),
