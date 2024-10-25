@@ -1,5 +1,6 @@
 package com.testehan.springai.chatstreaming.controller;
 
+import com.testehan.springai.chatstreaming.model.Movie;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -9,6 +10,7 @@ import reactor.core.publisher.Flux;
 public class ChatController {
 
     private final ChatClient chatClient;
+
 
     public ChatController(ChatClient.Builder builder) {
         this.chatClient = builder.build();
@@ -23,11 +25,11 @@ public class ChatController {
     }
 
     @GetMapping("/stream")
-    public Flux<String> chatWithStream(@RequestParam String message) {
+    public Flux<Movie> chatWithStream(@RequestParam String message){
         return chatClient.prompt()
                 .user(message)
                 .stream()
-                .content();
+                .chatResponse().cast(Movie.class);
     }
 
 }
