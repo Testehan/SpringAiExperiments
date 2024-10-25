@@ -52,15 +52,17 @@ public class ChatController {
             userService.updateUser(user);
 
 
+            if (searchQueriesAvailable<=5){
+                var queriesAvailableMessage = "You have " + searchQueriesAvailable + " available searches.";
+                model.addAttribute("queriesAvailableMessage", queriesAvailableMessage);
+            }
+            model.addAttribute("response", response.message());
             if (response.containsApartments()) {
-                model.addAttribute("response", response.message());
                 model.addAttribute("apartments", response.apartments());
 
                 return HtmxResponse.builder()
                         .view("response :: responseFragmentWithApartments")
                         .build();
-            } else {
-                model.addAttribute("response", response.message());
             }
         } else {
             model.addAttribute("response", M00_NO_SEARCH_QUERIES_AVAILABLE);
