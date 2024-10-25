@@ -3,14 +3,14 @@ var imagesCount=0;
 $(document).ready(function(){
 
     $("input[name='apartmentImages']").each(function(index){
-            imagesCount++;
-            $(this).change(function(){                       // "this" is here an input type element with name image
-                 if (!checkFileSize(this)){
-                    return ;
-                 }
-                showImageThumbnail(this, index);
-            });
+        imagesCount++;
+        $(this).change(function(){                       // "this" is here an input type element with name image
+             if (!checkFileSize(this)){
+                return ;
+             }
+            showImageThumbnail(this, index);
         });
+    });
 
     $("a[name='linkRemoveImage'").each(function(index){
         $(this).click(function(){
@@ -62,7 +62,7 @@ function addExtraImageSection(index){
         <a class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             name='linkRemoveImage'
             href="javascript:removeImage(${index})"
-            title="Remove this image">Delete</a>
+            title="Remove this image">Delete image</a>
     `;
 
     $("#apartmentImages").append(htmlExtraImage);
@@ -77,8 +77,6 @@ function addExtraImageSection(index){
         // we select the previous image section in order to add the remove button
         divImagePrevious.append(htmlLinkRemove);
     }
-
-
 
     imagesCount++;
 }
