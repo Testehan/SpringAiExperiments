@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -84,7 +85,9 @@ public class ApartmentService {
         DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateCustom = now.format(customFormatter);
 
-        apartment.setCreationDateTime(formattedDateCustom);
+        if (Objects.isNull(apartment.getId())) {
+            apartment.setCreationDateTime(formattedDateCustom);
+        }
         apartment.setLastUpdateDateTime(formattedDateCustom);
 
         saveApartment(apartment);
@@ -137,9 +140,10 @@ public class ApartmentService {
                 AmazonS3Util.uploadFile(uploadDir, filename, extraImage.getInputStream(), extraImage.getContentType());
 
                 apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
+
+                imagesWereUploaded = true;
             }
 
-            imagesWereUploaded = true;
         }
         return imagesWereUploaded;
     }

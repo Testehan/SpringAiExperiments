@@ -80,6 +80,10 @@
                     <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
                            placeholder="An email or a phone number where you can be contacted"/>
                 </div>
+                <div th:if="${apartment.creationDateTime != null}" class="mb-4">
+                    <label for="creationDateTime" class="block text-gray-700 font-bold mb-2">Creation date:</label>
+                    <input type="text" id="creationDateTime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-slate-200" th:field="*{creationDateTime}" readonly/>
+                </div>
                 <div class="mb-4">
                     <label for="active" class="block text-gray-700 font-bold mb-2">Visible to potential clients:</label>
                     <input type="checkbox" id="active" th:field="*{active}">

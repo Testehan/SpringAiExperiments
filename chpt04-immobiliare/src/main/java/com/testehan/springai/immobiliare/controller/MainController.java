@@ -104,7 +104,7 @@ public class MainController {
 			if (apartment != null) {
 				model.addAttribute("apartment", apartment);
 				model.addAttribute("numberOfExistingImages", apartment.getImages().size());
-				model.addAttribute("buttonMessage", "Edit Apartment");
+				model.addAttribute("buttonMessage", "Update Apartment");
 			}
 		}
 
@@ -130,7 +130,8 @@ public class MainController {
 	@GetMapping("/profile")
 	public String profile(Model model) {
 		var user = conversationSession.getImmobiliareUser();
-		UserProfile userProfile = new UserProfile(user.getEmail(),user.getCity(),user.getPropertyType(),user.getLastPropertyDescription());
+
+		UserProfile userProfile = new UserProfile(user.getEmail(),user.getCity(),user.getPropertyType(),user.getLastPropertyDescription(),user.getSearchesAvailable());
 
 		model.addAttribute("user", userProfile);
 		// todo for now the list of cities available for posting properties is hardcoded here

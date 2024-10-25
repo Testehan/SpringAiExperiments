@@ -17,7 +17,7 @@
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Email:</label>
                     <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
-     focus:shadow-outline" th:field="*{email}"  readonly />
+     focus:shadow-outline bg-slate-200" th:field="*{email}"  readonly />
                 </div>
                 <div class="mb-4">
                     <label for="city" class="block text-gray-700 font-bold mb-2">City you are interested in:</label>
@@ -45,6 +45,11 @@
                     <textarea id="description"
                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                               th:field="*{lastPropertyDescription}"></textarea>
+                </div>
+                <div class="mb-4">
+                    <label for="searchesAvailable" class="block text-gray-700 font-bold mb-2">Searches Available:</label>
+                    <input type="text" id="searchesAvailable" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+     focus:shadow-outline bg-slate-200" th:field="*{searchesAvailable}"  readonly />
                 </div>
 
                 <div class="flex items-center justify-between">
