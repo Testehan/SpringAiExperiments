@@ -21,7 +21,7 @@
     <main class="flex overflow-auto bg-white p-4 w-full max-w-full">
         <div class="w-4/5 md:w-3/4 flex-1 mb-4 p-4 h-full ">
             <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
-                <input type="hidden" name="id" th:value="${apartment.id}" />
+                <input th:if="${apartment.id != null}" type="hidden" name="id" th:value="${apartment.id}" />
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
                     <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none

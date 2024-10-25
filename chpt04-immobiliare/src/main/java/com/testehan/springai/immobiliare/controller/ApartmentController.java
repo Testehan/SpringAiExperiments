@@ -37,7 +37,7 @@ public class ApartmentController {
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
         var user = userService.getImmobiliareUserByEmail(userEmail);
-        if ((apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
+        if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
             redirectAttributes.addFlashAttribute("errorMessage","ERROR: You can't make this edit!");
             return "redirect:/error";
         }

@@ -60,7 +60,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         List<Bson> filters = new ArrayList<>();
         filters.add(Filters.eq("propertyType", propertyType));
-        filters.add(Filters.eq("active", true));        //TODO Added this in index.. test how it works..
+        filters.add(Filters.eq("active", true));
         if (Objects.nonNull(city)){
             filters.add(Filters.or(Filters.eq("city", city),
                     Filters.eq("city",city.toLowerCase()),
@@ -72,11 +72,11 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         if (Objects.nonNull(apartment.getSurface()) && apartment.getSurface()>0){
             filters.add(Filters.and(Filters.gte("surface", getMinValue(apartment.getSurface())),
                     Filters.lte("surface", getMaxValue(apartment.getSurface()))));
-        }
-        if (Objects.nonNull(apartment.getPrice()) && apartment.getPrice()>0){
-            filters.add(Filters.and(Filters.gte("price", getMinValue(apartment.getPrice())),
-                    Filters.lte("price", getMaxValue(apartment.getPrice()))));
-        }
+        } // the LLM will filter the semantic results based on the description, so it should filter out apartments that do not fit wanted price
+//        if (Objects.nonNull(apartment.getPrice()) && apartment.getPrice()>0){
+//            filters.add(Filters.and(Filters.gte("price", getMinValue(apartment.getPrice())),
+//                    Filters.lte("price", getMaxValue(apartment.getPrice()))));
+//        }
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
 

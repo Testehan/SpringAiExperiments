@@ -150,14 +150,16 @@ public class ApartmentService {
 
     private void generateImageMetadata(Apartment apartment) throws IOException {
 
-        ChatClient chatClient = ChatClient.builder(chatModel).build();
-        ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
+
         StringBuilder stringBuilder = new StringBuilder();
         boolean imagesWereModified = false;
 
         for (String apartmentImages : apartment.getImages()) {
             URL url = new URL(apartmentImages);
             try (InputStream inputStream = url.openStream()) {
+                ChatClient chatClient = ChatClient.builder(chatModel).build();
+                ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
+
                 imagesWereModified = true;
                 URLConnection connection = url.openConnection();
                 Resource imageResource = new InputStreamResource(inputStream);
@@ -168,8 +170,7 @@ public class ApartmentService {
                 );
                 Message systemMessage = new SystemMessage(systemPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()));
                 chatClientRequest.messages(List.of(systemMessage, userMessage));
-                Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {
-                });
+                Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {});
                 stringBuilder.append(result.get("description"));
             }
         }

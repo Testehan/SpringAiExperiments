@@ -131,7 +131,9 @@ public class MainController {
 	public String profile(Model model) {
 		var user = conversationSession.getImmobiliareUser();
 
-		UserProfile userProfile = new UserProfile(user.getEmail(),user.getCity(),user.getPropertyType(),user.getLastPropertyDescription(),user.getSearchesAvailable());
+		UserProfile userProfile = new UserProfile(user.getEmail(),user.getCity(),
+				user.getPropertyType(),user.getLastPropertyDescription(),
+				user.getSearchesAvailable(), user.getMaxNumberOfListedProperties());
 
 		model.addAttribute("user", userProfile);
 		// todo for now the list of cities available for posting properties is hardcoded here
