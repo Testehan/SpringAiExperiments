@@ -2,39 +2,36 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Movies List</title>
-    <script src="https://unpkg.com/htmx.org"></script>
     <style>
         .movie { border-bottom: 1px solid #ccc; padding: 10px 0; }
     </style>
 </head>
-<script>
-    const eventSource = new EventSource('/movies/stream');
-    eventSource.onmessage = function(event) {
-        // Append each movie to the movie container
-        const movieHtml = event.data; // The HTML content from the event
-        console.log(movieHtml);
-        document.getElementById('movie-container').insertAdjacentHTML('beforeend', movieHtml);
-    };
-
-    eventSource.onerror = function(event) {
-        console.error("EventSource failed: ", event);
-        eventSource.close();
-    };
-</script>
 <body>
     <h1>Movies</h1>
-<!--    <div id="movie-container" hx-get="/movies/stream"-->
-<!--         hx-trigger="load"-->
-<!--         hx-swap="beforeend"-->
-<!--         hx-sse="true"-->
-<!--         hx-target="#movie-container">-->
-<!--    </div>-->
     <div id="movie-container">
 
     </div>
 
-    <a href="/movies/stream" >
-        Load Movies
-    </a>
+    <button id="start-sse-btn">Start Movie Stream</button>
+
 </body>
+<script>
+    function startSSE() {
+        console.log("Button clicked, starting sse endpoint");
+        const eventSource = new EventSource('/movies/stream'); // Your SSE endpoint
+
+         eventSource.onmessage = function(event) {
+                // Insert received movie data into the movie container
+                document.getElementById('movie-container').insertAdjacentHTML('beforeend', event.data);
+            };
+
+            eventSource.onerror = function(event) {
+                console.error("EventSource failed:", event);
+                eventSource.close(); // Optionally close the connection on error
+            };
+    }
+
+    // Attach click event to the button to start SSE
+    document.getElementById('start-sse-btn').addEventListener('click', startSSE);
+</script>
 </html>

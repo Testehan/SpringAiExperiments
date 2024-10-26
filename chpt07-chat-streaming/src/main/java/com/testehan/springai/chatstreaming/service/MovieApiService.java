@@ -26,7 +26,7 @@ public class MovieApiService {
         String format = outputParser.getFormat();
         System.out.println("format = " + format);
 
-        var promptMessage = "give me exactly 5 movies by actor Al Pacino without duplicated please" + "\n {format}";
+        var promptMessage = "What movies won the oscar in 1994? " + "\n {format}";
         PromptTemplate promptTemplate = new PromptTemplate(promptMessage, Map.of("format", format));
         Prompt prompt = promptTemplate.create();
 

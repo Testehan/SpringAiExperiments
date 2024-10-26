@@ -41,7 +41,7 @@ public class MovieController {
 
         return Flux.fromIterable(sampleMovies)
                 .delayElements(Duration.ofSeconds(1))  // Delay for testing purposes
-                .map(movie -> "data: " + formatMovieHtml(movie) + "\n\n");
+                .map(movie -> formatMovieHtml(movie) + "\n\n");
 
 //        return movieApiService.streamMovies()
 //                .map(movie -> formatMovieHtml(movie) + "\n\n");

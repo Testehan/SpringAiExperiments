@@ -19,7 +19,6 @@ public class MovieService {
                 // Accumulate characters into a full JSON string
                 .scan(new StringBuilder(), (acc, next) -> acc.append(next))  // Append characters
                 .filter(buffer -> containsCompleteJsonObject(buffer.toString()))  // Check if the buffer contains complete JSON
-                .map(StringBuilder::toString)  // Convert StringBuilder to String
                 .flatMap(this::splitAndConvertToMovies);  // Convert JSON string to Movie
     }
 
@@ -31,10 +30,6 @@ public class MovieService {
             // Handle any parsing errors (e.g., log and skip the faulty entry)
             throw new RuntimeException("Error parsing movie JSON: " + jsonString, e);
         }
-    }
-
-    private boolean isCompleteJson(String jsonString) {
-        return jsonString.trim().startsWith("{") && jsonString.trim().endsWith("}");
     }
 
     // Helper method to check if we have at least one complete JSON object in the buffer
@@ -54,9 +49,9 @@ public class MovieService {
     }
 
     // Helper method to split the JSON array into individual movie objects and parse them
-    private Flux<Movie> splitAndConvertToMovies(String jsonArrayString) {
+    private Flux<Movie> splitAndConvertToMovies(StringBuilder jsonArrayString) {
         // Remove the array brackets if necessary and split into individual objects
-        String trimmed = jsonArrayString.trim();
+        String trimmed = jsonArrayString.toString().trim();
         if (trimmed.startsWith("[")) {
             trimmed = trimmed.substring(1); // Remove starting bracket
         }
