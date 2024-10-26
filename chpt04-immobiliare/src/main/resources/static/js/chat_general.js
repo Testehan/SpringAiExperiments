@@ -9,26 +9,25 @@ $(document).ready(function(){
         }
     });
 
-    const source = new EventSource("/api/apartments/stream");
+    const eventSource = new EventSource("/api/apartments/stream");
 
-    source.onmessage = function (event) {
-        // Dynamically insert the fragment into the response container
+    eventSource.addEventListener('apartment', function(event) {
+         // Dynamically insert the fragment into the response container
+        console.log("Received update:", event.data);
         const container = $('.responseFragmentWithApartments').last()
         const newFragment = event.data;
         console.log(newFragment);
-         $('#spinner').hide();
+        $('#spinner').hide();
         container.append(newFragment);
-    };
+    });
 
-    const source2 = new EventSource("/api/apartments/streamresponse");
-
-    source2.onmessage = function (event) {
+    eventSource.addEventListener('response', function(event) {
         // Dynamically insert the fragment into the response container
         const container = $("#response-container").last()
         const newFragment = event.data;
         console.log(newFragment);
         container.append(newFragment);
-    };
+    });
 
 
 });

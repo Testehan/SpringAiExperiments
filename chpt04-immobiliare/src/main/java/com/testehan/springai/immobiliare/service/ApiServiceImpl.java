@@ -3,6 +3,9 @@ package com.testehan.springai.immobiliare.service;
 import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.constants.PromptConstants;
+import com.testehan.springai.immobiliare.events.ApartmentPayload;
+import com.testehan.springai.immobiliare.events.Event;
+import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
@@ -46,8 +49,7 @@ public class ApiServiceImpl implements ApiService{
 
     private Executor executor;
 
-    private final Sinks.Many<Apartment> eventSink = Sinks.many().multicast().onBackpressureBuffer();
-    private final Sinks.Many<ResultsResponse> eventSinkResultResponse = Sinks.many().multicast().onBackpressureBuffer();
+    private final Sinks.Many<Event> eventSink = Sinks.many().multicast().onBackpressureBuffer();
 
     private ConversationSession conversationSession;
     private ConversationService conversationService;
@@ -104,10 +106,10 @@ public class ApiServiceImpl implements ApiService{
                                 .findFirst();
                            if (!apartmentLLM.isEmpty()){
                                if (isFirst.getAndSet(false)) {
-                                   eventSinkResultResponse.tryEmitNext(new ResultsResponse(M04_APARTMENTS_FOUND));
+                                   eventSink.tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND)));
                                }
                                System.out.println("Found apartment id" + apartmentLLM.get().getId());
-                               eventSink.tryEmitNext(apartmentLLM.get());
+                               eventSink.tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
                            }
 
                         },
@@ -116,7 +118,7 @@ public class ApiServiceImpl implements ApiService{
                         },
                         () -> {
                             if (isFirst.get()){     // this means that we processed stream and we got no match
-                                eventSinkResultResponse.tryEmitNext(new ResultsResponse(M04_NO_APARTMENTS_FOUND));
+                                eventSink.tryEmitNext(new Event("response",new ResponsePayload(M04_NO_APARTMENTS_FOUND)));
                             }
                             System.out.println("Flux completed");
                         }
@@ -132,12 +134,8 @@ public class ApiServiceImpl implements ApiService{
         return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',';
     }
 
-    public Flux<Apartment> getApartmentsFlux() {
+    public Flux<Event> getApartmentsFlux() {
         return eventSink.asFlux();
-    }
-
-    public Flux<ResultsResponse> getResultResponseFlux() {
-        return eventSinkResultResponse.asFlux();
     }
 
     private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {

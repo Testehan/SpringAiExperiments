@@ -1,10 +1,14 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.events.Event;
+import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,12 +23,15 @@ import org.thymeleaf.spring6.SpringWebFluxTemplateEngine;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 
 @Controller
 @RequestMapping("/api/apartments")
 public class ApartmentController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentController.class);
 
     private final ApartmentService apartmentService;
     private final UserService userService;
@@ -63,42 +70,58 @@ public class ApartmentController {
     }
 
     @GetMapping(value = "/stream", produces = "text/event-stream")
-    public Flux<String> streamApartments() {
+    public Flux<ServerSentEvent<String>> streamApartments() {
 
-        return apiService.getApartmentsFlux()
-                .map(this::renderApartmentFragment);
-
-    }
-
-    @GetMapping(value = "/streamresponse", produces = "text/event-stream")
-    public Flux<String> getResultResponseFlux() {
-
-        return apiService.getResultResponseFlux()
-                .map(this::renderResultResponseFragment);
+        return apiService.getApartmentsFlux()       // TODO rename this as it is NO LONGER Related strictly to apartments
+                .map(this::renderApartmentFragment);    // also this
 
     }
 
-    private String renderApartmentFragment(Apartment apartment){
-        Context context = new Context();
-        Set<String> selectors = new HashSet<>();
-        selectors.add("apartment");
-        context.setVariable("apartment", apartment);
-        context.setVariable("favouriteButtonStartMessage","Save to Favourites");
-
-        return templateEngine.process("fragments",selectors, context).
-                replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
+    private ServerSentEvent<String> renderApartmentFragment(Event event){
+        if (event.getEventType().equals("apartment")){
+            return getApartmentServerSentEvent(event.getPayload());
+        } else {
+            return getResponseServerSideEvent(event.getPayload());
+        }
     }
 
-    private String renderResultResponseFragment(ResultsResponse resultsResponse){
+    private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("responseFragmentWithApartments");
-        context.setVariable("response", resultsResponse.message());
+        context.setVariable("response", eventPayload.getPayload());
 
-        return templateEngine.process("response",selectors, context).
+        var data =templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
+// TODO extract this builder in a separate method
+        return ServerSentEvent.<String>builder()
+                .data(data)
+                // Set the event type
+                .event("response")
+                // Set the retry duration
+                .retry(Duration.ofMillis(1000))
+                // Build the Server-Sent Event
+                .build();
     }
 
+    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload) {
+        Context context = new Context();
+        Set<String> selectors = new HashSet<>();
+        selectors.add("apartment");
+        context.setVariable("apartment", eventPayload.getPayload());
+        context.setVariable("favouriteButtonStartMessage","Save to Favourites");
 
+        var data = templateEngine.process("fragments",selectors, context).
+                replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
+// TODO extract this builder in a separate method
+        return ServerSentEvent.<String>builder()
+                .data(data)
+                // Set the event type
+                .event("apartment")
+                // Set the retry duration
+                .retry(Duration.ofMillis(1000))
+                // Build the Server-Sent Event
+                .build();
+    }
 
 }
