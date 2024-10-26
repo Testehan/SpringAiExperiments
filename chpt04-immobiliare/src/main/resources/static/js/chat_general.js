@@ -2,10 +2,23 @@
 $(document).ready(function(){
     // after voice message is transcribed, or text message is added to chat, send a request to obtain a response
     $(document).bind('htmx:load', function(evt) {
-        if ((evt.target.parentNode.id === 'response-container') && (evt.target.children[0].className.includes("userMessage"))) {
-            askForResponse();
+        if ((evt.target.parentNode.id === 'response-container')
+            && (evt.target.children.length>0)
+            && (evt.target.children[0].className.includes("userMessage"))) {
+                askForResponse();
         }
     });
+
+    const source = new EventSource("/api/apartments/stream");
+
+    source.onmessage = function (event) {
+        // Dynamically insert the fragment into the response container
+        const container = $('#response-container');
+        const newFragment = event.data;
+        console.log(newFragment);
+        container.append(newFragment);
+    };
+
 });
 
 function askForResponse() {

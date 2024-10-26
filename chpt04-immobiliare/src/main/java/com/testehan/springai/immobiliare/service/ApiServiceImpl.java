@@ -18,11 +18,16 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Sinks;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
@@ -31,6 +36,8 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 @Service
 public class ApiServiceImpl implements ApiService{
+
+    public static final int MONGO_OBJECT_ID_LENGTH_PLUS_COMMA = 25;
 
     private ImmobiliareApiService immobiliareApiService;
 
@@ -41,6 +48,8 @@ public class ApiServiceImpl implements ApiService{
     private VectorStore vectorStore;
 
     private Executor executor;
+
+    private final Sinks.Many<ResultsResponse> eventSink = Sinks.many().multicast().onBackpressureBuffer();
 
     private ConversationSession conversationSession;
     private ConversationService conversationService;
@@ -64,13 +73,14 @@ public class ApiServiceImpl implements ApiService{
             case SET_CITY : { return setCity(serviceCall); }
             case GET_APARTMENTS:{ return getApartments(message); }
             case RESTART_CONVERSATION : { return restartConversation(); }
-            case DEFAULT : return respondToUserMessage(message);
+//            case DEFAULT : return respondToUserMessage(message);           TODO   maybe we can do streaming for this as well ?
         }
 
         return new ResultsResponse(M00_IRRELEVANT_PROMPT, new ArrayList<>());
     }
 
     private ResultsResponse getApartments(String description) {
+
         conversationSession.setLastPropertyDescription(description);
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 
@@ -78,20 +88,41 @@ public class ApiServiceImpl implements ApiService{
         var city = conversationSession.getCity();
         var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
-        ResultsResponse response;
+        ResultsResponse response = new ResultsResponse("", new ArrayList<>());
 
         if (apartmentsFromSemanticSearch.size() > 0) {
             var bestMatchingApartmentIds = getBestMatchingApartmentIds(apartmentsFromSemanticSearch, description);
-            Set<String> idsToFilter = Arrays.stream(bestMatchingApartmentIds.split(","))
-                    .collect(Collectors.toSet());
-            var apartmentsFromLLM=  apartmentsFromSemanticSearch.stream()
-                    .filter(item -> idsToFilter.contains(item.getId().toString()))
-                    .collect(Collectors.toList());
-            if (apartmentsFromLLM.size()>0) {
-                response = new ResultsResponse(M04_APARTMENTS_FOUND, apartmentsFromLLM);
-            } else {
-                response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
-            }
+            AtomicBoolean isFirst = new AtomicBoolean(true);
+            bestMatchingApartmentIds
+                    .scan(new StringBuilder(), (acc, next) -> acc.append(next))  // Append characters
+                    .filter(buffer -> propertyIdContainsComma(buffer.toString()))
+                    .map(buffer-> buffer.toString().split(","))
+                    .flatMap(idsArray -> Flux.fromArray(idsArray))
+                    .distinct()
+                    .subscribe(
+                        apId -> {
+                            try {
+                                Thread.sleep(5000);
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                            if (isFirst.getAndSet(false)) {
+                                eventSink.tryEmitNext(new ResultsResponse(M04_APARTMENTS_FOUND, new ArrayList<>()));
+                            }
+
+                           var apartmentLLM = apartmentsFromSemanticSearch.stream()
+                                .filter(item -> apId.equals(item.getId().toString()))
+                                .findFirst();
+                            System.out.println("Found apartment id" + apartmentLLM.get().getId());
+                            eventSink.tryEmitNext(new ResultsResponse("", List.of(apartmentLLM.get())));
+                        },
+                        error -> {
+                            System.err.println("Error: " + error);
+                        },
+                        () -> {
+                            System.out.println("Flux completed");
+                        }
+                    );
         } else {
             response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
         }
@@ -99,7 +130,15 @@ public class ApiServiceImpl implements ApiService{
         return response;
     }
 
-    private String getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
+    private boolean propertyIdContainsComma(String propertyId) {
+        return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',' && propertyId.length()== MONGO_OBJECT_ID_LENGTH_PLUS_COMMA;
+    }
+
+    public Flux<ResultsResponse> getApartmentsFlux() {
+        return eventSink.asFlux();
+    }
+
+    private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
         var resource = new ClassPathResource("prompts/apartments_found.txt");
 
         var promptTemplate = new PromptTemplate(resource);
@@ -108,7 +147,7 @@ public class ApiServiceImpl implements ApiService{
         promptParameters.put("description", description);
         var prompt = promptTemplate.create(promptParameters);
 
-        return respondToUserMessage(prompt.getContents()).message();
+        return respondToUserMessage(prompt.getContents());
 
     }
 
@@ -157,7 +196,7 @@ public class ApiServiceImpl implements ApiService{
                 .build();
     }
 
-    private ResultsResponse respondToUserMessage(String userMessage) {
+    private Flux<String> respondToUserMessage(String userMessage) {
 
         var chatResponse = createNewChatClient()
                 .prompt()
@@ -174,10 +213,9 @@ public class ApiServiceImpl implements ApiService{
                     }
                 })
             .user(userMessage)
-                .call()
-                .chatResponse();
+                .stream().content();
 
-        return new ResultsResponse(chatResponse.getResult().getOutput().getContent(), new ArrayList<>());
+        return chatResponse;
     }
 
 

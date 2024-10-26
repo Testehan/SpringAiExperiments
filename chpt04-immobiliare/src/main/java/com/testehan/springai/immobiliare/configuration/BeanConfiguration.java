@@ -11,6 +11,8 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
+import org.thymeleaf.spring6.SpringWebFluxTemplateEngine;
+import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
 @Configuration
 public class BeanConfiguration {
@@ -38,4 +40,10 @@ public class BeanConfiguration {
     }
 
 
+    @Bean
+    public SpringWebFluxTemplateEngine thymeleafTemplateEngine(SpringResourceTemplateResolver templateResolver) {
+        SpringWebFluxTemplateEngine templateEngine = new SpringWebFluxTemplateEngine();
+        templateEngine.setTemplateResolver(templateResolver);
+        return templateEngine;
+    }
 }
