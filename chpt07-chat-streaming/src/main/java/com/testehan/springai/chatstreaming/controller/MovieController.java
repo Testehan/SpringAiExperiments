@@ -6,6 +6,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import reactor.core.publisher.Flux;
 
@@ -28,7 +29,7 @@ public class MovieController {
 
     @GetMapping(value = "/movies/stream", produces = "text/event-stream")
     @ResponseBody
-    public Flux<String> streamMovies(ServerHttpResponse response) {
+    public Flux<String> streamMovies(@RequestParam String message, ServerHttpResponse response) {
         response.getHeaders().set("Transfer-Encoding", "chunked");
         response.getHeaders().set("Content-Type", "text/event-stream");
         response.getHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -41,7 +42,7 @@ public class MovieController {
 
         return Flux.fromIterable(sampleMovies)
                 .delayElements(Duration.ofSeconds(1))  // Delay for testing purposes
-                .map(movie -> formatMovieHtml(movie) + "\n\n");
+                .map(movie -> formatMovieHtml(movie) ); //+ "\n\n"
 
 //        return movieApiService.streamMovies()
 //                .map(movie -> formatMovieHtml(movie) + "\n\n");
@@ -49,7 +50,7 @@ public class MovieController {
 
     private String formatMovieHtml(Movie movie){
         try {
-            Thread.sleep(5000);
+            Thread.sleep(3000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
