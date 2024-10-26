@@ -10,10 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import reactor.core.publisher.Flux;
 
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-
 @Controller
 public class MovieController {
     private final MovieApiService movieApiService;
@@ -34,18 +30,19 @@ public class MovieController {
         response.getHeaders().set("Content-Type", "text/event-stream");
         response.getHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
 
-        List<Movie> sampleMovies = Arrays.asList(
-                new Movie("Inception", 2010, "A mind-bending thriller."),
-                new Movie("The Matrix", 1999, "A computer hacker learns about the true nature of reality."),
-                new Movie("Interstellar", 2014, "A team of explorers travel through a wormhole in space.")
-        );
+//        List<Movie> sampleMovies = Arrays.asList(
+//                new Movie("Inception", 2010, "A mind-bending thriller."),
+//                new Movie("The Matrix", 1999, "A computer hacker learns about the true nature of reality."),
+//                new Movie("Interstellar", 2014, "A team of explorers travel through a wormhole in space.")
+//        );
 
-        return Flux.fromIterable(sampleMovies)
-                .delayElements(Duration.ofSeconds(1))  // Delay for testing purposes
-                .map(movie -> formatMovieHtml(movie) ); //+ "\n\n"
+//        return Flux.fromIterable(sampleMovies)
+//                .delayElements(Duration.ofSeconds(1))  // Delay for testing purposes
+//                .map(movie -> formatMovieHtml(movie) ); //+ "\n\n"
 
-//        return movieApiService.streamMovies()
-//                .map(movie -> formatMovieHtml(movie) + "\n\n");
+        return movieApiService.streamMovies(message)
+                .distinct()
+               .map(movie -> formatMovieHtml(movie));   // + "\n\n"
     }
 
     private String formatMovieHtml(Movie movie){

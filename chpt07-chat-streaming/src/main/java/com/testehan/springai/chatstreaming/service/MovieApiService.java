@@ -4,10 +4,12 @@ import com.testehan.springai.chatstreaming.model.Movie;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.parser.BeanOutputParser;
+import org.springframework.ai.converter.BeanOutputConverter;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -21,12 +23,12 @@ public class MovieApiService {
         this.movieService = movieService;
     }
 
-    public Flux<Movie> streamMovies() {
-        var outputParser = new BeanOutputParser<>(Movie.class);
+    public Flux<Movie> streamMovies(String message) {
+        var outputParser = new BeanOutputConverter<>( new ParameterizedTypeReference<List<Movie>>() { });
         String format = outputParser.getFormat();
         System.out.println("format = " + format);
 
-        var promptMessage = "What movies won the oscar in 1994? " + "\n {format}";
+        var promptMessage = message + "\n {format}";
         PromptTemplate promptTemplate = new PromptTemplate(promptMessage, Map.of("format", format));
         Prompt prompt = promptTemplate.create();
 

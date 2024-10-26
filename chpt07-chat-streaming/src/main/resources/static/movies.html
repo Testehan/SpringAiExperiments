@@ -26,6 +26,14 @@
         <div id="chat-messages" class="space-y-4"></div>
     </div>
 
+    <img id="spinner" style="position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: lightblue;
+    padding: 1rem;
+    z-index: 9999; display:none" src="/images/bars.svg"/>
+
     <form id="chat-form" class="flex items-center">
         <input
                 type="text"
@@ -53,6 +61,10 @@
         e.preventDefault();
         const message = messageInput.value;
         if (!message) return;
+
+        // display spinner
+         var spinner = document.getElementById("spinner");
+         spinner.style.display = "block";
 
         // Add user message to chat
         addMessageToChat('User', message);
@@ -96,6 +108,8 @@
                 var rawData = decoder.decode(value, { stream: true });
                 const cleanData = rawData.startsWith("data:") ? rawData.replace("data:", "") : rawData;
                 console.log(cleanData);
+                var spinner = document.getElementById("spinner");
+                spinner.style.display = "none";
                 contentElement.innerHTML += cleanData;
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
