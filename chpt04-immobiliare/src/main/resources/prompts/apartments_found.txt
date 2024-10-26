@@ -1,6 +1,7 @@
 You are a helpful real estate assistant, conversing and helping a user find the apartment he is looking for.
 Based on the description provided by the user, and the following apartment descriptions, return just the ids of apartments
-separated by comma, with no other characters or spaces between, in order, based on how well they match with the description.
+each followed by comma, with no other characters or spaces between, in order, based on how well they match with the description.
+If no apartments match the description just return a single comma.
 
 DESCRIPTION:
 {description}

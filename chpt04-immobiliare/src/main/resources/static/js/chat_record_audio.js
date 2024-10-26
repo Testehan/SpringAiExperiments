@@ -34,6 +34,7 @@ $(document).ready(function () {
 
     // Start and stop recording on button click
     $("#recordVoiceButton").on('click', function() {
+         $('#spinner').show();
         if (mediaRecorder.state === "inactive") {
             mediaRecorder.start();
             $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );

@@ -13,11 +13,23 @@ $(document).ready(function(){
 
     source.onmessage = function (event) {
         // Dynamically insert the fragment into the response container
-        const container = $('#response-container');
+        const container = $('.responseFragmentWithApartments').last()
+        const newFragment = event.data;
+        console.log(newFragment);
+         $('#spinner').hide();
+        container.append(newFragment);
+    };
+
+    const source2 = new EventSource("/api/apartments/streamresponse");
+
+    source2.onmessage = function (event) {
+        // Dynamically insert the fragment into the response container
+        const container = $("#response-container").last()
         const newFragment = event.data;
         console.log(newFragment);
         container.append(newFragment);
     };
+
 
 });
 

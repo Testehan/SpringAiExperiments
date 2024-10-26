@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +36,6 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 @Service
 public class ApiServiceImpl implements ApiService{
 
-    public static final int MONGO_OBJECT_ID_LENGTH_PLUS_COMMA = 25;
-
     private ImmobiliareApiService immobiliareApiService;
 
     private ApartmentService apartmentService;
@@ -49,7 +46,8 @@ public class ApiServiceImpl implements ApiService{
 
     private Executor executor;
 
-    private final Sinks.Many<ResultsResponse> eventSink = Sinks.many().multicast().onBackpressureBuffer();
+    private final Sinks.Many<Apartment> eventSink = Sinks.many().multicast().onBackpressureBuffer();
+    private final Sinks.Many<ResultsResponse> eventSinkResultResponse = Sinks.many().multicast().onBackpressureBuffer();
 
     private ConversationSession conversationSession;
     private ConversationService conversationService;
@@ -76,7 +74,7 @@ public class ApiServiceImpl implements ApiService{
 //            case DEFAULT : return respondToUserMessage(message);           TODO   maybe we can do streaming for this as well ?
         }
 
-        return new ResultsResponse(M00_IRRELEVANT_PROMPT, new ArrayList<>());
+        return new ResultsResponse(M00_IRRELEVANT_PROMPT);
     }
 
     private ResultsResponse getApartments(String description) {
@@ -88,7 +86,7 @@ public class ApiServiceImpl implements ApiService{
         var city = conversationSession.getCity();
         var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
-        ResultsResponse response = new ResultsResponse("", new ArrayList<>());
+        ResultsResponse response = new ResultsResponse("");
 
         if (apartmentsFromSemanticSearch.size() > 0) {
             var bestMatchingApartmentIds = getBestMatchingApartmentIds(apartmentsFromSemanticSearch, description);
@@ -101,41 +99,45 @@ public class ApiServiceImpl implements ApiService{
                     .distinct()
                     .subscribe(
                         apId -> {
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException e) {
-                                throw new RuntimeException(e);
-                            }
-                            if (isFirst.getAndSet(false)) {
-                                eventSink.tryEmitNext(new ResultsResponse(M04_APARTMENTS_FOUND, new ArrayList<>()));
-                            }
-
                            var apartmentLLM = apartmentsFromSemanticSearch.stream()
                                 .filter(item -> apId.equals(item.getId().toString()))
                                 .findFirst();
-                            System.out.println("Found apartment id" + apartmentLLM.get().getId());
-                            eventSink.tryEmitNext(new ResultsResponse("", List.of(apartmentLLM.get())));
+                           if (!apartmentLLM.isEmpty()){
+                               if (isFirst.getAndSet(false)) {
+                                   eventSinkResultResponse.tryEmitNext(new ResultsResponse(M04_APARTMENTS_FOUND));
+                               }
+                               System.out.println("Found apartment id" + apartmentLLM.get().getId());
+                               eventSink.tryEmitNext(apartmentLLM.get());
+                           }
+
                         },
                         error -> {
                             System.err.println("Error: " + error);
                         },
                         () -> {
+                            if (isFirst.get()){     // this means that we processed stream and we got no match
+                                eventSinkResultResponse.tryEmitNext(new ResultsResponse(M04_NO_APARTMENTS_FOUND));
+                            }
                             System.out.println("Flux completed");
                         }
                     );
         } else {
-            response = new ResultsResponse(M04_NO_APARTMENTS_FOUND, new ArrayList<>());
+            response = new ResultsResponse(M04_NO_APARTMENTS_FOUND);
         }
 
         return response;
     }
 
     private boolean propertyIdContainsComma(String propertyId) {
-        return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',' && propertyId.length()== MONGO_OBJECT_ID_LENGTH_PLUS_COMMA;
+        return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',';
     }
 
-    public Flux<ResultsResponse> getApartmentsFlux() {
+    public Flux<Apartment> getApartmentsFlux() {
         return eventSink.asFlux();
+    }
+
+    public Flux<ResultsResponse> getResultResponseFlux() {
+        return eventSinkResultResponse.asFlux();
     }
 
     private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
@@ -165,19 +167,19 @@ public class ApiServiceImpl implements ApiService{
         conversationSession.setCity("");
         conversationSession.getChatMemory().clear(conversationSession.getConversationId());
         conversationService.deleteConversation(conversationSession.getConversationId());
-        return new ResultsResponse(M01_INITIAL_MESSAGE, new ArrayList<>());
+        return new ResultsResponse(M01_INITIAL_MESSAGE);
 
     }
 
     private ResultsResponse setCity(ServiceCall serviceCall) {
         conversationSession.setCity(serviceCall.message());
         var user = conversationSession.getImmobiliareUser();
-        return new ResultsResponse(String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()), new ArrayList<>());
+        return new ResultsResponse(String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()));
     }
 
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
         conversationSession.setRentOrSale(serviceCall.message());
-        return new ResultsResponse(M02_CITY, new ArrayList<>());
+        return new ResultsResponse(M02_CITY);
     }
 
     private ChatClient createNewChatClient(){

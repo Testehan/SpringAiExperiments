@@ -19,8 +19,8 @@
         <span th:if="${queriesAvailableMessage!= null}" class="text-red-500">[[${queriesAvailableMessage}]]</span>
     </p>
 
-    <div th:replace="~{fragments :: apartments_list('Save to Favourites')}" />
-
+    <div class="responseFragmentWithApartments grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+    </div>
 
 </div>
 

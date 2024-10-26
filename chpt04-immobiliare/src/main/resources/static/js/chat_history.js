@@ -16,6 +16,7 @@ function storeInputInHistory(input) {
 $(document).ready(function () {
     var messageInput = $("#message");
     $('#sendMessageButton').click(function() {
+        $('#spinner').show();
         storeInputInHistory(messageInput[0].value);
     });
 

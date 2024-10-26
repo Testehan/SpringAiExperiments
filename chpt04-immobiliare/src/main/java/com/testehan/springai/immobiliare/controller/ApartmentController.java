@@ -66,19 +66,39 @@ public class ApartmentController {
     public Flux<String> streamApartments() {
 
         return apiService.getApartmentsFlux()
-                .map(this::renderResponseFragment);
+                .map(this::renderApartmentFragment);
 
     }
 
-    private String renderResponseFragment(ResultsResponse resultsResponse){
+    @GetMapping(value = "/streamresponse", produces = "text/event-stream")
+    public Flux<String> getResultResponseFlux() {
+
+        return apiService.getResultResponseFlux()
+                .map(this::renderResultResponseFragment);
+
+    }
+
+    private String renderApartmentFragment(Apartment apartment){
+        Context context = new Context();
+        Set<String> selectors = new HashSet<>();
+        selectors.add("apartment");
+        context.setVariable("apartment", apartment);
+        context.setVariable("favouriteButtonStartMessage","Save to Favourites");
+
+        return templateEngine.process("fragments",selectors, context).
+                replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
+    }
+
+    private String renderResultResponseFragment(ResultsResponse resultsResponse){
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("responseFragmentWithApartments");
-        context.setVariable("response",resultsResponse.message());
-        context.setVariable("apartments", resultsResponse.apartments());
+        context.setVariable("response", resultsResponse.message());
+
         return templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
     }
+
 
 
 }
