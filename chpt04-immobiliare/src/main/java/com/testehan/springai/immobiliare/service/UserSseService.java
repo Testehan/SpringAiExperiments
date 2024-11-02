@@ -25,7 +25,7 @@ public class UserSseService {
         if (!userSseUuids.containsKey(userSessionId)) {
             UUID userSseId = UUID.randomUUID();
             userSseUuids.put(userSessionId, userSseId.toString());
-            Sinks.Many<Event> sink = Sinks.many().replay().latest();
+            Sinks.Many<Event> sink =  Sinks.many().multicast().onBackpressureBuffer();
             userSseConnections.put(userSseId.toString(), sink);
             return userSseId.toString();
         } else {

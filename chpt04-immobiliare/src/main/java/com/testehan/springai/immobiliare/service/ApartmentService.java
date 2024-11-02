@@ -136,7 +136,7 @@ public class ApartmentService {
             for (MultipartFile extraImage : apartmentImages) {
                 if (extraImage.isEmpty()) continue;
 
-                String filename = StringUtils.cleanPath(extraImage.getOriginalFilename());
+                String filename = StringUtils.cleanPath(extraImage.getOriginalFilename()).replace(" ", "-");
                 AmazonS3Util.uploadFile(uploadDir, filename, extraImage.getInputStream(), extraImage.getContentType());
 
                 apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
