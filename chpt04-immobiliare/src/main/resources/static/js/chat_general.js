@@ -21,6 +21,9 @@ $(document).ready(function(){
             const newFragment = event.data;
             $('#spinner').hide();
             container.append(newFragment);
+
+            // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
+            htmx.process(document.getElementById("response-container"));
         }
     });
 
@@ -51,12 +54,20 @@ function setUpScrollingToLastUserMessage(){
     const observer = new MutationObserver((mutationsList) => {
         mutationsList.forEach((mutation) => {
             if (mutation.type === "childList") {
-//                console.log("Detected mutation:", mutation);
 
                 const targetElements = document.querySelectorAll(`.${targetClassName}`);
                 const lastElement = targetElements[targetElements.length - 1];
-                if (lastElement) {
-                    lastElement.scrollIntoView({ behavior: "smooth" });
+
+                // hide spinner when we get an assistant response, that is not obtained via SSE
+                const addedNodes = mutation.addedNodes;
+                for (const node of addedNodes) {
+                    if (node.nodeType === Node.ELEMENT_NODE && node.childNodes[1].classList.contains('assistantResponse')) {
+                        $('#spinner').hide();
+                    }
+
+                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode === document.getElementById("response-container")) {
+                        lastElement.scrollIntoView({ behavior: "smooth" });
+                    }
                 }
             }
         });

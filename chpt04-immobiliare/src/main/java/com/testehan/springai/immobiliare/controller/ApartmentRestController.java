@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/apartments")
+@RequestMapping("/api/apartments")
 public class ApartmentRestController {
 
     private final OpenAiService openAiService;
@@ -38,6 +38,7 @@ public class ApartmentRestController {
     }
 
     @GetMapping("/getContact/{apartmentId}")
+    @HxRequest
     public String getContact(@PathVariable(value = "apartmentId") String apartmentId) {
         var apartment = apartmentService.findApartmentById(apartmentId);
         return "Contact: " + apartment.getContact();

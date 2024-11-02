@@ -76,7 +76,7 @@ public class ApiServiceImpl implements ApiService{
             case SET_CITY : { return setCity(serviceCall); }
             case GET_APARTMENTS:{ return getApartments(message, session); }
             case RESTART_CONVERSATION : { return restartConversation(); }
-//            case DEFAULT : return respondToUserMessage(message);           TODO   maybe we can do streaming for this as well ?
+            case DEFAULT : return respondToUserMessage(message);
         }
 
         return new ResultsResponse(M00_IRRELEVANT_PROMPT);
@@ -153,7 +153,7 @@ public class ApiServiceImpl implements ApiService{
         promptParameters.put("description", description);
         var prompt = promptTemplate.create(promptParameters);
 
-        return respondToUserMessage(prompt.getContents());
+        return respondToUserMessageStream(prompt.getContents());
 
     }
 
@@ -202,7 +202,7 @@ public class ApiServiceImpl implements ApiService{
                 .build();
     }
 
-    private Flux<String> respondToUserMessage(String userMessage) {
+    private Flux<String> respondToUserMessageStream(String userMessage) {
 
         var chatResponse = createNewChatClient()
                 .prompt()
@@ -222,6 +222,28 @@ public class ApiServiceImpl implements ApiService{
                 .stream().content();
 
         return chatResponse;
+    }
+
+    private ResultsResponse respondToUserMessage(String userMessage) {
+
+        var chatResponse = createNewChatClient()
+                .prompt()
+                .advisors (new Consumer<ChatClient.AdvisorSpec>() {
+                    @Override
+                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
+                        advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationSession.getConversationId());
+                    }
+                })
+                .advisors(new Consumer<ChatClient.AdvisorSpec>() {
+                    @Override
+                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
+                        advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
+                    }
+                })
+                .user(userMessage)
+                .call().content();
+
+        return new ResultsResponse(chatResponse);
     }
 
 
