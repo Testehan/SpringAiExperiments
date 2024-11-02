@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
@@ -24,6 +25,7 @@ import reactor.core.publisher.Flux;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Controller
@@ -62,8 +64,9 @@ public class ApartmentController {
         }
 
         if (user.getMaxNumberOfListedProperties() > 0){
-            apartmentService.saveApartmentAndImages(apartment, apartmentImages, user);
-
+            List<ApartmentImage> proccesedImages = apartmentService.processImages(apartmentImages);
+            apartmentService.saveApartmentAndImages(apartment, proccesedImages, user);
+            redirectAttributes.addFlashAttribute("infoMessage","We are processing the information provided. Refresh the page in 1 minute.");
             return "redirect:/add";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage","ERROR: You have reached the maximum number of listed apartments!");

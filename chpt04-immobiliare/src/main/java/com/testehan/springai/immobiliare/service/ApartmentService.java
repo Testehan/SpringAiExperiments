@@ -2,11 +2,14 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.constants.AmazonS3Constants;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.SystemMessage;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
@@ -42,6 +46,8 @@ public class ApartmentService {
     private Resource systemPictureMetadataGeneration;
     @Value("classpath:/prompts/user/PictureMetadataGeneration.txt")
     private Resource userPictureMetadataGeneration;
+
+    private static final Logger logger = LoggerFactory.getLogger(ApartmentService.class);
 
     private final ApartmentsRepository apartmentsRepository;
     private final OpenAiService embedder;
@@ -80,7 +86,8 @@ public class ApartmentService {
         apartmentsRepository.saveApartment(apartment);
     }
 
-    public void saveApartmentAndImages(Apartment apartment, MultipartFile[] apartmentImages, ImmobiliareUser user) throws IOException {
+    @Async
+    public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user) throws IOException {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateCustom = now.format(customFormatter);
@@ -129,15 +136,14 @@ public class ApartmentService {
         return imagesWereDeleted;
     }
 
-    private boolean saveUploadedImages(Apartment apartment, MultipartFile[] apartmentImages) throws IOException {
+    private boolean saveUploadedImages(Apartment apartment, List<ApartmentImage> apartmentImages) throws IOException {
         boolean imagesWereUploaded = false;
-        if (apartmentImages.length>0) {
+        if (apartmentImages.size()>0) {
             var uploadDir = "apartment-images/" + apartment.getId();
-            for (MultipartFile extraImage : apartmentImages) {
-                if (extraImage.isEmpty()) continue;
+            for (ApartmentImage extraImage : apartmentImages) {
 
-                String filename = StringUtils.cleanPath(extraImage.getOriginalFilename()).replace(" ", "-");
-                AmazonS3Util.uploadFile(uploadDir, filename, extraImage.getInputStream(), extraImage.getContentType());
+                var filename = extraImage.name();
+                AmazonS3Util.uploadFile(uploadDir, filename, extraImage.data(), extraImage.contentType());
 
                 apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
 
@@ -149,7 +155,6 @@ public class ApartmentService {
     }
 
     private void generateImageMetadata(Apartment apartment) throws IOException {
-
 
         StringBuilder stringBuilder = new StringBuilder();
         boolean imagesWereModified = false;
@@ -180,4 +185,19 @@ public class ApartmentService {
 
     }
 
+    public List<ApartmentImage> processImages(MultipartFile[] apartmentImages) {
+        List<ApartmentImage> processedImages = new ArrayList<>();
+        for (MultipartFile extraImage : apartmentImages) {
+            if (extraImage.isEmpty()) continue;
+
+            var filename = StringUtils.cleanPath(extraImage.getOriginalFilename()).replace(" ", "-");
+            var contentType = extraImage.getContentType();
+            try {
+                processedImages.add(new ApartmentImage(filename, contentType, extraImage.getInputStream()));
+            } catch (IOException ex){
+                logger.error(filename + " could not be read, hence it will be skipped");
+            }
+        }
+        return processedImages;
+    }
 }
