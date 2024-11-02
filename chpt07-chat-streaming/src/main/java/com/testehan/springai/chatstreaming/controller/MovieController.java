@@ -2,7 +2,6 @@ package com.testehan.springai.chatstreaming.controller;
 
 import com.testehan.springai.chatstreaming.model.Movie;
 import com.testehan.springai.chatstreaming.service.MovieApiService;
-import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,11 +23,11 @@ public class MovieController {
     }
 
     @GetMapping(value = "/movies/stream", produces = "text/event-stream")
-    @ResponseBody
-    public Flux<String> streamMovies(@RequestParam String message, ServerHttpResponse response) {
-        response.getHeaders().set("Transfer-Encoding", "chunked");
-        response.getHeaders().set("Content-Type", "text/event-stream");
-        response.getHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
+    @ResponseBody       //ServerHttpResponse response
+    public Flux<String> streamMovies(@RequestParam String message) {
+//        response.getHeaders().set("Transfer-Encoding", "chunked");
+//        response.getHeaders().set("Content-Type", "text/event-stream");
+//        response.getHeaders().set("Cache-Control", "no-cache, no-store, must-revalidate");
 
 //        List<Movie> sampleMovies = Arrays.asList(
 //                new Movie("Inception", 2010, "A mind-bending thriller."),

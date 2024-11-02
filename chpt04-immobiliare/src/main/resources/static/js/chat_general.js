@@ -9,21 +9,29 @@ $(document).ready(function(){
         }
     });
 
-    const eventSource = new EventSource("/api/apartments/stream");
+    console.log("SSE ID:", sseId);
+    const eventSourceUrl = "/api/apartments/stream/"+sseId;
+    console.log("eventSourceUrl" + eventSourceUrl)
+    const eventSource = new EventSource(eventSourceUrl);
 
     eventSource.addEventListener('apartment', function(event) {
-         // Dynamically insert the fragment into the response container
-        const container = $('.responseFragmentWithApartments').last()
-        const newFragment = event.data;
-        $('#spinner').hide();
-        container.append(newFragment);
+        if (event.lastEventId === sseId) {
+             // Dynamically insert the fragment into the response container
+            const container = $('.responseFragmentWithApartments').last()
+            const newFragment = event.data;
+            $('#spinner').hide();
+            container.append(newFragment);
+        }
     });
 
     eventSource.addEventListener('response', function(event) {
-        // Dynamically insert the fragment into the response container
-        const container = $("#response-container").last()
-        const newFragment = event.data;
-        container.append(newFragment);
+         if (event.lastEventId === sseId) {
+            // Dynamically insert the fragment into the response container
+            const container = $("#response-container").last()
+            const newFragment = event.data;
+            $('#spinner').hide();
+            container.append(newFragment);
+        }
 
     });
 

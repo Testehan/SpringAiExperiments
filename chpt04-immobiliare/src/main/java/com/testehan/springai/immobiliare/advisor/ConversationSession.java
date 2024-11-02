@@ -86,4 +86,5 @@ public class ConversationSession {
         var user = userService.getImmobiliareUserByEmail(userEmail);
         return user;
     }
+
 }

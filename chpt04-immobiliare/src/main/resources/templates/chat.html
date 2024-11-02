@@ -22,6 +22,12 @@
 <!--});-->
 <!--</script>-->
 
+
+<script>
+    const sseId = "[[${sseId}]]";
+    console.log("SSE ID:", sseId);
+</script>
+
 <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}" ></script>
 
 <script th:src="@{/js/chat_history.js}"></script>
@@ -43,7 +49,7 @@
 
         </div>
 
-        <img id="spinner" style="display:none;" class="htmx-indicator absolute m-auto inset-0" src="/images/bars.svg"/>
+        <img id="spinner" style="display:none;" class="absolute m-auto inset-0" src="/images/bars.svg"/>
 
         <div class="">
             <form id="chatForm"
@@ -89,5 +95,7 @@
     function closeLightbox() {
         document.getElementById('lightbox').style.display = 'none';
     }
+
 </script>
 </body>
+</html>

@@ -6,6 +6,8 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.UserSseService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,10 +25,12 @@ public class MainController {
 
 	private final ApartmentService apartmentService;
 	private final ConversationSession conversationSession;
+	private final UserSseService userSseService;
 
-	public MainController(ApartmentService apartmentService, ConversationSession conversationSession) {
+	public MainController(ApartmentService apartmentService, ConversationSession conversationSession, UserSseService userSseService) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
+		this.userSseService = userSseService;
 	}
 
 	@GetMapping("/")
@@ -35,8 +39,9 @@ public class MainController {
 	}
 
 	@GetMapping("/chat")
-	public String chat(Model model) {
+	public String chat(Model model, HttpSession session) {
 		var user = conversationSession.getImmobiliareUser();
+		var sessionId = session.getId();
 		if (StringUtils.isEmpty(user.getPropertyType())) {
 			model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
 		} else if (StringUtils.isEmpty(user.getCity())){
@@ -44,6 +49,9 @@ public class MainController {
 		} else {
 			model.addAttribute("initialMessage", String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()));
 		}
+		var userSseId = userSseService.addUserSseId(sessionId);
+		model.addAttribute("sseId", userSseId);
+
 		return "chat";
 	}
 

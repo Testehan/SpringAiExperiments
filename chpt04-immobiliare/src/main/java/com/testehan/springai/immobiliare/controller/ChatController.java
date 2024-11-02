@@ -6,6 +6,7 @@ import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
+import jakarta.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
@@ -40,12 +41,12 @@ public class ChatController {
 
     @HxRequest
     @PostMapping("/respond")
-    public HtmxResponse respond(@RequestParam String message, Model model) {
+    public HtmxResponse respond(@RequestParam String message, Model model, HttpSession session) {
 
        var user  = conversationSession.getImmobiliareUser();
         Integer searchQueriesAvailable = user.getSearchesAvailable();
         if (searchQueriesAvailable>0) {
-            ResultsResponse response = apiService.getChatResponse(message);
+            ResultsResponse response = apiService.getChatResponse(message, session);
 
             user  = conversationSession.getImmobiliareUser();   // TODO getting the user again, because it might have been updated during the chat call
             user.setSearchesAvailable(searchQueriesAvailable - 1);

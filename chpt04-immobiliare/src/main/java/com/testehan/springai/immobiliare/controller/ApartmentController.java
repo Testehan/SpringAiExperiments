@@ -6,16 +6,15 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
+import com.testehan.springai.immobiliare.service.UserSseService;
+import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.context.Context;
@@ -35,16 +34,19 @@ public class ApartmentController {
 
     private final ApartmentService apartmentService;
     private final UserService userService;
+    private final UserSseService userSseService;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
 
 
-    public ApartmentController(ApartmentService apartmentService, UserService userService, ApiService apiService, SpringWebFluxTemplateEngine templateEngine)
+    public ApartmentController(ApartmentService apartmentService, UserService userService, ApiService apiService,
+                               SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService)
     {
         this.apartmentService = apartmentService;
         this.userService = userService;
         this.apiService = apiService;
         this.templateEngine = templateEngine;
+        this.userSseService = userSseService;
     }
 
     @PostMapping("/save")
@@ -69,23 +71,23 @@ public class ApartmentController {
         }
     }
 
-    @GetMapping(value = "/stream", produces = "text/event-stream")
-    public Flux<ServerSentEvent<String>> streamApartments() {
-
-        return apiService.getApartmentsFlux()       // TODO rename this as it is NO LONGER Related strictly to apartments
-                .map(this::renderApartmentFragment);    // also this
+    @GetMapping(value = "/stream/{sseId}", produces = "text/event-stream")
+    public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession) {
+        userSseService.addUserSseId(httpSession.getId());
+        return apiService.getServerSideEventsFlux(httpSession)
+                .map(event -> renderServerSideEventData(event, sseId));
 
     }
 
-    private ServerSentEvent<String> renderApartmentFragment(Event event){
+    private ServerSentEvent<String> renderServerSideEventData(Event event, String sseId){
         if (event.getEventType().equals("apartment")){
-            return getApartmentServerSentEvent(event.getPayload());
+            return getApartmentServerSentEvent(event.getPayload(),sseId);
         } else {
-            return getResponseServerSideEvent(event.getPayload());
+            return getResponseServerSideEvent(event.getPayload(),sseId);
         }
     }
 
-    private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload) {
+    private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload, String sseId) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("responseFragmentWithApartments");
@@ -93,18 +95,11 @@ public class ApartmentController {
 
         var data =templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
-// TODO extract this builder in a separate method
-        return ServerSentEvent.<String>builder()
-                .data(data)
-                // Set the event type
-                .event("response")
-                // Set the retry duration
-                .retry(Duration.ofMillis(1000))
-                // Build the Server-Sent Event
-                .build();
+
+        return createSSE(data,"response",sseId);
     }
 
-    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload) {
+    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload, String sseId) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("apartment");
@@ -113,11 +108,16 @@ public class ApartmentController {
 
         var data = templateEngine.process("fragments",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
-// TODO extract this builder in a separate method
+
+        return createSSE(data,"apartment",sseId);
+    }
+
+    private static ServerSentEvent<String> createSSE(String data, String eventType, String sseId) {
         return ServerSentEvent.<String>builder()
+                .id(sseId)
                 .data(data)
                 // Set the event type
-                .event("apartment")
+                .event(eventType)
                 // Set the retry duration
                 .retry(Duration.ofMillis(1000))
                 // Build the Server-Sent Event
