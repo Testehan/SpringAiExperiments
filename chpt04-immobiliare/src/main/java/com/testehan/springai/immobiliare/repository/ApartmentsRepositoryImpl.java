@@ -10,14 +10,13 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
+import java.util.*;
 
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
@@ -30,6 +29,8 @@ import static java.util.Arrays.asList;
 public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
     private static final double PERCENTAGE_INTERVAL = 0.1;  //10%
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentsRepositoryImpl.class);
 
     private final MongoDatabase mongoDatabase;
 
@@ -80,7 +81,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
 
-        System.out.println("Combined Filter: " + combinedFilters.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()).toJson());
+        LOGGER.info("Using MongoDB Filter : {}", combinedFilters.toBsonDocument(Document.class, MongoClientSettings.getDefaultCodecRegistry()).toJson());
 
         VectorSearchOptions options = vectorSearchOptions().filter(combinedFilters);
 
@@ -103,16 +104,17 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public Apartment findApartmentById(final String apartmentId) {
+    public Optional<Apartment> findApartmentById(final String apartmentId) {
 
         var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
         ObjectId objectId = new ObjectId(apartmentId);
         var apartment = mongoCollection.find(new Document("_id", objectId)).first();
 
         if (apartment != null) {
-            return apartment;
+            return Optional.of(apartment);
         } else {
-                throw new NoSuchElementException("Apartment not found");
+            LOGGER.error("Apartment with id {} was not found.", apartmentId);
+            return Optional.empty();
         }
     }
 

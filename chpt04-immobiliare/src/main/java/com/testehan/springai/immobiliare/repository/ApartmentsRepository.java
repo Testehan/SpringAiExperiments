@@ -4,11 +4,12 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.PropertyType;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ApartmentsRepository {
     List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, Apartment apartment, List<Double> embedding);
 
-    Apartment findApartmentById(String apartmentId);
+    Optional<Apartment> findApartmentById(String apartmentId);
 
     List<Apartment> findAll();
 

@@ -61,7 +61,7 @@ public class MainController {
 		List<Apartment> apartments = new ArrayList<>();
 		for (String apartmentId : user.getFavouriteProperties()){
 			if (!StringUtils.isEmpty(apartmentId)) {
-				apartments.add(apartmentService.findApartmentById(apartmentId));
+				apartmentService.findApartmentById(apartmentId).ifPresent(apartment -> apartments.add(apartment));
 			}
 		}
 
@@ -108,8 +108,9 @@ public class MainController {
 		model.addAttribute("buttonMessage", "Add Apartment");
 
 		if (user.getListedProperties().contains(apartmentId) || user.isAdmin()) {
-			var apartment = apartmentService.findApartmentById(apartmentId);
-			if (apartment != null) {
+			var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+			if (!apartmentOptional.isEmpty()) {
+				var apartment = apartmentOptional.get();
 				model.addAttribute("apartment", apartment);
 				model.addAttribute("numberOfExistingImages", apartment.getImages().size());
 				model.addAttribute("buttonMessage", "Update Apartment");

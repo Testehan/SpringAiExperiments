@@ -33,11 +33,7 @@ import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class ApartmentService {
@@ -47,7 +43,7 @@ public class ApartmentService {
     @Value("classpath:/prompts/user/PictureMetadataGeneration.txt")
     private Resource userPictureMetadataGeneration;
 
-    private static final Logger logger = LoggerFactory.getLogger(ApartmentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentService.class);
 
     private final ApartmentsRepository apartmentsRepository;
     private final OpenAiService embedder;
@@ -66,7 +62,7 @@ public class ApartmentService {
         return apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
     }
 
-    public Apartment findApartmentById(String apartmentId) {
+    public Optional<Apartment> findApartmentById(String apartmentId) {
         return apartmentsRepository.findApartmentById(apartmentId);
     }
 
@@ -77,7 +73,7 @@ public class ApartmentService {
     public List<Apartment> findApartmentsByIds(List<String> apartmentIds){
         List<Apartment> apartments = new ArrayList<>();
         for (String apartmentId : apartmentIds){
-            apartments.add(findApartmentById(apartmentId));
+            findApartmentById(apartmentId).ifPresent(apartment -> apartments.add(apartment));
         }
         return apartments;
     }
@@ -107,7 +103,7 @@ public class ApartmentService {
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
         var mono = embedder.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
-        System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
+
         apartment.setPlot_embedding(embeddings);
 
         saveApartment(apartment);
@@ -148,6 +144,7 @@ public class ApartmentService {
                 apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
 
                 imagesWereUploaded = true;
+                LOGGER.info("Image {} uploaded to S3 for apartment {}", filename, apartment.getName());
             }
 
         }
@@ -177,6 +174,8 @@ public class ApartmentService {
                 chatClientRequest.messages(List.of(systemMessage, userMessage));
                 Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {});
                 stringBuilder.append(result.get("description"));
+
+                LOGGER.info("Image Metatada generated : {}", result.get("description"));
             }
         }
         if (imagesWereModified) {
@@ -195,7 +194,7 @@ public class ApartmentService {
             try {
                 processedImages.add(new ApartmentImage(filename, contentType, extraImage.getInputStream()));
             } catch (IOException ex){
-                logger.error(filename + " could not be read, hence it will be skipped");
+                LOGGER.error("File {} could not be read, hence it will be skipped", filename);
             }
         }
         return processedImages;

@@ -11,6 +11,8 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.model.ServiceCall;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
@@ -38,6 +40,8 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 @Service
 public class ApiServiceImpl implements ApiService{
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApiServiceImpl.class);
 
     private ImmobiliareApiService immobiliareApiService;
 
@@ -112,21 +116,21 @@ public class ApiServiceImpl implements ApiService{
                                    userSseService.getUserSseConnection(session.getId())
                                            .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND)));
                                }
-                               System.out.println("Found apartment id" + apartmentLLM.get().getId());
+                               LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
                                userSseService.getUserSseConnection(session.getId())
                                        .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
                            }
 
                         },
                         error -> {
-                            System.err.println("Error: " + error);
+                            LOGGER.error("Error: {}", error);
                         },
                         () -> {
                             if (isFirst.get()){     // this means that we processed stream and we got no match
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("response",new ResponsePayload(M04_NO_APARTMENTS_FOUND)));
                             }
-                            System.out.println("Flux completed");
+                            LOGGER.info("Flux completed");
                         }
                     );
         } else {

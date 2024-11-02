@@ -1,29 +1,23 @@
 package com.testehan.springai.immobiliare.controller;
 
-import com.google.gson.Gson;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.UpdateResult;
-import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
-import org.bson.Document;
-import org.bson.types.ObjectId;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/apartments")
 public class ApartmentRestController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentRestController.class);
 
     private final OpenAiService openAiService;
 
@@ -37,11 +31,16 @@ public class ApartmentRestController {
         this.userService = userService;
     }
 
-    @GetMapping("/getContact/{apartmentId}")
+    @GetMapping("/contact/{apartmentId}")
     @HxRequest
-    public String getContact(@PathVariable(value = "apartmentId") String apartmentId) {
-        var apartment = apartmentService.findApartmentById(apartmentId);
-        return "Contact: " + apartment.getContact();
+    public String contact(@PathVariable(value = "apartmentId") String apartmentId) {
+        var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+        if (!apartmentOptional.isEmpty()) {
+            return "Contact: " + apartmentOptional.get().getContact();
+        } else {
+            LOGGER.error("No apartment with id {} was found" , apartmentId);
+            return "No apartment found!";
+        }
     }
 
     @GetMapping("/favourite/{apartmentId}")
@@ -62,47 +61,4 @@ public class ApartmentRestController {
         return result;
     }
 
-    // the service will be used to create the embeddings for the apartments
-    @GetMapping("/getEmbedding")
-    public String getEmbedding(@RequestParam(value = "message") String message) {
-        var mono = openAiService.createEmbedding(message);
-        return mono.block().stream().map( d -> d.toString()).collect(Collectors.joining(" "));
-    }
-
-
-    @Autowired
-    private MongoDatabase mongoDatabase;
-    
-    @GetMapping("/testEmbeddings")
-    public String testEmbeddings() {
-
-        MongoCollection<Document> collection = mongoDatabase.getCollection("apartments");
-
-        for (Document document : collection.find()){
-            ObjectId id = document.getObjectId("_id");
-            String json = document.toJson();
-            // Create Gson instance
-            Gson gson = new Gson();
-            // Convert JSON string to POJO
-            Apartment apartment = gson.fromJson(json, Apartment.class);
-
-            var apartmentInfoToEmbedd = apartment.getApartmentInfoToEmbedd();
-            System.out.println(apartmentInfoToEmbedd);
-
-            var mono = openAiService.createEmbedding(apartmentInfoToEmbedd);
-            List<Double> embeddings = mono.block();
-            System.out.println(embeddings.stream().map( d -> d.toString()).collect(Collectors.joining(" ")));
-
-            UpdateResult result = collection.updateOne(
-                    Filters.eq("_id", id),
-                    Updates.set("plot_embedding", embeddings)
-            );
-
-            System.out.println("Modified elements " + result.getModifiedCount());
-            System.out.println("Matched elements " + result.getMatchedCount());
-
-        }
-
-        return "success";
-    }
 }
