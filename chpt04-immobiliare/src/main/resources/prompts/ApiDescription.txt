@@ -6,7 +6,7 @@ Available APIs:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-3. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called.
+3. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city".
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
@@ -69,9 +69,17 @@ Examples:
   - API Call: `/setCity`
   - Parameters: `\{"message": "Cluj"\}`
 
+- User Input: "Cluj"
+  - API Call: `/setCity`
+  - Parameters: `\{"message": "Cluj-Napoca"\}`
+
 - User Input: "I want to search in Bucharest"
   - API Call: `/setCity`
   - Parameters: `\{"message": "Bucharest"\}`
+
+- User Input: "I want to search in New-York"
+  - API Call: `/setCity`
+  - Parameters: `\{"message": "Unsupported city"\}`
 
 - User Input: "I am looking for a location that has a price under 100000 euro and is a good neighborhood"
   - API Call: `/getApartments`

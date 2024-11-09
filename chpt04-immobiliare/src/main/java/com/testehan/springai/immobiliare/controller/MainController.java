@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
@@ -44,10 +45,10 @@ public class MainController {
 		var sessionId = session.getId();
 		if (StringUtils.isEmpty(user.getPropertyType())) {
 			model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
-		} else if (StringUtils.isEmpty(user.getCity())){
+		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.valueOf(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
 			model.addAttribute("initialMessage", PromptConstants.M02_CITY);
 		} else {
-			model.addAttribute("initialMessage", String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()));
+			model.addAttribute("initialMessage", String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), SupportedCity.valueOf(user.getCity()).getName()));
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
@@ -84,8 +85,7 @@ public class MainController {
 	public String add(Model model) {
 
 		var apartment = new Apartment();
-		// todo for now the list of cities available for posting properties is hardcoded here
-		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
+		model.addAttribute("listCities",SupportedCity.getSupportedCities());
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 		model.addAttribute("apartment", apartment);
 		model.addAttribute("numberOfExistingImages", 0);
@@ -117,7 +117,7 @@ public class MainController {
 			}
 		}
 
-		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
+		model.addAttribute("listCities",SupportedCity.getSupportedCities());
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 
 		List<Apartment> listOfProperties = getListOfProperties(user);;
@@ -140,13 +140,13 @@ public class MainController {
 	public String profile(Model model) {
 		var user = conversationSession.getImmobiliareUser();
 
-		UserProfile userProfile = new UserProfile(user.getEmail(),user.getCity(),
+		UserProfile userProfile = new UserProfile(user.getEmail(), SupportedCity.valueOf(user.getCity()).getName(),
 				user.getPropertyType(),user.getLastPropertyDescription(),
 				user.getSearchesAvailable(), user.getMaxNumberOfListedProperties());
 
 		model.addAttribute("user", userProfile);
-		// todo for now the list of cities available for posting properties is hardcoded here
-		model.addAttribute("listCities",List.of("Cluj-Napoca", "Bucharest"));
+
+		model.addAttribute("listCities", SupportedCity.getSupportedCities());
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 		return "profile";
 	}

@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
+import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.security.UserService;
 import org.springframework.stereotype.Controller;
@@ -24,7 +25,8 @@ public class UserController {
 
     @PostMapping("/save")
     public String saveUserProfile(UserProfile userProfile)throws IOException {
-        conversationSession.setCity(userProfile.city());
+        SupportedCity supportedCity = SupportedCity.getByName(userProfile.city());
+        conversationSession.setCity(supportedCity);
         conversationSession.setRentOrSale(userProfile.propertyType());
         conversationSession.setLastPropertyDescription(userProfile.lastPropertyDescription());
 

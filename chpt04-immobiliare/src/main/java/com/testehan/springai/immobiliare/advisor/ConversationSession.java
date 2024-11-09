@@ -1,8 +1,10 @@
 package com.testehan.springai.immobiliare.advisor;
 
+import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ConversationService;
+import io.micrometer.common.util.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -23,7 +25,7 @@ public class ConversationSession {
     private Authentication authentication;
     private final UserService userService;
     private final ConversationService conversationService;
-    private String city;
+    private SupportedCity city;
     private String rentOrSale;
     private String lastPropertyDescription;
 
@@ -31,7 +33,7 @@ public class ConversationSession {
     public ConversationSession(ChatMemory chatMemory, UserService userService, ConversationService conversationService) {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         this.userService = userService;
-        this.city = getImmobiliareUser() != null ? getImmobiliareUser().getCity() : null;
+        this.city = getImmobiliareUser() != null ? StringUtils.isNotEmpty(getImmobiliareUser().getCity()) ? SupportedCity.valueOf(getImmobiliareUser().getCity()) : SupportedCity.UNSUPPORTED : SupportedCity.UNSUPPORTED;
         this.rentOrSale = getImmobiliareUser() != null ?  getImmobiliareUser().getPropertyType() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
@@ -49,12 +51,12 @@ public class ConversationSession {
     }
 
     public String getCity() {
-        return city;
+        return city.getName();
     }
 
-    public void setCity(String city) {
+    public void setCity(SupportedCity city) {
         var user = getImmobiliareUser();
-        user.setCity(city);
+        user.setCity(city.name().toString());
         userService.updateUser(user);
         this.city = city;
     }

@@ -14,9 +14,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
@@ -51,7 +53,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         int numCandidates = 100;  // how many neighbours it will use when doing the nearest neighbour search; it should be
         // higher than the limit we set below...higher numbers of this variable will
         // provide higher accuracy, but it will also give some latency hits..
-        int limit = 5;
+        int limit = 50;
 
 
         // TODO if you want to add more filters, remember that you must modify the existing index in MongoAtlas, and add the
@@ -63,21 +65,19 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         filters.add(Filters.eq("propertyType", propertyType));
         filters.add(Filters.eq("active", true));
         if (Objects.nonNull(city)){
-            filters.add(Filters.or(Filters.eq("city", city),
-                    Filters.eq("city",city.toLowerCase()),
-                    Filters.eq("city",city.toUpperCase()),
-                    Filters.eq("city", StringUtils.capitalize(city))));
+            filters.add(Filters.or(Filters.eq("city", city)
+//                    ,
+//                    Filters.eq("city",city.toLowerCase()),
+//                    Filters.eq("city",city.toUpperCase()),
+//                    Filters.eq("city", StringUtils.capitalize(city))
+            ));
         }
 
         // optional filters depending on user input
         if (Objects.nonNull(apartment.getSurface()) && apartment.getSurface()>0){
             filters.add(Filters.and(Filters.gte("surface", getMinValue(apartment.getSurface())),
                     Filters.lte("surface", getMaxValue(apartment.getSurface()))));
-        } // the LLM will filter the semantic results based on the description, so it should filter out apartments that do not fit wanted price
-//        if (Objects.nonNull(apartment.getPrice()) && apartment.getPrice()>0){
-//            filters.add(Filters.and(Filters.gte("price", getMinValue(apartment.getPrice())),
-//                    Filters.lte("price", getMaxValue(apartment.getPrice()))));
-//        }
+        }
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
 

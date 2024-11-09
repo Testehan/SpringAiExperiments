@@ -6,10 +6,7 @@ import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.events.ApartmentPayload;
 import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
-import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.PropertyType;
-import com.testehan.springai.immobiliare.model.ResultsResponse;
-import com.testehan.springai.immobiliare.model.ServiceCall;
+import com.testehan.springai.immobiliare.model.*;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +29,7 @@ import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
@@ -172,7 +170,7 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse restartConversation() {
         conversationSession.setRentOrSale("");
-        conversationSession.setCity("");
+        conversationSession.setCity(SupportedCity.UNSUPPORTED);
         conversationSession.getChatMemory().clear(conversationSession.getConversationId());
         conversationService.deleteConversation(conversationSession.getConversationId());
         return new ResultsResponse(M01_INITIAL_MESSAGE);
@@ -180,9 +178,14 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse setCity(ServiceCall serviceCall) {
-        conversationSession.setCity(serviceCall.message());
+        SupportedCity supportedCity = SupportedCity.getByName(serviceCall.message());
+        conversationSession.setCity(supportedCity);
         var user = conversationSession.getImmobiliareUser();
-        return new ResultsResponse(String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), user.getCity()));
+        if (supportedCity.compareTo(SupportedCity.UNSUPPORTED) != 0) {
+            return new ResultsResponse(String.format(PromptConstants.M03_DETAILS, user.getPropertyType(), supportedCity.getName()));
+        } else {
+            return new ResultsResponse(String.format(PromptConstants.M021_SUPPORTED_CITIES, SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "))));
+        }
     }
 
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
