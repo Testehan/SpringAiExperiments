@@ -55,7 +55,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                 .append("city", user.getCity())
                 .append("propertyType",user.getPropertyType())
                 .append("lastPropertyDescription",user.getLastPropertyDescription())
-                .append("searchesAvailable",user.getSearchesAvailable());
+                .append("searchesAvailable",user.getSearchesAvailable())
+                .append("isAdmin",user.getIsAdmin());
 
         // Insert the document
         collection.insertOne(document);
@@ -80,7 +81,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("city", user.getCity())
                         .append("propertyType",user.getPropertyType())
                         .append("lastPropertyDescription",user.getLastPropertyDescription())
-                        .append("searchesAvailable",user.getSearchesAvailable()));
+                        .append("searchesAvailable",user.getSearchesAvailable())
+                        .append("isAdmin",user.getIsAdmin()));
 
         UpdateResult result = collection.updateOne(filter, update);
     }

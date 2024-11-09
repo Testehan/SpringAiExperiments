@@ -34,7 +34,7 @@
                             <a href="/chat" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
                                hx-get="/chat"
                                hx-trigger="click"
-                               hx-swap="innerHTML"
+                               hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Search</a>
                         </li>
@@ -42,7 +42,7 @@
                             <a href="/favourites" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
                                hx-get="/favourites"
                                hx-trigger="click"
-                               hx-swap="innerHTML"
+                               hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Favourites
                             </a>
@@ -51,7 +51,7 @@
                             <a href="/add" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
                                hx-get="/add"
                                hx-trigger="click"
-                               hx-swap="innerHTML"
+                               hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Add/Edit
                             </a>
@@ -60,7 +60,7 @@
                             <a href="/profile" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
                                hx-get="/profile"
                                hx-trigger="click"
-                               hx-swap="innerHTML"
+                               hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Profile
                             </a>
@@ -76,7 +76,7 @@
                             </a>
                         </li>
                     </div>
-                    <div class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
+                    <div th:if="${isAuthenticated}" class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
                         <div class="inline-flex rounded-full shadow">
                             <a href="javascript: document.logoutForm.submit()"
                                  class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50 ">

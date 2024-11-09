@@ -17,6 +17,9 @@ function checkLogin(event) {
                 // Prevent the default action of the link
                 event.preventDefault();
                 openLoginModal();
+            } else {
+                // User is authenticated, navigate to the requested page
+                window.location.href = event.target.href;
             }
         });
 }
