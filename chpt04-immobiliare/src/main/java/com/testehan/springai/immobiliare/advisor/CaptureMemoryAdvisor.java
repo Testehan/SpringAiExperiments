@@ -65,23 +65,28 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
     }
 
     private boolean extractMemoryIfPossible(AdvisedRequest request,  Map<String, Object> adviseContext) {
-        var memoryResponse = chatClient
-                .prompt()
-                .messages(lastMessageMemoryBasisExtractor.extract(request))
-                .call()
-                .entity(MemoryResponse.class);
+        try {
+            var memoryResponse = chatClient
+                    .prompt()
+                    .messages(lastMessageMemoryBasisExtractor.extract(request))
+                    .call()
+                    .entity(MemoryResponse.class);
 
-        if (memoryResponse.worthKeeping()) {
-            logger.info("Adding memory to vector store: {}", memoryResponse);
+            if (memoryResponse.worthKeeping()) {
+                logger.info("Adding memory to vector store: {}", memoryResponse);
 
-            List<Document> docs = List.of(
-                    new Document(memoryResponse.content(), Map.of("user", adviseContext.get(CHAT_MEMORY_CONVERSATION_ID_KEY))));
-            vectorStore.add(docs);
-            return true;
+                List<Document> docs = List.of(
+                        new Document(memoryResponse.content(), Map.of("user", adviseContext.get(CHAT_MEMORY_CONVERSATION_ID_KEY))));
+                vectorStore.add(docs);
+                return true;
+            }
+
+            logger.info("Ignoring useless memory: {}", memoryResponse);
+            return false;
+        } catch (Exception e) {
+            logger.error("Something went wrong when trying to extract a memory : {}", e );
+            return false;
         }
-
-        logger.info("Ignoring useless memory: {}", memoryResponse);
-        return false;
     }
 
     // Advisors with lower order values are executed first

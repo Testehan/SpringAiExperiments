@@ -6,6 +6,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.search.VectorSearchOptions;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
@@ -48,7 +49,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, Apartment apartment, List<Double> embedding) {
+    public List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, ApartmentDescription apartment, List<Double> embedding) {
         String indexName = "vector_index";
         int numCandidates = 100;  // how many neighbours it will use when doing the nearest neighbour search; it should be
         // higher than the limit we set below...higher numbers of this variable will
@@ -65,18 +66,29 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         filters.add(Filters.eq("propertyType", propertyType));
         filters.add(Filters.eq("active", true));
         if (Objects.nonNull(city)){
-            filters.add(Filters.or(Filters.eq("city", city)
-//                    ,
-//                    Filters.eq("city",city.toLowerCase()),
-//                    Filters.eq("city",city.toUpperCase()),
-//                    Filters.eq("city", StringUtils.capitalize(city))
-            ));
+            filters.add(Filters.eq("city", city));
         }
 
         // optional filters depending on user input
-        if (Objects.nonNull(apartment.getSurface()) && apartment.getSurface()>0){
-            filters.add(Filters.and(Filters.gte("surface", getMinValue(apartment.getSurface())),
-                    Filters.lte("surface", getMaxValue(apartment.getSurface()))));
+        if (Objects.nonNull(apartment.getMinimumSurface()) && apartment.getMinimumSurface()>0){
+            filters.add(Filters.and(Filters.gte("surface", apartment.getMinimumSurface())));
+        }
+        if (Objects.nonNull(apartment.getMaximumSurface()) && apartment.getMaximumSurface()>0){
+            filters.add(Filters.and(Filters.lte("surface", apartment.getMaximumSurface())));
+        }
+
+        if (Objects.nonNull(apartment.getMinimumPrice()) && apartment.getMinimumPrice()>0){
+            filters.add(Filters.and(Filters.gte("price", apartment.getMinimumPrice())));
+        }
+        if (Objects.nonNull(apartment.getMaximumPrice()) && apartment.getMaximumPrice()>0){
+            filters.add(Filters.and(Filters.lte("price", apartment.getMaximumPrice())));
+        }
+
+        if (Objects.nonNull(apartment.getMinimumNumberOfRooms()) && apartment.getMinimumNumberOfRooms()>0){
+            filters.add(Filters.and(Filters.gte("noOfRooms", apartment.getMinimumNumberOfRooms())));
+        }
+        if (Objects.nonNull(apartment.getMaximumNumberOfRooms()) && apartment.getMaximumNumberOfRooms()>0){
+            filters.add(Filters.and(Filters.lte("noOfRooms", apartment.getMaximumNumberOfRooms())));
         }
 
         Bson combinedFilters = filters.isEmpty() ? new Document() : Filters.and(filters);
@@ -130,11 +142,4 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         mongoTemplate.save(apartment, "apartments");
     }
 
-    private static long getMinValue(Integer value) {
-        return value - Math.round(value * PERCENTAGE_INTERVAL);
-    }
-
-    private static long getMaxValue(Integer value) {
-        return value + Math.round(value * PERCENTAGE_INTERVAL);
-    }
 }

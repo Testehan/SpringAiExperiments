@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.constants.AmazonS3Constants;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
@@ -57,7 +58,7 @@ public class ApartmentService {
         this.userService = userService;
     }
 
-    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, Apartment apartment, String apartmentDescription) {
+    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
         var embedding = embedder.createEmbedding(apartmentDescription).block();
         return apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
     }
@@ -93,6 +94,7 @@ public class ApartmentService {
         }
         apartment.setLastUpdateDateTime(formattedDateCustom);
 
+        apartment.setShortDescription(apartment.getShortDescription().replace("\n", " ")); // no newlines in description
         saveApartment(apartment);
         var imagesWereUploaded = saveUploadedImages(apartment, apartmentImages);
         var imagesWereDeleted = deleteUploadedImages(apartment);
@@ -110,6 +112,8 @@ public class ApartmentService {
 
         user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
         userService.updateUser(user);
+
+        LOGGER.info("Apartment was added with success!");   // TODO maybe you can send a SSE when this happens so that the user will be informed
     }
 
     private boolean deleteUploadedImages(Apartment apartment) {

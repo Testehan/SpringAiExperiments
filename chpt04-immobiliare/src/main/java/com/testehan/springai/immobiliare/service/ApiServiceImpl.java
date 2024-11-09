@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.*;
 import jakarta.servlet.http.HttpSession;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -93,31 +94,34 @@ public class ApiServiceImpl implements ApiService{
         var city = conversationSession.getCity();
         var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
+        LOGGER.info("Apartments found from vector store semantic search:");
+        apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info( "Apartment {}  : {}", ap.getId(), ap.getApartmentInfo()));
+
         ResultsResponse response = new ResultsResponse("");
 
         if (apartmentsFromSemanticSearch.size() > 0) {
-            var bestMatchingApartmentIds = getBestMatchingApartmentIds(apartmentsFromSemanticSearch, description);
+            int batchSize = 2;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
             AtomicBoolean isFirst = new AtomicBoolean(true);
+
+            var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
             bestMatchingApartmentIds
-                    .scan(new StringBuilder(), (acc, next) -> acc.append(next))  // Append characters
-                    .filter(buffer -> propertyIdContainsComma(buffer.toString()))
-                    .map(buffer-> buffer.toString().split(","))
-                    .flatMap(idsArray -> Flux.fromArray(idsArray))
-                    .distinct()
-                    .subscribe(
+                .filter(id -> ObjectId.isValid(id))
+                .distinct()
+                .subscribe(
                         apId -> {
-                           var apartmentLLM = apartmentsFromSemanticSearch.stream()
-                                .filter(item -> apId.equals(item.getId().toString()))
-                                .findFirst();
-                           if (!apartmentLLM.isEmpty()){
-                               if (isFirst.getAndSet(false)) {
-                                   userSseService.getUserSseConnection(session.getId())
-                                           .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND)));
-                               }
-                               LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
-                               userSseService.getUserSseConnection(session.getId())
-                                       .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
-                           }
+                            var apartmentLLM = apartmentsFromSemanticSearch.stream()
+                                    .filter(item -> apId.equals(item.getId().toString()))
+                                    .findFirst();
+                            if (!apartmentLLM.isEmpty()){
+                                if (isFirst.getAndSet(false)) {
+                                    userSseService.getUserSseConnection(session.getId())
+                                            .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND)));
+                                }
+                                LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
+//                                            conversationSession.getChatMemory().add(conversationSession.getConversationId(), new Me);
+                                userSseService.getUserSseConnection(session.getId())
+                                        .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
+                            }
 
                         },
                         error -> {
@@ -129,8 +133,10 @@ public class ApiServiceImpl implements ApiService{
                                         .tryEmitNext(new Event("response",new ResponsePayload(M04_NO_APARTMENTS_FOUND)));
                             }
                             LOGGER.info("Flux completed");
+
                         }
-                    );
+                );
+
         } else {
             response = new ResultsResponse(M04_NO_APARTMENTS_FOUND);
         }
@@ -139,14 +145,29 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private boolean propertyIdContainsComma(String propertyId) {
-        return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',';
+        LOGGER.info("Current list of ids from llm: {}", propertyId);
+        return true;
+//        return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',';
     }
 
     public Flux<Event> getServerSideEventsFlux(HttpSession session) {
         return  userSseService.getUserSseConnection(session.getId()).asFlux();
     }
 
+
+    public Flux<String> sendIdsInBatches(List<Apartment> apartments, String description, int batchSize) {
+        return Flux.fromIterable(apartments)
+                .buffer(batchSize)//.delayElements(Duration.ofSeconds(batchSize*5))
+                .flatMap(batchApartments -> getBestMatchingApartmentIds(batchApartments,description));  // Send each batch to the service
+    }
+
     private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
+        try {
+            Thread.sleep(10000);        // TODO this is for testing purposes in order to not get exception for the large number of requests sent to the LLM
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         var resource = new ClassPathResource("prompts/apartments_found.txt");
 
         var promptTemplate = new PromptTemplate(resource);
@@ -228,7 +249,10 @@ public class ApiServiceImpl implements ApiService{
             .user(userMessage)
                 .stream().content();
 
-        return chatResponse;
+        return chatResponse.scan(new StringBuilder(), (acc, next) -> acc.append(next))  // Append characters
+                .filter(buffer -> propertyIdContainsComma(buffer.toString()))
+                .map(buffer-> buffer.toString().replace("\\s+", "").split(","))
+                .flatMap(idsArray -> Flux.fromArray(idsArray));
     }
 
     private ResultsResponse respondToUserMessage(String userMessage) {
