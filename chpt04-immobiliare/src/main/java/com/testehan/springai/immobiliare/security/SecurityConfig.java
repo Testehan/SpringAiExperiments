@@ -3,9 +3,11 @@ package com.testehan.springai.immobiliare.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
@@ -26,19 +28,20 @@ public class SecurityConfig {
         http.authorizeHttpRequests(req -> req
                 .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/edit/**","/api/apartments/**",
                         "/actuator/**","/api/user/**","/profile").authenticated()
-                .requestMatchers("/","/help","/blog","/contact", "/error").permitAll()
+                .requestMatchers("/","/help","/blog","/contact", "/error", "/login-modal").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
                 .requestMatchers(antMatcher("/webjars/**")).permitAll()
                 .requestMatchers(antMatcher("/images/**")).permitAll()
                 )
             .oauth2Login( oauth2Login -> oauth2Login
-                .loginPage("/login")
+                .loginPage("/login-modal")
                 .permitAll()
                 .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
-                        .userService(customerOAuth2UserService)
-                )
-                .successHandler(oAuth2LoginSuccessHandler));
+                        .userService(customerOAuth2UserService))
+                .successHandler(oAuth2LoginSuccessHandler))
+            .logout((logout) -> logout.logoutSuccessUrl("/"))       // after logout redirect user to /index
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
         return http.build();
     }

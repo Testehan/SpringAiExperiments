@@ -32,20 +32,36 @@
                     <div id="menuItems" class="hidden md:flex md:space-x-10 list-none">
                         <li>
                             <a href="/chat" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               hx-get="/chat"
+                               hx-trigger="click"
+                               hx-swap="innerHTML"
+                               hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Search</a>
                         </li>
                         <li>
                             <a href="/favourites" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               hx-get="/favourites"
+                               hx-trigger="click"
+                               hx-swap="innerHTML"
+                               hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Favourites
                             </a>
                         </li>
                         <li>
                             <a href="/add" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               hx-get="/add"
+                               hx-trigger="click"
+                               hx-swap="innerHTML"
+                               hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Add/Edit
                             </a>
                         </li>
                         <li>
                             <a href="/profile" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
+                               hx-get="/profile"
+                               hx-trigger="click"
+                               hx-swap="innerHTML"
+                               hx-on="htmx:beforeRequest: checkLogin(event)"
                                target="">Profile
                             </a>
                         </li>
@@ -76,62 +92,8 @@
         </div>
     </div>
 
+    <div class="hidden" id="modalLoginContainer"></div>
 </div>
-
-<!--<div th:fragment="search_nav" class="row">-->
-<!--    <th:block sec:authorize="isAuthenticated()">-->
-<!--        <form th:action="@{/logout}" method="post" th:hidden="true" name="logoutForm">-->
-<!--            <input type="submit" value="Logout" />-->
-<!--        </form>-->
-<!--    </th:block>-->
-
-<!--    <div class="col-md">-->
-<!--        <nav class="navbar navbar-expand-sm bg-light">-->
-<!--            <div class="collapse navbar-collapse" id="searchNavbar">-->
-<!--                <form class="form-inline" th:action="@{/search}" method="get" >-->
-<!--                    <input type="search" name="keyword" class="form-control mr-sm-2" placeholder="keyword" required-->
-<!--                           th:value="${keyword}"/>-->
-<!--                    <input type="submit" value="Search" class="btn btn-outline-success" />-->
-<!--                </form>-->
-
-<!--                <ul class="navbar-nav">-->
-<!--                    <th:block sec:authorize="isAuthenticated()">-->
-<!--                        <li class="nav-item">-->
-<!--                            <b>-->
-<!--                                <a class="nav-link" th:href="@{/account_details}" sec:authentication="principal.fullName"></a>-->
-<!--                            </b>-->
-<!--                        </li>-->
-
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" th:href="@{/address_book}">Address Book</a>-->
-<!--                        </li>-->
-
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" th:href="@{/customer/questions}">Questions</a>-->
-<!--                        </li>-->
-
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" th:href="@{/reviews}">Reviews</a>-->
-<!--                        </li>-->
-
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" th:href="@{/orders}">Orders</a>-->
-<!--                        </li>-->
-
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link fas fa-shopping-cart fa-2x" th:href="@{/cart}"></a>-->
-<!--                        </li>-->
-
-<!--                        <li class="nav-item">-->
-<!--                            <a class="nav-link" href="javascript: document.logoutForm.submit()">Logout</a>-->
-<!--                        </li>-->
-<!--                    </th:block>-->
-<!--                </ul>-->
-<!--            </div>-->
-<!--        </nav>-->
-<!--    </div>-->
-<!--</div>-->
-
 
 </body>
 </html>
