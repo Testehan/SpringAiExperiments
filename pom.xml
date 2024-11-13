@@ -24,7 +24,8 @@
 		<module>chpt04-immobiliare</module>
 		<module>chpt05-llama3</module>
 		<module>chpt07-chat-streaming</module>
-	</modules>
+        <module>chpt08-gemini</module>
+    </modules>
 	<properties>
 		<java.version>17</java.version>
 		<spring-ai.version>1.0.0-M1</spring-ai.version>
