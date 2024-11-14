@@ -3,11 +3,9 @@ package com.testehan.springai.immobiliare.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
@@ -20,15 +18,17 @@ public class SecurityConfig {
     @Autowired
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
+    @Autowired
+    private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(CsrfConfigurer::disable);
-
         http.authorizeHttpRequests(req -> req
                 .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/edit/**","/api/apartments/**",
                         "/actuator/**","/api/user/**","/profile").authenticated()
-                .requestMatchers("/","/help","/blog","/contact", "/error", "/login-modal").permitAll()
+                .requestMatchers("/","/help","/blog","/contact", "/error/**", "/error-login", "/login-modal").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
                 .requestMatchers(antMatcher("/webjars/**")).permitAll()
@@ -41,7 +41,9 @@ public class SecurityConfig {
                         .userService(customerOAuth2UserService))
                 .successHandler(oAuth2LoginSuccessHandler))
             .logout((logout) -> logout.logoutSuccessUrl("/"))       // after logout redirect user to /index
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+            .exceptionHandling(ex -> {
+                ex.authenticationEntryPoint(customAuthenticationEntryPoint);
+            });
 
         return http.build();
     }

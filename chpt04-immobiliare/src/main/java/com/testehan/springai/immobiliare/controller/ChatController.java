@@ -7,6 +7,8 @@ import com.testehan.springai.immobiliare.service.OpenAiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,6 +22,8 @@ import static com.testehan.springai.immobiliare.constants.PromptConstants.M00_SE
 @Controller
 @CrossOrigin
 public class ChatController {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChatController.class);
 
     private final ApiService apiService;
     private final OpenAiService openAiService;
@@ -68,8 +72,8 @@ public class ChatController {
     public HtmxResponse addUserMessage(@RequestParam(required = false) String message,
                                        @RequestParam(required = false) MultipartFile audioFile,
                                        Model model) {
-        if (message.isEmpty()){
-
+        if (message.isEmpty()) {
+            LOGGER.info("Audio file sent from user for transcription ");
             message = openAiService.transcribeAudioMessage(audioFile.getResource());
         }
         model.addAttribute("message",message);
