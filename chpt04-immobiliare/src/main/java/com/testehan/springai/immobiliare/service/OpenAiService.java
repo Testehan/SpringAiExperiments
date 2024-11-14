@@ -2,7 +2,12 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.EmbeddingResponse;
 import jakarta.annotation.PostConstruct;
+import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
+import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -19,6 +24,12 @@ public class OpenAiService {
     private String OPENAI_API_KEY;
 
     private WebClient webClient;
+
+    private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
+
+    public OpenAiService(OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel){
+        this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
+    }
 
     @PostConstruct
     void init() {
@@ -42,5 +53,20 @@ public class OpenAiService {
                 .retrieve()
                 .bodyToMono(EmbeddingResponse.class)
                 .map(EmbeddingResponse::getEmbedding);
+    }
+
+    public String transcribeAudioMessage(Resource audioFile){
+        var responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
+
+        var transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+                .withLanguage("en")
+                .withTemperature(0f)
+                .withResponseFormat(responseFormat)
+                .build();
+        var transcriptionRequest = new AudioTranscriptionPrompt(audioFile, transcriptionOptions);
+        var response = openAiAudioTranscriptionModel.call(transcriptionRequest);
+
+        var transcribedAudioMessage = response.getResult().getOutput();
+        return transcribedAudioMessage;
     }
 }

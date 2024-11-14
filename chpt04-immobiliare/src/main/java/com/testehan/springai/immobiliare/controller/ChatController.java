@@ -1,17 +1,12 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApiService;
+import com.testehan.springai.immobiliare.service.OpenAiService;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
-import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
-import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
-import org.springframework.ai.openai.api.OpenAiAudioApi;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -20,20 +15,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.M00_NO_SEARCH_QUERIES_AVAILABLE;
+import static com.testehan.springai.immobiliare.constants.PromptConstants.M00_SEARCH_QUERIES_AVAILABLE;
 
 @Controller
 @CrossOrigin
 public class ChatController {
 
     private final ApiService apiService;
-    private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
+    private final OpenAiService openAiService;
     private final ConversationSession conversationSession;
     private final UserService userService;
 
-    public ChatController(ApiService apiService, OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel, ConversationSession conversationSession,
+    public ChatController(ApiService apiService, OpenAiService openAiService, ConversationSession conversationSession,
                           UserService userService) {
         this.apiService = apiService;
-        this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
+        this.openAiService = openAiService;
         this.conversationSession = conversationSession;
         this.userService = userService;
     }
@@ -42,17 +38,17 @@ public class ChatController {
     @PostMapping("/respond")
     public HtmxResponse respond(@RequestParam String message, Model model, HttpSession session) {
 
-       var user  = conversationSession.getImmobiliareUser();
-        Integer searchQueriesAvailable = user.getSearchesAvailable();
-        if (searchQueriesAvailable>0) {
-            ResultsResponse response = apiService.getChatResponse(message, session);
+    var user  = conversationSession.getImmobiliareUser();
+    var searchQueriesAvailable = user.getSearchesAvailable();
+    if (searchQueriesAvailable > 0) {
+            var response = apiService.getChatResponse(message, session);
 
-            user  = conversationSession.getImmobiliareUser();   // TODO getting the user again, because it might have been updated during the chat call
+            user  = conversationSession.getImmobiliareUser();   // getting the user again, because it might have been updated during the chat call
             user.setSearchesAvailable(searchQueriesAvailable - 1);
             userService.updateUser(user);
 
-            if (searchQueriesAvailable<=5){
-                var queriesAvailableMessage = "You have " + searchQueriesAvailable + " available searches.";
+            if (searchQueriesAvailable <= 5){
+                var queriesAvailableMessage = String.format(M00_SEARCH_QUERIES_AVAILABLE, searchQueriesAvailable);
                 model.addAttribute("queriesAvailableMessage", queriesAvailableMessage);
             }
             model.addAttribute("response", response.message());
@@ -73,16 +69,8 @@ public class ChatController {
                                        @RequestParam(required = false) MultipartFile audioFile,
                                        Model model) {
         if (message.isEmpty()){
-            OpenAiAudioApi.TranscriptResponseFormat responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
 
-            OpenAiAudioTranscriptionOptions transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-                    .withLanguage("en")
-                    .withTemperature(0f)
-                    .withResponseFormat(responseFormat)
-                    .build();
-            AudioTranscriptionPrompt transcriptionRequest = new AudioTranscriptionPrompt(audioFile.getResource(), transcriptionOptions);
-            AudioTranscriptionResponse response = openAiAudioTranscriptionModel.call(transcriptionRequest);
-            message = response.getResult().getOutput();
+            message = openAiService.transcribeAudioMessage(audioFile.getResource());
         }
         model.addAttribute("message",message);
         return HtmxResponse.builder()

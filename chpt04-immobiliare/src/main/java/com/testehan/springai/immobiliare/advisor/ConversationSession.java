@@ -47,7 +47,7 @@ public class ConversationSession {
     }
 
     private void initializeChatMemory() {
-        List<String> conversation = conversationService.getUserConversation(getConversationId()) ;
+        var conversation = conversationService.getUserConversation(getConversationId()) ;
         List<Message> messages = conversation.stream().map(message -> new UserMessage(message)).collect(Collectors.toList());
         chatMemory.add(getConversationId(),messages);
     }

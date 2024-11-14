@@ -56,6 +56,8 @@ public class ApartmentController {
         var user = conversationSession.getImmobiliareUser();
         if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
             redirectAttributes.addFlashAttribute("errorMessage","ERROR: You can't make this edit!");
+            LOGGER.warn("User {} tried to edit property with id {} that was not owned", user.getEmail(), apartment.getId());
+
             return "redirect:/error";
         }
 
@@ -63,9 +65,13 @@ public class ApartmentController {
             List<ApartmentImage> proccesedImages = apartmentService.processImages(apartmentImages);
             apartmentService.saveApartmentAndImages(apartment, proccesedImages, user);
             redirectAttributes.addFlashAttribute("infoMessage","We are processing the information provided. Refresh the page in 1 minute.");
+            LOGGER.info("User {} added a new property ", user.getEmail());
+
             return "redirect:/add";
         } else {
             redirectAttributes.addFlashAttribute("errorMessage","ERROR: You have reached the maximum number of listed apartments!");
+            LOGGER.warn("User {} tried to add more properties than allowed", user.getEmail());
+
             return "redirect:/error";
         }
     }

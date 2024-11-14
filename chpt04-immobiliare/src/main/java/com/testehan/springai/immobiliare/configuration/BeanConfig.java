@@ -9,6 +9,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +21,10 @@ import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
 @Configuration
 @EnableAsync
-public class BeanConfiguration {
+public class BeanConfig {
+
+    @Value("${OPEN_API_KEY}")
+    private String OPENAI_API_KEY;
 
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder){
@@ -36,7 +40,7 @@ public class BeanConfiguration {
     @Bean
     public EmbeddingModel embeddingModel() {
         // Can be any other EmbeddingModel implementation.
-        return new OpenAiEmbeddingModel(new OpenAiApi(System.getenv("OPEN_API_KEY")));
+        return new OpenAiEmbeddingModel(new OpenAiApi(OPENAI_API_KEY));
     }
 
     @Bean
