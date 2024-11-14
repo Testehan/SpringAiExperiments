@@ -6,4 +6,6 @@ public interface ConversationRepository {
     void deleteUserConversation(String user);
 
     List<String> getUserConversation(String user);
+
+    void addContentToConversation(String user, String content);
 }

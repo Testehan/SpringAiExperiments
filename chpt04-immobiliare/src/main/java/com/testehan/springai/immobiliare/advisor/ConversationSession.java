@@ -37,12 +37,17 @@ public class ConversationSession {
         this.rentOrSale = getImmobiliareUser() != null ?  getImmobiliareUser().getPropertyType() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
+        initializeChatMemory();
+    }
+
+    private void initializeChatMemory() {
         List<String> conversation = conversationService.getUserConversation(getConversationId()) ;
         List<Message> messages = conversation.stream().map(message -> new UserMessage(message)).collect(Collectors.toList());
         chatMemory.add(getConversationId(),messages);
     }
 
     public ChatMemory getChatMemory() {
+        initializeChatMemory();
         return chatMemory;
     }
 

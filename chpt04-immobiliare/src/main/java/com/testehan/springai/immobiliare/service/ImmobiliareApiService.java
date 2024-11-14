@@ -47,7 +47,7 @@ public class ImmobiliareApiService {
                 .user(prompt.getContents())
                 .call().chatResponse();
 
-        ServiceCall serviceCall = outputParser.parse(assistantResponse.getResult().getOutput().getContent());
+        ServiceCall serviceCall = outputParser.convert(assistantResponse.getResult().getOutput().getContent());
         return serviceCall;
     }
 
@@ -68,7 +68,7 @@ public class ImmobiliareApiService {
                 .user(prompt.getContents())
                 .call().chatResponse();
 
-        ApartmentDescription apartment = outputParser.parse(assistantResponse.getResult().getOutput().getContent());
+        ApartmentDescription apartment = outputParser.convert(assistantResponse.getResult().getOutput().getContent());
         return apartment;
     }
 

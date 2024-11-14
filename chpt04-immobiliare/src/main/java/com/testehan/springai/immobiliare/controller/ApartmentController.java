@@ -1,10 +1,10 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
-import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
 import com.testehan.springai.immobiliare.service.UserSseService;
@@ -12,8 +12,6 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,29 +33,27 @@ public class ApartmentController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentController.class);
 
     private final ApartmentService apartmentService;
-    private final UserService userService;
+    private final ConversationSession conversationSession;
     private final UserSseService userSseService;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
 
 
-    public ApartmentController(ApartmentService apartmentService, UserService userService, ApiService apiService,
+    public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService)
     {
         this.apartmentService = apartmentService;
-        this.userService = userService;
+        this.conversationSession = conversationSession;
         this.apiService = apiService;
         this.templateEngine = templateEngine;
         this.userSseService = userSseService;
     }
 
     @PostMapping("/save")
-    public String saveApartment(Apartment apartment, Authentication authentication, RedirectAttributes redirectAttributes,
+    public String saveApartment(Apartment apartment, RedirectAttributes redirectAttributes,
                                 @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
 
-        String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
-
-        var user = userService.getImmobiliareUserByEmail(userEmail);
+        var user = conversationSession.getImmobiliareUser();
         if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
             redirectAttributes.addFlashAttribute("errorMessage","ERROR: You can't make this edit!");
             return "redirect:/error";

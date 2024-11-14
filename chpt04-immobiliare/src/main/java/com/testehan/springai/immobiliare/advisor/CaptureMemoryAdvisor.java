@@ -66,6 +66,8 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
 
     private boolean extractMemoryIfPossible(AdvisedRequest request,  Map<String, Object> adviseContext) {
         try {
+            logger.info("Trying to extract memory for : {}", lastMessageMemoryBasisExtractor.extract(request));
+
             var memoryResponse = chatClient
                     .prompt()
                     .messages(lastMessageMemoryBasisExtractor.extract(request))

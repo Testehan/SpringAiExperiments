@@ -22,5 +22,9 @@ public class ConversationService {
        return conversationRepository.getUserConversation(user);
     }
 
+    public void addContentToConversation(String content, String user){
+        conversationRepository.addContentToConversation(user,content);
+    }
+
 
 }

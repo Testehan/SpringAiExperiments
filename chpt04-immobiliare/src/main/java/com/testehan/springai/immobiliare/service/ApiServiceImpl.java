@@ -13,11 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
@@ -92,6 +90,7 @@ public class ApiServiceImpl implements ApiService{
 
         var rentOrSale = conversationSession.getRentOrSale();
         var city = conversationSession.getCity();
+        var conversationId = conversationSession.getConversationId();
         var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
         LOGGER.info("Apartments found from vector store semantic search:");
@@ -115,10 +114,12 @@ public class ApiServiceImpl implements ApiService{
                             if (!apartmentLLM.isEmpty()){
                                 if (isFirst.getAndSet(false)) {
                                     userSseService.getUserSseConnection(session.getId())
-                                            .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND)));
+                                            .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND_START)));
                                 }
                                 LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
-//                                            conversationSession.getChatMemory().add(conversationSession.getConversationId(), new Me);
+                                // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
+                                // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
+                                conversationService.addContentToConversation(apartmentLLM.get().getApartmentInfo(), conversationId);
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
                             }
@@ -132,6 +133,8 @@ public class ApiServiceImpl implements ApiService{
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("response",new ResponsePayload(M04_NO_APARTMENTS_FOUND)));
                             }
+                            userSseService.getUserSseConnection(session.getId())
+                                    .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND_END)));
                             LOGGER.info("Flux completed");
 
                         }
@@ -214,16 +217,26 @@ public class ApiServiceImpl implements ApiService{
         return new ResultsResponse(M02_CITY);
     }
 
+    private ChatClient createNewChatClientForStream(){
+        return ChatClient
+                .builder(chatmodel)
+                .defaultAdvisors(
+                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
+                        new SimpleLoggerAdvisor()
+                )
+                .build();
+    }
+
     private ChatClient createNewChatClient(){
         return ChatClient
                 .builder(chatmodel)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
                         new CaptureMemoryAdvisor(  vectorStore, chatmodel, executor),
-                        new QuestionAnswerAdvisor(      // this is an advisor to be used when you need RAG
-                                vectorStore,
-                                SearchRequest.defaults().withSimilarityThreshold(.8)
-                        ),
+//                        new QuestionAnswerAdvisor(      // TODO  this is an advisor to be used when you need RAG
+//                                vectorStore,            //  KEEP IN mind that if we use this for all DEFAULT requests, it will only use what it knows in the "context", and it will not use its whole knowledge..
+//                                SearchRequest.defaults().withSimilarityThreshold(.8)
+//                        ),
                         new SimpleLoggerAdvisor()
                         )
 //                .defaultSystem()        // conversationSession.promptResource()
@@ -232,7 +245,7 @@ public class ApiServiceImpl implements ApiService{
 
     private Flux<String> respondToUserMessageStream(String userMessage) {
 
-        var chatResponse = createNewChatClient()
+        var chatResponse = createNewChatClientForStream()
                 .prompt()
                 .advisors (new Consumer<ChatClient.AdvisorSpec>() {
                     @Override
