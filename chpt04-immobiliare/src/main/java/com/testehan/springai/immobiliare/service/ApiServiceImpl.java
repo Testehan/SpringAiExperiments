@@ -119,7 +119,10 @@ public class ApiServiceImpl implements ApiService{
                                 LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
                                 // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
                                 // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
-                                conversationService.addContentToConversation(apartmentLLM.get().getApartmentInfo(), conversationId);
+
+                                var apartmentInfo = apartmentLLM.get().getApartmentInfo();
+                                conversationService.addContentToConversation(apartmentInfo, conversationId);
+
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
                             }

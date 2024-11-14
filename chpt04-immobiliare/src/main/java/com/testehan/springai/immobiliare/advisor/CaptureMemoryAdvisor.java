@@ -24,6 +24,7 @@ import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvis
 
 public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
 
+    public static final int MAX_ATTEMPTS = 3;
     private Logger logger = LoggerFactory.getLogger(CaptureMemoryAdvisor.class);
 
     private final VectorStore vectorStore;
@@ -31,7 +32,7 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
     private final Executor executor;
     private final ChatClient chatClient;
 
-    private RetryTemplate retryTemplate  = new RetryTemplateBuilder().maxAttempts(3).fixedBackoff(1000).build();
+    private RetryTemplate retryTemplate  = new RetryTemplateBuilder().maxAttempts(MAX_ATTEMPTS).fixedBackoff(1000).build();
     private MemoryBasisExtractor lastMessageMemoryBasisExtractor
             = (AdvisedRequest request) -> Collections.singletonList(new UserMessage(request.userText()));
 

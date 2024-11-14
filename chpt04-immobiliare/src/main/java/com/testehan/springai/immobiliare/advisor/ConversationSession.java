@@ -5,6 +5,8 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ConversationService;
 import io.micrometer.common.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -21,6 +23,8 @@ import java.util.stream.Collectors;
 @SessionScope
 public class ConversationSession {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConversationSession.class);
+
     private ChatMemory chatMemory;
     private Authentication authentication;
     private final UserService userService;
@@ -33,11 +37,13 @@ public class ConversationSession {
     public ConversationSession(ChatMemory chatMemory, UserService userService, ConversationService conversationService) {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         this.userService = userService;
-        this.city = getImmobiliareUser() != null ? StringUtils.isNotEmpty(getImmobiliareUser().getCity()) ? SupportedCity.valueOf(getImmobiliareUser().getCity()) : SupportedCity.UNSUPPORTED : SupportedCity.UNSUPPORTED;
+        this.city = getImmobiliareUser() != null ?
+                StringUtils.isNotEmpty(getImmobiliareUser().getCity()) ?
+                        SupportedCity.valueOf(getImmobiliareUser().getCity()) : SupportedCity.UNSUPPORTED
+                : SupportedCity.UNSUPPORTED;
         this.rentOrSale = getImmobiliareUser() != null ?  getImmobiliareUser().getPropertyType() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
-        initializeChatMemory();
     }
 
     private void initializeChatMemory() {

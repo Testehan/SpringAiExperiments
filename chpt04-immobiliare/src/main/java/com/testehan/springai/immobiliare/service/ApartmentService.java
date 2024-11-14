@@ -113,7 +113,7 @@ public class ApartmentService {
         user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
         userService.updateUser(user);
 
-        LOGGER.info("Apartment was added with success!");   // TODO maybe you can send a SSE when this happens so that the user will be informed
+        LOGGER.info("Apartment was added with success!");
     }
 
     private boolean deleteUploadedImages(Apartment apartment) {
