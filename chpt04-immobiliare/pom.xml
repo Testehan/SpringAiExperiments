@@ -78,8 +78,15 @@
 
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-openai-spring-boot-starter</artifactId>
+            <artifactId>spring-ai-openai</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-vertex-ai-gemini</artifactId>
+        </dependency>
+
+
 
         <!-- not sure if both of the next 2 dependencies are needed or not. Maybe with the first i would need to
          create new entries in the DB, and use it to persist embeddings while the second has some helpful features
@@ -157,8 +164,6 @@
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporter-otlp</artifactId>
         </dependency>
-
-
 
     </dependencies>
 

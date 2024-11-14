@@ -4,12 +4,15 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.web.client.RestTemplate;
 import org.thymeleaf.spring6.SpringWebFluxTemplateEngine;
@@ -34,6 +37,12 @@ public class BeanConfiguration {
     public EmbeddingModel embeddingModel() {
         // Can be any other EmbeddingModel implementation.
         return new OpenAiEmbeddingModel(new OpenAiApi(System.getenv("OPEN_API_KEY")));
+    }
+
+    @Bean
+    @Primary
+    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
+        return vertexAiGeminiChatModel;
     }
 
     @Bean
