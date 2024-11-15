@@ -153,7 +153,7 @@ public class MainController {
 
 	@GetMapping("/contact")
 	public String contact(Model model) {
-		return "index";
+		return "contact";
 	}
 
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
