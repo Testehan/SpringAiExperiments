@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.thymeleaf.util.StringUtils;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -140,7 +141,7 @@ public class MainController {
 	public String profile(Model model) {
 		var user = conversationSession.getImmobiliareUser();
 
-		UserProfile userProfile = new UserProfile(user.getEmail(), SupportedCity.valueOf(user.getCity()).getName(),
+		UserProfile userProfile = new UserProfile(user.getEmail(), user.getName(), SupportedCity.valueOf(user.getCity()).getName(),
 				user.getPropertyType(),user.getLastPropertyDescription(),
 				user.getSearchesAvailable(), user.getMaxNumberOfListedProperties());
 
@@ -152,7 +153,17 @@ public class MainController {
 	}
 
 	@GetMapping("/contact")
-	public String contact(Model model) {
+	public String contact(Model model, Principal principal) {
+		if (principal != null) {
+			var user = conversationSession.getImmobiliareUser();
+			UserProfile userProfile = new UserProfile(user.getEmail(), user.getName(), SupportedCity.valueOf(user.getCity()).getName(),
+					user.getPropertyType(),user.getLastPropertyDescription(),
+					user.getSearchesAvailable(), user.getMaxNumberOfListedProperties());
+
+			model.addAttribute("user", userProfile);
+		} else {
+			model.addAttribute("user", null);
+		}
 		return "contact";
 	}
 
