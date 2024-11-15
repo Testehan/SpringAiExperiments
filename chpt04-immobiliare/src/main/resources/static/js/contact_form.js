@@ -1,5 +1,6 @@
 emailjs.init('Nc9IU4enMFiqEX8QI');
 
+
 $(document).ready(function(){
     const Joi = window.joi;
     console.log(typeof Joi);
@@ -20,22 +21,43 @@ $(document).ready(function(){
             message: $('#message').val(),
         };
 
-        const { error } = schema.validate(formData, { abortEarly: true });
+        const { error } = schema.validate(formData, { abortEarly: false });
         if (error) {
             // Display validation errors
-            const errorMessages = error.details.map(err => err.message).join("\n");
-            alert("Validation Errors:\n" + errorMessages);
+            const errorMessages = error.details.forEach(err => {
+                Toastify({
+                    text: err.message,
+                    duration: 5000,
+                    style: {
+                        background: "linear-gradient(to right, #fd0713, #ff7675)",
+                        color: "white"
+                      }
+                }).showToast();
+            })
             return;
         }
 
         // Send form data using EmailJS
         emailjs.sendForm('service_07fsa7e', 'template_j12c142', this)
             .then(function(response) {
-                console.log('SUCCESS!', response.status, response.text);
-                alert('Message sent successfully!');
+                Toastify({
+                    text: "Message sent successfully!",
+                    duration: 3000,
+                    style: {
+                        background: "linear-gradient(to right, #007bff, #3a86ff)",
+                        color: "white"
+                      }
+                }).showToast();
+
             }, function(error) {
-                console.error('FAILED...', error);
-                alert('Failed to send message. Please try again later.');
+                Toastify({
+                    text: "Failed to send message. Please try again later.",
+                    duration: 5000,
+                    style: {
+                        background: "linear-gradient(to right, #fd0713, #ff7675)",
+                        color: "white"
+                      }
+                }).showToast();
             });
 
         // Optionally, reset the form after submission
