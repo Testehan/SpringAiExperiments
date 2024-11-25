@@ -190,15 +190,17 @@ public class ApartmentService {
 
     public List<ApartmentImage> processImages(MultipartFile[] apartmentImages) {
         List<ApartmentImage> processedImages = new ArrayList<>();
-        for (MultipartFile extraImage : apartmentImages) {
-            if (extraImage.isEmpty()) continue;
+        if (Objects.nonNull(apartmentImages)) {
+            for (MultipartFile extraImage : apartmentImages) {
+                if (extraImage.isEmpty()) continue;
 
-            var filename = StringUtils.cleanPath(extraImage.getOriginalFilename()).replace(" ", "-");
-            var contentType = extraImage.getContentType();
-            try {
-                processedImages.add(new ApartmentImage(filename, contentType, extraImage.getInputStream()));
-            } catch (IOException ex){
-                LOGGER.error("File {} could not be read, hence it will be skipped", filename);
+                var filename = StringUtils.cleanPath(extraImage.getOriginalFilename()).replace(" ", "-");
+                var contentType = extraImage.getContentType();
+                try {
+                    processedImages.add(new ApartmentImage(filename, contentType, extraImage.getInputStream()));
+                } catch (IOException ex) {
+                    LOGGER.error("File {} could not be read, hence it will be skipped", filename);
+                }
             }
         }
         return processedImages;
