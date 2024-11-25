@@ -89,8 +89,10 @@ public class ApartmentService {
         DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateCustom = now.format(customFormatter);
 
+        var isPropertyNew = false;
         if (Objects.isNull(apartment.getId())) {
             apartment.setCreationDateTime(formattedDateCustom);
+            isPropertyNew = true;
         }
         apartment.setLastUpdateDateTime(formattedDateCustom);
 
@@ -110,8 +112,10 @@ public class ApartmentService {
 
         saveApartment(apartment);
 
-        user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
-        userService.updateUser(user);
+        if (isPropertyNew) {
+            user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
+            userService.updateUser(user);
+        }
 
         LOGGER.info("Apartment was added with success!");
     }
