@@ -11,8 +11,9 @@ import com.testehan.springai.immobiliare.service.UserSseService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -26,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-@Controller
+@RestController
 @RequestMapping("/api/apartments")
 public class ApartmentController {
 
@@ -50,29 +51,27 @@ public class ApartmentController {
     }
 
     @PostMapping("/save")
-    public String saveApartment(Apartment apartment, RedirectAttributes redirectAttributes,
-                                @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
+    public ResponseEntity<String> saveApartment(Apartment apartment, RedirectAttributes redirectAttributes,
+                                                @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
 
         var user = conversationSession.getImmobiliareUser();
         if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
-            redirectAttributes.addFlashAttribute("errorMessage","ERROR: You can't make this edit!");
             LOGGER.warn("User {} tried to edit property with id {} that was not owned", user.getEmail(), apartment.getId());
-
-            return "redirect:/error";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("You can't perform this edit!");
         }
 
         if (user.getMaxNumberOfListedProperties() > 0){
-            List<ApartmentImage> proccesedImages = apartmentService.processImages(apartmentImages);
-            apartmentService.saveApartmentAndImages(apartment, proccesedImages, user);
-            redirectAttributes.addFlashAttribute("infoMessage","We are processing the information provided. Refresh the page in 1 minute.");
-            LOGGER.info("User {} added a new property ", user.getEmail());
+            List<ApartmentImage> processedImages = apartmentService.processImages(apartmentImages);
+            apartmentService.saveApartmentAndImages(apartment, processedImages, user);
+            LOGGER.info("User {} added/edited a property ", user.getEmail());
+            // Return a response to the frontend
+            return ResponseEntity.ok("We are processing the information provided. Refresh the page in 1 minute.");
 
-            return "redirect:/add";
         } else {
-            redirectAttributes.addFlashAttribute("errorMessage","ERROR: You have reached the maximum number of listed apartments!");
             LOGGER.warn("User {} tried to add more properties than allowed", user.getEmail());
-
-            return "redirect:/error";
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("You have reached the maximum number of listed apartments!");
         }
     }
 
