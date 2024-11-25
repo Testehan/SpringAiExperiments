@@ -113,6 +113,7 @@ public class ApartmentService {
         saveApartment(apartment);
 
         if (isPropertyNew) {
+            user.getListedProperties().add(apartment.getId().toString());
             user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
             userService.updateUser(user);
         }
