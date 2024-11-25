@@ -18,15 +18,57 @@ $(document).ready(function(){
         });
     });
 
+    $("#addForm").submit(function(event) {
+        handleSubmit(event);
+    });
+
 });
+
+function handleSubmit(event){
+    event.preventDefault();
+
+    const formData = new FormData(event.target);
+//    for (const [key, value] of formData.entries()) {
+//            console.log(key, value);
+//    }
+
+    $.ajax({
+        url: "/api/apartments/save",
+        type: "POST",
+        data: formData,
+        processData: false, // Prevent jQuery from processing the FormData
+        contentType: false, // Let the browser set the content type (multipart/form-data)
+        success: function (response) {
+            Toastify({
+                text: response,
+                duration: 4000,
+                style: {
+                  background: "linear-gradient(to right, #007bff, #3a86ff)",
+                  color: "white"
+                }
+            }).showToast();
+        },
+        error: function (xhr) {
+            console.log(xhr);
+
+            Toastify({
+                text: xhr.responseText,
+                duration: 3000,
+                gravity: "top",
+                position: "right",
+                style: {
+                  background: "linear-gradient(to right, #fd0713, #ff7675)",
+                  color: "white"
+                }
+            }).showToast();
+        }
+    })
+
+}
 
 function showImageThumbnail(fileInput, index){
     var file = fileInput.files[0];
     fileName = file.name;
-//    imageNameHiddenField = $("#imageName"+index)
-//    if (imageNameHiddenField.length > 0){
-//        imageNameHiddenField.val(fileName);
-//    }
 
     var reader = new FileReader();
     reader.onload = function(e){

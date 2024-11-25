@@ -20,12 +20,7 @@
     <main class="flex overflow-auto bg-white p-4 w-full max-w-full">
         <div class="w-4/5 md:w-3/4 flex-1 mb-4 p-4 h-full ">
 
-            <div th:if="${infoMessage}" class="max-w-md mx-auto mt-5 p-4 bg-blue-100 border-l-4 border-blue-500 text-blue-700">
-                <p class="font-bold">Info</p>
-                <p th:text="${infoMessage}"></p>
-            </div>
-
-            <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
+            <form id="addForm" class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
                 <input th:if="${apartment.id != null}" type="hidden" name="id" th:value="${apartment.id}" />
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
