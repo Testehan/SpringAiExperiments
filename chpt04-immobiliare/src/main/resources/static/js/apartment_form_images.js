@@ -1,5 +1,21 @@
 var imagesCount=0;
 
+// input validation
+const Joi = window.joi;
+console.log(typeof Joi);
+const schema = Joi.object({
+    name: Joi.string().required().label('Title'),
+    area: Joi.string().required().label('Area / Neighbourhood'),
+    description: Joi.string().required().label('Description'),
+    price: Joi.number().positive().label('Price'),
+    surface: Joi.number().positive().label('Surface'),
+    noOfRooms: Joi.number().positive().label('Number of rooms'),
+    contact: Joi.alternatives().try(
+                Joi.string().email({ tlds: { allow: false } }),      // either an email
+                Joi.string().regex(/^\d{10,13}$/)                   // or a phone number
+           ).required().label('Contact')
+});
+
 $(document).ready(function(){
 
     $("input[name='apartmentImages']").each(function(index){
@@ -27,43 +43,78 @@ $(document).ready(function(){
 function handleSubmit(event){
     event.preventDefault();
 
-    const formData = new FormData(event.target);
-//    for (const [key, value] of formData.entries()) {
-//            console.log(key, value);
-//    }
+    var valid = isFormValid();
 
-    $.ajax({
-        url: "/api/apartments/save",
-        type: "POST",
-        data: formData,
-        processData: false, // Prevent jQuery from processing the FormData
-        contentType: false, // Let the browser set the content type (multipart/form-data)
-        success: function (response) {
+    if (valid){
+        const formData = new FormData(event.target);
+
+        $.ajax({
+            url: "/api/apartments/save",
+            type: "POST",
+            data: formData,
+            processData: false, // Prevent jQuery from processing the FormData
+            contentType: false, // Let the browser set the content type (multipart/form-data)
+            success: function (response) {
+                Toastify({
+                    text: response,
+                    duration: 4000,
+                    style: {
+                      background: "linear-gradient(to right, #007bff, #3a86ff)",
+                      color: "white"
+                    }
+                }).showToast();
+
+                $("#addForm")[0].reset();
+            },
+            error: function (xhr) {
+                console.log(xhr);
+
+                Toastify({
+                    text: xhr.responseText,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "right",
+                    style: {
+                      background: "linear-gradient(to right, #fd0713, #ff7675)",
+                      color: "white"
+                    }
+                }).showToast();
+            }
+        })
+    }
+
+}
+
+function isFormValid(){
+
+     // Extract form data that needs validation
+    const formData = {
+        name: $('#name').val(),
+        area: $('#area').val(),
+        description: $('#description').val(),
+        price: $('#price').val(),
+        surface: $('#surface').val(),
+        noOfRooms: $('#noOfRooms').val(),
+        contact: $('#contact').val(),
+    };
+
+    const { error } = schema.validate(formData, { abortEarly: false });
+    if (error) {
+
+        // Display validation errors
+        const errorMessages = error.details.slice().reverse().forEach(err => {
             Toastify({
-                text: response,
-                duration: 4000,
+                text: err.message,
+                duration: 5000,
                 style: {
-                  background: "linear-gradient(to right, #007bff, #3a86ff)",
-                  color: "white"
-                }
+                    background: "linear-gradient(to right, #fd0713, #ff7675)",
+                    color: "white"
+                  }
             }).showToast();
-        },
-        error: function (xhr) {
-            console.log(xhr);
-
-            Toastify({
-                text: xhr.responseText,
-                duration: 3000,
-                gravity: "top",
-                position: "right",
-                style: {
-                  background: "linear-gradient(to right, #fd0713, #ff7675)",
-                  color: "white"
-                }
-            }).showToast();
-        }
-    })
-
+        })
+        return false;
+    }
+    return true;
 }
 
 function showImageThumbnail(fileInput, index){
