@@ -8,10 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/apartments")
@@ -43,22 +40,19 @@ public class ApartmentRestController {
         }
     }
 
-    @GetMapping("/favourite/{apartmentId}")
+    @PostMapping("/favourite/{apartmentId}")
     @HxRequest
-    public String favourite(@PathVariable(value = "apartmentId") String apartmentId, Authentication authentication) {
+    public void favourite(@PathVariable(value = "apartmentId") String apartmentId, Authentication authentication) {
         String result;
         String userEmail = ((OAuth2AuthenticatedPrincipal)authentication.getPrincipal()).getAttribute("email");
 
         var user = userService.getImmobiliareUserByEmail(userEmail);
         if (!user.getFavouriteProperties().contains(apartmentId)){
             user.getFavouriteProperties().add(apartmentId);
-            result = "&hearts;";
         } else {
             user.getFavouriteProperties().remove(apartmentId);
-            result = "Save to Favourites";
         }
         userService.updateUser(user);
-        return result;
     }
 
 }

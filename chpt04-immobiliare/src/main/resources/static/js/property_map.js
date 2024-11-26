@@ -31,6 +31,7 @@ $(document).ready(function () {
     });
 
 
+    // TODO this functionality is used in the chat and favourites pages. You should move it to a different js file
     $('.favouriteButton').on('click', function () {
         if ($(this).text() === 'Save to Favourites') {
             $(this).html('&hearts;').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700').addClass('text-red-500 font-bold');
