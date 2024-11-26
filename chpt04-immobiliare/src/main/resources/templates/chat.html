@@ -32,6 +32,7 @@
 <script th:src="@{/js/chat_history.js}"></script>
 <script th:src="@{/js/chat_record_audio.js}"></script>
 <script th:src="@{/js/chat_general.js}"></script>
+<script th:src="@{/js/property_map.js}"></script>
 
 <body class="h-screen bg-gray-100" >
 
@@ -81,6 +82,23 @@
             <span class="absolute top-4 right-4 text-white text-3xl cursor-pointer" onclick="closeLightbox()">&times;</span>
             <img id="lightbox-img" class="max-w-full max-h-full rounded-lg shadow-lg" />
         </div>
+
+        <div id="mapModal" class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+            <span id="closeMapModal" class="absolute top-4 right-4 text-white text-3xl cursor-pointer">&times;</span>
+            <div id="lightbox-map" class="max-w-full max-h-full rounded-lg shadow-lg">
+                <iframe
+                        id="mapFrame"
+                        width="600"
+                        height="450"
+                        style="border:0"
+                        loading="lazy"
+                        allowfullscreen
+                        referrerpolicy="no-referrer-when-downgrade"
+                        src="">
+                </iframe>
+            </div>
+        </div>
+
     </main>
 </div>
 <script>

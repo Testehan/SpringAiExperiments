@@ -51,7 +51,16 @@
 <!--        <span th:id="'hiddenApartmentId' + ${status.count}" style="display: none;">[[${apartment.id}]]</span>-->
         <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
         <p class="text-gray-600 mt-2">Location: [[${apartment.city}]]</p>
-        <p class="text-gray-600 mt-2">Area: [[${apartment.area}]]</p>
+        <div class="grid grid-cols-2 flex justify-between mt-2">
+            <p class="text-left text-gray-600">Area: [[${apartment.area}]]</p>
+            <span class="text-right ">
+                <button
+                        class="openMapButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
+                        th:data-location="${apartment.city}+','+${apartment.area}">
+                    Map
+                </button>
+            </span>
+        </div>
         <p class="text-gray-600 mt-2">[[${apartment.shortDescription}]]</p>
         <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
         <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
@@ -65,15 +74,15 @@
 
         <p th:id="'contactResult'" class="text-red-500 font-bold mt-2"> <!-- + ${status.count} -->
             <span class="flex justify-between">
-                <button class="text-blue-500 hover:text-blue-700"
+                <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
                         th:hx-swap = "outerHTML"
                         th:hx-get="@{http://localhost:8080/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id})}"  >
                     Show contact
                 </button>
 
-                <button class="text-blue-500 hover:text-blue-700"
-                        th:hx-swap = "innerHTML"
-                        th:hx-get="@{http://localhost:8080/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"
+                <button class="favouriteButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
+                        th:hx-swap="none"
+                        th:hx-post="@{http://localhost:8080/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"
                         th:text="${favouriteButtonStartMessage}">
                 </button>
             </span>
