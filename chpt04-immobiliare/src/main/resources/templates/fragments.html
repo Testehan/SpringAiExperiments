@@ -72,7 +72,7 @@
             <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
         </p>
 
-        <p th:id="'contactResult'" class="text-red-500 font-bold mt-2"> <!-- + ${status.count} -->
+        <p th:id="'contactResult'" class="text-red-500 mt-2"> <!-- + ${status.count} -->
             <span class="flex justify-between">
                 <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
                         th:hx-swap = "outerHTML"

@@ -5,7 +5,7 @@ $(document).ready(function () {
     const apiKey = '';
 
     // Open the modal
-    $('.openMapButton').click(function () {
+    $('#response-container').on('click', '.openMapButton', function () {
         const location = $(this).data('location'); // Get location from button
         const mapUrl = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(location)}`;
 
@@ -30,13 +30,4 @@ $(document).ready(function () {
         }
     });
 
-
-    // TODO this functionality is used in the chat and favourites pages. You should move it to a different js file
-    $('.favouriteButton').on('click', function () {
-        if ($(this).text() === 'Save to Favourites') {
-            $(this).html('&hearts;').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700').addClass('text-red-500 font-bold');
-        } else if ($(this).html() === '♥')  {
-            $(this).text('Save to Favourites').removeClass('text-red-500 font-bold').addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
-        }
-    });
 });

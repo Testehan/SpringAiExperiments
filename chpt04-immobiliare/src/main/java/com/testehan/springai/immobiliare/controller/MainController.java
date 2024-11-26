@@ -68,6 +68,7 @@ public class MainController {
 		}
 
 		model.addAttribute("apartments", apartments);
+//		model.addAttribute("favouriteButtonStartMessage","&hearts;");
 		return "favourites";
 	}
 
