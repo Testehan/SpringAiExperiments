@@ -35,7 +35,7 @@ public class Apartment {
     private List<Double> plot_embedding;
     private Double score;
 
-    private boolean active;
+    private boolean active = true;  // i want properties to be visible by default
 
     @JsonIgnore
     public String getApartmentInfoToEmbedd(){

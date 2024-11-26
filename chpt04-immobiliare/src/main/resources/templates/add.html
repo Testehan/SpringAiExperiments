@@ -38,7 +38,8 @@
                 </div>
                 <div class="mb-4">
                     <label for="area" class="block text-gray-700 font-bold mb-2">Area / Neighbourhood:</label>
-                    <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}">
+                    <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}"
+                           placeholder="Approximate location of property or neighbourhood">
                 </div>
                 <div class="mb-4">
                     <label for="propertyType" class="block text-gray-700 font-bold mb-2">Property Type:</label>
@@ -53,7 +54,8 @@
                     <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
                     <textarea id="description"
                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
-                              th:field="*{shortDescription}"></textarea>
+                              th:field="*{shortDescription}"
+                              placeholder="A description for your listing. You can also add requirements for future clients."></textarea>
                 </div>
                 <div class="mb-4">
                     <label for="price" class="block text-gray-700 font-bold mb-2">Price:</label>
@@ -69,11 +71,13 @@
                 </div>
                 <div class="mb-4">
                     <label for="floor" class="block text-gray-700 font-bold mb-2">Floor:</label>
-                    <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}">
+                    <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}"
+                           placeholder="Enter the floor number (possible values: ground floor, 2, 3, 5/10 etc.)">
                 </div>
                 <div class="mb-4">
                     <label for="tags" class="block text-gray-700 font-bold mb-2">Tags:</label>
-                    <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}">
+                    <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}"
+                        placeholder="Add tags to describe your property (examples: spacious, students, pool, garden)">
                 </div>
                 <div class="mb-4">
                     <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>
@@ -92,7 +96,7 @@
                 <span>Number of existing images is : [[${numberOfExistingImages}]]</span>
                 <div class="mb-4" id="apartmentImages">
                     <div th:each="image, status : ${apartment.images}" class="col border m-3 p-2" th:id="'divImage'+${status.index}">
-                        <div th:id="'imageHeader'+${status.index}"><label>Image no [[${status.index+1}]]</label></div>
+                        <div th:id="'imageHeader'+${status.index}"><label>Image number [[${status.index+1}]]</label></div>
                         <div class="m-2">
                             <img th:id="'imageThumbnail'+${status.index}" alt="Image preview" class="img-fluid"
                                  th:src="${image}"/>
@@ -105,7 +109,7 @@
                         </a>
                     </div>
                     <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages}">
-                        <div th:id="'imageHeader'+${numberOfExistingImages}"><label>Image no [[${numberOfExistingImages + 1}]]</label></div>
+                        <div th:id="'imageHeader'+${numberOfExistingImages}"><label>Image number [[${numberOfExistingImages + 1}]]</label></div>
                         <div class="m-2">
                             <img th:id="'newImageThumbnail0'" alt="Image preview" class="img-fluid"
                                  th:src="@{/images/image-thumbnail.png}"/>
