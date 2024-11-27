@@ -90,6 +90,22 @@
     </div>
 </div>
 
+<div th:fragment="property_map" id="mapModal"  class="lightbox fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden" >
+    <span id="closeMapModal" class="absolute top-4 right-4 text-white text-3xl cursor-pointer">&times;</span>
+    <div id="lightbox-map" class="max-w-full max-h-full rounded-lg shadow-lg">
+        <iframe
+                id="mapFrame"
+                width="600"
+                height="450"
+                style="border:0"
+                loading="lazy"
+                allowfullscreen
+                referrerpolicy="no-referrer-when-downgrade"
+                src="">
+        </iframe>
+    </div>
+</div>
+
 <div th:fragment="loginModal" >
     <div id="loginModal" class="max-w-sm mx-auto">
         <div class="fixed inset-0 flex items-center justify-center">
