@@ -23,26 +23,33 @@
             <form id="addForm" class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
                 <input th:if="${apartment.id != null}" type="hidden" name="id" th:value="${apartment.id}" />
                 <div class="mb-4">
-                    <label for="name" class="block text-gray-700 font-bold mb-2">Title:</label>
+                    <label for="name" class="block text-gray-700 font-bold mb-2">
+                        Title<span class="text-red-500">*</span>:
+                    </label>
                     <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline" th:field="*{name}" placeholder="Think of a title that best describes your listing" />
                 </div>
                 <div class="mb-4">
-                    <label for="city" class="block text-gray-700 font-bold mb-2">City:</label>
-                    <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
-     focus:shadow-outline">
+                    <label for="city" class="block text-gray-700 font-bold mb-2">
+                        City<span class="text-red-500">*</span>:
+                    </label>
+                    <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                         <th:block th:each="city: ${listCities}">
                             <option th:value="${city}">[[${city}]]</option>
                         </th:block>
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label for="area" class="block text-gray-700 font-bold mb-2">Area / Neighbourhood:</label>
+                    <label for="area" class="block text-gray-700 font-bold mb-2">
+                        Area / Neighbourhood<span class="text-red-500">*</span>:
+                    </label>
                     <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}"
-                           placeholder="Approximate location of property or neighbourhood">
+                           placeholder="Approximate area of property or neighbourhood to be used to display on map">
                 </div>
                 <div class="mb-4">
-                    <label for="propertyType" class="block text-gray-700 font-bold mb-2">Property Type:</label>
+                    <label for="propertyType" class="block text-gray-700 font-bold mb-2">
+                        Property Type<span class="text-red-500">*</span>:
+                    </label>
                     <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline">
                         <th:block th:each="propertyType: ${listPropertyTypes}">
@@ -51,22 +58,30 @@
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label for="description" class="block text-gray-700 font-bold mb-2">Description:</label>
+                    <label for="description" class="block text-gray-700 font-bold mb-2">
+                        Description<span class="text-red-500">*</span>:
+                    </label>
                     <textarea id="description"
                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
                               th:field="*{shortDescription}"
                               placeholder="A description for your listing. You can also add requirements for future clients."></textarea>
                 </div>
                 <div class="mb-4">
-                    <label for="price" class="block text-gray-700 font-bold mb-2">Price:</label>
+                    <label for="price" class="block text-gray-700 font-bold mb-2">
+                        Price<span class="text-red-500">*</span>:
+                    </label>
                     <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{price}">
                 </div>
                 <div class="mb-4">
-                    <label for="surface" class="block text-gray-700 font-bold mb-2">Surface:</label>
+                    <label for="surface" class="block text-gray-700 font-bold mb-2">
+                        Surface<span class="text-red-500">*</span>:
+                    </label>
                     <input type="number" id="surface" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{surface}">
                 </div>
                 <div class="mb-4">
-                    <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">Number of rooms:</label>
+                    <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">
+                        Number of rooms<span class="text-red-500">*</span>:
+                    </label>
                     <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{noOfRooms}">
                 </div>
                 <div class="mb-4">
@@ -80,7 +95,9 @@
                         placeholder="Add tags to describe your property (examples: spacious, students, pool, garden)">
                 </div>
                 <div class="mb-4">
-                    <label for="contact" class="block text-gray-700 font-bold mb-2">Contact:</label>
+                    <label for="contact" class="block text-gray-700 font-bold mb-2">
+                        Contact<span class="text-red-500">*</span>:
+                    </label>
                     <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
                            placeholder="An email or a phone number where you can be contacted"/>
                 </div>

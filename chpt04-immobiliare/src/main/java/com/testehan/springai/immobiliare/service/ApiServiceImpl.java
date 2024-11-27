@@ -169,7 +169,7 @@ public class ApiServiceImpl implements ApiService{
 
     private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
         try {
-            Thread.sleep(10000);        // TODO this is for testing purposes in order to not get exception for the large number of requests sent to the LLM
+            Thread.sleep(1500);        // TODO this is for testing purposes in order to not get exception for the large number of requests sent to the LLM
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

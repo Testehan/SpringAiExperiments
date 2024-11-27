@@ -107,7 +107,7 @@ public class ApartmentController {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("apartment");
-        context.setVariable("apartment", eventPayload.getPayload());        // TODO Below you need to make sure that the user did not already set the apartment to favourites in a previous call
+        context.setVariable("apartment", eventPayload.getPayload());
         context.setVariable("favouriteButtonStartMessage","Save to Favourites");
 
         var data = templateEngine.process("fragments",selectors, context).

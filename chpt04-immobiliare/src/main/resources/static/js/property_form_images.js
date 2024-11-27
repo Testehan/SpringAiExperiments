@@ -7,9 +7,9 @@ const schema = Joi.object({
     name: Joi.string().required().label('Title'),
     area: Joi.string().required().label('Area / Neighbourhood'),
     description: Joi.string().required().label('Description'),
-    price: Joi.number().positive().label('Price'),
-    surface: Joi.number().positive().label('Surface'),
-    noOfRooms: Joi.number().positive().label('Number of rooms'),
+    price: Joi.number().positive().required().label('Price'),
+    surface: Joi.number().positive().required().label('Surface'),
+    noOfRooms: Joi.number().positive().required().label('Number of rooms'),
     contact: Joi.alternatives().try(
                 Joi.string().email({ tlds: { allow: false } }),      // either an email
                 Joi.string().regex(/^\d{10,13}$/)                   // or a phone number
