@@ -7,6 +7,7 @@ import com.testehan.springai.immobiliare.events.ApartmentPayload;
 import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.*;
+import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import jakarta.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -94,6 +95,7 @@ public class ApiServiceImpl implements ApiService{
         // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
         var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
         var conversationId = conversationSession.getConversationId();
+        final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
         var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
         LOGGER.info("Apartments found from vector store semantic search:");
@@ -126,8 +128,9 @@ public class ApiServiceImpl implements ApiService{
                                 var apartmentInfo = apartmentLLM.get().getApartmentInfo();
                                 conversationService.addContentToConversation(apartmentInfo, conversationId);
 
+                                var isFavourite = isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
                                 userSseService.getUserSseConnection(session.getId())
-                                        .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get())));
+                                        .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get(), isFavourite)));
                             }
 
                         },
@@ -152,6 +155,13 @@ public class ApiServiceImpl implements ApiService{
         }
 
         return response;
+    }
+
+    private boolean isApartmentAlreadyFavourite(String string, ImmobiliareUser immobiliareUser) {
+        if (immobiliareUser.getFavouriteProperties().contains(string)){
+            return true;
+        }
+        return false;
     }
 
     private boolean propertyIdContainsComma(String propertyId) {

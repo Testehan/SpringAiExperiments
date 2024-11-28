@@ -22,6 +22,8 @@ $(document).ready(function(){
             $('#spinner').hide();
             container.append(newFragment);
 
+            applyFavouriteButtonStylingDependingOnText($('.favouriteButton').last());
+
             // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
             htmx.process($('#response-container')[0]);
         }
@@ -81,4 +83,13 @@ function setUpScrollingToLastUserMessage(){
         console.error("Container not found");
     }
 
+}
+
+function applyFavouriteButtonStylingDependingOnText(favouriteButton){
+    if (favouriteButton.text() === 'Save to Favourites') {
+        favouriteButton.addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700')
+                        .removeClass('text-red-500');
+    } else if (favouriteButton.html() === '♥')  {
+        favouriteButton.addClass('text-red-500').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
+    }
 }

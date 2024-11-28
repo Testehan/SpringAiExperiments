@@ -25,8 +25,9 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-
+        // TODO unify this with the ApartmentRestController..both are rest
 @RestController
 @RequestMapping("/api/apartments")
 public class ApartmentController {
@@ -106,14 +107,26 @@ public class ApartmentController {
     private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload, String sseId) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
+        var apartment = ((Map<String, Object>)eventPayload.getPayload()).get("apartment");
+        var isFavourite = (boolean)((Map<String, Object>)eventPayload.getPayload()).get("isFavourite");
+
         selectors.add("apartment");
-        context.setVariable("apartment", eventPayload.getPayload());
-        context.setVariable("favouriteButtonStartMessage","Save to Favourites");
+        context.setVariable("apartment", apartment);
+        context.setVariable("favouriteButtonStartMessage",getFavouritesText(isFavourite));
 
         var data = templateEngine.process("fragments",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
 
         return createSSE(data,"apartment",sseId);
+    }
+
+    private String getFavouritesText(boolean isFavourite) {
+        if (isFavourite){
+            var heartSymbol = "♥";
+            return heartSymbol;
+        } else {
+            return "Save to Favourites";
+        }
     }
 
     private static ServerSentEvent<String> createSSE(String data, String eventType, String sseId) {
@@ -127,5 +140,4 @@ public class ApartmentController {
                 // Build the Server-Sent Event
                 .build();
     }
-
 }
