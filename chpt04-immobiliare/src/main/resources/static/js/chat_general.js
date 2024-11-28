@@ -67,7 +67,7 @@ function setUpScrollingToLastUserMessage(){
                         $('#spinner').hide();
                     }
 
-                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode ===  $("#response-container")) {
+                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode ===  $("#response-container")[0]) {
                         lastElement.scrollIntoView({ behavior: "smooth" });
                     }
                 }

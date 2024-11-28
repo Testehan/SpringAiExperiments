@@ -96,7 +96,7 @@ public class ApiServiceImpl implements ApiService{
         var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
         var conversationId = conversationSession.getConversationId();
         final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
-        var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
+        var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city,apartmentDescription, description);
 
         LOGGER.info("Apartments found from vector store semantic search:");
         apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info( "Apartment {}  : {}", ap.getId(), ap.getApartmentInfo()));

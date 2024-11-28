@@ -49,6 +49,12 @@ public class BeanConfig {
         return vertexAiGeminiChatModel;
     }
 
+//    @Bean
+//    @Primary
+//    public ChatModel getGeminiChatModel(OpenAiChatModel openAiChatModel){
+//        return openAiChatModel;
+//    }
+
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
         return builder.build();

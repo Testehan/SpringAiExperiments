@@ -5,9 +5,11 @@ import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
+import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
 import com.testehan.springai.immobiliare.service.UserSseService;
+import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-        // TODO unify this with the ApartmentRestController..both are rest
+
 @RestController
 @RequestMapping("/api/apartments")
 public class ApartmentController {
@@ -36,12 +38,14 @@ public class ApartmentController {
 
     private final ApartmentService apartmentService;
     private final ConversationSession conversationSession;
+    private final UserService userService;
     private final UserSseService userSseService;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
 
 
-    public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession, ApiService apiService,
+    public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
+                               UserService userService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService)
     {
         this.apartmentService = apartmentService;
@@ -49,6 +53,7 @@ public class ApartmentController {
         this.apiService = apiService;
         this.templateEngine = templateEngine;
         this.userSseService = userSseService;
+        this.userService = userService;
     }
 
     @PostMapping("/save")
@@ -74,6 +79,30 @@ public class ApartmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("You have reached the maximum number of listed apartments!");
         }
+    }
+
+    @GetMapping("/contact/{apartmentId}")
+    @HxRequest
+    public String contact(@PathVariable(value = "apartmentId") String apartmentId) {
+        var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+        if (!apartmentOptional.isEmpty()) {
+            return "Contact: " + apartmentOptional.get().getContact();
+        } else {
+            LOGGER.error("No apartment with id {} was found" , apartmentId);
+            return "No apartment found!";
+        }
+    }
+
+    @PostMapping("/favourite/{apartmentId}")
+    @HxRequest
+    public void favourite(@PathVariable(value = "apartmentId") String apartmentId) {
+        var user = conversationSession.getImmobiliareUser();
+        if (!user.getFavouriteProperties().contains(apartmentId)){
+            user.getFavouriteProperties().add(apartmentId);
+        } else {
+            user.getFavouriteProperties().remove(apartmentId);
+        }
+        userService.updateUser(user);
     }
 
     @GetMapping(value = "/stream/{sseId}", produces = "text/event-stream")
