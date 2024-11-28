@@ -88,8 +88,8 @@ function setUpScrollingToLastUserMessage(){
 function applyFavouriteButtonStylingDependingOnText(favouriteButton){
     if (favouriteButton.text() === 'Save to Favourites') {
         favouriteButton.addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700')
-                        .removeClass('text-red-500');
+                        .removeClass('text-red-500 text-2xl');
     } else if (favouriteButton.html() === '♥')  {
-        favouriteButton.addClass('text-red-500').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
+        favouriteButton.addClass('text-red-500 text-2xl').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
     }
 }
