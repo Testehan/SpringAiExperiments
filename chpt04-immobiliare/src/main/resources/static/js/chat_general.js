@@ -23,7 +23,7 @@ $(document).ready(function(){
             container.append(newFragment);
 
             // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
-            htmx.process(document.getElementById("response-container"));
+            htmx.process($('#response-container')[0]);
         }
     });
 
@@ -44,7 +44,7 @@ $(document).ready(function(){
 
 function askForResponse() {
     let userMessage = $('#response-container div:last').text();
-    document.getElementById('message').value = '';
+    $('#message').val('');
     htmx.ajax('POST', '/respond', {target: '#response-container', swap: 'beforeend', values: {message: userMessage}});
 }
 
@@ -65,7 +65,7 @@ function setUpScrollingToLastUserMessage(){
                         $('#spinner').hide();
                     }
 
-                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode === document.getElementById("response-container")) {
+                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode ===  $("#response-container")) {
                         lastElement.scrollIntoView({ behavior: "smooth" });
                     }
                 }
@@ -74,7 +74,7 @@ function setUpScrollingToLastUserMessage(){
     });
 
     // Observe the container where dynamic content is added
-    const container = document.getElementById("response-container");
+    const container = $("#response-container")[0];
     if (container) {
         observer.observe(container, { childList: true, subtree: true });
     } else {

@@ -5,9 +5,15 @@ document.addEventListener('htmx:afterRequest', (event) => {
     }
 });
 
+$(document).ready(function() {
+    $("#menuButton").click(function() {
+        toggleMenu();
+    });
+});
+
 function toggleMenu() {
-     var menuItems = document.getElementById("menuItems");
-     menuItems.classList.toggle("hidden");
+//     $("#menuItems").classList.toggle("hidden");
+    $("#menuItems").toggleClass("hidden");
 }
 
 function checkLogin(event) {
@@ -25,14 +31,14 @@ function checkLogin(event) {
 }
 
 function openLoginModal(){
-    document.getElementById("modalLoginContainer").innerHTML = "";
+    $("#modalLoginContainer").html("");
     htmx.ajax("GET", "/login-modal", { target: "#modalLoginContainer", swap: "innerHTML" });
-    document.getElementById('modalLoginContainer').classList.remove('hidden');
+    $("#modalLoginContainer").removeClass('hidden');
 }
 
 function closeLoginModal() {
-    document.getElementById('modalLoginContainer').classList.add('hidden');
-    document.getElementById('loginError').innerHTML = '';
+    $("#modalLoginContainer").addClass('hidden');
+    $("#loginError").html('');
 }
 
 
