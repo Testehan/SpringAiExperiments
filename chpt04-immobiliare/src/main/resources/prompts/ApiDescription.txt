@@ -2,13 +2,17 @@ Task Description:
 You are given various types of user inputs and your job is to decide which API to call based on the input. Below are the available APIs and their descriptions.
 
 Available APIs:
-2. **Sale or rent API**: Determines if the user wants to rent or buy an apartment. If the user mentions buy or sale then your reply must be "sale".
+1. **Sale or rent API**: Determines if the user wants to rent or buy an apartment. If the user mentions buy or sale then your reply must be "sale".
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-3. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city".
+2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city".
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
+
+3.**Sale or rent and city of interest API**: Determines if the user wants to buy or rent and also the city that interests the user. If a city name and the type of property, meaning rent or buy is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city". Your reply must have the format "rent,city name" or "buy,city name". So the separator of the 2 values is the comma.
+     - **Endpoint**: `/setRentOrBuyAndCity`
+     - **Parameters**: `message` (string)
 
 4. **Apartments description API**: Displays a list of apartments available based on a description or a list of criteria or attributes or properties the user provides for the search.
    - **Endpoint**: `/getApartments`
@@ -80,6 +84,15 @@ Examples:
 - User Input: "I want to search in New-York"
   - API Call: `/setCity`
   - Parameters: `\{"message": "Unsupported city"\}`
+
+- User Input: "I'm looking for an apartment to rent in Cluj-Napoca."
+  - API Call: `/setRentOrBuyAndCity`
+  - Parameters: `\{"message": "rent,Cluj-Napoca"\}`
+
+- User Input: "Can you help me find a house for sale in Bucharest?"
+  - API Call: `/setRentOrBuyAndCity`
+  - Parameters: `\{"message": "sale,Bucharest"\}`
+
 
 - User Input: "I am looking for a location that has a price under 100000 euro and is a good neighborhood"
   - API Call: `/getApartments`

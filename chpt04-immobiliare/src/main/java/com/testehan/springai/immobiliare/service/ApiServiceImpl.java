@@ -31,6 +31,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
+import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
@@ -71,10 +72,11 @@ public class ApiServiceImpl implements ApiService{
     @Override
     public ResultsResponse getChatResponse(String message, HttpSession session) {
         var serviceCall = immobiliareApiService.whichApiToCall(message);
-
+// TODO ADD a service call like "Can you help me find a house for sale in Bucharest?"
         switch (serviceCall.apiCall()) {
             case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
             case SET_CITY : { return setCity(serviceCall); }
+            case SET_RENT_OR_BUY_AND_CITY: {return setRentOrBuyAndCity(serviceCall);}
             case GET_APARTMENTS:{ return getApartments(message, session); }
             case RESTART_CONVERSATION : { return restartConversation(); }
             case DEFAULT : return respondToUserMessage(message);
@@ -89,7 +91,8 @@ public class ApiServiceImpl implements ApiService{
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 
         var rentOrSale = conversationSession.getRentOrSale();
-        var city = conversationSession.getCity();
+        // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
+        var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
         var conversationId = conversationSession.getConversationId();
         var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.valueOf(rentOrSale), city,apartmentDescription, description);
 
@@ -135,9 +138,10 @@ public class ApiServiceImpl implements ApiService{
                             if (isFirst.get()){     // this means that we processed stream and we got no match
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("response",new ResponsePayload(M04_NO_APARTMENTS_FOUND)));
+                            } else {
+                                userSseService.getUserSseConnection(session.getId())
+                                        .tryEmitNext(new Event("response", new ResponsePayload(M04_APARTMENTS_FOUND_END)));
                             }
-                            userSseService.getUserSseConnection(session.getId())
-                                    .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND_END)));
                             LOGGER.info("Flux completed");
 
                         }
@@ -197,7 +201,7 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse restartConversation() {
         conversationSession.setRentOrSale("");
-        conversationSession.setCity(SupportedCity.UNSUPPORTED);
+        conversationSession.setCity(UNSUPPORTED);
         conversationSession.getChatMemory().clear(conversationSession.getConversationId());
         conversationService.deleteConversation(conversationSession.getConversationId());
         return new ResultsResponse(M01_INITIAL_MESSAGE);
@@ -208,7 +212,7 @@ public class ApiServiceImpl implements ApiService{
         SupportedCity supportedCity = SupportedCity.getByName(serviceCall.message());
         conversationSession.setCity(supportedCity);
         var user = conversationSession.getImmobiliareUser();
-        if (supportedCity.compareTo(SupportedCity.UNSUPPORTED) != 0) {
+        if (supportedCity.compareTo(UNSUPPORTED) != 0) {
             return new ResultsResponse(String.format(PromptConstants.M03_DETAILS, user.getPropertyType(), supportedCity.getName()));
         } else {
             return new ResultsResponse(String.format(PromptConstants.M021_SUPPORTED_CITIES, SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "))));
@@ -218,6 +222,14 @@ public class ApiServiceImpl implements ApiService{
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
         conversationSession.setRentOrSale(serviceCall.message());
         return new ResultsResponse(M02_CITY);
+    }
+
+    private ResultsResponse setRentOrBuyAndCity(ServiceCall serviceCall) {
+        String[] parts = serviceCall.message().split(",");
+
+        conversationSession.setRentOrSale(parts[0]);
+        var cityName = parts[1];
+        return setCity(new ServiceCall(ApiCall.SET_RENT_OR_BUY_AND_CITY,cityName));
     }
 
     private ChatClient createNewChatClientForStream(){
