@@ -19,6 +19,8 @@ import org.springframework.web.context.annotation.SessionScope;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
+
 @Component
 @SessionScope
 public class ConversationSession {
@@ -97,7 +99,14 @@ public class ConversationSession {
     public ImmobiliareUser getImmobiliareUser() {
         String userEmail = ((OAuth2AuthenticatedPrincipal) authentication.getPrincipal()).getAttribute("email");
         var user = userService.getImmobiliareUserByEmail(userEmail);
-        return user;
+        return user.get();
+    }
+
+    public void clearConversation() {
+        setRentOrSale("");
+        setCity(UNSUPPORTED);
+        getChatMemory().clear(getConversationId());
+        conversationService.deleteConversation(getConversationId());
     }
 
 }

@@ -210,10 +210,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse restartConversation() {
-        conversationSession.setRentOrSale("");
-        conversationSession.setCity(UNSUPPORTED);
-        conversationSession.getChatMemory().clear(conversationSession.getConversationId());
-        conversationService.deleteConversation(conversationSession.getConversationId());
+        conversationSession.clearConversation();
         return new ResultsResponse(M01_INITIAL_MESSAGE);
 
     }

@@ -19,7 +19,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         var customer = immobiliareUserRepository.findUserByEmail(email);
         if (Objects.nonNull(customer)) {
-            return new CustomerUserDetails(customer);
+            return new CustomerUserDetails(customer.get());
         } else {
             throw new UsernameNotFoundException("Customer with email " + email + " does not exist");
         }
