@@ -142,4 +142,24 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         mongoTemplate.save(apartment, "apartments");
     }
 
+    @Override
+    public void deleteApartmentsByIds(final List<String> apartmentIds) {
+        var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
+
+        // Convert string IDs to ObjectId
+        List<ObjectId> objectIds = apartmentIds.stream()
+                .map(ObjectId::new)
+                .toList();
+
+        // Delete apartments with matching IDs
+        var deleteResult = mongoCollection.deleteMany(new Document("_id", new Document("$in", objectIds)));
+
+        // Log the result
+        if (deleteResult.getDeletedCount() > 0) {
+            LOGGER.info("Deleted {} apartments.", deleteResult.getDeletedCount());
+        } else {
+            LOGGER.warn("No apartments were deleted. Check if the IDs are correct.");
+        }
+    }
+
 }

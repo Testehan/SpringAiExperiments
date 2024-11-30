@@ -83,6 +83,10 @@ public class ApartmentService {
         apartmentsRepository.saveApartment(apartment);
     }
 
+    public void deleteApartmentsByIds(List<String> apartmentIds){
+        apartmentsRepository.deleteApartmentsByIds(apartmentIds);
+    }
+
     @Async
     public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user) throws IOException {
         LocalDateTime now = LocalDateTime.now();

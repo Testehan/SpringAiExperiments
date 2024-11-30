@@ -15,4 +15,6 @@ public interface ApartmentsRepository {
     List<Apartment> findAll();
 
     void saveApartment(Apartment apartment);
+
+    void deleteApartmentsByIds(List<String> apartmentIds);
 }
