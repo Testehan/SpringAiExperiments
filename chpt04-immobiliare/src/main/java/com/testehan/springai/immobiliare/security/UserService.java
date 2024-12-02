@@ -6,6 +6,8 @@ import com.testehan.springai.immobiliare.repository.ImmobiliareUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class UserService {
 
@@ -27,7 +29,11 @@ public class UserService {
         immobiliareUserRepository.update(user);
     }
 
-    public ImmobiliareUser getImmobiliareUserByEmail(String email){
+    public void deleteUser(ImmobiliareUser user){
+        immobiliareUserRepository.deleteById(user.getId());
+    }
+
+    public Optional<ImmobiliareUser> getImmobiliareUserByEmail(String email){
         return immobiliareUserRepository.findUserByEmail(email);
     }
 

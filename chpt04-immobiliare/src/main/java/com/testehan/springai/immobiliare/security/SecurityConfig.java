@@ -40,7 +40,10 @@ public class SecurityConfig {
                 .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                         .userService(customerOAuth2UserService))
                 .successHandler(oAuth2LoginSuccessHandler))
-            .logout((logout) -> logout.logoutSuccessUrl("/"))       // after logout redirect user to /index
+            .logout((logout) -> logout.logoutSuccessUrl("/")        // after logout redirect user to /index
+                                    .invalidateHttpSession(true)
+                                    .clearAuthentication(true)
+                                    .deleteCookies("JSESSIONID"))
             .exceptionHandling(ex -> {
                 ex.authenticationEntryPoint(customAuthenticationEntryPoint);
             });

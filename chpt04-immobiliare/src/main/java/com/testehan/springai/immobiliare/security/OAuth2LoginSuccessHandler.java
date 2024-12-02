@@ -28,10 +28,10 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
         var user = userService.getImmobiliareUserByEmail(userEmail);
 
         var authenticationType = getAuthenticationType(((OAuth2AuthenticationToken)authentication).getAuthorizedClientRegistrationId());
-        if (user == null){
+        if (user.isEmpty()){
             userService.addNewCustomerAfterOAuth2Login(userName, userEmail, authenticationType);
         } else {
-            userService.updateAuthenticationType(user, authenticationType);
+            userService.updateAuthenticationType(user.get(), authenticationType);
         }
 
         super.onAuthenticationSuccess(request, response, authentication);
