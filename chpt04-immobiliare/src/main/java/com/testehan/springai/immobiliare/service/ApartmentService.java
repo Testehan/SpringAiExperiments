@@ -79,8 +79,10 @@ public class ApartmentService {
         return apartments;
     }
 
-    public void saveApartment(Apartment apartment){
+    public boolean saveApartment(Apartment apartment){
+        var isPropertyNew = isPropertyNew(apartment);
         apartmentsRepository.saveApartment(apartment);
+        return isPropertyNew;
     }
 
     public void deleteApartmentsByIds(List<String> apartmentIds){
@@ -89,19 +91,10 @@ public class ApartmentService {
 
     @Async
     public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user) throws IOException {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateCustom = now.format(customFormatter);
-
-        var isPropertyNew = false;
-        if (Objects.isNull(apartment.getId())) {
-            apartment.setCreationDateTime(formattedDateCustom);
-            isPropertyNew = true;
-        }
-        apartment.setLastUpdateDateTime(formattedDateCustom);
-
         apartment.setShortDescription(apartment.getShortDescription().replace("\n", " ")); // no newlines in description
-        saveApartment(apartment);
+
+        var isPropertyNew = saveApartment(apartment);
+
         var imagesWereUploaded = saveUploadedImages(apartment, apartmentImages);
         var imagesWereDeleted = deleteUploadedImages(apartment);
         if (imagesWereUploaded || imagesWereDeleted) {
@@ -123,6 +116,23 @@ public class ApartmentService {
         }
 
         LOGGER.info("Apartment was added with success!");
+    }
+
+    private static boolean isPropertyNew(Apartment apartment) {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateCustom = now.format(customFormatter);
+
+        var isPropertyNew = false;
+        if (Objects.isNull(apartment.getId())) {
+            apartment.setCreationDateTime(formattedDateCustom);
+            isPropertyNew = true;
+        }
+
+        apartment.setLastUpdateDateTime(formattedDateCustom);
+        apartment.setActivationToken(UUID.randomUUID().toString());
+
+        return isPropertyNew;
     }
 
     private boolean deleteUploadedImages(Apartment apartment) {

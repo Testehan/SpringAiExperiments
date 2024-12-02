@@ -119,8 +119,14 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     public Optional<Apartment> findApartmentById(final String apartmentId) {
 
         var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
-        ObjectId objectId = new ObjectId(apartmentId);
-        var apartment = mongoCollection.find(new Document("_id", objectId)).first();
+        Apartment apartment;
+        try {
+            ObjectId objectId = new ObjectId(apartmentId);
+            apartment = mongoCollection.find(new Document("_id", objectId)).first();
+        } catch (IllegalArgumentException ex){
+            LOGGER.error("Apartment id {} might not be valid.", apartmentId);
+            return Optional.empty();
+        }
 
         if (apartment != null) {
             return Optional.of(apartment);
