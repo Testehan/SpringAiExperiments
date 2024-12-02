@@ -5,6 +5,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
+// TODO use this when a user creates a listing...Also use this to make users to prelungeasca their listing,
+// and if they do not, then the listing will be deactivated and removed eventually
 @Service
 public class EmailService {
     private final SesClient sesClient;
@@ -38,6 +40,19 @@ public class EmailService {
                         .build())
                 .template("WelcomeEmailTemplate") // Template name
                 .templateData("{\"name\":\""+name+"\"}") // JSON string to replace placeholders
+                .build();
+
+        sesClient.sendTemplatedEmail(request);
+    }
+
+    public void sendReactivateListingEmail(String to, String name, String listingName, String reactivateLink){
+        SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
+                .source("admin@casamia.ai") // Replace with a verified email
+                .destination(Destination.builder()
+                        .toAddresses(to)
+                        .build())
+                .template("ReactivateListingEmailTemplate") // Template name
+                .templateData("{\"name\":\""+name+"\",\"listingName\":\""+listingName+"\",\"reactivateLink\":\""+reactivateLink+"\"}")
                 .build();
 
         sesClient.sendTemplatedEmail(request);

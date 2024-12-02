@@ -7,6 +7,7 @@ import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -28,11 +29,13 @@ public class MainController {
 	private final ApartmentService apartmentService;
 	private final ConversationSession conversationSession;
 	private final UserSseService userSseService;
+	private final EmailService emailService;
 
-	public MainController(ApartmentService apartmentService, ConversationSession conversationSession, UserSseService userSseService) {
+	public MainController(ApartmentService apartmentService, ConversationSession conversationSession, UserSseService userSseService, EmailService emailService) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
+		this.emailService = emailService;
 	}
 
 	@GetMapping("/")
@@ -150,6 +153,10 @@ public class MainController {
 
 		model.addAttribute("listCities", SupportedCity.getSupportedCities());
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
+
+//		smsService.sendSms("+40771734054", "Hello! This is Dan from CasaMia.ai");
+//		emailService.sendReactivateListingEmail("tdan89@yahoo.com","Dan","Detached 3-room apartment","http://localhost:8080/reactivate?token=4f70abdd-e60f-4118-8f42-b0cfbb1ea973&id=66963adfe705bcd421d26b46");
+
 		return "profile";
 	}
 
@@ -166,6 +173,12 @@ public class MainController {
 			model.addAttribute("user", null);
 		}
 		return "contact";
+	}
+
+	@GetMapping("/confirmation")
+	public String confirmation(Model model, HttpSession session) {
+		model.addAttribute("confirmationMessage", session.getAttribute("confirmationMessage"));
+		return "confirmation";
 	}
 
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
