@@ -2,16 +2,25 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.service.ApartmentService;
+import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
 import java.util.Optional;
 
 @RestController
 public class ReactivateController {
 
+    // todo this needs to be configured to your domain
+    public static final String DOMAIN = "http://localhost:8080";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateController.class);
     private final ApartmentService apartmentService;
 
     public ReactivateController(ApartmentService apartmentService) {
@@ -20,22 +29,33 @@ public class ReactivateController {
 
     @GetMapping("/reactivate")
     public ResponseEntity<String> favourite(@RequestParam String token,     // activation token
-                                            @RequestParam String id) {      // listing id
+                                            @RequestParam String id,         // listing id
+                                            HttpSession session) {
 
         // 1. Validate token
         var optionalListing = validateToken(token, id);
         if (optionalListing.isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid or expired reactivation token.");
+            LOGGER.warn("Invalid or expired reactivation token.");
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(DOMAIN +"/error"))
+                    .build();
+
         }
 
         // 2. Reactivate the listing
         boolean reactivated = reactivateListing(optionalListing.get());
         if (!reactivated) {
-            return ResponseEntity.internalServerError().body("Failed to reactivate listing.");
+            LOGGER.warn("Failed to reactivate listing.");
+            return ResponseEntity.status(HttpStatus.FOUND)
+                    .location(URI.create(DOMAIN +"/error"))
+                    .build();
         }
 
         // 3. Return success response
-        return ResponseEntity.ok("Listing successfully reactivated.");
+        session.setAttribute("confirmationMessage", "Your listing was reactivated with success!");
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(DOMAIN +"/confirmation"))
+                .build();
     }
 
     private boolean reactivateListing(Apartment apartment) {

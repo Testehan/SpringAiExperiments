@@ -124,7 +124,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
             ObjectId objectId = new ObjectId(apartmentId);
             apartment = mongoCollection.find(new Document("_id", objectId)).first();
         } catch (IllegalArgumentException ex){
-            LOGGER.error("Apartment id {} might not be valid.", apartmentId);
+            LOGGER.error("Apartment id {} is not valid.", apartmentId);
             return Optional.empty();
         }
 
