@@ -88,6 +88,7 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse getApartments(String description, HttpSession session) {
 
+        session.setAttribute("sseIndex", 0);
         conversationSession.setLastPropertyDescription(description);
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 

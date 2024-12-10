@@ -25,16 +25,14 @@ import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/apartments")
 public class ApartmentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentController.class);
+    private static final String BEST_RESULTS_IMAGE_PATH = "/images/best.png";
 
     private final ApartmentService apartmentService;
     private final ConversationSession conversationSession;
@@ -42,7 +40,6 @@ public class ApartmentController {
     private final UserSseService userSseService;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
-
 
     public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
                                UserService userService, ApiService apiService,
@@ -109,14 +106,22 @@ public class ApartmentController {
     public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession) {
         userSseService.addUserSseId(httpSession.getId());
         return apiService.getServerSideEventsFlux(httpSession)
-                .map(event -> renderServerSideEventData(event, sseId));
+                .map(event -> renderServerSideEventData(httpSession, event, sseId));
 
     }
 
-    private ServerSentEvent<String> renderServerSideEventData(Event event, String sseId){
+    private ServerSentEvent<String> renderServerSideEventData(HttpSession httpSession, Event event, String sseId){
         if (event.getEventType().equals("apartment")){
-            return getApartmentServerSentEvent(event.getPayload(),sseId);
+            var sseIndex = httpSession.getAttribute("sseIndex");
+            int index = Objects.isNull(sseIndex) ? 0 : (int) sseIndex;
+            if (index == 0) {
+                httpSession.setAttribute("sseIndex", 1);
+            } else {
+                httpSession.setAttribute("sseIndex", index + 1);
+            }
+            return getApartmentServerSentEvent(event.getPayload(),index ,sseId);
         } else {
+            httpSession.setAttribute("sseIndex", 0);
             return getResponseServerSideEvent(event.getPayload(),sseId);
         }
     }
@@ -133,7 +138,7 @@ public class ApartmentController {
         return createSSE(data,"response",sseId);
     }
 
-    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload, String sseId) {
+    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload,int index, String sseId) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         var apartment = ((Map<String, Object>)eventPayload.getPayload()).get("apartment");
@@ -142,6 +147,9 @@ public class ApartmentController {
         selectors.add("apartment");
         context.setVariable("apartment", apartment);
         context.setVariable("favouriteButtonStartMessage",getFavouritesText(isFavourite));
+        context.setVariable("pageName", "chat");
+        context.setVariable("index", index);
+        context.setVariable("imagePath", BEST_RESULTS_IMAGE_PATH);
 
         var data = templateEngine.process("fragments",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
