@@ -183,7 +183,8 @@ public class ApiServiceImpl implements ApiService{
 
     private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
         try {
-            Thread.sleep(1500);        // TODO this is for testing purposes in order to not get exception for the large number of requests sent to the LLM
+            // users will have time to look over the first results and in the mean time more listings are displayed
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }

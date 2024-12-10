@@ -35,21 +35,40 @@
 
 </div>
 
-<div class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, status, favouriteButtonStartMessage)">
-    <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 justify-center">
-        <div th:each="image, iterStat : ${apartment.images}">
+<div class="max-w-sm mx-auto bg-white rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, status, favouriteButtonStartMessage)">
+        <div
+            class="grid gap-4 px-4 grid-cols-2" th:classappend="
+            ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
+            (${#lists.size(apartment.images) % 3 == 0} ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3' :
+            (${#lists.size(apartment.images) % 2 == 0} ? 'sm:grid-cols-2 md:grid-cols-2' : 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'))">
 
-            <div class="overflow-hidden rounded-lg shadow-lg">
-                <img class="w-full h-auto object-cover cursor-pointer" th:src="@{${image}}" onclick="openLightbox(this.src)" alt="" onerror="this.onerror=null; this.src='https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg'">
+            <div class="flex items-center justify-center overflow-hidden" th:each="image, iterStat : ${apartment.images}">
+                    <img class="w-full object-contain cursor-pointer"
+                         th:src="@{${image}}"
+                         th:unless="${#strings.isEmpty(image)}"
+                         alt=""
+                         onclick="openLightbox(this.src)" />
+                    <img class="w-full h-full max-h-[20vh] object-contain cursor-pointer"
+                         th:if="${#strings.isEmpty(image)}"
+                         src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon.vector.jpg"
+                         alt="Image Not Found" />
+
             </div>
-
         </div>
-    </div>
 
-    <div class="w-full p-6">
+        <div th:if="${#lists.isEmpty(apartment.images)}">
+            <div class="overflow-hidden rounded-lg place-items-center">
+                <img class="w-full h-auto object-cover @apply max-w-[50%]"
+                     src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg"
+                     alt="No Images Available">
+            </div>
+        </div>
+
+        <div class="w-full p-6">
 
 <!--        <span th:id="'hiddenApartmentId' + ${status.count}" style="display: none;">[[${apartment.id}]]</span>-->
         <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
+        <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
         <p class="text-gray-600 mt-2">Location: [[${apartment.city}]]</p>
         <div class="grid grid-cols-2 flex justify-between mt-2">
             <p class="text-left text-gray-600">Area: [[${apartment.area}]]</p>
@@ -62,7 +81,6 @@
             </span>
         </div>
         <p class="text-gray-600 mt-2">[[${apartment.shortDescription}]]</p>
-        <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
         <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
         <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
         <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>

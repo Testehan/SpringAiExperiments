@@ -36,11 +36,8 @@ public class ScheduledTasks {
         log.info("The user available searches number was reset");
     }
 
-    // TODO create one that will deactivate listings that were updated more than 2 week ago
-    // also send email to the owners with the reactivation link
-//    @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
-
-    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
+    @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
+//    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void myScheduledMethod() {
         // Code to run at 3 AM every day
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
@@ -64,7 +61,7 @@ public class ScheduledTasks {
                     log.error("Can't send SMS for + " + contact + " of listing " + a.getName());
                 } else {
                     // if you will need a longer message and thus to shorthen the URL, there are various services online that offer this
-                    smsService.sendSms(phoneWithPrefix.get(),"Hi! Click link or reply yes to reactivate your listing " + reactivateLink);
+                    smsService.sendSms(phoneWithPrefix.get(),"Hi! Click link to reactivate your listing " + reactivateLink);    // "or reply yes" => this is not implemented yet, see notes from SmsService
                 }
 
             }

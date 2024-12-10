@@ -7,6 +7,11 @@ import software.amazon.awssdk.services.sns.model.PublishRequest;
 
 // TODO Before releasing the app you need to make sure that the SNS service is not in "sandbox" mode
 // and that you can send sms to anyone. For this follow the steps from AWS web console
+// TODO in order to have the functionality of the users reply to the sms with yes/no..and to get that reply..
+// you would need to have => "1. Set Up a Dedicated Phone Number
+//Requirement: You'll need either a long code or a short code from Amazon SNS to receive SMS messages.
+//Request a dedicated number (long code or short code) via AWS Support, as shared numbers do not support inbound messages.
+//A short code is recommended for high-volume traffic."
 
 @Service
 public class SmsService {
