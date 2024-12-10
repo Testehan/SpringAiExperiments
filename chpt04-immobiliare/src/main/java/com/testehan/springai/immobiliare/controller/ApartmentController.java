@@ -33,6 +33,8 @@ public class ApartmentController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentController.class);
     private static final String BEST_RESULTS_IMAGE_PATH = "/images/best.png";
+    private static final String MOST_FAVOURITE_IMAGE_PATH = "/images/most-favourite.png";
+    private static final String TOP_CONTACTED_IMAGE_PATH = "/images/top-contacted.png";
 
     private final ApartmentService apartmentService;
     private final ConversationSession conversationSession;
@@ -149,7 +151,9 @@ public class ApartmentController {
         context.setVariable("favouriteButtonStartMessage",getFavouritesText(isFavourite));
         context.setVariable("pageName", "chat");
         context.setVariable("index", index);
-        context.setVariable("imagePath", BEST_RESULTS_IMAGE_PATH);
+        context.setVariable("bestResultsImagePath", BEST_RESULTS_IMAGE_PATH);
+        context.setVariable("mostFavouriteImagePath", MOST_FAVOURITE_IMAGE_PATH);
+        context.setVariable("topContactedImagePath", TOP_CONTACTED_IMAGE_PATH);
 
         var data = templateEngine.process("fragments",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
