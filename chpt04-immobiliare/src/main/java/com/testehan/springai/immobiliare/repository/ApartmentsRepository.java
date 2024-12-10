@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.PropertyType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,7 +15,11 @@ public interface ApartmentsRepository {
 
     List<Apartment> findAll();
 
+    List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date);
+
     void saveApartment(Apartment apartment);
+
+    void deactivateApartments(LocalDateTime date);
 
     void deleteApartmentsByIds(List<String> apartmentIds);
 }

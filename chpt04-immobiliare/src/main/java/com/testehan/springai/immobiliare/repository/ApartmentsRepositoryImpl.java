@@ -16,14 +16,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
 import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.search.SearchPath.fieldPath;
 import static com.mongodb.client.model.search.VectorSearchOptions.vectorSearchOptions;
 import static java.util.Arrays.asList;
@@ -144,8 +144,41 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
+    public List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date) {
+        var listings = mongoDatabase.getCollection("apartments", Apartment.class);
+
+        var formattedDateCustom = getFormattedDateCustom(date);
+        Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
+        Bson condition2 = Filters.eq("active", true);
+        Bson combinedFilter = Filters.and(condition1, condition2);
+
+        List<Apartment> result = new ArrayList<>();
+        listings.find(combinedFilter).forEach(listing -> result.add(listing));
+
+        return result;
+    }
+
+    private static String getFormattedDateCustom(LocalDateTime date) {
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        return date.format(customFormatter);
+    }
+
+    @Override
     public void saveApartment(Apartment apartment) {
         mongoTemplate.save(apartment, "apartments");
+    }
+
+    @Override
+    public void deactivateApartments(LocalDateTime date) {
+        var listings = mongoDatabase.getCollection("apartments", Apartment.class);
+
+        var formattedDateCustom = getFormattedDateCustom(date);
+
+        Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
+        Bson condition2 = Filters.eq("active", true);
+        Bson combinedFilter = Filters.and(condition1, condition2);
+
+        listings.updateMany(combinedFilter, set("active", false));
     }
 
     @Override

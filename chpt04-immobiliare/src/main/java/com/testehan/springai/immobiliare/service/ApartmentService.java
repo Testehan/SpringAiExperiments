@@ -78,6 +78,13 @@ public class ApartmentService {
         }
         return apartments;
     }
+    public List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date){
+        return apartmentsRepository.findByLastUpdateDateTimeBefore(date);
+    }
+
+    public void deactivateApartments(LocalDateTime date) {
+        apartmentsRepository.deactivateApartments(date);
+    }
 
     public boolean saveApartment(Apartment apartment){
         var isPropertyNew = isPropertyNew(apartment);
