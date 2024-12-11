@@ -9,6 +9,7 @@ import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
 import com.testehan.springai.immobiliare.service.UserSseService;
+import com.testehan.springai.immobiliare.util.ListingUtil;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -161,7 +162,7 @@ public class ApartmentController {
 
         selectors.add("apartment");
         context.setVariable("apartment", apartment);
-        context.setVariable("favouriteButtonStartMessage",getFavouritesText(isFavourite));
+        context.setVariable("favouriteButtonStartMessage", ListingUtil.getFavouritesText(isFavourite));
         context.setVariable("pageName", "chat");
         context.setVariable("index", index);
         context.setVariable("bestResultsImagePath", BEST_RESULTS_IMAGE_PATH);
@@ -181,15 +182,6 @@ public class ApartmentController {
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
 
         return createSSE(data,"apartment",sseId);
-    }
-
-    private String getFavouritesText(boolean isFavourite) {
-        if (isFavourite){
-            var heartSymbol = "♥";
-            return heartSymbol;
-        } else {
-            return "Save to Favourites";
-        }
     }
 
     private static ServerSentEvent<String> createSSE(String data, String eventType, String sseId) {

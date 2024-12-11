@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
 import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
+import static com.testehan.springai.immobiliare.util.ListingUtil.isApartmentAlreadyFavourite;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
@@ -158,12 +159,7 @@ public class ApiServiceImpl implements ApiService{
         return response;
     }
 
-    private boolean isApartmentAlreadyFavourite(String string, ImmobiliareUser immobiliareUser) {
-        if (immobiliareUser.getFavouriteProperties().contains(string)){
-            return true;
-        }
-        return false;
-    }
+
 
     private boolean propertyIdContainsComma(String propertyId) {
         LOGGER.info("Current list of ids from llm: {}", propertyId);
