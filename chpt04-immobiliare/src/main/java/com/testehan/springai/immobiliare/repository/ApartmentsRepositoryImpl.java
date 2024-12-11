@@ -178,7 +178,11 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         Bson condition2 = Filters.eq("active", true);
         Bson combinedFilter = Filters.and(condition1, condition2);
 
-        listings.updateMany(combinedFilter, set("active", false));
+        var listOfUpdates = new ArrayList<Bson>();
+        listOfUpdates.add(set("active", false));
+        listOfUpdates.add(set("noOfFavourite", 0));
+        listOfUpdates.add(set("noOfContact", 0));
+        listings.updateMany(combinedFilter, listOfUpdates);
     }
 
     @Override

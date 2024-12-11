@@ -45,7 +45,7 @@ public class ScheduledTasks {
         var listings = apartmentService.findByLastUpdateDateTimeBefore(twoWeeksAgo);
 
         apartmentService.deactivateApartments(twoWeeksAgo);
-        log.info("The listings last updated before " + twoWeeksAgo + " were deactivated.");
+        log.info("The listings last updated before {} were deactivated.", twoWeeksAgo);
 
         for (Apartment a : listings){
             log.info(a.getLastUpdateDateTime() + "       " + a.getName());
