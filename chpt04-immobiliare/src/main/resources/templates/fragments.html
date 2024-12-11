@@ -30,41 +30,13 @@
 <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3" th:fragment="apartments_list(favouriteButtonStartMessage, pageName)">
     <div th:each="apartment : ${apartments}" >
         <div th:replace="~{fragments :: apartment(${apartment}, 100, ${favouriteButtonStartMessage}, ${pageName}, '','','')}"></div>
-
     </div>
-
 </div>
 
 <div class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
-        <div
-            class="grid gap-4 px-4 grid-cols-2" th:classappend="
-            ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
-            (${#lists.size(apartment.images) % 3 == 0} ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3' :
-            (${#lists.size(apartment.images) % 2 == 0} ? 'sm:grid-cols-2 md:grid-cols-2' : 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'))">
+    <div th:replace="~{fragments :: listing_images}"></div>
 
-            <div class="flex items-center justify-center overflow-hidden" th:each="image, iterStat : ${apartment.images}">
-                    <img class="w-full object-contain cursor-pointer"
-                         th:src="@{${image}}"
-                         th:unless="${#strings.isEmpty(image)}"
-                         alt=""
-                         onclick="openLightbox(this.src)" />
-                    <img class="w-full h-full max-h-[20vh] object-contain cursor-pointer"
-                         th:if="${#strings.isEmpty(image)}"
-                         src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon.vector.jpg"
-                         alt="Image Not Found" />
-
-            </div>
-        </div>
-
-        <div th:if="${#lists.isEmpty(apartment.images)}">
-            <div class="overflow-hidden rounded-lg place-items-center">
-                <img class="w-full h-auto object-cover @apply max-w-[50%]"
-                     src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg"
-                     alt="No Images Available">
-            </div>
-        </div>
-
-        <div class="w-full p-6">
+    <div class="w-full p-6">
 
         <div class="flex justify-between items-center">
             <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">[[${apartment.name}]]</a>
@@ -72,16 +44,9 @@
         </div>
         <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
         <p class="text-gray-600 mt-2">Location: [[${apartment.city}]]</p>
-        <div class="grid grid-cols-2 flex justify-between mt-2">
-            <p class="text-left text-gray-600">Area: [[${apartment.area}]]</p>
-            <span class="text-right ">
-                <button
-                        class="openMapButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
-                        th:data-location="${apartment.city}+','+${apartment.area}">
-                    Map
-                </button>
-            </span>
-        </div>
+
+        <div th:replace="~{fragments :: listing_area}"></div>
+
         <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) <= 250}" th:text="${apartment.shortDescription}"></p>
         <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) > 250}">
             <span th:text="${#strings.substring(apartment.shortDescription, 0, 250)} + '...'"></span>
@@ -96,21 +61,8 @@
             <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
         </p>
 
-        <p th:id="'contactResult'" class="text-red-500 mt-2">
-            <span class="flex justify-between">
-                <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
-                        th:hx-swap = "outerHTML"
-                        th:hx-get="@{http://localhost:8080/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id})}"  >
-                    Show contact
-                </button>
+        <p th:replace="~{fragments :: listing_contact}"></p>
 
-                <button class="favouriteButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
-                        th:hx-swap="none"
-                        th:hx-post="@{http://localhost:8080/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"
-                        th:text="${favouriteButtonStartMessage}">
-                </button>
-            </span>
-        </p>
         <p class="text-gray-600 mt-2">
              <span class="flex justify-between">
                  <img th:if="${pageName == 'chat' and topContactedImagePath != null and topContactedImagePath != ''}" th:src="${topContactedImagePath}" alt="Most favourite" title="This is one of the most contacted listings.">
@@ -120,6 +72,107 @@
                       class="ml-auto">
              </span>
         </p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden mt-10">
+        <div th:replace="~{fragments :: listing_images}"></div>
+    </div>
+
+    <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" >
+        <div class="w-full p-6">
+
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
+                <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
+            </div>
+            <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
+            <p class="text-gray-600 mt-2">Location: [[${apartment.city}]]</p>
+
+            <div th:replace="~{fragments :: listing_area}"></div>
+
+            <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
+            <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
+            <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>
+            <p class="text-gray-600 mt-2">Last update date: [[${apartment.lastUpdateDateTime}]]</p>
+            <p th:replace="~{fragments :: listing_contact}"></p>
+            <p class="text-gray-600 mt-2" th:text="${apartment.shortDescription}"></p>
+
+            <p class="text-gray-600 mt-2">Tags:
+                <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
+            </p>
+
+            <p class="text-gray-600 mt-2">
+                 <span class="flex justify-between">
+                     <img th:if="${pageName == 'chat' and topContactedImagePath != null and topContactedImagePath != ''}" th:src="${topContactedImagePath}" alt="Most favourite" title="This is one of the most contacted listings.">
+                     <img th:if="${pageName == 'chat' and mostFavouriteImagePath != null and mostFavouriteImagePath != ''}"
+                          th:src="${mostFavouriteImagePath}"
+                          alt="Most favourite" title="This is one of the most favourite listings."
+                          class="ml-auto">
+                 </span>
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<p th:fragment="listing_contact" th:id="'contactResult'" class="text-red-500 mt-2">
+    <span class="flex justify-between">
+        <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
+                th:hx-swap = "outerHTML"
+                th:hx-get="@{http://localhost:8080/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id})}"  >
+            Show contact
+        </button>
+
+        <button class="favouriteButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
+                th:hx-swap="none"
+                th:hx-post="@{http://localhost:8080/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"
+                th:text="${favouriteButtonStartMessage}">
+        </button>
+    </span>
+</p>
+
+<div th:fragment="listing_images">
+    <div
+            class="grid gap-4 px-4 grid-cols-2" th:classappend="
+            ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
+            (${#lists.size(apartment.images) % 3 == 0} ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3' :
+            (${#lists.size(apartment.images) % 2 == 0} ? 'sm:grid-cols-2 md:grid-cols-2' : 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'))">
+
+        <div class="flex items-center justify-center overflow-hidden" th:each="image, iterStat : ${apartment.images}">
+            <img class="w-full object-contain cursor-pointer"
+                 th:src="@{${image}}"
+                 th:unless="${#strings.isEmpty(image)}"
+                 alt=""
+                 onclick="openLightbox(this.src)" />
+            <img class="w-full h-full max-h-[20vh] object-contain cursor-pointer"
+                 th:if="${#strings.isEmpty(image)}"
+                 src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon.vector.jpg"
+                 alt="Image Not Found" />
+
+        </div>
+    </div>
+
+    <div th:if="${#lists.isEmpty(apartment.images)}">
+        <div class="overflow-hidden rounded-lg place-items-center">
+            <img class="w-full h-auto object-cover @apply max-w-[50%]"
+                 src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg"
+                 alt="No Images Available">
+        </div>
+    </div>
+</div>
+
+<div th:fragment="listing_area">
+    <div class="grid grid-cols-2 flex justify-between mt-2">
+        <p class="text-left text-gray-600">Area: [[${apartment.area}]]</p>
+        <span class="text-right ">
+            <button
+                    class="openMapButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
+                    th:data-location="${apartment.city}+','+${apartment.area}">
+                Map
+            </button>
+        </span>
     </div>
 </div>
 
