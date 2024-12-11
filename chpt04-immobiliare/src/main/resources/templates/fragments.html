@@ -67,7 +67,7 @@
         <div class="w-full p-6">
 
         <div class="flex justify-between items-center">
-            <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
+            <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">[[${apartment.name}]]</a>
             <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
         </div>
         <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
@@ -82,7 +82,11 @@
                 </button>
             </span>
         </div>
-        <p class="text-gray-600 mt-2">[[${apartment.shortDescription}]]</p>
+        <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) <= 250}" th:text="${apartment.shortDescription}"></p>
+        <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) > 250}">
+            <span th:text="${#strings.substring(apartment.shortDescription, 0, 250)} + '...'"></span>
+            <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">See Full Description</a>
+        </p>
         <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
         <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
         <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>
@@ -110,7 +114,10 @@
         <p class="text-gray-600 mt-2">
              <span class="flex justify-between">
                  <img th:if="${pageName == 'chat' and topContactedImagePath != null and topContactedImagePath != ''}" th:src="${topContactedImagePath}" alt="Most favourite" title="This is one of the most contacted listings.">
-                 <img th:if="${pageName == 'chat' and mostFavouriteImagePath != null and mostFavouriteImagePath != ''}" th:src="${mostFavouriteImagePath}" alt="Most favourite" title="This is one of the most favourite listings.">
+                 <img th:if="${pageName == 'chat' and mostFavouriteImagePath != null and mostFavouriteImagePath != ''}"
+                      th:src="${mostFavouriteImagePath}"
+                      alt="Most favourite" title="This is one of the most favourite listings."
+                      class="ml-auto">
              </span>
         </p>
     </div>

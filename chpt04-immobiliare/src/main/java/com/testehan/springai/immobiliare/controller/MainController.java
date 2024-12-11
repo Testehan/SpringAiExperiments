@@ -131,6 +131,13 @@ public class MainController {
 		return "add";
 	}
 
+	@GetMapping("/view/{apartmentId}")
+	public String view(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
+		// todo
+
+		return "add";
+	}
+
 	@GetMapping("/help")
 	public String help(Model model) {
 		return "index";
@@ -153,9 +160,6 @@ public class MainController {
 
 		model.addAttribute("listCities", SupportedCity.getSupportedCities());
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
-
-//		smsService.sendSms("+40771734054", "Hello! This is Dan from CasaMia.ai");
-//		emailService.sendReactivateListingEmail("tdan89@yahoo.com","Dan","Detached 3-room apartment","http://localhost:8080/reactivate?token=4f70abdd-e60f-4118-8f42-b0cfbb1ea973&id=66963adfe705bcd421d26b46");
 
 		return "profile";
 	}
