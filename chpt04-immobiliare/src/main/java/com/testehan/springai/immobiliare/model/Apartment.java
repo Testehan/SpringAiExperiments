@@ -1,7 +1,10 @@
 package com.testehan.springai.immobiliare.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
@@ -34,6 +37,11 @@ public class Apartment {
 
     private List<Double> plot_embedding;
     private Double score;
+
+    private Integer noOfFavourite;
+    private transient boolean isMostFavourite;
+    private Integer noOfContact;
+    private transient boolean isMostContacted;
 
     private String activationToken;
     private boolean active = true;  // i want properties to be visible by default
@@ -100,4 +108,11 @@ public class Apartment {
         }
     }
 
+    public Integer getNoOfFavourite() {
+        return Objects.nonNull(noOfFavourite) ? noOfFavourite : 0;
+    }
+
+    public Integer getNoOfContact() {
+        return Objects.nonNull(noOfContact) ? noOfContact : 0;
+    }
 }

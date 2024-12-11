@@ -60,7 +60,13 @@ public class ApartmentService {
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
         var embedding = embedder.createEmbedding(apartmentDescription).block();
-        return apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
+        var listings = apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
+
+        // later in the call, these results are further filtered by the llm...so assuming that the maxContacted
+        // listing or maxFavourite listing are filtered out by the llm, then those badges will not be displayed
+        // for the results...no harm as these are supposed to be 100% accurate
+        setIsMostFavouriteAndContacted(listings);
+        return listings;
     }
 
     public Optional<Apartment> findApartmentById(String apartmentId) {
@@ -230,5 +236,32 @@ public class ApartmentService {
             }
         }
         return processedImages;
+    }
+
+    private void setIsMostFavouriteAndContacted(List<Apartment> listings){
+        final int[] maxFavourite = {0};
+        final int[] maxContacted = {0};
+        listings.stream().forEach(listing -> {
+            if (listing.getNoOfFavourite()> maxFavourite[0]){
+                maxFavourite[0] = listing.getNoOfFavourite();
+            }
+            if (listing.getNoOfContact()> maxContacted[0]){
+                maxContacted[0] = listing.getNoOfContact();
+            }
+        });
+
+        listings.stream().forEach(listing -> {
+            if (listing.getNoOfFavourite()==maxFavourite[0]){
+                listing.setMostFavourite(true);
+            } else {
+                listing.setMostFavourite(false);
+            }
+
+            if (listing.getNoOfContact()==maxContacted[0]){
+                listing.setMostContacted(true);
+            } else {
+                listing.setMostContacted(false);
+            }
+        });
     }
 }

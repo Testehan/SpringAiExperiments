@@ -29,13 +29,13 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3" th:fragment="apartments_list(favouriteButtonStartMessage, pageName)">
     <div th:each="apartment : ${apartments}" >
-        <div th:replace="~{fragments :: apartment(apartment=${apartment}, index=100, favouriteButtonStartMessage=${favouriteButtonStartMessage}, pageName=${pageName}, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')}"></div>
+        <div th:replace="~{fragments :: apartment(${apartment}, 100, ${favouriteButtonStartMessage}, ${pageName}, '','','')}"></div>
 
     </div>
 
 </div>
 
-<div class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath, mostFavouriteImagePath, topContactedImagePath)">
+<div class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
         <div
             class="grid gap-4 px-4 grid-cols-2" th:classappend="
             ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
@@ -109,8 +109,8 @@
         </p>
         <p class="text-gray-600 mt-2">
              <span class="flex justify-between">
-                 <img th:if="${pageName == 'chat'}" th:src="${topContactedImagePath}" alt="Most favourite" title="This is one of the most contacted listings.">
-                 <img th:if="${pageName == 'chat'}" th:src="${mostFavouriteImagePath}" alt="Most favourite" title="This is one of the most favourite listings.">
+                 <img th:if="${pageName == 'chat' and topContactedImagePath != null and topContactedImagePath != ''}" th:src="${topContactedImagePath}" alt="Most favourite" title="This is one of the most contacted listings.">
+                 <img th:if="${pageName == 'chat' and mostFavouriteImagePath != null and mostFavouriteImagePath != ''}" th:src="${mostFavouriteImagePath}" alt="Most favourite" title="This is one of the most favourite listings.">
              </span>
         </p>
     </div>

@@ -85,6 +85,9 @@ public class ApartmentController {
     public String contact(@PathVariable(value = "apartmentId") String apartmentId) {
         var apartmentOptional = apartmentService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
+            var listing = apartmentOptional.get();
+            listing.setNoOfContact(listing.getNoOfContact()+1);
+            apartmentService.saveApartment(listing);
             return "Contact: " + apartmentOptional.get().getContact();
         } else {
             LOGGER.error("No apartment with id {} was found" , apartmentId);
@@ -96,12 +99,22 @@ public class ApartmentController {
     @HxRequest
     public void favourite(@PathVariable(value = "apartmentId") String apartmentId) {
         var user = conversationSession.getImmobiliareUser();
-        if (!user.getFavouriteProperties().contains(apartmentId)){
-            user.getFavouriteProperties().add(apartmentId);
+        var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+        if (!apartmentOptional.isEmpty()) {
+            var listing = apartmentOptional.get();
+            if (!user.getFavouriteProperties().contains(apartmentId)) {
+                listing.setNoOfFavourite(listing.getNoOfFavourite() + 1);
+                user.getFavouriteProperties().add(apartmentId);
+            } else {
+                listing.setNoOfFavourite(listing.getNoOfFavourite() - 1);
+                user.getFavouriteProperties().remove(apartmentId);
+            }
+
+            apartmentService.saveApartment(listing);
+            userService.updateUser(user);
         } else {
-            user.getFavouriteProperties().remove(apartmentId);
+            LOGGER.error("No apartment with id {} was found" , apartmentId);
         }
-        userService.updateUser(user);
     }
 
     @GetMapping(value = "/stream/{sseId}", produces = "text/event-stream")
@@ -152,8 +165,17 @@ public class ApartmentController {
         context.setVariable("pageName", "chat");
         context.setVariable("index", index);
         context.setVariable("bestResultsImagePath", BEST_RESULTS_IMAGE_PATH);
-        context.setVariable("mostFavouriteImagePath", MOST_FAVOURITE_IMAGE_PATH);
-        context.setVariable("topContactedImagePath", TOP_CONTACTED_IMAGE_PATH);
+        if (((Apartment)apartment).isMostContacted()){
+            context.setVariable("topContactedImagePath", TOP_CONTACTED_IMAGE_PATH);
+        } else {
+            context.setVariable("topContactedImagePath", "");
+        }
+        if (((Apartment)apartment).isMostFavourite()) {
+            context.setVariable("mostFavouriteImagePath", MOST_FAVOURITE_IMAGE_PATH);
+        } else {
+            context.setVariable("mostFavouriteImagePath", "");
+        }
+
 
         var data = templateEngine.process("fragments",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
