@@ -9,6 +9,7 @@ import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.UserSseService;
+import com.testehan.springai.immobiliare.util.ListingUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -71,7 +72,6 @@ public class MainController {
 		}
 
 		model.addAttribute("apartments", apartments);
-//		model.addAttribute("favouriteButtonStartMessage","&hearts;");
 		return "favourites";
 	}
 
@@ -133,9 +133,22 @@ public class MainController {
 
 	@GetMapping("/view/{apartmentId}")
 	public String view(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
-		// todo
+		var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+		if (!apartmentOptional.isEmpty()) {
+			var apartment = apartmentOptional.get();
+			var user = conversationSession.getImmobiliareUser();
+			var isFavourite = ListingUtil.isApartmentAlreadyFavourite(apartmentId, user);
 
-		return "add";
+			model.addAttribute("apartment", apartment);
+			model.addAttribute("favouriteButtonStartMessage", ListingUtil.getFavouritesText(isFavourite));
+			model.addAttribute("pageName", "view");
+
+			return "view";
+		} else {
+			model.addAttribute("errorMessage", "It seems the page you're looking for doesn't exist or you don't have access.");
+			return "error-404";
+		}
+
 	}
 
 	@GetMapping("/help")
