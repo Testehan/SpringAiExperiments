@@ -96,6 +96,52 @@ public class ApartmentController {
         }
     }
 
+    @GetMapping("/suggestions/{suggestionStep}")
+    public List<String> suggestions(@PathVariable(value = "suggestionStep") Integer suggestionStep) {
+        List<String> suggestions = new ArrayList<String>();
+        switch (suggestionStep) {
+            case 1:
+                suggestions = getStep1Suggestions();
+                break;
+            case 2:
+                suggestions = getStep2Suggestions();
+                break;
+            case 3:
+                suggestions = getStep3Suggestions();
+                break;
+            default:
+                return suggestions;
+        }
+        return suggestions;
+    }
+
+    private List<String> getStep1Suggestions() {
+        var suggestions = new ArrayList<String>();
+        suggestions.add("Rent");
+        suggestions.add("Buy");
+
+        return suggestions;
+    }
+
+    private List<String> getStep2Suggestions() {
+        var suggestions = new ArrayList<String>();
+        suggestions.add("Cluj-Napoca");
+        suggestions.add("Bucharest");
+
+        return suggestions;
+    }
+
+    private List<String> getStep3Suggestions() {
+        var suggestions = new ArrayList<String>();
+        var user = conversationSession.getImmobiliareUser();
+        // TODO this is with low priority but i would add the top 10 searches of the users in the DB
+        // and randomly add some of them to the suggestions list that is returned
+        suggestions.add(user.getLastPropertyDescription());
+        suggestions.add("Pet friendly studio close to city center or universities");
+        suggestions.add("3 room apartment for a family with a price below 700 euro ");
+        return suggestions;
+    }
+
     @PostMapping("/favourite/{apartmentId}")
     @HxRequest
     public void favourite(@PathVariable(value = "apartmentId") String apartmentId) {
@@ -148,7 +194,7 @@ public class ApartmentController {
         selectors.add("responseFragmentWithApartments");
         context.setVariable("response", eventPayload.getPayload());
 
-        var data =templateEngine.process("response",selectors, context).
+        var data = templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
 
         return createSSE(data,"response",sseId);

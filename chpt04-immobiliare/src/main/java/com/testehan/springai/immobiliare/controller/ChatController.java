@@ -42,9 +42,9 @@ public class ChatController {
     @PostMapping("/respond")
     public HtmxResponse respond(@RequestParam String message, Model model, HttpSession session) {
 
-    var user  = conversationSession.getImmobiliareUser();
-    var searchQueriesAvailable = user.getSearchesAvailable();
-    if (searchQueriesAvailable > 0) {
+        var user  = conversationSession.getImmobiliareUser();
+        var searchQueriesAvailable = user.getSearchesAvailable();
+        if (searchQueriesAvailable > 0) {
             var response = apiService.getChatResponse(message, session);
 
             user  = conversationSession.getImmobiliareUser();   // getting the user again, because it might have been updated during the chat call
@@ -61,6 +61,8 @@ public class ChatController {
             model.addAttribute("response", M00_NO_SEARCH_QUERIES_AVAILABLE);
         }
 
+    // TODO
+//        model.addAttribute("response", "this is a test for noqw");
         return HtmxResponse.builder()
                 .view("response :: responseFragment")
                 .build();

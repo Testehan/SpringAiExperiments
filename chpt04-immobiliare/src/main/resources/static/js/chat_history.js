@@ -8,6 +8,8 @@ let historyIndex = -1;
 
 function storeInputInHistory(input) {
     if (input.trim() !== "") {
+        logCallHierarchy();
+        console.log("Storing history " + input);
         messageInputHistory.push(input);
         historyIndex = messageInputHistory.length; // Reset index to one beyond the latest input
     }
@@ -16,6 +18,7 @@ function storeInputInHistory(input) {
 $(document).ready(function () {
     var messageInput = $("#message");
     $('#sendMessageButton').click(function() {
+        console.log("sendMessageButton cliecked ");
         $('#spinner').show();
         storeInputInHistory(messageInput[0].value);
     });
@@ -26,11 +29,12 @@ $(document).ready(function () {
         if (event.key === 'ArrowUp') {
             // Navigate to the previous input
             if (historyIndex > 0) {
+                console.log("Arrow up ");
                 historyIndex--;
                 messageInput[0].value = messageInputHistory[historyIndex];
             }
         } else if (event.key === 'ArrowDown') {
-
+             console.log("Arrow down ");
             // Navigate to the next input
             if (historyIndex < messageInputHistory.length - 1) {
                 historyIndex++;
@@ -40,8 +44,17 @@ $(document).ready(function () {
                 historyIndex = messageInputHistory.length;
                 messageInput[0].value = '';
             }
-        } else if (event.key === 'Enter') {
-            storeInputInHistory(messageInput[0].value);
         }
     });
 });
+
+function logCallHierarchy() {
+  const stackTrace = new Error().stack;
+  const lines = stackTrace.split('\n');
+
+  console.log("Call Hierarchy:");
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+      console.log(line);
+  }
+}
