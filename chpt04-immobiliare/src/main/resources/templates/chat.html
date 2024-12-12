@@ -60,6 +60,20 @@
                   hx-swap="beforeend"
                   hx-target="#response-container">
 
+                <!-- Suggestion Items -->
+                <div id="suggestions" class="flex gap-2 mb-4 flex-wrap">
+
+                    <button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 ml-auto">
+                        What's the weather today?
+                    </button>
+                    <button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 ml-auto">
+                        Tell me a joke.
+                    </button>
+                    <button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 ml-auto">
+                        How to cook pasta?
+                    </button>
+                </div>
+
                 <div class="flex items-center bg-gray-200 rounded-full p-2 shadow-md">
 
                     <input id="message" name="message" required pattern="[a-zA-Z0-9\\s\.\';,-]+" class="bg-gray-200 outline-none text-gray-700 rounded-full py-2 px-4 w-full" type="text" placeholder="Message Imobil AI" autocomplete="off" />

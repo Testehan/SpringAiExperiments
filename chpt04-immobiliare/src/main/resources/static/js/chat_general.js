@@ -42,6 +42,15 @@ $(document).ready(function(){
 
    setUpScrollingToLastUserMessage();
 
+   $(".suggestion-btn").on("click", function () {
+        const suggestionText = $(this).text(); // Get button text
+        $("#message").val(suggestionText); // Populate input box
+        $('#spinner').show();
+        // see chat_history.js to understand why this is needed
+        var messageInput = $("#message");
+        storeInputInHistory(messageInput[0].value);
+    });
+
 });
 
 function askForResponse() {
