@@ -6,7 +6,6 @@ $(document).ready(function(){
         if ((evt.target.parentNode.id === 'response-container')
             && (evt.target.children.length>0)
             && (evt.target.children[0].className.includes("userMessage"))) {
-                logCallHierarchy();
                 askForResponse();
         }
     });
@@ -28,17 +27,12 @@ $(document).ready(function(){
             applyFavouriteButtonStylingDependingOnText($('.favouriteButton').last());
 
             // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
-            logCallHierarchy();
-            console.log("processed an apartment");
             htmx.process($('#response-container')[0]);
         }
     });
 
     eventSource.addEventListener('response', function(event) {
          if (event.lastEventId === sseId) {
-            logCallHierarchy();
-            console.log("processed a response");
-
             // Dynamically insert the fragment into the response container
             const container = $("#response-container").last()
             const newFragment = event.data;
@@ -49,18 +43,9 @@ $(document).ready(function(){
     });
 
    setCurrentStep();
-//   fetchSuggestions();
    setUpScrollingToLastUserMessage();
 
    $(document).on("click", ".suggestion-btn", function (e) {
-         console.log("suggestion butoon clicked");
-         logCallHierarchy();
-// todo don't think below i is needed
-         if (e.key === "Enter") {
-             e.preventDefault(); // Ignore Enter key
-             return;
-         }
-
         const suggestionText = $(this).text(); // Get button text
         $("#message").val(suggestionText); // Populate input box
         $('#spinner').show();

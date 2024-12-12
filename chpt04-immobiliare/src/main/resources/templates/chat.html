@@ -45,7 +45,7 @@
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-4 h-full overflow-auto">
             <div class="mb-2">
-                <p class="inline-block bg-slate-50 rounded-lg p-2 ml-auto" th:text="${initialMessage}"></p>
+                <p class="assistantResponse inline-block bg-slate-50 rounded-lg p-2 ml-auto" th:text="${initialMessage}"></p>
             </div>
 
         </div>
@@ -53,26 +53,16 @@
         <img id="spinner" style="display:none;" class="absolute m-auto inset-0" src="/images/bars.svg"/>
 
         <div class="">
+            <!-- Suggestion Items -->
+            <div id="suggestions" class="flex gap-2 mb-4 flex-wrap flex-wrap justify-center items-center">
+
+            </div>
             <form id="chatForm"
                   enctype="multipart/form-data"
                   class="w-full"
                   hx-post="/message"
                   hx-swap="beforeend"
                   hx-target="#response-container">
-
-                <!-- Suggestion Items -->
-                <div id="suggestions" class="flex gap-2 mb-4 flex-wrap">
-
-                    <button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 ml-auto">
-                        What's the weather today?
-                    </button>
-                    <button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 ml-auto">
-                        Tell me a joke.
-                    </button>
-                    <button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 ml-auto">
-                        How to cook pasta?
-                    </button>
-                </div>
 
                 <div class="flex items-center bg-gray-200 rounded-full p-2 shadow-md">
 
@@ -98,18 +88,5 @@
 
     </main>
 </div>
-<script>
-    // Open the lightbox with the clicked image
-    function openLightbox(src) {
-        document.getElementById('lightbox-img').src = src;
-        document.getElementById('lightbox').style.display = 'flex';
-    }
-
-    // Close the lightbox
-    function closeLightbox() {
-        document.getElementById('lightbox').style.display = 'none';
-    }
-
-</script>
 </body>
 </html>

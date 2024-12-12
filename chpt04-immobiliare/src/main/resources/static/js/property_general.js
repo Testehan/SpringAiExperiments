@@ -30,3 +30,14 @@ function applyInitialFavouriteStylingFor(favouriteButton){
                       .removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
     }
 }
+
+// Open the lightbox with the clicked image
+function openLightbox(src) {
+    $('#lightbox-img').attr('src', src);
+    $('#lightbox').css('display', 'flex');
+}
+
+// Close the lightbox
+function closeLightbox() {
+    $('#lightbox').css('display', 'none');
+}
