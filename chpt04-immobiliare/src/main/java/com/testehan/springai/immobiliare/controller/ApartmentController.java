@@ -131,14 +131,28 @@ public class ApartmentController {
         return suggestions;
     }
 
-    private List<String> getStep3Suggestions() {
-        var suggestions = new ArrayList<String>();
+    private List<String> getStep3Suggestions()
+    {
         var user = conversationSession.getImmobiliareUser();
+
         // TODO this is with low priority but i would add the top 10 searches of the users in the DB
         // and randomly add some of them to the suggestions list that is returned
+        List<String> promptIdeas = new ArrayList<>();
+        promptIdeas.add("Pet friendly studio close to city center or universities");
+        promptIdeas.add("3 room apartment for a family with a price below 700 euro ");
+        promptIdeas.add("Spacious 2-bedroom apartments with a yard ");
+        promptIdeas.add("Luxury apartments near downtown ");
+        promptIdeas.add("1-bedroom apartments with a home office space  ");
+        promptIdeas.add("Newly renovated 2 room apartments ");
+
+        if (promptIdeas.contains(user.getLastPropertyDescription())){
+            promptIdeas.remove(user.getLastPropertyDescription());
+        }
+
+        Collections.shuffle(promptIdeas, new Random());
+        var suggestions = promptIdeas.subList(0, 2);
         suggestions.add(user.getLastPropertyDescription());
-        suggestions.add("Pet friendly studio close to city center or universities");
-        suggestions.add("3 room apartment for a family with a price below 700 euro ");
+
         return suggestions;
     }
 
