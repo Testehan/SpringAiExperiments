@@ -149,19 +149,20 @@ function setCurrentStep(){
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.trim() === "Which city are you interested in ?") {
+    if (lastAssistantMessage.trim() === "Which city are you interested in ?")
+    {
+        suggestionsStep = 2;
         $('#suggestions').empty();
         fetchSuggestions();
         $('#suggestions').show();
-        suggestionsStep = 2;
     }
     if (lastAssistantMessage.includes("You are looking for properties for") &&
         lastAssistantMessage.includes("Give me more details about the location you are searching for"))
     {
+        suggestionsStep = 3;
         $('#suggestions').empty();
         fetchSuggestions();
         $('#suggestions').show();
-        suggestionsStep = 3;
     }
 }
 
