@@ -14,6 +14,7 @@ import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
@@ -43,10 +44,12 @@ public class ApartmentController {
     private final UserSseService userSseService;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
+    private final MessageSource messageSource;
 
     public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
                                UserService userService, ApiService apiService,
-                               SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService)
+                               SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
+                               MessageSource messageSource)
     {
         this.apartmentService = apartmentService;
         this.conversationSession = conversationSession;
@@ -54,6 +57,7 @@ public class ApartmentController {
         this.templateEngine = templateEngine;
         this.userSseService = userSseService;
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     @PostMapping("/save")
@@ -94,6 +98,11 @@ public class ApartmentController {
             LOGGER.error("No apartment with id {} was found" , apartmentId);
             return "No apartment found!";
         }
+    }
+
+    @GetMapping("/testlanguage")
+    public String language(Locale locale) {
+        return messageSource.getMessage("greeting", null, locale);
     }
 
     @GetMapping("/suggestions/{suggestionStep}")
