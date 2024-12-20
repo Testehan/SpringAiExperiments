@@ -121,11 +121,12 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>me.paulschwarz</groupId>
-            <artifactId>spring-dotenv</artifactId>
-            <version>3.0.0</version>
-        </dependency>
+        <!-- started using spring profiles.. -->
+<!--        <dependency>-->
+<!--            <groupId>me.paulschwarz</groupId>-->
+<!--            <artifactId>spring-dotenv</artifactId>-->
+<!--            <version>3.0.0</version>-->
+<!--        </dependency>-->
 
         <!-- for S3 related code -->
         <dependency>
@@ -240,7 +241,9 @@
                     <installDirectory>target</installDirectory>
                 </configuration>
             </plugin>
+
         </plugins>
+
     </build>
 
 </project>

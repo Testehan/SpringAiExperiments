@@ -40,3 +40,5 @@ build/
 /chpt04-immobiliare/src/main/resources/AWS-login.txt
 /chpt05-llama3/src/main/resources/secrets.properties
 /chpt08-gemini/src/main/resources/secrets.properties
+/chpt04-immobiliare/src/main/resources/secrets-dev.properties
+/chpt04-immobiliare/src/main/resources/secrets-prod.properties
