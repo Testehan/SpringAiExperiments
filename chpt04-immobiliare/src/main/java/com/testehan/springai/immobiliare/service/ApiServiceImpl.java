@@ -228,7 +228,8 @@ public class ApiServiceImpl implements ApiService{
         conversationSession.setCity(supportedCity);
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
-            return new ResultsResponse(messageSource.getMessage("M03_DETAILS",  new Object[]{user.getPropertyType(), supportedCity.getName()}, LocaleUtils.getCurrentLocale()));
+            var propertyType =  messageSource.getMessage(user.getPropertyType(), null, LocaleUtils.getCurrentLocale());
+            return new ResultsResponse(messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, LocaleUtils.getCurrentLocale()));
         } else {
             var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
             return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, LocaleUtils.getCurrentLocale()));

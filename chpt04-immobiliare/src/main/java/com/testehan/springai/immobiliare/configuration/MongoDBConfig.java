@@ -8,12 +8,16 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class MongoDBConfig {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MongoDBConfig.class);
 
     @Value("${spring.data.mongodb.uri}")
     private String MONGO_DB_URI;
@@ -41,6 +45,7 @@ public class MongoDBConfig {
 
     @Bean
     public MongoDatabase mongoDatabase(MongoClient mongoClient) {
+        LOGGER.info("Using {}", MONGO_DB_NAME);
         return mongoClient.getDatabase(MONGO_DB_NAME);
     }
 

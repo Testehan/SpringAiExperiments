@@ -58,7 +58,8 @@ public class MainController {
 			model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
 		} else {
 			var city = SupportedCity.valueOf(user.getCity()).getName();
-			model.addAttribute("initialMessage",  messageSource.getMessage("M03_DETAILS",  new Object[]{user.getPropertyType(), city}, locale));
+			var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
+			model.addAttribute("initialMessage",  messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, city}, locale));
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
