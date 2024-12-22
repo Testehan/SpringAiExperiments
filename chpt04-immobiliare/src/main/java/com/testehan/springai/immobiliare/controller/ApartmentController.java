@@ -10,6 +10,7 @@ import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -100,9 +101,10 @@ public class ApartmentController {
         }
     }
 
+    // TODO This is just for testing and should be removed in the end..
     @GetMapping("/testlanguage")
     public String language(Locale locale) {
-        return messageSource.getMessage("greeting", null, locale);
+        return messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, LocaleUtils.getCurrentLocale());
     }
 
     @GetMapping("/suggestions/{suggestionStep}")
