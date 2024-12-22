@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.*;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -19,6 +20,7 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -56,11 +58,13 @@ public class ApiServiceImpl implements ApiService{
     private ConversationSession conversationSession;
     private ConversationService conversationService;
     private UserSseService userSseService;
+    private final MessageSource messageSource;
 
     public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService,
                           ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
                           ConversationSession conversationSession, ConversationService conversationService,
-                          UserSseService userSseService) {
+                          UserSseService userSseService,
+                          MessageSource messageSource) {
         this.immobiliareApiService = immobiliareApiService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;
@@ -69,6 +73,8 @@ public class ApiServiceImpl implements ApiService{
         this.conversationSession = conversationSession;
         this.conversationService = conversationService;
         this.userSseService = userSseService;
+
+        this.messageSource = messageSource;
     }
 
     @Override
@@ -84,7 +90,7 @@ public class ApiServiceImpl implements ApiService{
             case DEFAULT : return respondToUserMessage(message);
         }
 
-        return new ResultsResponse(M00_IRRELEVANT_PROMPT);
+        return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, LocaleUtils.getCurrentLocale()));
     }
 
     private ResultsResponse getApartments(String description, HttpSession session) {

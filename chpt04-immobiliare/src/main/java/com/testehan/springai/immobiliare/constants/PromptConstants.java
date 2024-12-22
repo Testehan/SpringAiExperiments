@@ -1,9 +1,6 @@
 package com.testehan.springai.immobiliare.constants;
 
 public class PromptConstants {
-    public static final String M00_IRRELEVANT_PROMPT = "The prompt provided is not relevant for this application. Try and provide something related to real estate";
-    public static final String M00_NO_SEARCH_QUERIES_AVAILABLE = "You do not have search queries available :(.";
-    public static final String M00_SEARCH_QUERIES_AVAILABLE = "You have %s available searches.";
 
     public static final String M01_INITIAL_MESSAGE = "Hi..are you interested in apartments for rent or sale ?";
     public static final String M02_CITY = "Which city are you interested in ?";

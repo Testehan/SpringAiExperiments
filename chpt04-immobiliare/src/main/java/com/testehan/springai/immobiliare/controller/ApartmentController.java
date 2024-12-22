@@ -104,7 +104,7 @@ public class ApartmentController {
     // TODO This is just for testing and should be removed in the end..
     @GetMapping("/testlanguage")
     public String language(Locale locale) {
-        return messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, LocaleUtils.getCurrentLocale());
+        return messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{3}, LocaleUtils.getCurrentLocale());
     }
 
     @GetMapping("/suggestions/{suggestionStep}")

@@ -4,20 +4,19 @@ import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApiService;
 import com.testehan.springai.immobiliare.service.OpenAiService;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HtmxResponse;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import static com.testehan.springai.immobiliare.constants.PromptConstants.M00_NO_SEARCH_QUERIES_AVAILABLE;
-import static com.testehan.springai.immobiliare.constants.PromptConstants.M00_SEARCH_QUERIES_AVAILABLE;
 
 @Controller
 @CrossOrigin
@@ -29,13 +28,15 @@ public class ChatController {
     private final OpenAiService openAiService;
     private final ConversationSession conversationSession;
     private final UserService userService;
+    private final MessageSource messageSource;
 
     public ChatController(ApiService apiService, OpenAiService openAiService, ConversationSession conversationSession,
-                          UserService userService) {
+                          UserService userService, MessageSource messageSource) {
         this.apiService = apiService;
         this.openAiService = openAiService;
         this.conversationSession = conversationSession;
         this.userService = userService;
+        this.messageSource = messageSource;
     }
 
     @HxRequest
@@ -52,13 +53,12 @@ public class ChatController {
             userService.updateUser(user);
 
             if (searchQueriesAvailable <= 5){
-                var queriesAvailableMessage = String.format(M00_SEARCH_QUERIES_AVAILABLE, searchQueriesAvailable);
-                model.addAttribute("queriesAvailableMessage", queriesAvailableMessage);
+                model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, LocaleUtils.getCurrentLocale()));
             }
             model.addAttribute("response", response.message());
 
         } else {
-            model.addAttribute("response", M00_NO_SEARCH_QUERIES_AVAILABLE);
+            model.addAttribute("response", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, LocaleUtils.getCurrentLocale()));
         }
 
     // TODO
