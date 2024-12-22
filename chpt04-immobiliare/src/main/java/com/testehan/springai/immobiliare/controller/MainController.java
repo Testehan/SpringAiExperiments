@@ -1,7 +1,6 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
@@ -11,6 +10,7 @@ import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +23,7 @@ import org.thymeleaf.util.StringUtils;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Controller
 public class MainController {
@@ -31,12 +32,15 @@ public class MainController {
 	private final ConversationSession conversationSession;
 	private final UserSseService userSseService;
 	private final EmailService emailService;
+	private final MessageSource messageSource;
 
-	public MainController(ApartmentService apartmentService, ConversationSession conversationSession, UserSseService userSseService, EmailService emailService) {
+	public MainController(ApartmentService apartmentService, ConversationSession conversationSession,
+						  UserSseService userSseService, EmailService emailService, MessageSource messageSource) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
 		this.emailService = emailService;
+		this.messageSource = messageSource;
 	}
 
 	@GetMapping("/")
@@ -45,15 +49,16 @@ public class MainController {
 	}
 
 	@GetMapping("/chat")
-	public String chat(Model model, HttpSession session) {
+	public String chat(Model model, HttpSession session, Locale locale) {
 		var user = conversationSession.getImmobiliareUser();
 		var sessionId = session.getId();
 		if (StringUtils.isEmpty(user.getPropertyType())) {
-			model.addAttribute("initialMessage", PromptConstants.M01_INITIAL_MESSAGE);
+			model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
 		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.valueOf(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
-			model.addAttribute("initialMessage", PromptConstants.M02_CITY);
+			model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
 		} else {
-			model.addAttribute("initialMessage", String.format(PromptConstants.M03_DETAILS,user.getPropertyType(), SupportedCity.valueOf(user.getCity()).getName()));
+			var city = SupportedCity.valueOf(user.getCity()).getName();
+			model.addAttribute("initialMessage",  messageSource.getMessage("M03_DETAILS",  new Object[]{user.getPropertyType(), city}, locale));
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);

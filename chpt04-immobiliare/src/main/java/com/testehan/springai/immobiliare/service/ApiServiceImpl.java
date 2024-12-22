@@ -2,7 +2,6 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.constants.PromptConstants;
 import com.testehan.springai.immobiliare.events.ApartmentPayload;
 import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
@@ -33,7 +32,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.testehan.springai.immobiliare.constants.PromptConstants.*;
 import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
 import static com.testehan.springai.immobiliare.util.ListingUtil.isApartmentAlreadyFavourite;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
@@ -127,7 +125,9 @@ public class ApiServiceImpl implements ApiService{
                             if (!apartmentLLM.isEmpty()){
                                 if (isFirst.getAndSet(false)) {
                                     userSseService.getUserSseConnection(session.getId())
-                                            .tryEmitNext(new Event("response",new ResponsePayload(M04_APARTMENTS_FOUND_START)));
+                                            .tryEmitNext(new Event("response",new ResponsePayload(
+                                                    messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, LocaleUtils.getCurrentLocale())))
+                                            );
                                 }
                                 LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
                                 // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
@@ -148,10 +148,14 @@ public class ApiServiceImpl implements ApiService{
                         () -> {
                             if (isFirst.get()){     // this means that we processed stream and we got no match
                                 userSseService.getUserSseConnection(session.getId())
-                                        .tryEmitNext(new Event("response",new ResponsePayload(M04_NO_APARTMENTS_FOUND)));
+                                        .tryEmitNext(new Event("response",new ResponsePayload(
+                                                messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, LocaleUtils.getCurrentLocale())))
+                                        );
                             } else {
                                 userSseService.getUserSseConnection(session.getId())
-                                        .tryEmitNext(new Event("response", new ResponsePayload(M04_APARTMENTS_FOUND_END)));
+                                        .tryEmitNext(new Event("response", new ResponsePayload(
+                                                messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, LocaleUtils.getCurrentLocale())))
+                                        );
                             }
                             LOGGER.info("Flux completed");
 
@@ -159,7 +163,7 @@ public class ApiServiceImpl implements ApiService{
                 );
 
         } else {
-            response = new ResultsResponse(M04_NO_APARTMENTS_FOUND);
+            response = new ResultsResponse(messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, LocaleUtils.getCurrentLocale()));
         }
 
         return response;
@@ -215,7 +219,7 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse restartConversation() {
         conversationSession.clearConversation();
-        return new ResultsResponse(M01_INITIAL_MESSAGE);
+        return new ResultsResponse(messageSource.getMessage("M01_INITIAL_MESSAGE", null, LocaleUtils.getCurrentLocale()));
 
     }
 
@@ -224,15 +228,16 @@ public class ApiServiceImpl implements ApiService{
         conversationSession.setCity(supportedCity);
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
-            return new ResultsResponse(String.format(PromptConstants.M03_DETAILS, user.getPropertyType(), supportedCity.getName()));
+            return new ResultsResponse(messageSource.getMessage("M03_DETAILS",  new Object[]{user.getPropertyType(), supportedCity.getName()}, LocaleUtils.getCurrentLocale()));
         } else {
-            return new ResultsResponse(String.format(PromptConstants.M021_SUPPORTED_CITIES, SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "))));
+            var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
+            return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, LocaleUtils.getCurrentLocale()));
         }
     }
 
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
         conversationSession.setRentOrSale(serviceCall.message());
-        return new ResultsResponse(M02_CITY);
+        return new ResultsResponse(messageSource.getMessage("M02_CITY", null, LocaleUtils.getCurrentLocale()));
     }
 
     private ResultsResponse setRentOrBuyAndCity(ServiceCall serviceCall) {
