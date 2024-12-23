@@ -165,7 +165,7 @@
 
 <div th:fragment="listing_area">
     <div class="grid grid-cols-2 flex justify-between mt-2">
-        <p class="text-left text-gray-600">Area: [[${apartment.area}]]</p>
+        <p class="text-left text-gray-600" th:text="#{listing.area} + ': ' + ${apartment.area}" />
         <span class="text-right ">
             <button
                     class="openMapButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"

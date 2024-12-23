@@ -191,14 +191,14 @@ public class ApartmentController {
     }
 
     @GetMapping(value = "/stream/{sseId}", produces = "text/event-stream")
-    public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession) {
+    public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession, Locale locale) {
         userSseService.addUserSseId(httpSession.getId());
         return apiService.getServerSideEventsFlux(httpSession)
-                .map(event -> renderServerSideEventData(httpSession, event, sseId));
+                .map(event -> renderServerSideEventData(httpSession, event, sseId, locale));
 
     }
 
-    private ServerSentEvent<String> renderServerSideEventData(HttpSession httpSession, Event event, String sseId){
+    private ServerSentEvent<String> renderServerSideEventData(HttpSession httpSession, Event event, String sseId, Locale locale){
         if (event.getEventType().equals("apartment")){
             var sseIndex = httpSession.getAttribute("sseIndex");
             int index = Objects.isNull(sseIndex) ? 0 : (int) sseIndex;
@@ -207,7 +207,7 @@ public class ApartmentController {
             } else {
                 httpSession.setAttribute("sseIndex", index + 1);
             }
-            return getApartmentServerSentEvent(event.getPayload(),index ,sseId);
+            return getApartmentServerSentEvent(event.getPayload(),index ,sseId, locale);
         } else {
             httpSession.setAttribute("sseIndex", 0);
             return getResponseServerSideEvent(event.getPayload(),sseId);
@@ -226,15 +226,19 @@ public class ApartmentController {
         return createSSE(data,"response",sseId);
     }
 
-    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload,int index, String sseId) {
+    private ServerSentEvent<String> getApartmentServerSentEvent(EventPayload eventPayload,int index, String sseId, Locale locale) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         var apartment = ((Map<String, Object>)eventPayload.getPayload()).get("apartment");
         var isFavourite = (boolean)((Map<String, Object>)eventPayload.getPayload()).get("isFavourite");
+        var favouritesText = ListingUtil.getFavouritesText(isFavourite);
+        if (favouritesText.equalsIgnoreCase("save.favourites")){
+            favouritesText = messageSource.getMessage("save.favourites",null,locale);
+        }
 
         selectors.add("apartment");
         context.setVariable("apartment", apartment);
-        context.setVariable("favouriteButtonStartMessage", ListingUtil.getFavouritesText(isFavourite));
+        context.setVariable("favouriteButtonStartMessage", favouritesText);
         context.setVariable("pageName", "chat");
         context.setVariable("index", index);
         context.setVariable("bestResultsImagePath", BEST_RESULTS_IMAGE_PATH);

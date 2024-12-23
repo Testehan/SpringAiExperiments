@@ -63,12 +63,13 @@ public class MainController {
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
+		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("save.favourites",null,locale));
 
 		return "chat";
 	}
 
 	@GetMapping("/favourites")
-	public String favourites(Model model) {
+	public String favourites(Model model, Locale locale) {
 		var user = conversationSession.getImmobiliareUser();
 		List<Apartment> apartments = new ArrayList<>();
 		for (String apartmentId : user.getFavouriteProperties()){
@@ -78,6 +79,7 @@ public class MainController {
 		}
 
 		model.addAttribute("apartments", apartments);
+		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("save.favourites",null,locale));
 		return "favourites";
 	}
 
@@ -138,15 +140,20 @@ public class MainController {
 	}
 
 	@GetMapping("/view/{apartmentId}")
-	public String view(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
+	public String view(@PathVariable(value = "apartmentId") String apartmentId, Model model, Locale locale) {
 		var apartmentOptional = apartmentService.findApartmentById(apartmentId);
 		if (!apartmentOptional.isEmpty()) {
 			var apartment = apartmentOptional.get();
 			var user = conversationSession.getImmobiliareUser();
 			var isFavourite = ListingUtil.isApartmentAlreadyFavourite(apartmentId, user);
+			var favouritesText = ListingUtil.getFavouritesText(isFavourite);
+			if (favouritesText.equalsIgnoreCase("save.favourites")){
+				favouritesText = messageSource.getMessage("save.favourites",null,locale);
+			}
 
 			model.addAttribute("apartment", apartment);
-			model.addAttribute("favouriteButtonStartMessage", ListingUtil.getFavouritesText(isFavourite));
+			model.addAttribute("favouriteButtonStartMessage", favouritesText);
+			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("save.favourites",null,locale));
 			model.addAttribute("pageName", "view");
 
 			return "view";

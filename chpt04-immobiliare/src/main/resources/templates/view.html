@@ -2,6 +2,9 @@
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
 <head th:replace="~{fragments :: page_head('none')}" />
+<script>
+    const saveFavouritesTranslated = "[[${saveFavouritesTranslated}]]";
+</script>
 
 <script th:src="@{/js/property_map.js}"></script>
 <script th:src="@{/js/property_general.js}"></script>

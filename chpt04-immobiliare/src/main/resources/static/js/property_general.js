@@ -12,17 +12,17 @@ $(document).ready(function () {
 });
 
 function applyFavouriteStylingFor(favouriteButton){
-    if (favouriteButton.text() === 'Save to Favourites') {
+    if (favouriteButton.text() === saveFavouritesTranslated) {
         favouriteButton.html('&hearts;').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700')
                                         .addClass('text-red-500 text-2xl');
     } else if (favouriteButton.html() === '♥')  {
-        favouriteButton.text('Save to Favourites').removeClass('text-red-500 text-2xl')
+        favouriteButton.text(saveFavouritesTranslated).removeClass('text-red-500 text-2xl')
                                                   .addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
     }
 }
 
 function applyInitialFavouriteStylingFor(favouriteButton){
-    if (favouriteButton.text() === 'Save to Favourites') {
+    if (favouriteButton.text() === saveFavouritesTranslated) {
         favouriteButton.addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700')
                         .removeClass('text-red-500 text-2xl');
     } else if (favouriteButton.html() === '♥')  {
