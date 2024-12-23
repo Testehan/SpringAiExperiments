@@ -36,7 +36,8 @@
                                hx-trigger="click"
                                hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target="">Search</a>
+                               target=""
+                               th:text="#{navigation.search}"></a>
                         </li>
                         <li>
                             <a href="/favourites" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
@@ -44,7 +45,8 @@
                                hx-trigger="click"
                                hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target="">Favourites
+                               target=""
+                               th:text="#{navigation.favourites}">
                             </a>
                         </li>
                         <li>
@@ -53,7 +55,8 @@
                                hx-trigger="click"
                                hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target="">Add/Edit
+                               target=""
+                               th:text="#{navigation.addOrEdit}">
                             </a>
                         </li>
                         <li>
@@ -62,25 +65,28 @@
                                hx-trigger="click"
                                hx-swap="none"
                                hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target="">Profile
+                               target=""
+                               th:text="#{navigation.profile}">
                             </a>
                         </li>
                         <li>
                             <a href="/help" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               target="_blank">Help
+                               target="_blank"
+                               th:text="#{navigation.help}">
                             </a>
                         </li>
                         <li>
                             <a href="/contact" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               target="_blank">Contact
+                               target="_blank"
+                               th:text="#{navigation.contact}">
                             </a>
                         </li>
                     </div>
                     <div th:if="${isAuthenticated}" class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
                         <div class="inline-flex rounded-full shadow">
                             <a href="javascript: document.logoutForm.submit()"
-                                 class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50 ">
-                                Logout
+                                class="inline-flex items-center px-4 py-2 text-base text-gray-900 bg-white border border-transparent rounded-full cursor-pointer font-base hover:bg-gray-50 "
+                                th:text="#{navigation.logout}">
                             </a>
                         </div>
                     </div>
