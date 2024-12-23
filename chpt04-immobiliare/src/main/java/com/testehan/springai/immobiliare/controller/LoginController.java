@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ public class LoginController {
         WebContext context = new WebContext(webExchange);
 		Set<String> selectors = new HashSet<>();
 		selectors.add("loginModal");
+        context.setLocale(LocaleUtils.getCurrentLocale());
 
 		var data = templateEngine.process("fragments",selectors, context).
 				replaceAll("[\\n\\r]+", "");
