@@ -109,17 +109,17 @@ public class ApartmentController {
     }
 
     @GetMapping("/suggestions/{suggestionStep}")
-    public List<String> suggestions(@PathVariable(value = "suggestionStep") Integer suggestionStep) {
+    public List<String> suggestions(@PathVariable(value = "suggestionStep") Integer suggestionStep, Locale locale) {
         List<String> suggestions = new ArrayList<String>();
         switch (suggestionStep) {
             case 1:
-                suggestions = getStep1Suggestions();
+                suggestions = getStep1Suggestions(locale);
                 break;
             case 2:
-                suggestions = getStep2Suggestions();
+                suggestions = getStep2Suggestions(locale);
                 break;
             case 3:
-                suggestions = getStep3Suggestions();
+                suggestions = getStep3Suggestions(locale);
                 break;
             default:
                 return suggestions;
@@ -127,15 +127,15 @@ public class ApartmentController {
         return suggestions;
     }
 
-    private List<String> getStep1Suggestions() {
-        var suggestions = new ArrayList<String>();
-        suggestions.add("Rent");
-        suggestions.add("Buy");
+    private List<String> getStep1Suggestions(Locale locale) {
+        var suggestions = new ArrayList<String>(); // todo when the suggestion are clicked in the ui, their text is sent to the server back...so maybe the llm will not know how to interpret the translated message...
+        suggestions.add(messageSource.getMessage("rent", null,locale));
+        suggestions.add(messageSource.getMessage("buy", null,locale));
 
         return suggestions;
     }
 
-    private List<String> getStep2Suggestions() {
+    private List<String> getStep2Suggestions(Locale locale) {
         var suggestions = new ArrayList<String>();
         suggestions.add("Cluj-Napoca");
         suggestions.add("Bucharest");
@@ -143,19 +143,19 @@ public class ApartmentController {
         return suggestions;
     }
 
-    private List<String> getStep3Suggestions()
+    private List<String> getStep3Suggestions(Locale locale)
     {
         var user = conversationSession.getImmobiliareUser();
 
         // TODO this is with low priority but i would add the top 10 searches of the users in the DB
         // and randomly add some of them to the suggestions list that is returned
         List<String> promptIdeas = new ArrayList<>();
-        promptIdeas.add("Pet friendly studio close to city center or universities");
-        promptIdeas.add("3 room apartment for a family with a price below 700 euro ");
-        promptIdeas.add("Spacious 2-bedroom apartments with a yard ");
-        promptIdeas.add("Luxury apartments near downtown ");
-        promptIdeas.add("1-bedroom apartments with a home office space  ");
-        promptIdeas.add("Newly renovated 2 room apartments ");
+        promptIdeas.add(messageSource.getMessage("prompt.ideas.1", null,locale));
+        promptIdeas.add(messageSource.getMessage("prompt.ideas.2", null,locale));
+        promptIdeas.add(messageSource.getMessage("prompt.ideas.3", null,locale));
+        promptIdeas.add(messageSource.getMessage("prompt.ideas.4", null,locale));
+        promptIdeas.add(messageSource.getMessage("prompt.ideas.5", null,locale));
+        promptIdeas.add(messageSource.getMessage("prompt.ideas.6", null,locale));
 
         if (promptIdeas.contains(user.getLastPropertyDescription())){
             promptIdeas.remove(user.getLastPropertyDescription());
