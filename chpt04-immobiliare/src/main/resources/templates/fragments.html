@@ -42,8 +42,8 @@
             <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">[[${apartment.name}]]</a>
             <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
         </div>
-        <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
-        <p class="text-gray-600 mt-2">Location: [[${apartment.city}]]</p>
+        <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price}"/>
+        <p class="text-gray-600 mt-2" th:text="#{listing.location} + ': ' + ${apartment.city}"/>
 
         <div th:replace="~{fragments :: listing_area}"></div>
 
@@ -52,10 +52,10 @@
             <span th:text="${#strings.substring(apartment.shortDescription, 0, 250)} + '...'"></span>
             <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">See Full Description</a>
         </p>
-        <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
-        <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
-        <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>
-        <p class="text-gray-600 mt-2">Last update date: [[${apartment.lastUpdateDateTime}]]</p>
+        <p class="text-gray-600 mt-2" th:text="#{listing.surface} + ': ' + ${apartment.surface} + ' ' + #{listing.surface.measured.in}"/>
+        <p class="text-gray-600 mt-2" th:text="#{listing.no.rooms} + ': ' + ${apartment.noOfRooms}" />
+        <p class="text-gray-600 mt-2" th:text="#{listing.floor} + ': ' + ${apartment.floor}"/>
+        <p class="text-gray-600 mt-2" th:text="#{listing.last.update} + ': ' + ${apartment.lastUpdateDateTime}"/>
 
         <p class="text-gray-600 mt-2">Tags:
             <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
@@ -87,15 +87,15 @@
                 <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
                 <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
             </div>
-            <p class="text-gray-600 mt-2">Price: €[[${apartment.price}]]</p>
-            <p class="text-gray-600 mt-2">Location: [[${apartment.city}]]</p>
+            <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price}"/>
+            <p class="text-gray-600 mt-2" th:text="#{listing.location} + ': ' + ${apartment.city}"/>
 
             <div th:replace="~{fragments :: listing_area}"></div>
 
-            <p class="text-gray-600 mt-2">Surface: [[${apartment.surface}]] sqm</p>
-            <p class="text-gray-600 mt-2">No of Rooms: [[${apartment.noOfRooms}]]</p>
-            <p class="text-gray-600 mt-2">Floor: [[${apartment.floor}]]</p>
-            <p class="text-gray-600 mt-2">Last update date: [[${apartment.lastUpdateDateTime}]]</p>
+            <p class="text-gray-600 mt-2" th:text="#{listing.surface} + ': ' + ${apartment.surface} + ' ' + #{listing.surface.measured.in}"/>
+            <p class="text-gray-600 mt-2" th:text="#{listing.no.rooms} + ': ' + ${apartment.noOfRooms}" />
+            <p class="text-gray-600 mt-2" th:text="#{listing.floor} + ': ' + ${apartment.floor}"/>
+            <p class="text-gray-600 mt-2" th:text="#{listing.last.update} + ': ' + ${apartment.lastUpdateDateTime}"/>
             <p th:replace="~{fragments :: listing_contact}"></p>
             <p class="text-gray-600 mt-2" th:text="${apartment.shortDescription}"></p>
 
@@ -121,9 +121,8 @@
     <span class="flex justify-between">
         <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
                 th:hx-swap = "outerHTML"
-                th:hx-get="@{http://localhost:8080/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id})}"  >
-            Show contact
-        </button>
+                th:hx-get="@{http://localhost:8080/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id})}"
+                th:text="#{listing.contact}" />
 
         <button class="favouriteButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
                 th:hx-swap="none"
@@ -164,14 +163,12 @@
 </div>
 
 <div th:fragment="listing_area">
-    <div class="grid grid-cols-2 flex justify-between mt-2">
-        <p class="text-left text-gray-600" th:text="#{listing.area} + ': ' + ${apartment.area}" />
-        <span class="text-right ">
+    <div class="flex justify-between mt-2">
+        <p class="flex-1 text-left text-gray-600" th:text="#{listing.area} + ': ' + ${apartment.area}" />
+        <span class="basis-1/5 text-right ">
             <button
                     class="openMapButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
-                    th:data-location="${apartment.city}+','+${apartment.area}">
-                Map
-            </button>
+                    th:data-location="${apartment.city}+','+${apartment.area}"  th:text="#{listing.map}" />
         </span>
     </div>
 </div>

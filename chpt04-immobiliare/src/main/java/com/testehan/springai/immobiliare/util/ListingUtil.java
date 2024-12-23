@@ -17,7 +17,7 @@ public class ListingUtil {
             var heartSymbol = "♥";
             return heartSymbol;
         } else {
-            return "save.favourites";
+            return "listing.favourites";
         }
     }
 

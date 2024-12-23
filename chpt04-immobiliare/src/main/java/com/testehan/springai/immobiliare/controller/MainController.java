@@ -63,7 +63,7 @@ public class MainController {
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
-		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("save.favourites",null,locale));
+		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 
 		return "chat";
 	}
@@ -79,7 +79,7 @@ public class MainController {
 		}
 
 		model.addAttribute("apartments", apartments);
-		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("save.favourites",null,locale));
+		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		return "favourites";
 	}
 
@@ -147,13 +147,13 @@ public class MainController {
 			var user = conversationSession.getImmobiliareUser();
 			var isFavourite = ListingUtil.isApartmentAlreadyFavourite(apartmentId, user);
 			var favouritesText = ListingUtil.getFavouritesText(isFavourite);
-			if (favouritesText.equalsIgnoreCase("save.favourites")){
-				favouritesText = messageSource.getMessage("save.favourites",null,locale);
+			if (favouritesText.equalsIgnoreCase("listing.favourites")){
+				favouritesText = messageSource.getMessage("listing.favourites",null,locale);
 			}
 
 			model.addAttribute("apartment", apartment);
 			model.addAttribute("favouriteButtonStartMessage", favouritesText);
-			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("save.favourites",null,locale));
+			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 			model.addAttribute("pageName", "view");
 
 			return "view";

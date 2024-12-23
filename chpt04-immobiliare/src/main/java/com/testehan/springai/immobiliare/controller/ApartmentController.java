@@ -232,8 +232,8 @@ public class ApartmentController {
         var apartment = ((Map<String, Object>)eventPayload.getPayload()).get("apartment");
         var isFavourite = (boolean)((Map<String, Object>)eventPayload.getPayload()).get("isFavourite");
         var favouritesText = ListingUtil.getFavouritesText(isFavourite);
-        if (favouritesText.equalsIgnoreCase("save.favourites")){
-            favouritesText = messageSource.getMessage("save.favourites",null,locale);
+        if (favouritesText.equalsIgnoreCase("listing.favourites")){
+            favouritesText = messageSource.getMessage("listing.favourites",null,locale);
         }
 
         selectors.add("apartment");

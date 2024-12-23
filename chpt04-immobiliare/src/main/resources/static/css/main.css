@@ -655,6 +655,10 @@ video {
   margin-top: 0.75rem;
 }
 
+.mt-4 {
+  margin-top: 1rem;
+}
+
 .block {
   display: block;
 }
@@ -786,6 +790,10 @@ video {
 
 .flex-1 {
   flex: 1 1 0%;
+}
+
+.basis-1\/5 {
+  flex-basis: 20%;
 }
 
 .transform {
