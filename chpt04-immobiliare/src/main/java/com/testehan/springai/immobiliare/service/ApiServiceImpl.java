@@ -26,6 +26,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -109,6 +110,7 @@ public class ApiServiceImpl implements ApiService{
 
         ResultsResponse response = new ResultsResponse("");
 
+        Locale currentLocale = LocaleUtils.getCurrentLocale();
         if (apartmentsFromSemanticSearch.size() > 0) {
             int batchSize = 2;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
             AtomicBoolean isFirst = new AtomicBoolean(true);
@@ -126,7 +128,7 @@ public class ApiServiceImpl implements ApiService{
                                 if (isFirst.getAndSet(false)) {
                                     userSseService.getUserSseConnection(session.getId())
                                             .tryEmitNext(new Event("response",new ResponsePayload(
-                                                    messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, LocaleUtils.getCurrentLocale())))
+                                                    messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, currentLocale)))
                                             );
                                 }
                                 LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
@@ -149,12 +151,12 @@ public class ApiServiceImpl implements ApiService{
                             if (isFirst.get()){     // this means that we processed stream and we got no match
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("response",new ResponsePayload(
-                                                messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, LocaleUtils.getCurrentLocale())))
+                                                messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale)))
                                         );
                             } else {
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("response", new ResponsePayload(
-                                                messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, LocaleUtils.getCurrentLocale())))
+                                                messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, currentLocale)))
                                         );
                             }
                             LOGGER.info("Flux completed");
@@ -163,7 +165,7 @@ public class ApiServiceImpl implements ApiService{
                 );
 
         } else {
-            response = new ResultsResponse(messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, LocaleUtils.getCurrentLocale()));
+            response = new ResultsResponse(messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale));
         }
 
         return response;
@@ -229,7 +231,10 @@ public class ApiServiceImpl implements ApiService{
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
             var propertyType =  messageSource.getMessage(user.getPropertyType(), null, LocaleUtils.getCurrentLocale());
-            return new ResultsResponse(messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, LocaleUtils.getCurrentLocale()));
+            return new ResultsResponse(
+                    messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, LocaleUtils.getCurrentLocale()) +
+                    messageSource.getMessage("M03_DETAILS_PART_2",  null, LocaleUtils.getCurrentLocale())
+            );
         } else {
             var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
             return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, LocaleUtils.getCurrentLocale()));

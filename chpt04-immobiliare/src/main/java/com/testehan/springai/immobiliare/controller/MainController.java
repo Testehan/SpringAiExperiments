@@ -59,11 +59,17 @@ public class MainController {
 		} else {
 			var city = SupportedCity.valueOf(user.getCity()).getName();
 			var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
-			model.addAttribute("initialMessage",  messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, city}, locale));
+			model.addAttribute("initialMessage",
+					messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, city}, locale) +
+					messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
+		model.addAttribute("M01_INITIAL_MESSAGE", messageSource.getMessage("M01_INITIAL_MESSAGE",null,locale));
+		model.addAttribute("M02_CITY", messageSource.getMessage("M02_CITY",null,locale));
+		model.addAttribute("M03_DETAILS_PART_2", messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
+		model.addAttribute("M04_APARTMENTS_FOUND_START", messageSource.getMessage("M04_APARTMENTS_FOUND_START",  null,locale));
 
 		return "chat";
 	}

@@ -210,15 +210,16 @@ public class ApartmentController {
             return getApartmentServerSentEvent(event.getPayload(),index ,sseId, locale);
         } else {
             httpSession.setAttribute("sseIndex", 0);
-            return getResponseServerSideEvent(event.getPayload(),sseId);
+            return getResponseServerSideEvent(event.getPayload(),sseId, locale);
         }
     }
 
-    private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload, String sseId) {
+    private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload, String sseId, Locale locale) {
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("responseFragmentWithApartments");
         context.setVariable("response", eventPayload.getPayload());
+        context.setLocale(locale);
 
         var data = templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
@@ -252,7 +253,7 @@ public class ApartmentController {
         } else {
             context.setVariable("mostFavouriteImagePath", "");
         }
-
+        context.setLocale(locale);
 
         var data = templateEngine.process("fragments",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines

@@ -93,7 +93,7 @@ function setUpScrollingToLastUserMessage(){
                     if (node.nodeType === Node.ELEMENT_NODE && node.childNodes[1].classList.contains('assistantResponse')) {
                         $('#spinner').hide();
                         setCurrentStep();
-                        if (node.childNodes[1].innerText === "Searching for properties based on the provided description."){
+                        if (node.childNodes[1].innerText === M04_APARTMENTS_FOUND_START){
                             $('#suggestions').hide(); // at this point we don't care about suggestions anymore because the user enters his description
                         }
                     }
@@ -128,21 +128,20 @@ function applyFavouriteButtonStylingDependingOnText(favouriteButton){
 
 function setCurrentStep(){
     const lastAssistantMessage = $('.assistantResponse:last').text();
-    if (lastAssistantMessage.trim() === "Hi..are you interested in apartments for rent or sale ?"){
+    if (lastAssistantMessage.trim() === M01_INITIAL_MESSAGE){
         suggestionsStep = 1;
         $('#suggestions').empty();
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.trim() === "Which city are you interested in ?")
+    if (lastAssistantMessage.trim() === M02_CITY)
     {
         suggestionsStep = 2;
         $('#suggestions').empty();
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.includes("You are looking for properties for") &&
-        lastAssistantMessage.includes("Give me more details about the location you are searching for"))
+    if (lastAssistantMessage.includes(M03_DETAILS_PART_2))
     {
         suggestionsStep = 3;
         $('#suggestions').empty();
