@@ -17,9 +17,11 @@ import java.util.Set;
 public class LoginController {
 
     private final SpringTemplateEngine templateEngine;
+    private final LocaleUtils localeUtils;
 
-    public LoginController(SpringTemplateEngine templateEngine){
+    public LoginController(SpringTemplateEngine templateEngine, LocaleUtils localeUtils){
         this.templateEngine = templateEngine;
+        this.localeUtils = localeUtils;
     }
 
     @GetMapping("/login-modal")
@@ -29,7 +31,7 @@ public class LoginController {
         WebContext context = new WebContext(webExchange);
 		Set<String> selectors = new HashSet<>();
 		selectors.add("loginModal");
-        context.setLocale(LocaleUtils.getCurrentLocale());
+        context.setLocale(localeUtils.getCurrentLocale());
 
 		var data = templateEngine.process("fragments",selectors, context).
 				replaceAll("[\\n\\r]+", "");

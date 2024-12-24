@@ -3,13 +3,12 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.ServiceCall;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -18,16 +17,18 @@ import java.util.Map;
 @Service
 public class ImmobiliareApiService {
 
-    @Value("classpath:/prompts/ApiDescription.txt")
-    private Resource apiDescriptionFile;
-
-    @Value("classpath:/prompts/ApartmentDescription.txt")
-    private Resource apartmentDescriptionFile;
+//    @Value("classpath:/prompts/ApiDescription.txt")
+//    private Resource apiDescriptionFile;
+//
+//    @Value("classpath:/prompts/ApartmentDescription.txt")
+//    private Resource apartmentDescriptionFile;
 
     private final ChatClient chatClient;
+    private final LocaleUtils localeUtils;
 
-    public ImmobiliareApiService(ChatClient chatClient) {
+    public ImmobiliareApiService(ChatClient chatClient, LocaleUtils localeUtils) {
         this.chatClient = chatClient;
+        this.localeUtils = localeUtils;
     }
 
     public ServiceCall whichApiToCall(String message) {
@@ -37,7 +38,8 @@ public class ImmobiliareApiService {
         var outputParser = new BeanOutputConverter<>(ServiceCall.class);
         String format = outputParser.getFormat();
 
-        PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionFile);
+        var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
+        PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
         Map<String, Object> promptParameters = new HashMap<>();
         promptParameters.put("input_here", message);
         promptParameters.put("format", format);
@@ -58,7 +60,8 @@ public class ImmobiliareApiService {
         var outputParser = new BeanOutputConverter<>(ApartmentDescription.class);
         String format = outputParser.getFormat();
 
-        PromptTemplate promptTemplate = new PromptTemplate(apartmentDescriptionFile);
+        var apartmentDescriptionPrompt = localeUtils.getLocalizedPrompt("ApartmentDescription");
+        PromptTemplate promptTemplate = new PromptTemplate(apartmentDescriptionPrompt);
         Map<String, Object> promptParameters = new HashMap<>();
         promptParameters.put("property_description", apartmentDescription);
         promptParameters.put("format", format);
