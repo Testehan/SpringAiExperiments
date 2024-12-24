@@ -14,19 +14,17 @@
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div class="flex-1 mb-4 p-4 h-full overflow-auto">
             <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/user/save}" method="POST" th:object="${user}">
-                <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2">
-                    Edit profile
-                </h2>
+                <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{profile.title}"/>
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Email:</label>
                     <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline bg-slate-200" th:field="*{email}"  readonly />
                 </div>
                 <div class="mb-4">
-                    <label for="city" class="block text-gray-700 font-bold mb-2">City you are interested in:</label>
+                    <label for="city" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.city}"/>
                     <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline">
-                        <option value="" th:selected="${city == null}">-- Select an option --</option>
+                        <option value="" th:selected="${city == null}" th:text="#{profile.dropdown.city.default}"/>
                         <th:block th:each="city: ${listCities}">
                             <option th:value="${city}">[[${city}]]</option>
                         </th:block>
@@ -34,53 +32,49 @@
                 </div>
 
                 <div class="mb-4">
-                    <label for="propertyType" class="block text-gray-700 font-bold mb-2">Property Type:</label>
+                    <label for="propertyType" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.propertyType}"/>
                     <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline">
-                        <option value="" th:selected="${propertyType == null}">-- Select an option --</option>
+                        <option value="" th:selected="${propertyType == null}" th:text="#{profile.dropdown.city.default}"/>
                         <th:block th:each="propertyType: ${listPropertyTypes}">
                             <option th:value="${propertyType}">[[${propertyType}]]</option>
                         </th:block>
                     </select>
                 </div>
                 <div class="mb-4">
-                    <label for="description" class="block text-gray-700 font-bold mb-2">Detailed description of what you are looking for:</label>
+                    <label for="description" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.description}"/>
                     <textarea id="description"
                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                               th:field="*{lastPropertyDescription}"></textarea>
                 </div>
                 <div class="mb-4">
-                    <label for="searchesAvailable" class="block text-gray-700 font-bold mb-2">Searches Available:</label>
+                    <label for="searchesAvailable" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.searches}"/>
                     <input type="text" id="searchesAvailable" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline bg-slate-200" th:field="*{searchesAvailable}"  readonly />
                 </div>
 
                 <div class="mb-4">
-                    <label for="maxNumberOfListedProperties" class="block text-gray-700 font-bold mb-2">Maximum number of listed properties:</label>
+                    <label for="maxNumberOfListedProperties" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.noproperties}"/>
                     <input type="text" id="maxNumberOfListedProperties" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline bg-slate-200" th:field="*{maxNumberOfListedProperties}"  readonly />
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Update profile
-                    </button>
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            th:text="#{profile.button.update}"/>
                 </div>
             </form>
 
             <form class="w-[80%] p-6 bg-white rounded-lg shadow-md mt-3" th:action="@{/api/user/delete}" method="POST" >
-                <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2">
-                    Delete account
-                </h2>
+                <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{profile.title.delete}"/>
                 <div class="mb-4">
                     <label for="confirmDeletionEmail" class="block text-gray-700 font-bold mb-2">Email:</label>
-                    <input type="text" id="confirmDeletionEmail" name="confirmDeletionEmail" onpaste="return false;" placeholder="Retype your email for deletion confirmation. Pasting is disabled" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"   />
+                    <input type="text" id="confirmDeletionEmail" name="confirmDeletionEmail" onpaste="return false;" th:placeholder="#{profile.input.delete.placeholder}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"   />
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
-                        Delete Account
-                    </button>
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                    th:text="#{profile.title.delete}"/>
                 </div>
             </form>
         </div>
