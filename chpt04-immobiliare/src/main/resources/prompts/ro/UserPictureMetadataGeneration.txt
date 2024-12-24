@@ -1,0 +1,2 @@
+Generați următoarele perechi cheie-valoare de metadate pentru imagine pentru utilizare pe un site web imobiliar:
+* `description` - o descriere pentru imagine, având o lungime de maximum 500 de caractere

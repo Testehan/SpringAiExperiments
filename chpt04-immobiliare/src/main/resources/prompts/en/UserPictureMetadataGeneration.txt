@@ -1,0 +1,2 @@
+Generate the following metadata key-value pairs for the picture for use on a real estate website:
+* `description` - a description for the picture, having a length of a maximum of 500 characters
