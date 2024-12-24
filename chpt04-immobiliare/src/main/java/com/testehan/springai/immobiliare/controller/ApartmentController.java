@@ -47,10 +47,12 @@ public class ApartmentController {
     private final SpringWebFluxTemplateEngine templateEngine;
     private final MessageSource messageSource;
 
+    private final LocaleUtils localeUtils;
+
     public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
                                UserService userService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
-                               MessageSource messageSource)
+                               MessageSource messageSource, LocaleUtils localeUtils)
     {
         this.apartmentService = apartmentService;
         this.conversationSession = conversationSession;
@@ -59,6 +61,7 @@ public class ApartmentController {
         this.userSseService = userSseService;
         this.userService = userService;
         this.messageSource = messageSource;
+        this.localeUtils = localeUtils;
     }
 
     @PostMapping("/save")
@@ -105,7 +108,7 @@ public class ApartmentController {
     @GetMapping("/testlanguage")
     public String language(Locale locale) {
 //        return messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", null, LocaleUtils.getCurrentLocale());
-        return messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{3}, LocaleUtils.getCurrentLocale());
+        return messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{3}, localeUtils.getCurrentLocale());
     }
 
     @GetMapping("/suggestions/{suggestionStep}")

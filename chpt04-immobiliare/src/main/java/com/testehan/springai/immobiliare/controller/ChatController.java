@@ -29,14 +29,16 @@ public class ChatController {
     private final ConversationSession conversationSession;
     private final UserService userService;
     private final MessageSource messageSource;
+    private final LocaleUtils localeUtils;
 
     public ChatController(ApiService apiService, OpenAiService openAiService, ConversationSession conversationSession,
-                          UserService userService, MessageSource messageSource) {
+                          UserService userService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.apiService = apiService;
         this.openAiService = openAiService;
         this.conversationSession = conversationSession;
         this.userService = userService;
         this.messageSource = messageSource;
+        this.localeUtils = localeUtils;
     }
 
     @HxRequest
@@ -53,12 +55,12 @@ public class ChatController {
             userService.updateUser(user);
 
             if (searchQueriesAvailable <= 5){
-                model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, LocaleUtils.getCurrentLocale()));
+                model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, localeUtils.getCurrentLocale()));
             }
             model.addAttribute("response", response.message());
 
         } else {
-            model.addAttribute("response", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, LocaleUtils.getCurrentLocale()));
+            model.addAttribute("response", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, localeUtils.getCurrentLocale()));
         }
 
     // TODO

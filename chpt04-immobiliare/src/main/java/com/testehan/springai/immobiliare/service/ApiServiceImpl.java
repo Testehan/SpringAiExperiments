@@ -20,7 +20,6 @@ import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
@@ -58,12 +57,13 @@ public class ApiServiceImpl implements ApiService{
     private ConversationService conversationService;
     private UserSseService userSseService;
     private final MessageSource messageSource;
+    private final LocaleUtils localeUtils;
 
     public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService,
                           ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
                           ConversationSession conversationSession, ConversationService conversationService,
                           UserSseService userSseService,
-                          MessageSource messageSource) {
+                          MessageSource messageSource, LocaleUtils localeUtils) {
         this.immobiliareApiService = immobiliareApiService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;
@@ -74,6 +74,7 @@ public class ApiServiceImpl implements ApiService{
         this.userSseService = userSseService;
 
         this.messageSource = messageSource;
+        this.localeUtils = localeUtils;
     }
 
     @Override
@@ -89,7 +90,7 @@ public class ApiServiceImpl implements ApiService{
             case DEFAULT : return respondToUserMessage(message);
         }
 
-        return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, LocaleUtils.getCurrentLocale()));
+        return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, localeUtils.getCurrentLocale()));
     }
 
     private ResultsResponse getApartments(String description, HttpSession session) {
@@ -110,7 +111,7 @@ public class ApiServiceImpl implements ApiService{
 
         ResultsResponse response = new ResultsResponse("");
 
-        Locale currentLocale = LocaleUtils.getCurrentLocale();
+        Locale currentLocale = localeUtils.getCurrentLocale();
         if (apartmentsFromSemanticSearch.size() > 0) {
             int batchSize = 2;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
             AtomicBoolean isFirst = new AtomicBoolean(true);
@@ -198,9 +199,9 @@ public class ApiServiceImpl implements ApiService{
             throw new RuntimeException(e);
         }
 
-        var resource = new ClassPathResource("prompts/apartments_found.txt");
+        var apartmentsFoundPrompt = localeUtils.getLocalizedPrompt("apartments_found");
 
-        var promptTemplate = new PromptTemplate(resource);
+        var promptTemplate = new PromptTemplate(apartmentsFoundPrompt);
         Map<String, Object> promptParameters = new HashMap<>();
         promptParameters.put("apartmentsFound", formatApartmentsFound(apartments));
         promptParameters.put("description", description);
@@ -221,7 +222,7 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse restartConversation() {
         conversationSession.clearConversation();
-        return new ResultsResponse(messageSource.getMessage("M01_INITIAL_MESSAGE", null, LocaleUtils.getCurrentLocale()));
+        return new ResultsResponse(messageSource.getMessage("M01_INITIAL_MESSAGE", null, localeUtils.getCurrentLocale()));
 
     }
 
@@ -230,20 +231,20 @@ public class ApiServiceImpl implements ApiService{
         conversationSession.setCity(supportedCity);
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
-            var propertyType =  messageSource.getMessage(user.getPropertyType(), null, LocaleUtils.getCurrentLocale());
+            var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
             return new ResultsResponse(
-                    messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, LocaleUtils.getCurrentLocale()) +
-                    messageSource.getMessage("M03_DETAILS_PART_2",  null, LocaleUtils.getCurrentLocale())
+                    messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, localeUtils.getCurrentLocale()) +
+                    messageSource.getMessage("M03_DETAILS_PART_2",  null, localeUtils.getCurrentLocale())
             );
         } else {
             var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
-            return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, LocaleUtils.getCurrentLocale()));
+            return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
         }
     }
 
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
         conversationSession.setRentOrSale(serviceCall.message());
-        return new ResultsResponse(messageSource.getMessage("M02_CITY", null, LocaleUtils.getCurrentLocale()));
+        return new ResultsResponse(messageSource.getMessage("M02_CITY", null, localeUtils.getCurrentLocale()));
     }
 
     private ResultsResponse setRentOrBuyAndCity(ServiceCall serviceCall) {
@@ -269,7 +270,7 @@ public class ApiServiceImpl implements ApiService{
                 .builder(chatmodel)
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
-                        new CaptureMemoryAdvisor(  vectorStore, chatmodel, executor),
+                        new CaptureMemoryAdvisor(  vectorStore, chatmodel, executor, localeUtils),
 //                        new QuestionAnswerAdvisor(      // TODO  this is an advisor to be used when you need RAG
 //                                vectorStore,            //  KEEP IN mind that if we use this for all DEFAULT requests, it will only use what it knows in the "context", and it will not use its whole knowledge..
 //                                SearchRequest.defaults().withSimilarityThreshold(.8)

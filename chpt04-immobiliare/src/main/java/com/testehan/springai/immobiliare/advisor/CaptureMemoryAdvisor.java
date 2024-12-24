@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare.advisor;
 
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -10,7 +11,6 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.core.Ordered;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.retry.support.RetryTemplateBuilder;
@@ -36,13 +36,14 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
     private MemoryBasisExtractor lastMessageMemoryBasisExtractor
             = (AdvisedRequest request) -> Collections.singletonList(new UserMessage(request.userText()));
 
-    public CaptureMemoryAdvisor(VectorStore vectorStore, ChatModel chatModel, Executor executor) {
+    public CaptureMemoryAdvisor(VectorStore vectorStore, ChatModel chatModel, Executor executor, LocaleUtils localeUtils) {
         this.vectorStore = vectorStore;
         this.chatModel = chatModel;
         this.executor = executor;
+        var captureMemoryPrompt = localeUtils.getLocalizedPrompt("capture_memory");
         this.chatClient = ChatClient
                 .builder(chatModel)
-                .defaultSystem(new ClassPathResource("prompts/capture_memory.txt"))
+                .defaultSystem(captureMemoryPrompt)
                 .build();
     }
 

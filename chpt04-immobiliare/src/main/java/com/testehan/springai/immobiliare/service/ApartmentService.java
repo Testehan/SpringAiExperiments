@@ -9,6 +9,7 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -17,7 +18,6 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.Media;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -39,23 +38,21 @@ import java.util.*;
 @Service
 public class ApartmentService {
 
-    @Value("classpath:/prompts/system/PictureMetadataGeneration.txt")
-    private Resource systemPictureMetadataGeneration;
-    @Value("classpath:/prompts/user/PictureMetadataGeneration.txt")
-    private Resource userPictureMetadataGeneration;
-
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentService.class);
 
     private final ApartmentsRepository apartmentsRepository;
     private final OpenAiService embedder;
     private final ChatModel chatModel ;
     private final UserService userService;
+    private final LocaleUtils localeUtils;
 
-    public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel, UserService userService) {
+    public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel,
+                            UserService userService, LocaleUtils localeUtils) {
         this.apartmentsRepository = apartmentsRepository;
         this.embedder = embedder;
         this.chatModel = chatModel;
         this.userService = userService;
+        this.localeUtils = localeUtils;
     }
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
@@ -202,11 +199,13 @@ public class ApartmentService {
                 URLConnection connection = url.openConnection();
                 Resource imageResource = new InputStreamResource(inputStream);
 
+                var userPictureMetadataPrompt = localeUtils.getLocalizedPrompt("UserPictureMetadataGeneration");
+                var systemPictureMetadataPrompt = localeUtils.getLocalizedPrompt("SystemPictureMetadataGeneration");
                 Message userMessage = new UserMessage(
-                        userPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()),
+                        userPictureMetadataPrompt,
                         List.of(new Media(MimeTypeUtils.parseMimeType(connection.getContentType()), imageResource))
                 );
-                Message systemMessage = new SystemMessage(systemPictureMetadataGeneration.getContentAsString(Charset.defaultCharset()));
+                Message systemMessage = new SystemMessage(systemPictureMetadataPrompt);
                 chatClientRequest.messages(List.of(systemMessage, userMessage));
                 Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {});
                 stringBuilder.append(result.get("description"));
