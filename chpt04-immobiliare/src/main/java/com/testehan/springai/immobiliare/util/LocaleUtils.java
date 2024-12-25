@@ -8,7 +8,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Files;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 @Component
@@ -28,8 +29,8 @@ public class LocaleUtils {
     public String getLocalizedPrompt(String promptFileName) {
         var locale =  getCurrentLocale();
         Resource resource = resourceLoader.getResource(getLocalizedPromptFilePath(promptFileName, locale));
-        try {
-            return new String(Files.readAllBytes(resource.getFile().toPath()));
+        try (InputStream inputStream = resource.getInputStream()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOGGER.error("Prompt file {} with locale {} could not be read",promptFileName, locale);
             throw new RuntimeException(e);
