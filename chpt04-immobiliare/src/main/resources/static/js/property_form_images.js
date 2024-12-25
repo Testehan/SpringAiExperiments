@@ -1,4 +1,4 @@
-var imagesCount=0;
+let imagesCount=0;
 
 // input validation
 const Joi = window.joi;
@@ -17,9 +17,11 @@ const schema = Joi.object({
 });
 
 $(document).ready(function(){
+    $("div[id^='divImage']").each(function(index){
+        imagesCount++;
+    });
 
     $("input[name='apartmentImages']").each(function(index){
-        imagesCount++;
         $(this).change(function(){                       // "this" is here an input type element with name image
              if (!checkFileSize(this)){
                 return ;
@@ -128,19 +130,21 @@ function showImageThumbnail(fileInput, index){
 
     reader.readAsDataURL(file);
 
-    if (index >= imagesCount-1){
+//    if (index >= imagesCount-1){
         addExtraImageSection(index + 1);
-    }
+//    }
 }
 
 function addExtraImageSection(index){
     // we need to increase index by 1 because index starts at 0, however in the UI you don't want the user to see text starting
     // from 0, like "Extra image 0"...so while the id of the elements can have 0, the other index locations are incremented.
+
+    imagesCount++;
     htmlExtraImage = `
-        <div class="col border m-3 p-2" id="divImage${index}">
-           <div id="imageHeader${index}"><label>` + LABEL_IMAGE_NUMBER + ` ${index + 1}</label></div>
+        <div class="col border m-3 p-2" id="divImage${imagesCount}">
+           <div id="imageHeader${index}"><label>` + LABEL_IMAGE_NUMBER + ` ${imagesCount}</label></div>
            <div class="">
-               <img id="newImageThumbnail${index}" alt="Image ${index + 1} preview" class="img-fluid"
+               <img id="newImageThumbnail${index}" alt="Image ${imagesCount} preview" class="img-fluid"
                     src="${defaultThumbnailImageSrc}" />
            </div>
            <div>
@@ -154,28 +158,32 @@ function addExtraImageSection(index){
     htmlLinkRemove=`
         <a class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             name='linkRemoveImage'
-            href="javascript:removeImage(${index})"
+            href="javascript:removeImage(${imagesCount-1})"
             title="Remove this image">` + BUTTON_DELETE_IMAGE + `</a>
     `;
 
     $("#apartmentImages").append(htmlExtraImage);
 
-    var divImagePrevious = $("#divImage" + (index-1));
+    var divImagePrevious = $("div[id^='divImage']").eq(-2); // second to last divimage
     var elementWithSpecificName = divImagePrevious.find('[name="linkRemoveImage"]');
 
     if (elementWithSpecificName.length > 0) {
-      var divImageCurrent= $("#divImage" + index);
-       divImageCurrent.append(htmlLinkRemove);
+    // todo this can be removed
+//      var divImageCurrent= $("#divImage" + imagesCount);
+//       divImageCurrent.append(htmlLinkRemove);
     } else {
         // we select the previous image section in order to add the remove button
         divImagePrevious.append(htmlLinkRemove);
     }
-
-    imagesCount++;
 }
 
 function removeImage(index){
+   // index--;        // because apparently these indexes start from 1 and my divs from 0
+    imagesCount = imagesCount - 2;      // because we remove both the current and last element
     $("#divImage"+index).remove();
+    const lastElement = $("div[id^='divImage']").last();    /// we need to remove the last elemet and recreate it with a correct div number id
+    lastElement.remove();
+    addExtraImageSection(index);
 }
 
 function checkFileSize(fileInput){

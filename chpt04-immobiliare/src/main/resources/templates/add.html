@@ -149,7 +149,7 @@
                         <a name="linkRemoveImage" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         th:text="#{add.a.deleteimage}"/>
                     </div>
-                    <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages}">
+                    <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages+1}">
                         <div th:id="'imageHeader'+${numberOfExistingImages}">
                             <label>
                                 <span th:text="#{add.label.imagenumber}"></span>
@@ -161,7 +161,7 @@
                                  th:src="@{/images/image-thumbnail.png}"/>
                         </div>
                         <div>
-                            <input type="file" name="apartmentImages" accept="image/png, image/jpeg" value="Choose Fileeeee" />
+                            <input type="file" name="apartmentImages" accept="image/png, image/jpeg" />
                         </div>
                     </div>
 
