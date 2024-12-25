@@ -101,14 +101,15 @@ public class MainController {
 	}
 
 	@GetMapping("/add")
-	public String add(Model model) {
+	public String add(Model model, Locale locale) {
 
 		var apartment = new Apartment();
 		model.addAttribute("listCities",SupportedCity.getSupportedCities());
 		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
 		model.addAttribute("apartment", apartment);
 		model.addAttribute("numberOfExistingImages", 0);
-		model.addAttribute("buttonMessage", "Add Apartment");
+		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
+		model.addAttribute("buttonMessage", buttonMessage);
 
 		var user = conversationSession.getImmobiliareUser();
 		List<Apartment> listOfProperties = getListOfProperties(user);
@@ -119,12 +120,13 @@ public class MainController {
 	}
 
 	@GetMapping("/edit/{apartmentId}")
-	public String edit(@PathVariable(value = "apartmentId") String apartmentId, Model model) {
+	public String edit(@PathVariable(value = "apartmentId") String apartmentId, Model model, Locale locale) {
 
 		var user = conversationSession.getImmobiliareUser();
 		model.addAttribute("apartment", new Apartment());
 		model.addAttribute("numberOfExistingImages", 0);
-		model.addAttribute("buttonMessage", "Add Apartment");
+		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
+		model.addAttribute("buttonMessage", buttonMessage);
 
 		if (user.getListedProperties().contains(apartmentId) || user.isAdmin()) {
 			var apartmentOptional = apartmentService.findApartmentById(apartmentId);
@@ -132,7 +134,8 @@ public class MainController {
 				var apartment = apartmentOptional.get();
 				model.addAttribute("apartment", apartment);
 				model.addAttribute("numberOfExistingImages", apartment.getImages().size());
-				model.addAttribute("buttonMessage", "Update Apartment");
+				buttonMessage = messageSource.getMessage("add.button.update", null, locale);
+				model.addAttribute("buttonMessage", buttonMessage);
 			}
 		}
 
