@@ -42,3 +42,5 @@ build/
 /chpt08-gemini/src/main/resources/secrets.properties
 /chpt04-immobiliare/src/main/resources/secrets-dev.properties
 /chpt04-immobiliare/src/main/resources/secrets-prod.properties
+/chpt04-immobiliare/src/main/resources/docker-google-ai-key.json
+/chpt04-immobiliare/.env

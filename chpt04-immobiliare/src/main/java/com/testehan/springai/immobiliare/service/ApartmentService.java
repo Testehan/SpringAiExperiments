@@ -1,6 +1,5 @@
 package com.testehan.springai.immobiliare.service;
 
-import com.testehan.springai.immobiliare.constants.AmazonS3Constants;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
@@ -45,14 +44,16 @@ public class ApartmentService {
     private final ChatModel chatModel ;
     private final UserService userService;
     private final LocaleUtils localeUtils;
+    private final AmazonS3Util amazonS3Util;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel,
-                            UserService userService, LocaleUtils localeUtils) {
+                            UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util) {
         this.apartmentsRepository = apartmentsRepository;
         this.embedder = embedder;
         this.chatModel = chatModel;
         this.userService = userService;
         this.localeUtils = localeUtils;
+        this.amazonS3Util = amazonS3Util;
     }
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
@@ -149,7 +150,7 @@ public class ApartmentService {
         boolean imagesWereDeleted = false;
         var uploadDir = "apartment-images/" + apartment.getId().toString();
 
-        List<String> objectKeys = AmazonS3Util.listFolder(uploadDir);
+        List<String> objectKeys = amazonS3Util.listFolder(uploadDir);
         for (String key : objectKeys){
             int lastIndexOfSlash = key.lastIndexOf("/");
             var filename = key.substring(lastIndexOfSlash + 1);
@@ -157,7 +158,7 @@ public class ApartmentService {
                 int lastSlash = imageURL.lastIndexOf("/");
                 return imageURL.substring(lastSlash+1).equals(filename);
             }).count()<1){
-                AmazonS3Util.deleteFile(key);
+                amazonS3Util.deleteFile(key);
                 imagesWereDeleted = true;
             }
         }
@@ -169,12 +170,13 @@ public class ApartmentService {
         boolean imagesWereUploaded = false;
         if (apartmentImages.size()>0) {
             var uploadDir = "apartment-images/" + apartment.getId();
+            var amazonS3BaseUri = amazonS3Util.getS3_BASE_URI();
             for (ApartmentImage extraImage : apartmentImages) {
 
                 var filename = extraImage.name();
-                AmazonS3Util.uploadFile(uploadDir, filename, extraImage.data(), extraImage.contentType());
+                amazonS3Util.uploadFile(uploadDir, filename, extraImage.data(), extraImage.contentType());
 
-                apartment.getImages().add(AmazonS3Constants.S3_BASE_URI + "/" + uploadDir + "/" + filename);
+                apartment.getImages().add(amazonS3BaseUri + "/" + uploadDir + "/" + filename);
 
                 imagesWereUploaded = true;
                 LOGGER.info("Image {} uploaded to S3 for apartment {}", filename, apartment.getName());

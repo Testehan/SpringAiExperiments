@@ -1,7 +1,9 @@
 package com.testehan.springai.immobiliare.util;
 
+import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -14,15 +16,34 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
-import static com.testehan.springai.immobiliare.constants.AmazonS3Constants.*;
 
+@Component
 public class AmazonS3Util {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmazonS3Util.class);
 
-    public static S3Client createAmazomS3() {
+//    @Value("${AWS_IMOBIL_BUCKET_NAME:Not Set}")
+//    private String BUCKET_NAME;
+//    @Value("${AWS_REGION:Not Set}")
+//    private String REGION_NAME;
+//    @Value("${AWS_IMOBIL_ACCESS_KEY_ID:Not Set}")
+//    private String ACCESS_KEY_ID;
+//    @Value("${AWS_IMOBIL_SECRET_ACCESS_KEY:Not Set}")
+//    private String SECRET_ACCESS_KEY;
 
-        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(ACCESS_KEY_ID, SECRET_ACCESS_KEY);
+    private final String S3_BASE_URI;
+
+    private BeanConfig beanConfig;
+
+    public AmazonS3Util(BeanConfig beanConfig) {
+        var pattern = "https://%s.s3.%s.amazonaws.com";
+        this.beanConfig = beanConfig;
+        S3_BASE_URI = beanConfig.getBucketName() == null ? "" : String.format(pattern, beanConfig.getBucketName(), beanConfig.getRegionName());
+    }
+
+    public S3Client createAmazomS3() {
+
+        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(beanConfig.getAwsAccessKeyId(), beanConfig.getAwsAccessSecret());
 
         S3Client client = S3Client.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
@@ -31,14 +52,14 @@ public class AmazonS3Util {
         return client;
     }
 
-    public static ListObjectsRequest listAllFilesInAmazonS3(String folderName) {
+    public ListObjectsRequest listAllFilesInAmazonS3(String folderName) {
         ListObjectsRequest listRequest = ListObjectsRequest.builder()
-                .bucket(BUCKET_NAME).prefix(folderName).build();
+                .bucket(beanConfig.getBucketName()).prefix(folderName).build();
 
         return listRequest;
     }
 
-    public static List<String> listFolder(String folderName) {
+    public List<String> listFolder(String folderName) {
 
         S3Client client = createAmazomS3();
 
@@ -57,7 +78,7 @@ public class AmazonS3Util {
 
     }
 
-    public static void uploadFile(String folderName, String fileName, InputStream inputStream, String contentType) {
+    public void uploadFile(String folderName, String fileName, InputStream inputStream, String contentType) {
 
         S3Client client = createAmazomS3();
         PutObjectRequest request = putFileInAmazonS3(folderName, fileName, contentType);
@@ -71,27 +92,27 @@ public class AmazonS3Util {
         }
     }
 
-    public static PutObjectRequest putFileInAmazonS3(String folderName, String fileName, String contentType) {
-        PutObjectRequest request = PutObjectRequest.builder().bucket(BUCKET_NAME)
+    public PutObjectRequest putFileInAmazonS3(String folderName, String fileName, String contentType) {
+        PutObjectRequest request = PutObjectRequest.builder().bucket(beanConfig.getBucketName())
                 .key(folderName + "/" + fileName).contentType(contentType).acl("public-read").build();
 
         return request;
     }
 
-    public static void deleteFile(String fileName) {
+    public void deleteFile(String fileName) {
         S3Client client = createAmazomS3();
         DeleteObjectRequest request = deleteFileFromAmazonS3(fileName);
         client.deleteObject(request);
     }
 
-    public static DeleteObjectRequest deleteFileFromAmazonS3(String fileName) {
-        DeleteObjectRequest request = DeleteObjectRequest.builder().bucket(BUCKET_NAME)
+    public DeleteObjectRequest deleteFileFromAmazonS3(String fileName) {
+        DeleteObjectRequest request = DeleteObjectRequest.builder().bucket(beanConfig.getBucketName())
                 .key(fileName).build();
 
         return request;
     }
 
-    public static void removeFolder(String folderName) {
+    public void removeFolder(String folderName) {
 
         S3Client client = createAmazomS3();
         ListObjectsRequest listRequest = listAllFilesInAmazonS3ForRemove(folderName);
@@ -107,10 +128,14 @@ public class AmazonS3Util {
         }
     }
 
-    public static ListObjectsRequest listAllFilesInAmazonS3ForRemove(String folderName) {
+    public ListObjectsRequest listAllFilesInAmazonS3ForRemove(String folderName) {
         ListObjectsRequest listRequest = ListObjectsRequest.builder()
-                .bucket(BUCKET_NAME).prefix(folderName + "/").build();
+                .bucket(beanConfig.getBucketName()).prefix(folderName + "/").build();
 
         return listRequest;
+    }
+
+    public String getS3_BASE_URI() {
+        return S3_BASE_URI;
     }
 }
