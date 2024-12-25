@@ -109,7 +109,11 @@ public class MainController {
 		model.addAttribute("apartment", apartment);
 		model.addAttribute("numberOfExistingImages", 0);
 		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
+		var deleteButtonMessage = messageSource.getMessage("add.a.deleteimage", null, locale);
+		var imageNoLabel = messageSource.getMessage("add.label.imagenumber", null, locale);
 		model.addAttribute("buttonMessage", buttonMessage);
+		model.addAttribute("deleteButtonMessage", deleteButtonMessage);
+		model.addAttribute("imageNoLabel", imageNoLabel);
 
 		var user = conversationSession.getImmobiliareUser();
 		List<Apartment> listOfProperties = getListOfProperties(user);
@@ -126,7 +130,11 @@ public class MainController {
 		model.addAttribute("apartment", new Apartment());
 		model.addAttribute("numberOfExistingImages", 0);
 		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
+		var deleteButtonMessage = messageSource.getMessage("add.a.deleteimage", null, locale);
+		var imageNoLabel = messageSource.getMessage("add.label.imagenumber", null, locale);
 		model.addAttribute("buttonMessage", buttonMessage);
+		model.addAttribute("deleteButtonMessage", deleteButtonMessage);
+		model.addAttribute("imageNoLabel", imageNoLabel);
 
 		if (user.getListedProperties().contains(apartmentId) || user.isAdmin()) {
 			var apartmentOptional = apartmentService.findApartmentById(apartmentId);

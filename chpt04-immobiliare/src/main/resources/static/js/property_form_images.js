@@ -138,7 +138,7 @@ function addExtraImageSection(index){
     // from 0, like "Extra image 0"...so while the id of the elements can have 0, the other index locations are incremented.
     htmlExtraImage = `
         <div class="col border m-3 p-2" id="divImage${index}">
-           <div id="imageHeader${index}"><label>Image no ${index + 1}</label></div>
+           <div id="imageHeader${index}"><label>` + LABEL_IMAGE_NUMBER + ` ${index + 1}</label></div>
            <div class="">
                <img id="newImageThumbnail${index}" alt="Image ${index + 1} preview" class="img-fluid"
                     src="${defaultThumbnailImageSrc}" />
@@ -155,7 +155,7 @@ function addExtraImageSection(index){
         <a class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
             name='linkRemoveImage'
             href="javascript:removeImage(${index})"
-            title="Remove this image">Delete image</a>
+            title="Remove this image">` + BUTTON_DELETE_IMAGE + `</a>
     `;
 
     $("#apartmentImages").append(htmlExtraImage);
