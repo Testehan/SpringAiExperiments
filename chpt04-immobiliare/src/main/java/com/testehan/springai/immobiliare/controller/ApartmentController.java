@@ -104,13 +104,6 @@ public class ApartmentController {
         }
     }
 
-    // TODO This is just for testing and should be removed in the end..
-    @GetMapping("/testlanguage")
-    public String language(Locale locale) {
-//        return messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", null, LocaleUtils.getCurrentLocale());
-        return messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{3}, localeUtils.getCurrentLocale());
-    }
-
     @GetMapping("/suggestions/{suggestionStep}")
     public List<String> suggestions(@PathVariable(value = "suggestionStep") Integer suggestionStep, Locale locale) {
         List<String> suggestions = new ArrayList<String>();

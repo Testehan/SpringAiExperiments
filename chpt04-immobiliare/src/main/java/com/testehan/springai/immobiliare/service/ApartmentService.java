@@ -9,6 +9,7 @@ import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -217,6 +218,9 @@ public class ApartmentService {
         }
         if (imagesWereModified) {
             apartment.setImagesGeneratedDescription(stringBuilder.toString());
+        }
+        if (apartment.getImages().size()==0){   // means that user either removed images or didn't add any
+            apartment.setImagesGeneratedDescription(Strings.EMPTY);
         }
 
     }

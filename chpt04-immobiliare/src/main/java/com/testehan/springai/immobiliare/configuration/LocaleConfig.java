@@ -7,6 +7,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
@@ -26,6 +27,8 @@ public class LocaleConfig implements CommandLineRunner {
         SessionLocaleResolver localeResolver = new SessionLocaleResolver();
         Locale defaultLocale = new Locale(defaultLanguage);
         localeResolver.setDefaultLocale(defaultLocale);
+        Locale.setDefault(defaultLocale); // Ensures the JVM uses defaultLanguage as the default.
+        LocaleContextHolder.setLocale(new Locale(defaultLanguage));
         return localeResolver;
     }
 
