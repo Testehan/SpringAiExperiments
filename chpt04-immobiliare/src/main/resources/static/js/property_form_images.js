@@ -67,6 +67,9 @@ function handleSubmit(event){
                 }).showToast();
 
                 $("#addForm")[0].reset();
+                imagesCount = 0;
+                $("#apartmentImages").empty();
+                addExtraImageSection(0);
             },
             error: function (xhr) {
                 console.log(xhr);
