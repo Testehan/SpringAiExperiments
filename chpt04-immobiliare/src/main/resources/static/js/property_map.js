@@ -1,8 +1,6 @@
 $(document).ready(function () {
 
-    // TODO when you release in production, use a new key, that has some domain restriction, meaning
-    // that it will only allow requests from your website/domain... need to research this more..
-    const apiKey = 'AIzaSyDmZ_CkQKsJxlsTT8QyVuNsJuV8oIqc0RU';
+    const apiKey = GOOGLE_MAPS_API_KEY;
 
     // Open the modal
     $('#response-container').on('click', '.openMapButton', function () {

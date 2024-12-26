@@ -25,7 +25,7 @@ public class BeanConfig {
 
     @Value("${OPEN_API_KEY}")
     private String OPENAI_API_KEY;
-
+// TODO These properties should all be moved in 1 config class i guess...
     @Value("${AWS_IMOBIL_BUCKET_NAME}")
     private String bucketName;
     @Value("${AWS_REGION}")
@@ -36,6 +36,8 @@ public class BeanConfig {
     private String awsAccessSecret;
     @Value("${GOOGLE_APPLICATION_CREDENTIALS}")
     private String googleAppCredentials;
+    @Value("${google.maps.api-key}")
+    private String googleMapsApiKey;
 
 
 //    @PostConstruct
@@ -66,16 +68,14 @@ public class BeanConfig {
         return new OpenAiEmbeddingModel(new OpenAiApi(OPENAI_API_KEY));
     }
 
-//    @Bean         // this doesn't work in a docker container, because i would need to see how to make the authentication settings that google requires in the container..
-//    @Primary      // for the moment, i added a file GOOGLE_APPLICATION_CREDENTIALS=service-account-key.json in the docker image..and i guess env variable is set however
-                    // i assume other steps are also needed to access google ai ...
+//    @Bean         // this doesn't work in a docker container see Spring AI Notes.txt
 //    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
 //        return vertexAiGeminiChatModel;
 //    }
 
     @Bean
     @Primary
-    public ChatModel getGeminiChatModel(OpenAiChatModel openAiChatModel){
+    public ChatModel getOpenAiChatModel(OpenAiChatModel openAiChatModel){
         return openAiChatModel;
     }
 
@@ -106,5 +106,9 @@ public class BeanConfig {
 
     public String getAwsAccessSecret() {
         return awsAccessSecret;
+    }
+
+    public String getGoogleMapsApiKey() {
+        return googleMapsApiKey;
     }
 }

@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
+import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
@@ -33,14 +34,17 @@ public class MainController {
 	private final UserSseService userSseService;
 	private final EmailService emailService;
 	private final MessageSource messageSource;
+	private final BeanConfig beanConfig;
 
 	public MainController(ApartmentService apartmentService, ConversationSession conversationSession,
-						  UserSseService userSseService, EmailService emailService, MessageSource messageSource) {
+						  UserSseService userSseService, EmailService emailService, MessageSource messageSource,
+						  BeanConfig beanConfig) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
 		this.emailService = emailService;
 		this.messageSource = messageSource;
+		this.beanConfig = beanConfig;
 	}
 
 	@GetMapping("/")
@@ -65,6 +69,7 @@ public class MainController {
 		}
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
+		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("M01_INITIAL_MESSAGE", messageSource.getMessage("M01_INITIAL_MESSAGE",null,locale));
 		model.addAttribute("M02_CITY", messageSource.getMessage("M02_CITY",null,locale));
@@ -85,6 +90,7 @@ public class MainController {
 		}
 
 		model.addAttribute("apartments", apartments);
+		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		return "favourites";
 	}
@@ -169,6 +175,7 @@ public class MainController {
 			}
 
 			model.addAttribute("apartment", apartment);
+			model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 			model.addAttribute("favouriteButtonStartMessage", favouritesText);
 			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 			model.addAttribute("pageName", "view");
