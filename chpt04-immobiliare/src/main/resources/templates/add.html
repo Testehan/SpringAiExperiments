@@ -17,7 +17,7 @@
 
 <div th:replace="~{navigation :: header_menu}" />
 
-<div class="flex h-[90%] pt-16">
+<div class="flex pt-16">
 
     <!-- Main Content -->
     <main class="flex overflow-auto bg-white p-4 w-full max-w-full">
@@ -187,4 +187,7 @@
         </div>
     </main>
 </div>
+
+<head th:replace="~{fragments :: footer}" />
+
 </body>
