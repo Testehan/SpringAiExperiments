@@ -63,8 +63,6 @@ public class ChatController {
             model.addAttribute("response", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, localeUtils.getCurrentLocale()));
         }
 
-    // TODO
-//        model.addAttribute("response", "this is a test for noqw");
         return HtmxResponse.builder()
                 .view("response :: responseFragment")
                 .build();
