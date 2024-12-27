@@ -1,124 +1,123 @@
-Task Description:
-You are given various types of user inputs and your job is to decide which API to call based on the input. Below are the available APIs and their descriptions.
+Descrierea sarcinii:
+Vi se oferă diferite tipuri de intrări ale utilizatorului și sarcina dvs. este să decideți ce API să apelați în funcție de intrare. Mai jos sunt API-urile disponibile și descrierile acestora.
 
-Available APIs:
-1. **Sale or rent API**: Determines if the user wants to rent or buy an apartment. If the user mentions buy or sale then your reply must be "sale".
+API-uri disponibile:
+1. **Sale or rent API**: Stabilește dacă utilizatorul dorește să închirieze sau să cumpere un apartament. Dacă utilizatorul menționează cumpărare sau vânzare, atunci răspunsul dvs. trebuie să fie „vânzare”.
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city".
+2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă este menționat un nume de oraș, acest API ar trebui apelat. Sunt acceptate doar Cluj-Napoca și București, așa că dacă este menționat un alt nume de oraș trebuie să răspundeți cu "Unsupported city".
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-3.**Sale or rent and city of interest API**: Determines if the user wants to buy or rent and also the city that interests the user. If a city name and the type of property, meaning rent or buy is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city". Your reply must have the format "rent,city name" or "buy,city name". So the separator of the 2 values is the comma.
+3. **Vânzare sau închiriere și oraș de interes API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze și, de asemenea, orașul care îl interesează. Dacă se menționează numele orașului și tipul de proprietate, adică închiriere sau cumpărare, acest API ar trebui să fie apelat. Sunt acceptate doar Cluj-Napoca și București, așa că dacă este menționat un alt nume de oraș trebuie să răspundeți cu "Unsupported city". Răspunsul dvs. trebuie să aibă formatul "rent,city name" sau "buy,city name". Deci separatorul celor 2 valori este virgula.
      - **Endpoint**: `/setRentOrBuyAndCity`
      - **Parameters**: `message` (string)
 
-4. **Apartments description API**: Displays a list of apartments available based on a description or a list of criteria or attributes or properties the user provides for the search.
+4. **Apartments description API**: Afișează o listă de apartamente disponibile pe baza unei descrieri sau a unei liste de criterii sau atribute sau proprietăți furnizate de utilizator pentru căutare.
    - **Endpoint**: `/getApartments`
    - **Parameters**: `message` (string)
 
-5. **Restart API**: Restarts the conversation.
+5. **Reporniți API**: Repornește conversația. Cand userul introduce cuvantul "restart"
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-6. **Last option API**: If the user has requests that are not covered by the other APIs consider this as the default API.
+6. **Ultima opțiune API**: dacă utilizatorul are solicitări care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
-User Input Format:
-- The input will be a single string containing a request or question from the user.
-- Examples:
-  - "I want to buy an apartment"
-  - "I want to rent an apartment"
-  - "I am interested in Bucharest."
-  - "Bucharest"
-  - "I am looking for an apartment in Marasti, with a price range between 100000 and 150000 euro."
-  - "I am looking for an apartment in Marasti, that has about 70 square meters."
+Format de intrare utilizator:
+- Intrarea va fi un singur șir care conține o cerere sau o întrebare din partea utilizatorului.
+- Exemple:
+ - „Vreau să cumpăr un apartament”
+ - „Vreau să închiriez un apartament”
+ - „Sunt interesat de Cluj-Napoca”.
+ - „Cluj-Napoca”
+ - "Caut apartament in Marasti, cu o gama de preturi intre 100000 si 150000 euro."
+ - "Caut un apartament in Marasti, care are aproximativ 70 de metri patrati."
 
-Instructions:
-Based on the user input, decide which API to call and specify the endpoint and parameters needed.
-If you can't identify which API to call reply with **Not relevant API** information
+Instrucţiuni:
+Pe baza datelor introduse de utilizator, decideți ce API să apelați și specificați punctul final și parametrii necesari.
+Dacă nu puteți identifica ce API să apelați, răspundeți cu informații despre **API nu sunt relevante**
 
-Examples:
-- User Input: "Tell me a dad joke"
+Exemple:
+- Intrarea utilizatorului: „Spune-mi o glumă cu tata”
   - API Call: `/default`
-  - Parameters: `\{"message": "Tell me a dad joke"\}`
+  - Parameters: `\{"message": "spune-mi o glumă cu tata"\}`
 
-- User Input: "What is the biggest WW2 military operation"
+- Intrarea utilizatorului: „Care este cea mai mare operațiune militară din cel de-al doilea război mondial”
   - API Call: `/default`
-  - Parameters: `\{"message": "What is the biggest WW2 military operation"\}`
+  - Parameters: `\{"message": "Care este cea mai mare operațiune militară din cel de-al doilea război mondial"\}`
 
-- User Input: "buy"
+- Intrarea utilizatorului: „cumpăr”
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "sale"\}`
 
-- User Input: "I want to buy an apartment"
+- Intrarea utilizatorului: „Vreau să cumpăr un apartament”
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "sale"\}`
 
-- User Input: "I want to see apartments available for sale"
+- Intrarea utilizatorului: „Vreau să văd apartamente disponibile pentru vânzare”
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "sale"\}`
 
-- User Input: "I want to rent"
+- Intrarea utilizatorului: „Vreau să închiriez”
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "rent"\}`
 
-- User Input: "buy"
-  - API Call: `/setRentOrBuy`
-  - Parameters: `\{"message": "buy"\}`
-
-- User Input: "Cluj"
-  - API Call: `/setCity`
-  - Parameters: `\{"message": "Cluj"\}`
-
-- User Input: "Cluj"
+- Intrare utilizator: „Cluj”
   - API Call: `/setCity`
   - Parameters: `\{"message": "Cluj-Napoca"\}`
 
-- User Input: "I want to search in Bucharest"
+- Intrare utilizator: „Vreau să caut în București”
   - API Call: `/setCity`
   - Parameters: `\{"message": "Bucharest"\}`
 
-- User Input: "I want to search in New-York"
+- Intrare utilizator: „Vreau să caut în New-York”
   - API Call: `/setCity`
   - Parameters: `\{"message": "Unsupported city"\}`
 
-- User Input: "I'm looking for an apartment to rent in Cluj-Napoca."
+- Intrare utilizator: „Caut un apartament de închiriat în Cluj-Napoca.”
   - API Call: `/setRentOrBuyAndCity`
   - Parameters: `\{"message": "rent,Cluj-Napoca"\}`
 
-- User Input: "Can you help me find a house for sale in Bucharest?"
+- Intrarea utilizatorului: „Ma puteți ajuta să găsesc o casă de vânzare în București?”
   - API Call: `/setRentOrBuyAndCity`
   - Parameters: `\{"message": "sale,Bucharest"\}`
 
-
-- User Input: "I am looking for a location that has a price under 100000 euro and is a good neighborhood"
+- Intrarea utilizatorului: „Caut o locație care are un preț sub 100000 euro și este un cartier bun”
   - API Call: `/getApartments`
-  - Parameters: `\{"message": "I am looking for a location that has a price under 100000 euro and is a good neighborhood"\}`
+  - Parameters: `\{"message": "Caut o locație care are un preț sub 100000 euro și este un cartier bun"\}`
 
-- User Input: "I want a big apartment with a south orientation in Marasti neighbourhood"
+- Intrare utilizator: "Vreau un apartament mare cu orientare sud in cartierul Marasti"
   - API Call: `/getApartments`
-  - Parameters: `\{"message": "I want a big appartment with a south orientation in Marasti neighbourhood"\}`
+  - Parameters: `\{"message": "Vreau un apartament mare cu orientare sud in cartierul Marasti"\}`
 
-- User Input: "i want something with bedside lamps"
+- Intrare utilizator: „vreau ceva cu lămpi de noptieră”
   - API Call: `/getApartments`
-  - Parameters: `\{"message": "i want something with bedside lamps"\}`
+  - Parameters: `\{"message": "vreau ceva cu lămpi de noptieră"\}`
 
-- User Input: "restart"
+- Intrare utilizator: „repornire”
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
 
-- User Input: "restart the conversation"
+- Intrare utilizator: „restart”
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
 
-- User Input: "start from the beginning"
+- Intrare utilizator: „resetare”
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
 
-### User Input: {input_here}
+- Intrare utilizator: „reporniți conversația”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: „începe de la început”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+### Intrare utilizator: {input_here}
 API Call:
 Parameters:
 

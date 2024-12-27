@@ -65,14 +65,6 @@ Examples:
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "rent"\}`
 
-- User Input: "buy"
-  - API Call: `/setRentOrBuy`
-  - Parameters: `\{"message": "buy"\}`
-
-- User Input: "Cluj"
-  - API Call: `/setCity`
-  - Parameters: `\{"message": "Cluj"\}`
-
 - User Input: "Cluj"
   - API Call: `/setCity`
   - Parameters: `\{"message": "Cluj-Napoca"\}`
