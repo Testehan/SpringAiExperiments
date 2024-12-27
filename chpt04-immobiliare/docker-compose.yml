@@ -1,10 +1,15 @@
 version: '3.8'
 services:
   app:
+    image: casamia
+    container_name: casamia
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "8080:8080" # Map container port 8080 to host port 8080
-    env_file:
-      - .env
+
+
+# commented out this, because i added the spring profile in the Docker file, and all other entries from .env are present in the .properties files
+#    env_file:
+#      - .env
