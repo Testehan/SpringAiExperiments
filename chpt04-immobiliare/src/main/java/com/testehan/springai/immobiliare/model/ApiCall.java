@@ -7,7 +7,8 @@ public enum ApiCall {
     SET_RENT_OR_BUY_AND_CITY("/setRentOrBuyAndCity"),
     GET_APARTMENTS("/getApartments"),
     RESTART_CONVERSATION("/restart"),
-    DEFAULT("/default");
+    DEFAULT("/default"),
+    NOT_SUPPORTED("/notSupported");
 
     private final String path;
 

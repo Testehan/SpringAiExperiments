@@ -22,9 +22,13 @@ Available APIs:
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-6. **Last option API**: If the user has requests that are not covered by the other APIs consider this as the default API.
+6. **Last option API**: If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
+
+7. **Last resort API**: If the user has requests or questions that are not related in any way to real estate domain this API must be used.
+  - **Endpoint**: `/notSupported`
+  - **Parameters**: `message` (string)
 
 User Input Format:
 - The input will be a single string containing a request or question from the user.
@@ -42,11 +46,11 @@ If you can't identify which API to call reply with **Not relevant API** informat
 
 Examples:
 - User Input: "Tell me a dad joke"
-  - API Call: `/default`
+  - API Call: `/notSupported`
   - Parameters: `\{"message": "Tell me a dad joke"\}`
 
 - User Input: "What is the biggest WW2 military operation"
-  - API Call: `/default`
+  - API Call: `/notSupported`
   - Parameters: `\{"message": "What is the biggest WW2 military operation"\}`
 
 - User Input: "buy"

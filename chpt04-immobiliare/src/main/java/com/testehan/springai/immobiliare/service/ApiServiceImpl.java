@@ -88,6 +88,8 @@ public class ApiServiceImpl implements ApiService{
             case GET_APARTMENTS:{ return getApartments(message, session); }
             case RESTART_CONVERSATION : { return restartConversation(); }
             case DEFAULT : return respondToUserMessage(message);
+            case NOT_SUPPORTED : return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, localeUtils.getCurrentLocale()));
+
         }
 
         return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, localeUtils.getCurrentLocale()));
@@ -322,6 +324,8 @@ public class ApiServiceImpl implements ApiService{
                         advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
                     }
                 })
+                // todo it would be nice to have this response formatted ...
+//                .system("Please generate the response inside HTML code. Your response must not start with ```html and must not contain \\n or other newline characters. The response must be valid HTML code and must have a div as top element.")
                 .user(userMessage)
                 .call().content();
 

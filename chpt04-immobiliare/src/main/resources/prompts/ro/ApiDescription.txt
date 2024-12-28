@@ -22,9 +22,13 @@ API-uri disponibile:
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-6. **Ultima opțiune API**: dacă utilizatorul are solicitări care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
+6. **General imobiliar API**: Dacă utilizatorul are alte solicitări sau intrebari legate de domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
+
+7. **Ultima opțiune API**: Dacă utilizatorul are alte solicitări sau intrebari care nu au nici o legatura cu domeniul imobiliar acesta e API-ul care trebuie folosit.
+  - **Endpoint**: `/notSupported`
+  - **Parameters**: `message` (string)
 
 Format de intrare utilizator:
 - Intrarea va fi un singur șir care conține o cerere sau o întrebare din partea utilizatorului.
@@ -42,11 +46,11 @@ Dacă nu puteți identifica ce API să apelați, răspundeți cu informații des
 
 Exemple:
 - Intrarea utilizatorului: „Spune-mi o glumă cu tata”
-  - API Call: `/default`
+  - API Call: `/notSupported`
   - Parameters: `\{"message": "spune-mi o glumă cu tata"\}`
 
 - Intrarea utilizatorului: „Care este cea mai mare operațiune militară din cel de-al doilea război mondial”
-  - API Call: `/default`
+  - API Call: `/notSupported`
   - Parameters: `\{"message": "Care este cea mai mare operațiune militară din cel de-al doilea război mondial"\}`
 
 - Intrarea utilizatorului: „cumpăr”
