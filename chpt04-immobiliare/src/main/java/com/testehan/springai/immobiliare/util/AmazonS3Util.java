@@ -22,15 +22,6 @@ public class AmazonS3Util {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AmazonS3Util.class);
 
-//    @Value("${AWS_IMOBIL_BUCKET_NAME:Not Set}")
-//    private String BUCKET_NAME;
-//    @Value("${AWS_REGION:Not Set}")
-//    private String REGION_NAME;
-//    @Value("${AWS_IMOBIL_ACCESS_KEY_ID:Not Set}")
-//    private String ACCESS_KEY_ID;
-//    @Value("${AWS_IMOBIL_SECRET_ACCESS_KEY:Not Set}")
-//    private String SECRET_ACCESS_KEY;
-
     private final String S3_BASE_URI;
 
     private BeanConfig beanConfig;

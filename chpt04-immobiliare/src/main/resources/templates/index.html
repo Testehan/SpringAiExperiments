@@ -12,35 +12,35 @@
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <section class="text-center">
-            <h1 class="text-4xl font-bold text-gray-900">Find Your Perfect Long-Term Home Effortlessly</h1>
-            <p class="mt-4 text-lg text-gray-600">
-                Our AI-powered solution simplifies finding ideal rentals <u>directly from owners</u> to suit your lifestyle and budget.
+            <h1 class="text-4xl font-bold text-gray-900" th:text="#{index.title}">Find Your Perfect Long-Term Home Effortlessly</h1>
+            <p class="mt-4 text-lg text-gray-600" th:utext="#{index.subtitle}">
+
             </p>
         </section>
 
         <!-- How It Works Section for renters -->
         <section class="mt-12">
-            <h2 class="text-2xl font-semibold text-gray-800 text-center">How It Works - Renters</h2>
+            <h2 class="text-2xl font-semibold text-gray-800 text-center" th:text="#{index.howrenters.title}">How It Works - Renters</h2>
             <div class="mt-4 grid gap-8 md:grid-cols-4">
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xl">1</div>
-                    <h3 class="mt-4 font-semibold text-lg">Login using Google or Facebook</h3>
-                    <p class="mt-2 text-sm text-gray-600">Needed to make the best experience.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howrenters.step1.title}">Login using Google or Facebook</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howrenters.step1.extra}">Needed to make the best experience.</p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xl">2</div>
-                    <h3 class="mt-4 font-semibold text-lg">Chat with Our AI</h3>
-                    <p class="mt-2 text-sm text-gray-600">Answer a few questions about your preferences and needs.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howrenters.step2.title}">Chat with Our AI</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howrenters.step2.extra}">Answer a few questions about your preferences and needs.</p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xl">3</div>
-                    <h3 class="mt-4 font-semibold text-lg">Discover Your Options</h3>
-                    <p class="mt-2 text-sm text-gray-600">Browse through the listings tailored to you.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howrenters.step3.title}">Discover Your Options</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howrenters.step3.extra}">Browse through the listings tailored to you.</p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-xl">4</div>
-                    <h3 class="mt-4 font-semibold text-lg">Connect with Landlords</h3>
-                    <p class="mt-2 text-sm text-gray-600">Secure your rental seamlessly.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howrenters.step4.title}">Connect with Landlords</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howrenters.step4.extra}">Secure your rental seamlessly.</p>
                 </div>
             </div>
             <p class="mt-2 text-center">
@@ -49,7 +49,8 @@
                    hx-trigger="click"
                    hx-swap="none"
                    hx-on="htmx:beforeRequest: checkLogin(event)"
-                   target="">
+                   target=""
+                   th:text="#{index.howrenters.button}">
                     Find Rentals Now
                 </a>
             </p>
@@ -59,27 +60,27 @@
 
         <!-- How It Works Section for owners -->
         <section>
-            <h2 class="text-2xl font-semibold text-gray-800 text-center">How It Works - Owners</h2>
+            <h2 class="text-2xl font-semibold text-gray-800 text-center" th:text="#{index.howowners.title}">How It Works - Owners</h2>
             <div class="mt-4 grid gap-8 md:grid-cols-4">
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-xl">1</div>
-                    <h3 class="mt-4 font-semibold text-lg">Login using Google or Facebook</h3>
-                    <p class="mt-2 text-sm text-gray-600">Needed to make the best experience.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howowners.step1.title}">Login using Google or Facebook</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howowners.step1.extra}">Needed to make the best experience.</p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-xl">2</div>
-                    <h3 class="mt-4 font-semibold text-lg">List Your Property</h3>
-                    <p class="mt-2 text-sm text-gray-600">Provide key details about your rental property in a few simple steps.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howowners.step2.title}">List Your Property</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howowners.step2.extra}">Provide key details about your rental property in a few simple steps.</p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-xl">3</div>
-                    <h3 class="mt-4 font-semibold text-lg">Chat with Renters</h3>
-                    <p class="mt-2 text-sm text-gray-600">Receive inquiries and communicate with potential renters.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howowners.step3.title}">Chat with Renters</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howowners.step3.extra}">Receive inquiries and communicate with potential renters.</p>
                 </div>
                 <div class="text-center">
                     <div class="w-16 h-16 mx-auto bg-green-100 text-green-600 rounded-full flex items-center justify-center font-bold text-xl">4</div>
-                    <h3 class="mt-4 font-semibold text-lg">Secure a Tenant</h3>
-                    <p class="mt-2 text-sm text-gray-600">Finalize agreements and manage your rental with ease.</p>
+                    <h3 class="mt-4 font-semibold text-lg" th:text="#{index.howowners.step4.title}">Secure a Tenant</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.howowners.step4.extra}">Finalize agreements and manage your rental with ease.</p>
                 </div>
             </div>
             <p class="mt-2 text-center">
@@ -88,7 +89,8 @@
                    hx-trigger="click"
                    hx-swap="none"
                    hx-on="htmx:beforeRequest: checkLogin(event)"
-                   target="">
+                   target=""
+                   th:text="#{index.howowners.button}">
                     Add Listing Now
                 </a>
             </p>
@@ -98,23 +100,23 @@
 
         <!-- Features Section -->
         <section>
-            <h2 class="text-2xl font-semibold text-gray-800 text-center">Why Choose Us?</h2>
-            <div class="mt-8 grid gap-8 md:grid-cols-2">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center" th:text="#{index.whyus.title}">Why Choose Us?</h2>
+            <div class="mt-8 grid gap-8 md:grid-cols-2 text-center">
                 <div>
-                    <h3 class="font-semibold text-lg">AI-Powered Search</h3>
-                    <p class="mt-2 text-sm text-gray-600">Personalized recommendations through intelligent chat.</p>
+                    <h3 class="font-semibold text-lg" th:text="#{index.whyus.step1.title}">AI-Powered Search</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.whyus.step1.extra}">Personalized recommendations through intelligent chat.</p>
                 </div>
                 <div>
-                    <h3 class="font-semibold text-lg">Verified Listings</h3>
-                    <p class="mt-2 text-sm text-gray-600">Only trustworthy and up-to-date rental options.</p>
+                    <h3 class="font-semibold text-lg" th:text="#{index.whyus.step2.title}">Verified Listings</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.whyus.step2.extra}">Only trustworthy and up-to-date rental options.</p>
                 </div>
                 <div>
-                    <h3 class="font-semibold text-lg">Flexible Preferences</h3>
-                    <p class="mt-2 text-sm text-gray-600">Filter by budget, location, and amenities.</p>
+                    <h3 class="font-semibold text-lg" th:text="#{index.whyus.step3.title}">Flexible Preferences</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.whyus.step3.extra}">Filter by budget, location, and amenities.</p>
                 </div>
                 <div>
-                    <h3 class="font-semibold text-lg">24/7 Availability</h3>
-                    <p class="mt-2 text-sm text-gray-600">Your virtual rental assistant is always on.</p>
+                    <h3 class="font-semibold text-lg" th:text="#{index.whyus.step4.title}">24/7 Availability</h3>
+                    <p class="mt-2 text-sm text-gray-600" th:text="#{index.whyus.step4.extra}">Your virtual rental assistant is always on.</p>
                 </div>
             </div>
         </section>
@@ -123,7 +125,7 @@
 
         <section>
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <h2 class="text-2xl font-semibold text-gray-800 text-center">Ce Spun Utilizatorii Noștri?</h2>
+                <h2 class="text-2xl font-semibold text-gray-800 text-center" th:text="#{index.reviews.title}">What Are Our Users Saying?</h2>
 
                 <div class="mt-10 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
                     <!-- Testimonial 1 -->
