@@ -1,5 +1,9 @@
 package com.testehan.springai.immobiliare.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import java.util.Arrays;
+
 public enum ApiCall {
 
     SET_RENT_OR_BUY("/setRentOrBuy"),
@@ -18,5 +22,11 @@ public enum ApiCall {
 
     public String getPath() {
         return path;
+    }
+
+    @JsonCreator
+    public static ApiCall getByValue(String t) {
+        return Arrays.stream(ApiCall.values())
+                .filter(a -> a.name().equals(t)).findFirst().orElse(ApiCall.NOT_SUPPORTED);
     }
 }

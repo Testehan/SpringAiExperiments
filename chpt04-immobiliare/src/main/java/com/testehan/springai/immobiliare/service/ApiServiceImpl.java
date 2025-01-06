@@ -80,7 +80,7 @@ public class ApiServiceImpl implements ApiService{
     @Override
     public ResultsResponse getChatResponse(String message, HttpSession session) {
         var serviceCall = immobiliareApiService.whichApiToCall(message);
-// TODO make sure that a prompt like "what is the meaning of life" gets to M00_IRRELEVANT_PROMPT
+
         switch (serviceCall.apiCall()) {
             case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
             case SET_CITY : { return setCity(serviceCall); }
