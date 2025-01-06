@@ -39,6 +39,9 @@ public class ImmobiliareUser {
 
     private String isAdmin;
 
+    private Boolean gdprConsent;
+    private String gdprTimestamp;
+
     public ImmobiliareUser() {
         this.favouriteProperties = new ArrayList<>();
         this.maxNumberOfListedProperties = 1;

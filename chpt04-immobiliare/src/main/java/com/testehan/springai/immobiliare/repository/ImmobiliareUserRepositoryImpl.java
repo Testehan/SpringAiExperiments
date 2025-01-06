@@ -88,7 +88,10 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("propertyType",user.getPropertyType())
                         .append("lastPropertyDescription",user.getLastPropertyDescription())
                         .append("searchesAvailable",user.getSearchesAvailable())
-                        .append("isAdmin",user.getIsAdmin()));
+                        .append("isAdmin",user.getIsAdmin())
+                        .append("gdprConsent",user.getGdprConsent())
+                        .append("gdprTimestamp",user.getGdprTimestamp())
+        );
 
         UpdateResult result = collection.updateOne(filter, update);
     }

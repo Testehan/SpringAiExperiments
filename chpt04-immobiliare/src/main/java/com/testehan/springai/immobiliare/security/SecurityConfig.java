@@ -28,7 +28,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(req -> req
                 .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/edit/**","/api/apartments/**",
                         "/actuator/**","/api/user/**","/profile","/view/**").authenticated()
-                .requestMatchers("/","/help","/blog","/contact", "/error/**", "/error-login", "/login-modal", "/reactivate","/confirmation").permitAll()
+                .requestMatchers("/","/help","/blog","/contact", "/error/**", "/error-login", "/login-modal",
+                        "/reactivate","/confirmation","/accept-gdpr").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
                 .requestMatchers(antMatcher("/webjars/**")).permitAll()
