@@ -121,8 +121,4 @@ Exemple:
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
 
-### Intrare utilizator: {input_here}
-API Call:
-Parameters:
-
 {format}

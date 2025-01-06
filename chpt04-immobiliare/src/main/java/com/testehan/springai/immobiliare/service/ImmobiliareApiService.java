@@ -41,12 +41,13 @@ public class ImmobiliareApiService {
         var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
         PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
         Map<String, Object> promptParameters = new HashMap<>();
-        promptParameters.put("input_here", message);
+//        promptParameters.put("input_here", message);
         promptParameters.put("format", format);
         Prompt prompt = promptTemplate.create(promptParameters);
 
         assistantResponse = chatClient.prompt()
-                .user(prompt.getContents())
+                .system(prompt.getContents())   //Move large static content to the system message field
+                .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
                 .call().chatResponse();
 
         ServiceCall serviceCall = outputParser.convert(assistantResponse.getResult().getOutput().getContent());

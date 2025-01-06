@@ -114,8 +114,4 @@ Examples:
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
 
-### User Input: {input_here}
-API Call:
-Parameters:
-
 {format}
