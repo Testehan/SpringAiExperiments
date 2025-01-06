@@ -4,10 +4,13 @@ $(document).ready(function () {
 
   // Check if consent is already given
   const consentGiven = localStorage.getItem(consentKey);
+  const consentSavedInDB = localStorage.getItem(consentSavedInDBKey);
   if (!consentGiven || consentGiven === 'false') {
     $('#gdpr-consent-banner').removeClass('hidden');
   } else {
-    storeConsent(true);
+    if (consentGiven && consentSavedInDB === 'false'){
+        storeConsent(true);
+    }
   }
 
   // Accept button click event
