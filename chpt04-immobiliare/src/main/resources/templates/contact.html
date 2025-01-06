@@ -2,13 +2,15 @@
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
 <head th:replace="~{fragments :: page_head('none')}" />
+<script th:src="@{/js/contact_form.js}"></script>
 
 <body class="h-screen bg-gray-100" >
 
 <head th:replace="~{navigation :: header_menu}" />
 
+<div th:replace="~{fragments :: gdpr}" />
 
-<script th:src="@{/js/contact_form.js}"></script>
+
 
 <div class="flex h-[90%] pt-16">
 

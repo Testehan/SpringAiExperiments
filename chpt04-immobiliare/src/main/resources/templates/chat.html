@@ -46,7 +46,9 @@
 
 <head th:replace="~{navigation :: header_menu}" />
 
-<div class="flex h-[99%] pt-16">
+<div th:replace="~{fragments :: gdpr}" />
+
+<div id="mainContainer" class="flex h-[99%] pt-16">
 
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
