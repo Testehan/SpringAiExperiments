@@ -112,7 +112,7 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
     public void resetSearchesAvailable() {
         MongoCollection<Document> collection = mongoDatabase.getCollection("users");
        // should update all users that are not admin
-        Document filter = new Document("isAdmin", false);
+        Document filter = new Document("isAdmin", "false");
 
         Document update = new Document("$set", new Document("searchesAvailable",10));
 
