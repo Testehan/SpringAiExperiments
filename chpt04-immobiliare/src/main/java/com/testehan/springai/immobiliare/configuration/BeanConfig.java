@@ -40,17 +40,6 @@ public class BeanConfig {
     private String googleMapsApiKey;
 
 
-//    @PostConstruct
-//    public void init() {
-//        System.out.println("++++++++++++++++++++++++++++++++++++++");
-//        System.out.println("Bucket Name: " + bucketName);
-//        System.out.println("regionName: " + regionName);
-//        System.out.println("awsAccessKeyId: " + awsAccessKeyId);
-//        System.out.println("awsAccessSecret: " + awsAccessSecret);
-//        System.out.println("googleAppCredentials: " + googleAppCredentials);
-//        System.out.println("OPENAI_API_KEY: " + OPENAI_API_KEY);
-//    }
-
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder){
         return builder.defaultAdvisors(new MessageChatMemoryAdvisor(new InMemoryChatMemory()))
@@ -69,6 +58,7 @@ public class BeanConfig {
     }
 
 //    @Bean         // this doesn't work in a docker container see Spring AI Notes.txt
+//    @Primary
 //    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
 //        return vertexAiGeminiChatModel;
 //    }

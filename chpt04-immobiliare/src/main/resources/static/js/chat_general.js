@@ -86,6 +86,7 @@ function setUpScrollingToLastUserMessage(){
 
                 const targetElements = document.querySelectorAll(`.${targetClassName}`);
                 const lastElement = targetElements[targetElements.length - 1];
+                const container = $('#response-container');
 
                 // hide spinner when we get an assistant response, that is not obtained via SSE
                 const addedNodes = mutation.addedNodes;
@@ -98,8 +99,23 @@ function setUpScrollingToLastUserMessage(){
                         }
                     }
 
-                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode ===  $("#response-container")[0]) {
-                        lastElement.scrollIntoView({ behavior: "smooth" });
+// TODO if no more issues with autoscrolling this can be removed
+//                    if (lastElement && node.nodeType === Node.ELEMENT_NODE && node.parentNode ===  $("#response-container")[0]) {
+//                        lastElement.scrollIntoView({ behavior: "smooth" });
+//                    }
+
+                    if (node.nodeType === Node.ELEMENT_NODE && ( node.childNodes[1].classList.contains('assistantResponse') ||
+                        node.childNodes[1].classList.contains('userMessage')))
+                    {
+                        if (lastElement && container.has(lastElement).length) {
+                            const lastElementRect = $(lastElement)[0].getBoundingClientRect();
+                            const containerRect = container[0].getBoundingClientRect();
+
+                            // Calculate the new scroll position to bring the target element to the top of the container
+                            const scrollOffset = container.scrollTop() + (lastElementRect.top - containerRect.top);
+                            // Scroll the container to the calculated position
+                            container.animate({ scrollTop: scrollOffset }, 'smooth');
+                        }
                     }
 
                 }
