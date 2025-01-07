@@ -235,6 +235,12 @@ public class MainController {
 		return "confirmation";
 	}
 
+	@GetMapping("/privacy-policy")
+	public String privacy(Model model) {
+		model.addAttribute("privacyMessage", "A random privacy message");
+		return "privacy";
+	}
+
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
 		List<Apartment> listOfProperties;
 		if (user.isAdmin()){
