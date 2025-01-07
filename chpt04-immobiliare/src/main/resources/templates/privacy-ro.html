@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: page_head('none')}" />
+
+<body class="h-screen bg-gray-100" >
+
+<head th:replace="~{navigation :: header_menu}" />
+
+<div th:replace="~{fragments :: gdpr}" />
+
+<div class="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-28">
+    <h1 class="text-3xl font-bold text-center text-blue-600 mb-6">Politica de confidențialitate</h1>
+    <p class="text-sm text-gray-600 text-center mb-6">Ultima actualizare: <span class="font-semibold">20-01-2025</span></p>
+
+    <p class="mb-4">
+        CasaMia.ai (<span class="font-semibold">„noi”, „al nostru”</span> sau <span class="font-semibold">„nouă”</span>) respectă confidențialitatea dumneavoastră și se angajează să o protejeze prin această Politică de Confidențialitate. Acest document descrie modul în care colectăm, utilizăm și protejăm datele dumneavoastră personale și explică drepturile dumneavoastră conform legislației aplicabile, inclusiv Regulamentul General privind Protecția Datelor (GDPR).
+    </p>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 1 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">1. Informații pe care le colectăm</h2>
+    <p class="mb-4">Colectăm următoarele tipuri de date personale:</p>
+
+    <h3 class="text-xl font-semibold mb-2">1.1 Informații de identificare personală (PII)</h3>
+    <ul class="list-disc list-inside mb-4">
+        <li>Nume</li>
+        <li>Adresă de email</li>
+        <li>Număr de telefon</li>
+        <li>Adresă</li>
+    </ul>
+
+    <h3 class="text-xl font-semibold mb-2">1.2 Date comportamentale</h3>
+    <ul class="list-disc list-inside mb-4">
+        <li>Interacțiuni ale utilizatorilor</li>
+        <li>Date de utilizare a aplicației</li>
+        <li>Preferințele utilizatorilor</li>
+    </ul>
+
+    <h3 class="text-xl font-semibold mb-2">1.3 Cum sunt colectate datele</h3>
+    <ul class="list-disc list-inside mb-4">
+        <li><span class="font-semibold">Input al utilizatorului:</span> Informații furnizate prin formulare, înregistrări și actualizări ale profilului.</li>
+        <li><span class="font-semibold">Colectare automată:</span> Cookie-urile și instrumentele de analiză colectează informații despre interacțiunile dumneavoastră cu aplicația.</li>
+        <li><span class="font-semibold">Integrări terțe:</span> Date colectate prin login-ul cu Google sau Facebook.</li>
+    </ul>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 2 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">2. Cum utilizăm datele dumneavoastră</h2>
+    <ul class="list-disc list-inside mb-4">
+        <li><span class="font-semibold">Funcționalitate de bază a aplicației:</span> Pentru a furniza servicii, inclusiv afișarea de proprietăți de închiriat personalizate pe baza preferințelor dumneavoastră.</li>
+        <li><span class="font-semibold">Analiză și îmbunătățiri:</span> Pentru a monitoriza și a îmbunătăți performanța aplicației noastre.</li>
+        <li><span class="font-semibold">Marketing și comunicare:</span> Pentru a trimite actualizări promoționale sau notificări importante.</li>
+    </ul>
+
+    <h3 class="text-xl font-semibold mb-2">Partajare cu terțe părți</h3>
+    <ul class="list-disc list-inside mb-4">
+        <li><span class="font-semibold">Google Analytics:</span> Pentru analiza utilizării aplicației.</li>
+        <li><span class="font-semibold">MongoDB Atlas:</span> Pentru stocarea sigură a datelor.</li>
+        <li><span class="font-semibold">OpenAI LLM:</span> Pentru procesarea inputului utilizatorilor și oferirea de recomandări personalizate privind proprietățile.</li>
+    </ul>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 3 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">3. Drepturi și controale ale utilizatorilor</h2>
+    <p class="mb-4">
+        Conform GDPR, aveți următoarele drepturi:
+    </p>
+    <h3 class="text-xl font-semibold mb-2">3.1 Acces, actualizare sau ștergere a datelor</h3>
+    <p class="mb-4">Puteți accesa, actualiza sau șterge datele dumneavoastră prin secțiunea <span class="font-semibold">Profil</span> a aplicației.</p>
+
+    <h3 class="text-xl font-semibold mb-2">3.2 Retragerea consimțământului</h3>
+    <p class="mb-4">Puteți retrage consimțământul pentru utilizarea datelor prin ștergerea contului dumneavoastră.</p>
+
+    <h3 class="text-xl font-semibold mb-2">3.3 Contactați-ne</h3>
+    <p class="mb-4">Pentru întrebări legate de confidențialitate, vă rugăm să utilizați formularul de contact disponibil pe site-ul nostru sau să ne trimiteți un email la <span class="font-semibold">admin@casamia.ai</span>.</p>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 4 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">4. Politica de păstrare a datelor</h2>
+    <ul class="list-disc list-inside mb-4">
+        <li><span class="font-semibold">Perioada de păstrare:</span> Păstrăm datele dumneavoastră până când solicitați ștergerea lor.</li>
+        <li><span class="font-semibold">Procesul de ștergere:</span> Utilizatorii își pot șterge datele prin secțiunea <span class="font-semibold">Profil</span>. După ștergere, toate informațiile personale vor fi eliminate definitiv.</li>
+    </ul>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 5 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">5. Cookie-uri și urmărire</h2>
+    <h3 class="text-xl font-semibold mb-2">5.1 Utilizarea cookie-urilor</h3>
+    <ul class="list-disc list-inside mb-4">
+        <li>Gestionarea sesiunilor</li>
+        <li>Analiză pentru îmbunătățirea funcționalității aplicației</li>
+    </ul>
+    <h3 class="text-xl font-semibold mb-2">5.2 Urmărirea terțelor părți</h3>
+    <p class="mb-4">
+        Google Analytics poate utiliza cookie-uri pentru a colecta informații despre interacțiunile dumneavoastră cu aplicația.
+    </p>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 6 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">6. Măsuri de securitate</h2>
+    <p class="mb-4">Implementăm practici de securitate standard în industrie pentru a vă proteja datele:</p>
+    <ul class="list-disc list-inside mb-4">
+        <li>
+            <span class="font-semibold">Criptare:</span>
+            <ul class="list-disc list-inside ml-6">
+                <li>MongoDB Atlas criptează toate volumele de stocare și instantanee ale clusterelor în repaus.</li>
+                <li>Toate comunicațiile dintre aplicație și MongoDB Atlas sunt securizate folosind Transport Layer Security (TLS).</li>
+            </ul>
+        </li>
+        <li>
+            <span class="font-semibold">Acces securizat:</span> Aplicația este accesibilă doar prin HTTPS.
+        </li>
+    </ul>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 7 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">7. Conformitatea legală și de reglementare</h2>
+    <h3 class="text-xl font-semibold mb-2">7.1 Regiuni de operare</h3>
+    <p class="mb-4">CasaMia.ai operează în Europa, cu un accent deosebit pe România.</p>
+    <h3 class="text-xl font-semibold mb-2">7.2 Reglementări aplicabile</h3>
+    <p class="mb-4">CasaMia.ai respectă GDPR și alte legi relevante privind confidențialitatea, în funcție de locația utilizatorului.</p>
+    <h3 class="text-xl font-semibold mb-2">7.3 Restricții de vârstă</h3>
+    <p class="mb-4">
+        CasaMia.ai nu este destinată copiilor, dar nu sunt impuse restricții explicite de vârstă. Aplicația afișează liste cu proprietăți de închiriat.
+    </p>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 8 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">8. Actualizări ale acestei politici de confidențialitate</h2>
+    <p class="mb-4">
+        Este posibil să actualizăm această politică de confidențialitate periodic. Utilizatorii vor fi informați despre modificările semnificative prin e-mail.
+    </p>
+
+    <hr class="border-t my-6">
+
+    <!-- Secțiunea 9 -->
+    <h2 class="text-2xl font-semibold text-blue-500 mb-4">Informații de contact</h2>
+    <p class="mb-4">Dacă aveți întrebări despre această politică de confidențialitate sau despre modul în care sunt gestionate datele dumneavoastră, vă rugăm să ne contactați:</p>
+    <ul class="list-disc list-inside mb-4">
+        <li><span class="font-semibold">Email:</span> admin@casamia.ai</li>
+        <li><span class="font-semibold">Formular de contact:</span> <a href="/contact" target="_blank" th:text="#{navigation.contact}" class="hover:underline"/></li>
+    </ul>
+
+    <p class="text-center text-gray-600 mt-6">Prin utilizarea CasaMia.ai, sunteți de acord cu această politică de confidențialitate.</p>
+
+</div>
+
+<head th:replace="~{fragments :: footer}" />
+</body>

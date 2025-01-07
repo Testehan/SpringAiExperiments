@@ -236,9 +236,14 @@ public class MainController {
 	}
 
 	@GetMapping("/privacy-policy")
-	public String privacy(Model model) {
-		model.addAttribute("privacyMessage", "A random privacy message");
-		return "privacy";
+	public String privacy(Locale locale) {
+		String localeString = locale.getLanguage();
+		if (localeString.equals("ro")) {
+			return "privacy-ro";
+		} else {
+			return "privacy-en";
+		}
+
 	}
 
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
