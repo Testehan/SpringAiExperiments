@@ -147,7 +147,7 @@ public class ApartmentService {
         return isPropertyNew;
     }
 
-    private boolean deleteUploadedImages(Apartment apartment) {
+    public boolean deleteUploadedImages(Apartment apartment) {
         boolean imagesWereDeleted = false;
         var uploadDir = "apartment-images/" + apartment.getId().toString();
 

@@ -40,6 +40,48 @@ $(document).ready(function(){
         handleSubmit(event);
     });
 
+     $('#deleteButton').on('click', function () {
+        // Show confirmation dialog
+        if (confirm('Are you sure you want to delete this apartment?')) {
+        // Get the URL from the data attribute
+        const url = $(this).data('url');
+
+        // Send the POST request
+        $.ajax({
+          url: url,
+          type: 'POST',
+          success: function (response) {
+            // Handle success (e.g., show a success message or reload the page)
+            Toastify({
+                text: response,
+                duration: 4000,
+                style: {
+                  background: "linear-gradient(to right, #007bff, #3a86ff)",
+                  color: "white"
+                }
+            }).showToast();
+
+            setTimeout(function() {
+                window.location.href = "add";
+              }, 3000); // 3000 milliseconds = 3 seconds
+          },
+          error: function (xhr, status, error) {
+            // Handle error (e.g., show an error message)
+            Toastify({
+               text: xhr.responseText,
+               duration: 3000,
+               gravity: "top",
+               position: "right",
+               style: {
+                 background: "linear-gradient(to right, #fd0713, #ff7675)",
+                 color: "white"
+               }
+            }).showToast();
+          }
+        });
+        }
+    });
+
 });
 
 function handleSubmit(event){
@@ -203,4 +245,8 @@ function checkFileSize(fileInput){
         return true;
     }
 
+}
+
+function handleDelete(event){
+    console.log("Inside delete");
 }
