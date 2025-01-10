@@ -24,157 +24,164 @@
     <!-- Main Content -->
     <main class="flex bg-white p-4 w-full max-w-full">
         <div class="w-4/5 md:w-3/4 flex-1 mb-4 p-4 h-full ">
-
-            <form id="addForm" class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
-                <input th:if="${apartment.id != null}" type="hidden" name="id" th:value="${apartment.id}" />
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.title}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
-     focus:shadow-outline" th:field="*{name}" th:placeholder="#{add.placeholder.title}" />
-                </div>
-                <div class="mb-4">
-                    <label for="city" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.city}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-                        <th:block th:each="city: ${listCities}">
-                            <option th:value="${city}">[[${city}]]</option>
-                        </th:block>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="area" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.area}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}"
-                           th:placeholder="#{add.placeholder.area}">
-                </div>
-                <div class="mb-4">
-                    <label for="propertyType" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.propertyType}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
-     focus:shadow-outline">
-                        <th:block th:each="propertyType: ${listPropertyTypes}">
-                            <option th:value="${propertyType}">[[${propertyType}]]</option>
-                        </th:block>
-                    </select>
-                </div>
-                <div class="mb-4">
-                    <label for="description" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.description}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <textarea id="description"
-                              class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
-                              th:field="*{shortDescription}"
-                              th:placeholder="#{add.placeholder.description}"></textarea>
-                </div>
-                <div class="mb-4">
-                    <label for="price" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.price}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{price}">
-                </div>
-                <div class="mb-4">
-                    <label for="surface" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.surface}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <input type="number" id="surface" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{surface}">
-                </div>
-                <div class="mb-4">
-                    <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.noofrooms}"></span>
-                        <span class="text-red-500">*</span>:
-                    </label>
-                    <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{noOfRooms}">
-                </div>
-                <div class="mb-4">
-                    <label for="floor" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.floor}"></span>:
-                    </label>
-                    <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}"
-                           th:placeholder="#{add.placeholder.floor}">
-                </div>
-                <div class="mb-4">
-                    <label for="tags" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.tags}"></span>:
-                    </label>
-                    <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}"
-                        th:placeholder="#{add.placeholder.tags}">
-                </div>
-                <div class="mb-4">
-                    <label for="contact" class="block text-gray-700 font-bold mb-2">
-                        Contact<span class="text-red-500">*</span>:
-                    </label>
-                    <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
-                           th:placeholder="#{add.placeholder.contact}"/>
-                </div>
-                <div th:if="${apartment.creationDateTime != null}" class="mb-4">
-                    <label for="creationDateTime" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.creationdate}"/>:
-                    </label>
-                    <input type="text" id="creationDateTime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-slate-200" th:field="*{creationDateTime}" readonly/>
-                </div>
-                <div class="mb-4">
-                    <label for="active" class="block text-gray-700 font-bold mb-2">
-                        <span th:text="#{add.label.visibile}" />:
-                    </label>
-                    <input type="checkbox" id="active" th:field="*{active}">
-                </div>
-
-                <span th:text="#{add.label.numberofimages}"/>
-                <span> : [[${numberOfExistingImages}]]</span>
-                <div class="mb-4" id="apartmentImages">
-                    <div th:each="image, status : ${apartment.images}" class="col border m-3 p-2" th:id="'divImage'+${status.index}">
-                        <div th:id="'imageHeader'+${status.index}">
-                            <label>
-                                <span th:text="#{add.label.imagenumber}"></span>
-                                [[${status.index+1}]]
-                            </label>
-                        </div>
-                        <div class="m-2">
-                            <img th:id="'imageThumbnail'+${status.index}" alt="Image preview" class="img-fluid"
-                                 th:src="${image}"/>
-                        </div>
-                        <div>
-                            <input type="hidden" name="images" th:id="'imageName'+ ${status.index}" th:value="${image}" />
-                        </div>
-                        <a name="linkRemoveImage" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        th:text="#{add.a.deleteimage}"/>
+            <div class="w-[80%] p-6 bg-white rounded-lg shadow-md">
+                <form id="addForm" class="" th:action="@{/api/apartments/save}" method="POST" enctype="multipart/form-data" th:object="${apartment}">
+                    <input th:if="${apartment.id != null}" type="hidden" name="id" th:value="${apartment.id}" />
+                    <div class="mb-4">
+                        <label for="name" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.title}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+         focus:shadow-outline" th:field="*{name}" th:placeholder="#{add.placeholder.title}" />
                     </div>
-                    <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages+1}">
-                        <div th:id="'imageHeader'+${numberOfExistingImages}">
-                            <label>
-                                <span th:text="#{add.label.imagenumber}"></span>
-                                [[${numberOfExistingImages + 1}]]
-                            </label>
-                        </div>
-                        <div class="m-2">
-                            <img th:id="'newImageThumbnail0'" alt="Image preview" class="img-fluid"
-                                 th:src="@{/images/image-thumbnail.png}"/>
-                        </div>
-                        <div>
-                            <input type="file" name="apartmentImages" accept="image/png, image/jpeg" />
-                        </div>
+                    <div class="mb-4">
+                        <label for="city" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.city}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                            <th:block th:each="city: ${listCities}">
+                                <option th:value="${city}">[[${city}]]</option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="area" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.area}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}"
+                               th:placeholder="#{add.placeholder.area}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="propertyType" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.propertyType}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+         focus:shadow-outline">
+                            <th:block th:each="propertyType: ${listPropertyTypes}">
+                                <option th:value="${propertyType}">[[${propertyType}]]</option>
+                            </th:block>
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label for="description" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.description}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <textarea id="description"
+                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
+                                  th:field="*{shortDescription}"
+                                  th:placeholder="#{add.placeholder.description}"></textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label for="price" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.price}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{price}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="surface" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.surface}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <input type="number" id="surface" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{surface}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="noOfRooms" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.noofrooms}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{noOfRooms}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="floor" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.floor}"></span>:
+                        </label>
+                        <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}"
+                               th:placeholder="#{add.placeholder.floor}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="tags" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.tags}"></span>:
+                        </label>
+                        <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}"
+                            th:placeholder="#{add.placeholder.tags}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="contact" class="block text-gray-700 font-bold mb-2">
+                            Contact<span class="text-red-500">*</span>:
+                        </label>
+                        <input type="text" id="contact" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{contact}"
+                               th:placeholder="#{add.placeholder.contact}"/>
+                    </div>
+                    <div th:if="${apartment.creationDateTime != null}" class="mb-4">
+                        <label for="creationDateTime" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.creationdate}"/>:
+                        </label>
+                        <input type="text" id="creationDateTime" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-slate-200" th:field="*{creationDateTime}" readonly/>
+                    </div>
+                    <div class="mb-4">
+                        <label for="active" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.visibile}" />:
+                        </label>
+                        <input type="checkbox" id="active" th:field="*{active}">
                     </div>
 
-                </div>
+                    <span th:text="#{add.label.numberofimages}"/>
+                    <span> : [[${numberOfExistingImages}]]</span>
+                    <div class="mb-4" id="apartmentImages">
+                        <div th:each="image, status : ${apartment.images}" class="col border m-3 p-2" th:id="'divImage'+${status.index}">
+                            <div th:id="'imageHeader'+${status.index}">
+                                <label>
+                                    <span th:text="#{add.label.imagenumber}"></span>
+                                    [[${status.index+1}]]
+                                </label>
+                            </div>
+                            <div class="m-2">
+                                <img th:id="'imageThumbnail'+${status.index}" alt="Image preview" class="img-fluid"
+                                     th:src="${image}"/>
+                            </div>
+                            <div>
+                                <input type="hidden" name="images" th:id="'imageName'+ ${status.index}" th:value="${image}" />
+                            </div>
+                            <a name="linkRemoveImage" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                            th:text="#{add.a.deleteimage}"/>
+                        </div>
+                        <div class="col border m-3 p-2" th:id="'divImage'+${numberOfExistingImages+1}">
+                            <div th:id="'imageHeader'+${numberOfExistingImages}">
+                                <label>
+                                    <span th:text="#{add.label.imagenumber}"></span>
+                                    [[${numberOfExistingImages + 1}]]
+                                </label>
+                            </div>
+                            <div class="m-2">
+                                <img th:id="'newImageThumbnail0'" alt="Image preview" class="img-fluid"
+                                     th:src="@{/images/image-thumbnail.png}"/>
+                            </div>
+                            <div>
+                                <input type="file" name="apartmentImages" accept="image/png, image/jpeg" />
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
 
                 <div class="flex items-center justify-between">
-                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    <button type="submit" form="addForm" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         [[${buttonMessage}]]
                     </button>
+                    <button th:if="${apartment.id != null}" type="button"
+                            id="deleteButton"
+                            th:text="#{add.button.delete}"
+                            class="bg-red-500 font-bold text-white px-4 py-2 rounded hover:bg-red-600"
+                            th:data-url="@{http://localhost:8080/api/apartments/delete/{apartmentId}(apartmentId=${apartment.id})}"/>
                 </div>
-            </form>
+            </div>
+
         </div>
         <div class="w-1/5 md:w-1/4 p-4 ">
             <div class="p-6 bg-white rounded-lg shadow-md">
