@@ -278,8 +278,14 @@
         </span>
 
         <div class="flex justify-between">
-            <button id="confirmDelete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700">Delete</button>
-            <button id="cancelDelete" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">Cancel</button>
+            <button id="confirmDelete" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+                th:text="#{add.span.delete.confirmation.yes}">
+                Delete
+            </button>
+            <button id="cancelDelete" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400"
+                th:text="#{add.span.delete.confirmation.no}">
+                Cancel
+            </button>
         </div>
     </div>
 </div>
