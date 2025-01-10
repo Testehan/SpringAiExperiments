@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringWebFluxTemplateEngine;
 import reactor.core.publisher.Flux;
@@ -65,7 +64,7 @@ public class ApartmentController {
     }
 
     @PostMapping("/save")
-    public ResponseEntity<String> saveApartment(Apartment apartment, RedirectAttributes redirectAttributes,
+    public ResponseEntity<String> saveApartment(Apartment apartment,
                                                 @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
 
         var user = conversationSession.getImmobiliareUser();
@@ -87,6 +86,34 @@ public class ApartmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body("You have reached the maximum number of listed apartments!");
         }
+    }
+
+    @PostMapping("/delete/{listingId}")
+    public ResponseEntity<String> deleteListing(@PathVariable(value = "listingId") String listingId) {
+
+        var user = conversationSession.getImmobiliareUser();
+
+        if ((listingId != null && !user.getListedProperties().contains(listingId)) && !user.isAdmin()){ // make sure that only owners can delete the ap
+            LOGGER.warn("User {} tried to delete property with id {} that was not owned", user.getEmail(), listingId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("You can't perform this deletion!");
+        }
+
+        var apartment = apartmentService.findApartmentById(listingId);
+        if (apartment.isPresent()) {
+            apartmentService.deleteUploadedImages(apartment.get());
+            apartmentService.deleteApartmentsByIds(List.of(listingId));
+            user.getListedProperties().remove(listingId);
+            userService.updateUser(user);
+            LOGGER.info("User {} deleted a property ", user.getEmail());
+        } else {
+            LOGGER.warn("User {} tried to delete property with id {} that does not exist", user.getEmail(), listingId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("You can't perform this deletion!");
+        }
+        // Return a response to the frontend
+        return ResponseEntity.ok("Listing was deleted.");
+
     }
 
     @GetMapping("/contact/{apartmentId}")
