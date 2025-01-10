@@ -31,14 +31,14 @@ public class ScheduledTasks {
     }
 
     @Scheduled(cron = "0 00 12 * * ?")          // Code to run at 12 PM every day
-    public void reportCurrentTime() {
+    public void resetSearchesAvailableForNonAdminUsers() {
         userService.resetSearchesAvailable();
         log.info("The user available searches number was reset");
     }
 
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
-    public void myScheduledMethod() {
+    public void deactivatedListingsLastUpdated2WeeksAgoAndSendReactivationEmailOrSMS() {
         // Code to run at 3 AM every day
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
 
@@ -47,18 +47,18 @@ public class ScheduledTasks {
         apartmentService.deactivateApartments(twoWeeksAgo);
         log.info("The listings last updated before {} were deactivated.", twoWeeksAgo);
 
-        for (Apartment a : listings){
-            log.info(a.getLastUpdateDateTime() + "       " + a.getName());
-            var contact = a.getContact();
-            var reactivateLink = "http://localhost:8080/reactivate?token="+a.getActivationToken()+"&id=" + a.getId().toString();
+        for (Apartment listing : listings){
+            log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
+            var contact = listing.getContact();
+            var reactivateLink = "http://localhost:8080/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
 
             if (ContactValidator.isValidEmail(contact)){
-                emailService.sendReactivateListingEmail(contact,"",a.getName(),reactivateLink);
+                emailService.sendReactivateListingEmail(contact,"",listing.getName(),reactivateLink);
             }
             if (ContactValidator.isValidPhoneNumber(contact,"RO")){
                 var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
                 if (phoneWithPrefix.isEmpty()){
-                    log.error("Can't send SMS for + " + contact + " of listing " + a.getName());
+                    log.error("Can't send SMS for + " + contact + " of listing " + listing.getName());
                 } else {
                     // if you will need a longer message and thus to shorthen the URL, there are various services online that offer this
                     smsService.sendSms(phoneWithPrefix.get(),"Hi! Click link to reactivate your listing " + reactivateLink);    // "or reply yes" => this is not implemented yet, see notes from SmsService
