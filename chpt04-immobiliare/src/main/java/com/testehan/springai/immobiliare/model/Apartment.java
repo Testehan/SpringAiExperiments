@@ -115,4 +115,8 @@ public class Apartment {
     public Integer getNoOfContact() {
         return Objects.nonNull(noOfContact) ? noOfContact : 0;
     }
+
+    public String getIdString(){
+        return id.toString();
+    }
 }

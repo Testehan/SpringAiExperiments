@@ -41,3 +41,19 @@ function openLightbox(src) {
 function closeLightbox() {
     $('#lightbox').css('display', 'none');
 }
+
+function shareOnSocialMedia(id, title, price) {
+    var urlWithId = 'http://localhost:8080/view/'+id;
+    var titleWithPrice = title + ' - ' + price+' euro'
+    if (navigator.share) {
+      navigator.share({
+        title: titleWithPrice,
+        url: urlWithId
+      })
+      .then(() => console.log('Successful share'))
+      .catch((error) => console.error('Error sharing:', error));
+    } else {
+      // Fallback for browsers that don't support the Web Share API
+      alert('Please use the "Share" button from your browser\'s menu.');
+    }
+  }

@@ -42,7 +42,17 @@
             <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">[[${apartment.name}]]</a>
             <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
         </div>
-        <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price} + ' &euro;'"/>
+        <div class="flex justify-between mt-2">
+            <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price} + ' &euro;'"/>
+            <button class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md"
+                    th:onclick="shareOnSocialMedia([[${apartment.getIdString}]], [[${apartment.name}]], [[${apartment.price}]])"
+
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="mr-2" viewBox="0 0 16 16">
+                    <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/>
+                </svg>
+            </button>
+        </div>
         <p class="text-gray-600 mt-2" th:text="#{listing.location} + ': ' + ${apartment.city}"/>
 
         <div th:replace="~{fragments :: listing_area}"></div>
@@ -87,7 +97,17 @@
                 <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
                 <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
             </div>
-            <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price} +' &euro;'"/>
+            <div class="flex justify-between mt-2">
+                <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price} + ' &euro;'"/>
+                <button class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md"
+                        th:onclick="shareOnSocialMedia([[${apartment.getIdString}]], [[${apartment.name}]], [[${apartment.price}]])"
+
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="mr-2" viewBox="0 0 16 16">
+                        <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5m-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3m11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3"/>
+                    </svg>
+                </button>
+            </div>
             <p class="text-gray-600 mt-2" th:text="#{listing.location} + ': ' + ${apartment.city}"/>
 
             <div th:replace="~{fragments :: listing_area}"></div>
