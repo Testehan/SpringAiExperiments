@@ -5,6 +5,7 @@ import com.testehan.springai.immobiliare.service.ApartmentService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,8 @@ import java.util.Optional;
 @RestController
 public class ReactivateController {
 
-    // todo this needs to be configured to your domain
-    public static final String DOMAIN = "http://localhost:8080";
+    @Value("${app.url}")
+    private String appUrl;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateController.class);
     private final ApartmentService apartmentService;
@@ -37,7 +38,7 @@ public class ReactivateController {
         if (optionalListing.isEmpty()) {
             LOGGER.warn("Invalid or expired reactivation token.");
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(DOMAIN +"/error"))
+                    .location(URI.create(appUrl +"/error"))
                     .build();
 
         }
@@ -47,14 +48,14 @@ public class ReactivateController {
         if (!reactivated) {
             LOGGER.warn("Failed to reactivate listing.");
             return ResponseEntity.status(HttpStatus.FOUND)
-                    .location(URI.create(DOMAIN +"/error"))
+                    .location(URI.create(appUrl +"/error"))
                     .build();
         }
 
         // 3. Return success response
         session.setAttribute("confirmationMessage", "Your listing was reactivated with success!");
         return ResponseEntity.status(HttpStatus.FOUND)
-                .location(URI.create(DOMAIN +"/confirmation"))
+                .location(URI.create(appUrl +"/confirmation"))
                 .build();
     }
 

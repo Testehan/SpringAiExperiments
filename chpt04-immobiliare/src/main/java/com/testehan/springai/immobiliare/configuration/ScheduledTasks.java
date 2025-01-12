@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.service.SmsService;
 import com.testehan.springai.immobiliare.util.ContactValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,9 @@ import java.time.temporal.ChronoUnit;
 @Component
 public class ScheduledTasks {
     private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
+
+    @Value("${app.url}")
+    private String appUrl;
 
     private final UserService userService;
     private final ApartmentService apartmentService;
@@ -50,7 +54,7 @@ public class ScheduledTasks {
         for (Apartment listing : listings){
             log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
             var contact = listing.getContact();
-            var reactivateLink = "http://localhost:8080/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
+            var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
 
             if (ContactValidator.isValidEmail(contact)){
                 emailService.sendReactivateListingEmail(contact,"",listing.getName(),reactivateLink);

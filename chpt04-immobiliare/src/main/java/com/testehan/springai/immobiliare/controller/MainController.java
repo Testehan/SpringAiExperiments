@@ -11,6 +11,7 @@ import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,9 @@ import java.util.Locale;
 
 @Controller
 public class MainController {
+
+	@Value("${app.url}")
+	private String appUrl;
 
 	private final ApartmentService apartmentService;
 	private final ConversationSession conversationSession;
@@ -76,6 +80,7 @@ public class MainController {
 		model.addAttribute("M03_DETAILS_PART_2", messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
 		model.addAttribute("M04_APARTMENTS_FOUND_START", messageSource.getMessage("M04_APARTMENTS_FOUND_START",  null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
+		model.addAttribute("appUrl", appUrl);
 
 		return "chat";
 	}
@@ -94,6 +99,7 @@ public class MainController {
 		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
+		model.addAttribute("appUrl", appUrl);
 
 		return "favourites";
 	}
@@ -123,6 +129,7 @@ public class MainController {
 		model.addAttribute("buttonMessage", buttonMessage);
 		model.addAttribute("deleteButtonMessage", deleteButtonMessage);
 		model.addAttribute("imageNoLabel", imageNoLabel);
+		model.addAttribute("appUrl", appUrl);
 
 		var user = conversationSession.getImmobiliareUser();
 		List<Apartment> listOfProperties = getListOfProperties(user);
@@ -144,6 +151,7 @@ public class MainController {
 		model.addAttribute("buttonMessage", buttonMessage);
 		model.addAttribute("deleteButtonMessage", deleteButtonMessage);
 		model.addAttribute("imageNoLabel", imageNoLabel);
+		model.addAttribute("appUrl", appUrl);
 
 		if (user.getListedProperties().contains(apartmentId) || user.isAdmin()) {
 			var apartmentOptional = apartmentService.findApartmentById(apartmentId);
@@ -183,6 +191,7 @@ public class MainController {
 			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 			model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
 			model.addAttribute("pageName", "view");
+			model.addAttribute("appUrl", appUrl);
 
 			return "view";
 		} else {

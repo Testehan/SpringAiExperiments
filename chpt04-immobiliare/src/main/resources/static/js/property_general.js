@@ -43,7 +43,7 @@ function closeLightbox() {
 }
 
 function shareOnSocialMedia(id, title, price) {
-    var urlWithId = 'http://localhost:8080/view/'+id;
+    var urlWithId = APP_URL + '/view/' + id;
     var titleWithPrice = title + ' - ' + price+' euro'
 
     if (navigator.share) {

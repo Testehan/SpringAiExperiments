@@ -12,7 +12,6 @@
 
     const BUTTON_DELETE_IMAGE = "[[${deleteButtonMessage}]]";
     const LABEL_IMAGE_NUMBER = "[[${imageNoLabel}]]";
-
 </script>
 <body class="h-screen bg-gray-100" >
 
@@ -181,7 +180,7 @@
                             id="deleteButton"
                             th:text="#{add.button.delete}"
                             class="bg-red-500 font-bold text-white px-4 py-2 rounded hover:bg-red-600"
-                            th:data-url="@{http://localhost:8080/api/apartments/delete/{apartmentId}(apartmentId=${apartment.id})}"/>
+                            th:data-url="@{{appUrl}/api/apartments/delete/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}"/>
                 </div>
             </div>
 

@@ -39,7 +39,7 @@
     <div class="w-full p-6">
 
         <div class="flex justify-between items-center">
-            <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">[[${apartment.name}]]</a>
+            <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{{appUrl}view/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}">[[${apartment.name}]]</a>
             <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
         </div>
         <div class="flex justify-between mt-2">
@@ -60,7 +60,7 @@
         <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) <= 250}" th:text="${apartment.shortDescription}"></p>
         <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) > 250}">
             <span th:text="${#strings.substring(apartment.shortDescription, 0, 250)} + '...'"></span>
-            <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{http://localhost:8080/view/{apartmentId}(apartmentId=${apartment.id})}">See Full Description</a>
+            <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{{appUrl}/view/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}">See Full Description</a>
         </p>
         <p class="text-gray-600 mt-2" th:text="#{listing.surface} + ': ' + ${apartment.surface} + ' ' + #{listing.surface.measured.in}"/>
         <p class="text-gray-600 mt-2" th:text="#{listing.no.rooms} + ': ' + ${apartment.noOfRooms}" />
@@ -141,12 +141,12 @@
     <span class="flex justify-between">
         <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
                 th:hx-swap = "outerHTML"
-                th:hx-get="@{http://localhost:8080/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id})}"
+                th:hx-get="@{{appUrl}/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}"
                 th:text="#{listing.contact}" />
 
         <button class="favouriteButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
                 th:hx-swap="none"
-                th:hx-post="@{http://localhost:8080/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id})}"
+                th:hx-post="@{{appUrl}/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}"
                 th:text="${favouriteButtonStartMessage}">
         </button>
     </span>
