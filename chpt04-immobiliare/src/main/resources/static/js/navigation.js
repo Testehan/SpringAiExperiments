@@ -9,10 +9,18 @@ $(document).ready(function() {
     $("#menuButton").click(function() {
         toggleMenu();
     });
+
+    // Close the menu when clicking anywhere else
+    $(document).click(function (event) {
+        // Check if the menu is visible and the click is outside the menu and button
+        if (!$(event.target).closest("#menuItems, #menuButton").length) {
+            $("#menuItems").addClass("hidden"); // Hide the menu
+        }
+    });
+
 });
 
 function toggleMenu() {
-//     $("#menuItems").classList.toggle("hidden");
     $("#menuItems").toggleClass("hidden");
 }
 
