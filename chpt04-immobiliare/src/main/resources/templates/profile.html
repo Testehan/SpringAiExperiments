@@ -12,9 +12,9 @@
 <div class="flex pt-16">
 
     <!-- Main Content -->
-    <main class="flex flex-col bg-white p-4 w-full max-w-full">
-        <div class="flex-1 mb-4 p-4 h-full overflow-auto">
-            <form class="w-[80%] p-6 bg-white rounded-lg shadow-md" th:action="@{/api/user/save}" method="POST" th:object="${user}">
+    <main class="flex flex-col bg-white p-2 w-full max-w-full">
+        <div class="flex-1 mb-4 p-2 h-full overflow-auto">
+            <form class="p-2 bg-white rounded-lg shadow-md" th:action="@{/api/user/save}" method="POST" th:object="${user}">
                 <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{profile.title}"/>
                 <div class="mb-4">
                     <label for="name" class="block text-gray-700 font-bold mb-2">Email:</label>
@@ -66,7 +66,7 @@
                 </div>
             </form>
 
-            <form class="w-[80%] p-6 bg-white rounded-lg shadow-md mt-3" th:action="@{/api/user/delete}" method="POST" >
+            <form class="p-2 bg-white rounded-lg shadow-md mt-3" th:action="@{/api/user/delete}" method="POST" >
                 <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{profile.title.delete}"/>
                 <div class="mb-4">
                     <label for="confirmDeletionEmail" class="block text-gray-700 font-bold mb-2">Email:</label>
