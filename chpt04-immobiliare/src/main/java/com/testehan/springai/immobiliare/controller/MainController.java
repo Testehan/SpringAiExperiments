@@ -75,6 +75,7 @@ public class MainController {
 		model.addAttribute("M02_CITY", messageSource.getMessage("M02_CITY",null,locale));
 		model.addAttribute("M03_DETAILS_PART_2", messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
 		model.addAttribute("M04_APARTMENTS_FOUND_START", messageSource.getMessage("M04_APARTMENTS_FOUND_START",  null,locale));
+		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
 
 		return "chat";
 	}
@@ -92,6 +93,8 @@ public class MainController {
 		model.addAttribute("apartments", apartments);
 		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
+		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
+
 		return "favourites";
 	}
 
@@ -178,6 +181,7 @@ public class MainController {
 			model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 			model.addAttribute("favouriteButtonStartMessage", favouritesText);
 			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
+			model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
 			model.addAttribute("pageName", "view");
 
 			return "view";

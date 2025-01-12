@@ -45,6 +45,7 @@ function closeLightbox() {
 function shareOnSocialMedia(id, title, price) {
     var urlWithId = 'http://localhost:8080/view/'+id;
     var titleWithPrice = title + ' - ' + price+' euro'
+
     if (navigator.share) {
       navigator.share({
         title: titleWithPrice,
@@ -54,6 +55,6 @@ function shareOnSocialMedia(id, title, price) {
       .catch((error) => console.error('Error sharing:', error));
     } else {
       // Fallback for browsers that don't support the Web Share API
-      alert('Please use the "Share" button from your browser\'s menu.');
+      alert(SHARE_ERROR);
     }
   }
