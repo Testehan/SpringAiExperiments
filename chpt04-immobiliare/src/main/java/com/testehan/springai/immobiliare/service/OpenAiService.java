@@ -59,9 +59,10 @@ public class OpenAiService {
         var responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
 
         var transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-                .withLanguage("en")
-                .withTemperature(0f)
-                .withResponseFormat(responseFormat)
+                .language("en")
+                .temperature(0f)
+                .responseFormat(responseFormat)
+                .prompt("You must transcribe the audio in either English or Romanian. No other language is supported.")
                 .build();
         var transcriptionRequest = new AudioTranscriptionPrompt(audioFile, transcriptionOptions);
         var response = openAiAudioTranscriptionModel.call(transcriptionRequest);
