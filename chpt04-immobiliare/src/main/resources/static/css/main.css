@@ -745,6 +745,10 @@ video {
   height: 1.5rem;
 }
 
+.h-64 {
+  height: 16rem;
+}
+
 .h-8 {
   height: 2rem;
 }
@@ -1546,6 +1550,10 @@ video {
     height: 2.5rem;
   }
 
+  .sm\:h-80 {
+    height: 20rem;
+  }
+
   .sm\:w-96 {
     width: 24rem;
   }
@@ -1625,6 +1633,10 @@ video {
     height: 7rem;
   }
 
+  .md\:h-96 {
+    height: 24rem;
+  }
+
   .md\:w-1\/4 {
     width: 25%;
   }
@@ -1683,8 +1695,16 @@ video {
 }
 
 @media (min-width: 1024px) {
+  .lg\:hidden {
+    display: none;
+  }
+
   .lg\:h-36 {
     height: 9rem;
+  }
+
+  .lg\:h-\[450px\] {
+    height: 450px;
   }
 
   .lg\:max-w-xl {
