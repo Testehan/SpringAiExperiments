@@ -203,7 +203,7 @@ public class MainController {
 
 	@GetMapping("/help")
 	public String help(Model model) {
-		return "index";
+		return "help";
 	}
 
 	@GetMapping("/blog")
