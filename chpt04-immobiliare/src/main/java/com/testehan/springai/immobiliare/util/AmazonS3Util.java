@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
@@ -38,6 +39,7 @@ public class AmazonS3Util {
 
         S3Client client = S3Client.builder()
                 .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .region(Region.of(beanConfig.getRegionName()))
                 .build();
 
         return client;
