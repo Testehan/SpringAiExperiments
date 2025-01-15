@@ -320,6 +320,43 @@
         <div>
             <h3 class="font-semibold text-lg" th:text="#{footer.h.quicklinks}">Quick Links</h3>
             <ul class="mt-2 space-y-2 text-sm">
+                <li><a href="/chat" class="hover:underline"
+                       hx-get="/chat"
+                       hx-trigger="click"
+                       hx-swap="none"
+                       hx-on="htmx:beforeRequest: checkLogin(event)"
+                       target=""
+                       th:text="#{navigation.search}">
+                    </a>
+                </li>
+                <li><a href="/favourites" class="hover:underline"
+                       hx-get="/favourites"
+                       hx-trigger="click"
+                       hx-swap="none"
+                       hx-on="htmx:beforeRequest: checkLogin(event)"
+                       target=""
+                       th:text="#{navigation.favourites}">
+                    </a>
+                </li>
+                <li><a href="/add" class="hover:underline"
+                       hx-get="/add"
+                       hx-trigger="click"
+                       hx-swap="none"
+                       hx-on="htmx:beforeRequest: checkLogin(event)"
+                       target=""
+                       th:text="#{navigation.addOrEdit}">
+
+                    </a>
+                </li>
+                <li><a href="/profile" class="hover:underline"
+                       hx-get="/profile"
+                       hx-trigger="click"
+                       hx-swap="none"
+                       hx-on="htmx:beforeRequest: checkLogin(event)"
+                       target=""
+                       th:text="#{navigation.profile}">
+                    </a>
+                </li>
                 <li><a href="/help" target="_blank" class="hover:underline" th:text="#{footer.li.faq}">FAQs</a></li>
                 <li><a href="/contact" target="_blank" class="hover:underline" th:text="#{footer.li.contact}">Contact Us</a></li>
                 <li><a href="/privacy-policy" target="_blank" class="hover:underline" th:text="#{footer.li.privacy}">Privacy Policy</a></li>

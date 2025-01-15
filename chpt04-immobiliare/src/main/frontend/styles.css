@@ -44,12 +44,10 @@
     #menuItems {
         position: fixed;
         top: 60px;
-        right: 20px;
+        right: 0px;
         z-index: 1000; /* Adjust the z-index value as needed */
         border-radius: 0.375rem;
         border: 1px solid rgb(156 163 175);
-        padding:3px;
-        background:white;
     }
 }
 

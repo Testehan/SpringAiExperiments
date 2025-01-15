@@ -30,64 +30,68 @@
                             </button>
                         </div>
                     </div>
-                    <div id="menuItems" class="hidden md:flex md:space-x-10 list-none">
-                        <li>
-                            <a href="/chat" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               hx-get="/chat"
-                               hx-trigger="click"
-                               hx-swap="none"
-                               hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target=""
-                               th:text="#{navigation.search}"></a>
-                        </li>
-                        <li>
-                            <a href="/favourites" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               hx-get="/favourites"
-                               hx-trigger="click"
-                               hx-swap="none"
-                               hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target=""
-                               th:text="#{navigation.favourites}">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/add" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               hx-get="/add"
-                               hx-trigger="click"
-                               hx-swap="none"
-                               hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target=""
-                               th:text="#{navigation.addOrEdit}">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/profile" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               hx-get="/profile"
-                               hx-trigger="click"
-                               hx-swap="none"
-                               hx-on="htmx:beforeRequest: checkLogin(event)"
-                               target=""
-                               th:text="#{navigation.profile}">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/help" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               target="_blank"
-                               th:text="#{navigation.help}">
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/contact" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               target="_blank"
-                               th:text="#{navigation.contact}">
-                            </a>
-                        </li>
-                        <li th:if="${isAuthenticated}" class="md:hidden">
-                            <a href="javascript: document.logoutForm.submit()" class="text-base font-normal text-gray-500 list-none hover:text-gray-900"
-                               th:text="#{navigation.logout}">
-                            </a>
-                        </li>
-                    </div>
+<!--                    <div id="menuItems" class="hidden md:flex md:space-x-10 list-none">-->
+                        <ul id="menuItems"
+                            class="hidden flex-col space-y-4 md:flex md:flex-row md:space-y-0 md:space-x-10 list-none bg-gray-800 text-gray-200 md:text-gray-500 md:bg-transparent p-4 md:p-0"
+                        >
+                            <li>
+                                <a href="/chat" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   hx-get="/chat"
+                                   hx-trigger="click"
+                                   hx-swap="none"
+                                   hx-on="htmx:beforeRequest: checkLogin(event)"
+                                   target=""
+                                   th:text="#{navigation.search}"></a>
+                            </li>
+                            <li>
+                                <a href="/favourites" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   hx-get="/favourites"
+                                   hx-trigger="click"
+                                   hx-swap="none"
+                                   hx-on="htmx:beforeRequest: checkLogin(event)"
+                                   target=""
+                                   th:text="#{navigation.favourites}">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/add" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   hx-get="/add"
+                                   hx-trigger="click"
+                                   hx-swap="none"
+                                   hx-on="htmx:beforeRequest: checkLogin(event)"
+                                   target=""
+                                   th:text="#{navigation.addOrEdit}">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/profile" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   hx-get="/profile"
+                                   hx-trigger="click"
+                                   hx-swap="none"
+                                   hx-on="htmx:beforeRequest: checkLogin(event)"
+                                   target=""
+                                   th:text="#{navigation.profile}">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/help" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   target="_blank"
+                                   th:text="#{navigation.help}">
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/contact" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   target="_blank"
+                                   th:text="#{navigation.contact}">
+                                </a>
+                            </li>
+                            <li th:if="${isAuthenticated}" class="md:hidden">
+                                <a href="javascript: document.logoutForm.submit()" class="m-2 text-base font-normal hover:text-gray-300 md:hover:text-gray-900"
+                                   th:text="#{navigation.logout}">
+                                </a>
+                            </li>
+                        </ul>
+<!--                    </div>-->
                     <div th:if="${isAuthenticated}" class="hidden md:absolute md:flex md:items-center md:justify-end md:inset-y-0 md:right-0">
                         <div class="inline-flex rounded-full shadow">
                             <a href="javascript: document.logoutForm.submit()"
