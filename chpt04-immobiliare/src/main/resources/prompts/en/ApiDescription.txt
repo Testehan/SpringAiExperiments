@@ -14,19 +14,23 @@ Available APIs:
      - **Endpoint**: `/setRentOrBuyAndCity`
      - **Parameters**: `message` (string)
 
-4. **Apartments description API**: Displays a list of apartments available based on a description or a list of criteria or attributes or properties the user provides for the search.
+4.**Sale or rent, city of interest and description of the property API**: Determines if the user wants to buy or rent, also the city that interests the user and a description of the property of interest. If a city name, the type of property and description of property is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city". Your reply must have the format "rent,city name,property description" or "buy,city name,property description". So the separator of the 3 values is the comma.
+     - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
+     - **Parameters**: `message` (string)
+
+5. **Apartments description API**: Displays a list of apartments available based on a description or a list of criteria or attributes or properties the user provides for the search.
    - **Endpoint**: `/getApartments`
    - **Parameters**: `message` (string)
 
-5. **Restart API**: Restarts the conversation.
+6. **Restart API**: Restarts the conversation.
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-6. **Last option API**: If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
+7. **Last option API**: If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
-7. **Last resort API**: If the user has requests or questions that are not related in any way to real estate domain this API must be used.
+8. **Last resort API**: If the user has requests or questions that are not related in any way to real estate domain this API must be used.
   - **Endpoint**: `/notSupported`
   - **Parameters**: `message` (string)
 
@@ -89,6 +93,9 @@ Examples:
   - API Call: `/setRentOrBuyAndCity`
   - Parameters: `\{"message": "sale,Bucharest"\}`
 
+- User Input: "i am looking for a 2 room apartment for renting in Cluj-Napoca, having a rent of maximum 700 euro"
+  - API Call: `/setRentOrBuyAndCityAndDescription`
+  - Parameters: `\{"message": "rent,Cluj-Napoca,2 room apartment having a rent of maximum 700 euro"\}`
 
 - User Input: "I am looking for a location that has a price under 100000 euro and is a good neighborhood"
   - API Call: `/getApartments`

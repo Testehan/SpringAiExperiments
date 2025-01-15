@@ -85,6 +85,7 @@ public class ApiServiceImpl implements ApiService{
             case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
             case SET_CITY : { return setCity(serviceCall); }
             case SET_RENT_OR_BUY_AND_CITY: {return setRentOrBuyAndCity(serviceCall);}
+            case SET_RENT_OR_BUY_AND_CITY_AND_DESCRIPTION: {return setRentOrBuyAndCityAndDescription(serviceCall, session);}
             case GET_APARTMENTS:{ return getApartments(message, session); }
             case RESTART_CONVERSATION : { return restartConversation(); }
             case DEFAULT : return respondToUserMessage(message);
@@ -139,6 +140,7 @@ public class ApiServiceImpl implements ApiService{
                                 // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
 
                                 var apartmentInfo = apartmentLLM.get().getApartmentInfo();
+                                LOGGER.info("Adding apartment info to conversation memory {}",  apartmentInfo);
                                 conversationService.addContentToConversation(apartmentInfo, conversationId);
 
                                 var isFavourite = isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
@@ -156,13 +158,14 @@ public class ApiServiceImpl implements ApiService{
                                         .tryEmitNext(new Event("response",new ResponsePayload(
                                                 messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale)))
                                         );
+                                LOGGER.info("Search completed with no results for description : {}", description);
                             } else {
                                 userSseService.getUserSseConnection(session.getId())
                                         .tryEmitNext(new Event("response", new ResponsePayload(
                                                 messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, currentLocale)))
                                         );
+                                LOGGER.info("Search completed");
                             }
-                            LOGGER.info("Flux completed");
 
                         }
                 );
@@ -187,7 +190,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
 
-    public Flux<String> sendIdsInBatches(List<Apartment> apartments, String description, int batchSize) {
+    private Flux<String> sendIdsInBatches(List<Apartment> apartments, String description, int batchSize) {
         return Flux.fromIterable(apartments)
                 .buffer(batchSize)//.delayElements(Duration.ofSeconds(batchSize*5))
                 .flatMap(batchApartments -> getBestMatchingApartmentIds(batchApartments,description));  // Send each batch to the service
@@ -200,7 +203,11 @@ public class ApiServiceImpl implements ApiService{
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-
+        var listingIds = apartments.stream()
+                .map(Apartment::getId)
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+        LOGGER.info("Sending apartments descriptions to LLM {}", listingIds);
         var apartmentsFoundPrompt = localeUtils.getLocalizedPrompt("apartments_found");
 
         var promptTemplate = new PromptTemplate(apartmentsFoundPrompt);
@@ -229,8 +236,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse setCity(ServiceCall serviceCall) {
-        SupportedCity supportedCity = SupportedCity.getByName(serviceCall.message());
-        conversationSession.setCity(supportedCity);
+        SupportedCity supportedCity = getSupportedCity(serviceCall.message());
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
             var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
@@ -244,6 +250,12 @@ public class ApiServiceImpl implements ApiService{
         }
     }
 
+    private SupportedCity getSupportedCity(String city) {
+        SupportedCity supportedCity = SupportedCity.getByName(city);
+        conversationSession.setCity(supportedCity);
+        return supportedCity;
+    }
+
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
         conversationSession.setRentOrSale(serviceCall.message());
         return new ResultsResponse(messageSource.getMessage("M02_CITY", null, localeUtils.getCurrentLocale()));
@@ -255,6 +267,22 @@ public class ApiServiceImpl implements ApiService{
         conversationSession.setRentOrSale(parts[0]);
         var cityName = parts[1];
         return setCity(new ServiceCall(ApiCall.SET_RENT_OR_BUY_AND_CITY,cityName));
+    }
+
+    private ResultsResponse setRentOrBuyAndCityAndDescription(ServiceCall serviceCall, HttpSession session) {
+        String[] parts = serviceCall.message().split(",");
+
+        conversationSession.setRentOrSale(parts[0]);
+        var cityName = parts[1];
+
+        SupportedCity supportedCity = getSupportedCity(cityName);
+        var description = parts[2];
+        if (supportedCity.compareTo(UNSUPPORTED) != 0) {
+            return getApartments(description, session);
+        } else {
+            var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
+            return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
+        }
     }
 
     private ChatClient createNewChatClientForStream(){

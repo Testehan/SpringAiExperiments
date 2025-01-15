@@ -14,19 +14,23 @@ API-uri disponibile:
      - **Endpoint**: `/setRentOrBuyAndCity`
      - **Parameters**: `message` (string)
 
-4. **Apartments description API**: Afișează o listă de apartamente disponibile pe baza unei descrieri sau a unei liste de criterii sau atribute sau proprietăți furnizate de utilizator pentru căutare.
+4.**Vânzare sau închiriere, oraș de interes și descrierea proprietății API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze, de asemenea orașul care îl interesează pe utilizator și o descriere a proprietății de interes. Dacă se menționează numele unui oraș, tipul proprietății și descrierea proprietății, acest API ar trebui apelat. Sunt acceptate doar Cluj-Napoca și București, așa că dacă este menționat un alt nume de oraș trebuie să răspundeți cu „Oraș nesuportat”. Răspunsul dvs. trebuie să aibă formatul „închiriere,numele orașului,descrierea proprietății” sau „cumpărare,numele orașului,descrierea proprietății”. Deci separatorul celor 3 valori este virgula.
+    - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
+    - **Parameters**: `message` (string)
+
+5. **Apartments description API**: Afișează o listă de apartamente disponibile pe baza unei descrieri sau a unei liste de criterii sau atribute sau proprietăți furnizate de utilizator pentru căutare.
    - **Endpoint**: `/getApartments`
    - **Parameters**: `message` (string)
 
-5. **Reporniți API**: Repornește conversația. Cand userul introduce cuvantul "restart"
+6. **Reporniți API**: Repornește conversația. Cand userul introduce cuvantul "restart"
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-6. **General imobiliar API**: Dacă utilizatorul are alte solicitări sau intrebari legate de domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
+7. **General imobiliar API**: Dacă utilizatorul are alte solicitări sau intrebari legate de domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
-7. **Ultima opțiune API**: Dacă utilizatorul are alte solicitări sau intrebari care nu au nici o legatura cu domeniul imobiliar acesta e API-ul care trebuie folosit.
+8. **Ultima opțiune API**: Dacă utilizatorul are alte solicitări sau intrebari care nu au nici o legatura cu domeniul imobiliar acesta e API-ul care trebuie folosit.
   - **Endpoint**: `/notSupported`
   - **Parameters**: `message` (string)
 
@@ -88,6 +92,10 @@ Exemple:
 - Intrarea utilizatorului: „Ma puteți ajuta să găsesc o casă de vânzare în București?”
   - API Call: `/setRentOrBuyAndCity`
   - Parameters: `\{"message": "sale,Bucharest"\}`
+
+- User Input: "Caut apartament 2 camere de inchiriat in Cluj-Napoca, avand o chirie de maxim 700 euro"
+  - API Call: `/setRentOrBuyAndCityAndDescription`
+  - Parameters: `\{"message": "rent,Cluj-Napoca,2 camere avand o chirie de maxim 700 euro"\}`
 
 - Intrarea utilizatorului: „Caut o locație care are un preț sub 100000 euro și este un cartier bun”
   - API Call: `/getApartments`
