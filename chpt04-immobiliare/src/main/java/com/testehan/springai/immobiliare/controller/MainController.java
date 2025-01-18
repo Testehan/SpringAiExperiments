@@ -7,7 +7,6 @@ import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
-import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import jakarta.servlet.http.HttpSession;
@@ -36,17 +35,15 @@ public class MainController {
 	private final ApartmentService apartmentService;
 	private final ConversationSession conversationSession;
 	private final UserSseService userSseService;
-	private final EmailService emailService;
 	private final MessageSource messageSource;
 	private final BeanConfig beanConfig;
 
 	public MainController(ApartmentService apartmentService, ConversationSession conversationSession,
-						  UserSseService userSseService, EmailService emailService, MessageSource messageSource,
+						  UserSseService userSseService, MessageSource messageSource,
 						  BeanConfig beanConfig) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
-		this.emailService = emailService;
 		this.messageSource = messageSource;
 		this.beanConfig = beanConfig;
 	}

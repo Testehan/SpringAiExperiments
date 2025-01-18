@@ -17,12 +17,6 @@ import java.util.Map;
 @Service
 public class ImmobiliareApiService {
 
-//    @Value("classpath:/prompts/ApiDescription.txt")
-//    private Resource apiDescriptionFile;
-//
-//    @Value("classpath:/prompts/ApartmentDescription.txt")
-//    private Resource apartmentDescriptionFile;
-
     private final ChatClient chatClient;
     private final LocaleUtils localeUtils;
 

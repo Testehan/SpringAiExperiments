@@ -1,6 +1,9 @@
 package com.testehan.springai.immobiliare.service;
 
+import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sns.SnsClient;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
@@ -15,11 +18,15 @@ import software.amazon.awssdk.services.sns.model.PublishRequest;
 
 @Service
 public class SmsService {
+
     private final SnsClient snsClient;
 
-    public SmsService() {
+    public SmsService(BeanConfig beanConfig) {
+        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(beanConfig.getAwsAccessKeyId(), beanConfig.getAwsAccessSecret());
+
         snsClient = SnsClient.builder()
-                .region(Region.EU_NORTH_1) // Choose your region
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .region(Region.of(beanConfig.getRegionName()))
                 .build();
     }
 

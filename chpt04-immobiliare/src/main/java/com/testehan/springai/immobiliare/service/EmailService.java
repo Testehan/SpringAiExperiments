@@ -1,19 +1,24 @@
 package com.testehan.springai.immobiliare.service;
 
+import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
-// TODO use this when a user creates a listing...Also use this to make users to prelungeasca their listing,
-// and if they do not, then the listing will be deactivated and removed eventually
 @Service
 public class EmailService {
+
     private final SesClient sesClient;
 
-    public EmailService() {
+    public EmailService(BeanConfig beanConfig) {
+        AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(beanConfig.getAwsAccessKeyId(), beanConfig.getAwsAccessSecret());
+
         sesClient = SesClient.builder()
-                .region(Region.EU_NORTH_1)
+                .credentialsProvider(StaticCredentialsProvider.create(awsCredentials))
+                .region(Region.of(beanConfig.getRegionName()))
                 .build();
     }
 
