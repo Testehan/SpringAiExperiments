@@ -9,7 +9,7 @@ public class EmailTemplateMain {
 
 //        createWelcomeTemplate();
 //        deleteTemplate("ReactivateListingEmailTemplate");
-        createReactivateTemplate();
+        createReactivateTemplate_RO();
     }
 
     private static void deleteTemplate(String templateName){
@@ -82,6 +82,46 @@ public class EmailTemplateMain {
                     "Is it still available ? If so please click on the link from below to let potential customers know this. If" +
                     "link is not clickable, copy paste it in a browser.\n"+
                     "{{reactivateLink}}";
+
+            // Create the request
+            CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
+                    .template(Template.builder()
+                            .templateName(templateName)
+                            .subjectPart(subjectPart)
+                            .htmlPart(htmlBody)
+                            .textPart(textBody)
+                            .build())
+                    .build();
+
+            // Call SES to create the template
+            CreateTemplateResponse response = sesClient.createTemplate(createTemplateRequest);
+            System.out.println("Template created successfully: " + response);
+
+        } catch (SesException e) {
+            System.err.println("Error creating template: " + e.awsErrorDetails().errorMessage());
+        } finally {
+            sesClient.close();
+        }
+    }
+
+    private static void createReactivateTemplate_RO() {
+        SesClient sesClient = buildSesClient();
+
+        try {
+            // Define the email template
+            String templateName = "ReactivateListingEmailTemplate_RO";
+            String subjectPart = "Reactivați anunțul dvs. pe CasaMia.ai";
+            String htmlBody = "<h1>Bună, {{name}}!</h1>" +
+                    "<p>A trecut ceva timp de când anunțul dvs. \"{{listingName}}\" a fost publicat. " +
+                    "Este încă disponibil? Dacă da, vă rugăm să faceți clic pe linkul de mai jos pentru a anunța potențialii clienți acest lucru &#128522;.</p>" +
+                    "<a href=\"{{reactivateLink}}\" style=\"display: inline-block; background-color: #28a745; color: white; " +
+                    "text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold;\">" +
+                    "Anunțul meu este încă disponibil</a>";
+            String textBody = "Bună, {{name}}!\nA trecut ceva timp de când anunțul dvs. \"{{listingName}}\" a fost publicat.\n" +
+                    "Este încă disponibil? Dacă da, vă rugăm să faceți clic pe linkul de mai jos pentru a anunța potențialii clienți acest lucru. Dacă " +
+                    "linkul nu este clickable, copiați-l într-un browser.\n" +
+                    "{{reactivateLink}}";
+
 
             // Create the request
             CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()

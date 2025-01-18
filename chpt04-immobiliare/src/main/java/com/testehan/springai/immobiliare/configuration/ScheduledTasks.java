@@ -6,6 +6,7 @@ import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.SmsService;
 import com.testehan.springai.immobiliare.util.ContactValidator;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,18 +27,21 @@ public class ScheduledTasks {
     private final ApartmentService apartmentService;
     private final EmailService emailService;
     private final SmsService smsService;
+    private final LocaleUtils localeUtils;
 
-    public ScheduledTasks(UserService userService, ApartmentService apartmentService, EmailService emailService, SmsService smsService){
+    public ScheduledTasks(UserService userService, ApartmentService apartmentService, EmailService emailService, SmsService smsService,
+                          LocaleUtils localeUtils){
         this.userService = userService;
         this.apartmentService = apartmentService;
         this.emailService = emailService;
         this.smsService = smsService;
+        this.localeUtils = localeUtils;
     }
 
     @Scheduled(cron = "0 00 12 * * ?")          // Code to run at 12 PM every day
     public void resetSearchesAvailableForNonAdminUsers() {
         userService.resetSearchesAvailable();
-        log.info("The user available searches number was reset");
+        log.info("Scheduled Task - The user available searches number was reset");
     }
 
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
@@ -49,7 +53,7 @@ public class ScheduledTasks {
         var listings = apartmentService.findByLastUpdateDateTimeBefore(twoWeeksAgo);
 
         apartmentService.deactivateApartments(twoWeeksAgo);
-        log.info("The listings last updated before {} were deactivated.", twoWeeksAgo);
+        log.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
 
         for (Apartment listing : listings){
             log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
@@ -57,15 +61,16 @@ public class ScheduledTasks {
             var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
 
             if (ContactValidator.isValidEmail(contact)){
-                emailService.sendReactivateListingEmail(contact,"",listing.getName(),reactivateLink);
+                emailService.sendReactivateListingEmail(contact,"",listing.getName(),reactivateLink, localeUtils.getCurrentLocale());
             }
             if (ContactValidator.isValidPhoneNumber(contact,"RO")){
                 var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
                 if (phoneWithPrefix.isEmpty()){
                     log.error("Can't send SMS for + " + contact + " of listing " + listing.getName());
                 } else {
-                    // if you will need a longer message and thus to shorthen the URL, there are various services online that offer this
-                    smsService.sendSms(phoneWithPrefix.get(),"Hi! Click link to reactivate your listing " + reactivateLink);    // "or reply yes" => this is not implemented yet, see notes from SmsService
+                    var smsMessage = "Hi! Reactivate listing: " + reactivateLink;
+                    log.info("Scheduled Task - sending sms {}.", smsMessage);
+                    smsService.sendSms(phoneWithPrefix.get(), smsMessage);    // "or reply yes" => this is not implemented yet, see notes from SmsService
                 }
 
             }

@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.util.Locale;
 import java.util.Optional;
 
 @RestController
@@ -23,15 +25,18 @@ public class ReactivateController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateController.class);
     private final ApartmentService apartmentService;
+    private final MessageSource messageSource;
 
-    public ReactivateController(ApartmentService apartmentService) {
+    public ReactivateController(ApartmentService apartmentService, MessageSource messageSource) {
         this.apartmentService = apartmentService;
+        this.messageSource = messageSource;
     }
 
     @GetMapping("/reactivate")
     public ResponseEntity<String> favourite(@RequestParam String token,     // activation token
                                             @RequestParam String id,         // listing id
-                                            HttpSession session) {
+                                            HttpSession session,
+                                            Locale locale) {
 
         // 1. Validate token
         var optionalListing = validateToken(token, id);
@@ -53,7 +58,8 @@ public class ReactivateController {
         }
 
         // 3. Return success response
-        session.setAttribute("confirmationMessage", "Your listing was reactivated with success!");
+        var message = messageSource.getMessage("listing.reactivate.success", null, locale);
+        session.setAttribute("confirmationMessage", message);
         return ResponseEntity.status(HttpStatus.FOUND)
                 .location(URI.create(appUrl +"/confirmation"))
                 .build();

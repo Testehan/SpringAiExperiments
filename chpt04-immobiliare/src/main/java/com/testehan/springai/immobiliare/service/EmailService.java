@@ -8,6 +8,8 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
+import java.util.Locale;
+
 @Service
 public class EmailService {
 
@@ -50,16 +52,23 @@ public class EmailService {
         sesClient.sendTemplatedEmail(request);
     }
 
-    public void sendReactivateListingEmail(String to, String name, String listingName, String reactivateLink){
+    public void sendReactivateListingEmail(String to, String name, String listingName, String reactivateLink, Locale locale){
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
                 .source("admin@casamia.ai") // Replace with a verified email
                 .destination(Destination.builder()
                         .toAddresses(to)
                         .build())
-                .template("ReactivateListingEmailTemplate") // Template name
+                .template(getReactivateListingEmailTemplate(locale)) // Template name
                 .templateData("{\"name\":\""+name+"\",\"listingName\":\""+listingName+"\",\"reactivateLink\":\""+reactivateLink+"\"}")
                 .build();
 
         sesClient.sendTemplatedEmail(request);
+    }
+
+    private static String getReactivateListingEmailTemplate(Locale locale) {
+        if (locale.getLanguage().equals("ro")) {
+            return "ReactivateListingEmailTemplate_RO";
+        }
+        return "ReactivateListingEmailTemplate";
     }
 }
