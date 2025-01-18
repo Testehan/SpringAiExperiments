@@ -47,6 +47,9 @@ function openLoginModal(){
 function closeLoginModal() {
     $("#modalLoginContainer").addClass('hidden');
     $("#loginError").html('');
+    setTimeout(function() {     // redirect to homepage if user decides not to login
+        window.location.href = "/";
+    }, 0); // 0 milliseconds = 0 seconds
 }
 
 

@@ -139,7 +139,7 @@
 
 <p th:fragment="listing_contact" th:id="'contactResult'" class="text-red-500 mt-2">
     <span class="flex justify-between">
-        <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
+        <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700 mr-10"
                 th:hx-swap = "outerHTML"
                 th:hx-get="@{{appUrl}/api/apartments/contact/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}"
                 th:text="#{listing.contact}" />

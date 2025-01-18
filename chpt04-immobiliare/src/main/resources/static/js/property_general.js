@@ -1,7 +1,7 @@
 $(document).ready(function () {
     // initial page setup
     $('.favouriteButton').each(function () {
-            applyInitialFavouriteStylingFor($(this));
+        applyInitialFavouriteStylingFor($(this));
     });
 
 
