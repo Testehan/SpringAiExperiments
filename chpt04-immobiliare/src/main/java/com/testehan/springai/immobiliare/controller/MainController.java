@@ -259,6 +259,17 @@ public class MainController {
 
 	}
 
+	@GetMapping("/terms")
+	public String terms(Locale locale) {
+		String localeString = locale.getLanguage();
+		if (localeString.equals("ro")) {
+			return "terms-ro";
+		} else {
+			return "terms-en";
+		}
+
+	}
+
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
 		List<Apartment> listOfProperties;
 		if (user.isAdmin()){

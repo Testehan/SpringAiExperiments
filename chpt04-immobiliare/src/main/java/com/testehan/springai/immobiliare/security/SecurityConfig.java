@@ -54,7 +54,7 @@ public class SecurityConfig {
                 .requestMatchers("/chat", "/respond", "/message","/favourites","/add","/edit/**","/api/apartments/**",
                         "/actuator/**","/api/user/**","/profile","/view/**").authenticated()
                 .requestMatchers("/","/help","/blog","/contact", "/error/**", "/error-login", "/login-modal",
-                        "/reactivate","/confirmation","/accept-gdpr","/privacy-policy").permitAll()
+                        "/reactivate","/confirmation","/accept-gdpr","/privacy-policy","/terms").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
                 .requestMatchers(antMatcher("/webjars/**")).permitAll()
