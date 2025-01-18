@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.advisor;
 
 import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.security.CustomerUserDetails;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ConversationService;
 import io.micrometer.common.util.StringUtils;
@@ -97,7 +98,14 @@ public class ConversationSession {
     }
 
     public ImmobiliareUser getImmobiliareUser() {
-        String userEmail = ((OAuth2AuthenticatedPrincipal) authentication.getPrincipal()).getAttribute("email");
+        String userEmail = "";
+        if  (authentication.getPrincipal() instanceof OAuth2AuthenticatedPrincipal){
+            userEmail = ((OAuth2AuthenticatedPrincipal) authentication.getPrincipal()).getAttribute("email");
+        }
+        if (authentication.getPrincipal() instanceof CustomerUserDetails){
+            userEmail = ((CustomerUserDetails) authentication.getPrincipal()).getImmobiliareUser().getEmail();
+        }
+
         var user = userService.getImmobiliareUserByEmail(userEmail);
         return user.get();
     }

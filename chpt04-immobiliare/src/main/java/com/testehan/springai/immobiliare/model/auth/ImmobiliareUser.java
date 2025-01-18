@@ -21,6 +21,8 @@ public class ImmobiliareUser {
 
     private String password;
 
+    private String refreshToken;
+
     private AuthenticationType authenticationType;
 
     private List<String> favouriteProperties;
