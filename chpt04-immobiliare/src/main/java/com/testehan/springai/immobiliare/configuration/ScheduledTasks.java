@@ -43,17 +43,22 @@ public class ScheduledTasks {
         userService.resetSearchesAvailable();
         log.info("Scheduled Task - The user available searches number was reset");
     }
-
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
-    public void deactivatedListingsLastUpdated2WeeksAgoAndSendReactivationEmailOrSMS() {
-        // Code to run at 3 AM every day
+    public void deactivatedListingsLastUpdatedMoreThan2WeeksAgo() {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
-
-        var listings = apartmentService.findByLastUpdateDateTimeBefore(twoWeeksAgo);
-
         apartmentService.deactivateApartments(twoWeeksAgo);
         log.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
+    }
+
+    @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
+//    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
+    public void sendReactivationEmailOrSMS() {
+
+        LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
+        log.info("Scheduled Task - Reactivation emails or sms will be send to owners.");
+
+        var listings = apartmentService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
 
         for (Apartment listing : listings){
             log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
@@ -69,7 +74,6 @@ public class ScheduledTasks {
                     log.error("Can't send SMS for + " + contact + " of listing " + listing.getName());
                 } else {
                     var smsMessage = "Hi! Reactivate listing: " + reactivateLink;
-                    log.info("Scheduled Task - sending sms {}.", smsMessage);
                     smsService.sendSms(phoneWithPrefix.get(), smsMessage);    // "or reply yes" => this is not implemented yet, see notes from SmsService
                 }
 
