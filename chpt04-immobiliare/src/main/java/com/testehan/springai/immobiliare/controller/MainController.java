@@ -23,8 +23,10 @@ import org.thymeleaf.util.StringUtils;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 @Controller
 public class MainController {
@@ -92,7 +94,10 @@ public class MainController {
 			}
 		}
 
-		model.addAttribute("apartments", apartments);
+		var sortedApartments = apartments.stream().sorted(Comparator.comparing(Apartment::isActive).reversed())  // Inactive (false) at the end
+				.collect(Collectors.toList());
+
+		model.addAttribute("apartments", sortedApartments);
 		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));

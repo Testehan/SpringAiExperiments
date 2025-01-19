@@ -33,7 +33,9 @@
     </div>
 </div>
 
-<div class="max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+<div class="relative max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+    <div th:replace="~{fragments :: disabled_listing}"></div>
+
     <div th:replace="~{fragments :: listing_images}"></div>
 
     <div class="w-full p-6">
@@ -85,7 +87,9 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+<div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+    <div th:replace="~{fragments :: disabled_listing}"></div>
+
     <div class="bg-white shadow-lg rounded-lg overflow-hidden mt-10">
         <div th:replace="~{fragments :: listing_images}"></div>
     </div>
@@ -135,6 +139,13 @@
         </div>
     </div>
 
+</div>
+
+<!-- Blur effect -->
+<div th:if="${!apartment.active}" th:fragment="disabled_listing" class="absolute top-0 left-0 w-full h-full backdrop-blur-sm bg-white/50 pointer-events-none">
+    <span th:text="#{listing.inactive}" class="absolute top-[20%] left-1/2 transform -translate-x-1/2 p-4 text-red-500 border border-red-500 bg-transparent font-bold text-3xl rounded">
+        Inactive
+    </span>
 </div>
 
 <p th:fragment="listing_contact" th:id="'contactResult'" class="text-red-500 mt-2">
