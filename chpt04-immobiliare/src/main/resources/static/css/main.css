@@ -789,6 +789,10 @@ video {
   max-height: 20vh;
 }
 
+.max-h-\[50vh\] {
+  max-height: 50vh;
+}
+
 .max-h-full {
   max-height: 100%;
 }
@@ -938,6 +942,10 @@ video {
   place-items: center;
 }
 
+.items-end {
+  align-items: flex-end;
+}
+
 .items-center {
   align-items: center;
 }
@@ -986,6 +994,10 @@ video {
 
 .overflow-hidden {
   overflow: hidden;
+}
+
+.overflow-y-auto {
+  overflow-y: auto;
 }
 
 .rounded {

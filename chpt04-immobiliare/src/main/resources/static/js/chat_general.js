@@ -60,7 +60,7 @@ function fetchSuggestions() {
             console.log("fetching suggestions ");
             if (Array.isArray(response)) {
                 response.forEach(function(item, index) {
-                    $('#suggestions').append(`<button class="suggestion-btn inline-block bg-sky-200 rounded-lg p-2 mr-2 hover:bg-sky-300">${item}</button>`);
+                    $('#suggestions').append(`<button class="suggestion-btn bg-sky-200 rounded-lg p-2 mr-2 hover:bg-sky-300">${item}</button>`);
                 });
                 suggestionsStep++;
             } else {
