@@ -100,6 +100,10 @@ public class ApiServiceImpl implements ApiService{
 
         session.setAttribute("sseIndex", 0);
         conversationSession.setLastPropertyDescription(description);
+        // we do this clearing because we want our chat memory to contain only the latest listing results, on which
+        // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
+        // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
+        conversationSession.clearChatMemoryAndConversation();
         var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 
         var rentOrSale = conversationSession.getRentOrSale();

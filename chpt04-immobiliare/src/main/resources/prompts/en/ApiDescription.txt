@@ -26,7 +26,7 @@ Available APIs:
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-7. **Last option API**: If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
+7. **Last option API**: If the user has questions about the apartments displayed in previous calls, use this API. If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
@@ -120,5 +120,17 @@ Examples:
 - User Input: "start from the beginning"
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
+
+- User Input: "which apartment has the largest terrace?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "which apartment has the largest terrace?"\}`
+
+- User Input: "which apartment allows pets?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "which apartment has the largest terrace?"\}`
+
+- User Input: "when is the best time to rent and apartment?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "when is the best time to rent and apartment?"\}`
 
 {format}

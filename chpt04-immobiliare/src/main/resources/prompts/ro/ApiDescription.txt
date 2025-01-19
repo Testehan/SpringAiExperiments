@@ -26,7 +26,7 @@ API-uri disponibile:
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-7. **General imobiliar API**: Dacă utilizatorul are alte solicitări sau intrebari legate de domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
+7. **General imobiliar API**: Dacă utilizatorul are întrebări despre apartamentele afișate în apelurile anterioare, utilizați acest API. Dacă utilizatorul are alte solicitări sau intrebari legate de domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
@@ -128,5 +128,17 @@ Exemple:
 - Intrare utilizator: „începe de la început”
   - API Call: `/restart`
   - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: "care apartament are cea mai mare terasa?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "care apartament are cea mai mare terasa?"\}`
+
+- Intrare utilizator: „ce apartament acceptă animale de companie?”
+  - API Call: `/default`
+  - Parameters: `\{"message": "ce apartament acceptă animale de companie?"\}`
+
+- Intrare utilizator: "când este cel mai bun moment pentru închiriere și apartament?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "când este cel mai bun moment pentru închiriere și apartament?"\}`
 
 {format}
