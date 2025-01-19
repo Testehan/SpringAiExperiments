@@ -93,7 +93,8 @@ public class Apartment {
     }
 
     public void setTagsWithSplit(String tags){
-        this.tags = List.of(tags.split(" "));
+
+        this.tags = List.of(tags.replace(",","").split(" "));
     }
 
     public String getTagsWithSplit(){

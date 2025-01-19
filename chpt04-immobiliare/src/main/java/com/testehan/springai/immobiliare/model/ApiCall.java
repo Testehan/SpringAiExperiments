@@ -13,7 +13,8 @@ public enum ApiCall {
     GET_APARTMENTS("/getApartments"),
     RESTART_CONVERSATION("/restart"),
     DEFAULT("/default"),
-    NOT_SUPPORTED("/notSupported");
+    NOT_SUPPORTED("/notSupported"),
+    EXCEPTION("/exception");
 
     private final String path;
 

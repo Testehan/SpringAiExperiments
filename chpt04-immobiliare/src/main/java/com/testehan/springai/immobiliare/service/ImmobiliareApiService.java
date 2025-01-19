@@ -2,8 +2,11 @@ package com.testehan.springai.immobiliare.service;
 
 
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
+import com.testehan.springai.immobiliare.model.ApiCall;
 import com.testehan.springai.immobiliare.model.ServiceCall;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
@@ -17,6 +20,8 @@ import java.util.Map;
 @Service
 public class ImmobiliareApiService {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ImmobiliareApiService.class);
+
     private final ChatClient chatClient;
     private final LocaleUtils localeUtils;
 
@@ -26,26 +31,31 @@ public class ImmobiliareApiService {
     }
 
     public ServiceCall whichApiToCall(String message) {
+        try {
+            ChatResponse assistantResponse;
 
-        ChatResponse assistantResponse;
+            var outputParser = new BeanOutputConverter<>(ServiceCall.class);
+            String format = outputParser.getFormat();
 
-        var outputParser = new BeanOutputConverter<>(ServiceCall.class);
-        String format = outputParser.getFormat();
-
-        var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
-        PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
-        Map<String, Object> promptParameters = new HashMap<>();
+            var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
+            PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
+            Map<String, Object> promptParameters = new HashMap<>();
 //        promptParameters.put("input_here", message);
-        promptParameters.put("format", format);
-        Prompt prompt = promptTemplate.create(promptParameters);
+            promptParameters.put("format", format);
+            Prompt prompt = promptTemplate.create(promptParameters);
 
-        assistantResponse = chatClient.prompt()
-                .system(prompt.getContents())   //Move large static content to the system message field
-                .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
-                .call().chatResponse();
+            assistantResponse = chatClient.prompt()
+                    .system(prompt.getContents())   //Move large static content to the system message field
+                    .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
+                    .call().chatResponse();
 
-        ServiceCall serviceCall = outputParser.convert(assistantResponse.getResult().getOutput().getContent());
-        return serviceCall;
+            ServiceCall serviceCall = outputParser.convert(assistantResponse.getResult().getOutput().getContent());
+            return serviceCall;
+        } catch (Exception e) {
+            // Catch-all for unexpected errors
+            LOGGER.error("Unexpected error while calling LLM: {}", e.getMessage(), e);
+            return new ServiceCall(ApiCall.EXCEPTION, "");
+        }
     }
 
     public ApartmentDescription extractApartmentInformationFromProvidedDescription(String apartmentDescription) {

@@ -90,6 +90,7 @@ public class ApiServiceImpl implements ApiService{
             case RESTART_CONVERSATION : { return restartConversation(); }
             case DEFAULT : return respondToUserMessage(message);
             case NOT_SUPPORTED : return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, localeUtils.getCurrentLocale()));
+            case EXCEPTION: return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
 
         }
 
@@ -98,87 +99,92 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse getApartments(String description, HttpSession session) {
 
-        session.setAttribute("sseIndex", 0);
-        conversationSession.setLastPropertyDescription(description);
-        // we do this clearing because we want our chat memory to contain only the latest listing results, on which
-        // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
-        // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
-        conversationSession.clearChatMemoryAndConversation();
-        var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
+        try {
+            session.setAttribute("sseIndex", 0);
+            conversationSession.setLastPropertyDescription(description);
+            // we do this clearing because we want our chat memory to contain only the latest listing results, on which
+            // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
+            // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
+            conversationSession.clearChatMemoryAndConversation();
+            var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
 
-        var rentOrSale = conversationSession.getRentOrSale();
-        // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
-        var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
-        var conversationId = conversationSession.getConversationId();
-        final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
-        var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city,apartmentDescription, description);
+            var rentOrSale = conversationSession.getRentOrSale();
+            // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
+            var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
+            var conversationId = conversationSession.getConversationId();
+            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
+            var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, description);
 
-        LOGGER.info("Apartments found from vector store semantic search:");
-        apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info( "Apartment {}  : {}", ap.getId(), ap.getApartmentInfo()));
+            LOGGER.info("Apartments found from vector store semantic search:");
+            apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), ap.getApartmentInfo()));
 
-        ResultsResponse response = new ResultsResponse("");
+            ResultsResponse response = new ResultsResponse("");
 
-        Locale currentLocale = localeUtils.getCurrentLocale();
-        if (apartmentsFromSemanticSearch.size() > 0) {
-            int batchSize = 2;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
-            AtomicBoolean isFirst = new AtomicBoolean(true);
+            Locale currentLocale = localeUtils.getCurrentLocale();
+            if (apartmentsFromSemanticSearch.size() > 0) {
+                int batchSize = 2;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
+                AtomicBoolean isFirst = new AtomicBoolean(true);
 
-            var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
-            bestMatchingApartmentIds
-                .filter(id -> ObjectId.isValid(id))
-                .distinct()
-                .subscribe(
-                        apId -> {
-                            var apartmentLLM = apartmentsFromSemanticSearch.stream()
-                                    .filter(item -> apId.equals(item.getId().toString()))
-                                    .findFirst();
-                            if (!apartmentLLM.isEmpty()){
-                                if (isFirst.getAndSet(false)) {
-                                    userSseService.getUserSseConnection(session.getId())
-                                            .tryEmitNext(new Event("response",new ResponsePayload(
-                                                    messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, currentLocale)))
-                                            );
+                var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
+                bestMatchingApartmentIds
+                        .filter(id -> ObjectId.isValid(id))
+                        .distinct()
+                        .subscribe(
+                                apId -> {
+                                    var apartmentLLM = apartmentsFromSemanticSearch.stream()
+                                            .filter(item -> apId.equals(item.getId().toString()))
+                                            .findFirst();
+                                    if (!apartmentLLM.isEmpty()) {
+                                        if (isFirst.getAndSet(false)) {
+                                            userSseService.getUserSseConnection(session.getId())
+                                                    .tryEmitNext(new Event("response", new ResponsePayload(
+                                                            messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, currentLocale)))
+                                                    );
+                                        }
+                                        LOGGER.info("Found apartment id {}", apartmentLLM.get().getId());
+                                        // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
+                                        // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
+
+                                        var apartmentInfo = apartmentLLM.get().getApartmentInfo();
+                                        LOGGER.info("Adding apartment info to conversation memory {}", apartmentInfo);
+                                        conversationService.addContentToConversation(apartmentInfo, conversationId);
+
+                                        var isFavourite = isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
+                                        userSseService.getUserSseConnection(session.getId())
+                                                .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get(), isFavourite)));
+                                    }
+
+                                },
+                                error -> {
+                                    LOGGER.error("Error: {}", error);
+                                    throw new RuntimeException(error.getMessage());
+                                },
+                                () -> {
+                                    if (isFirst.get()) {     // this means that we processed stream and we got no match
+                                        userSseService.getUserSseConnection(session.getId())
+                                                .tryEmitNext(new Event("response", new ResponsePayload(
+                                                        messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale)))
+                                                );
+                                        LOGGER.info("Search completed with no results for description : {}", description);
+                                    } else {
+                                        userSseService.getUserSseConnection(session.getId())
+                                                .tryEmitNext(new Event("response", new ResponsePayload(
+                                                        messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, currentLocale)))
+                                                );
+                                        LOGGER.info("Search completed");
+                                    }
+
                                 }
-                                LOGGER.info("Found apartment id {}",  apartmentLLM.get().getId());
-                                // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
-                                // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
+                        );
 
-                                var apartmentInfo = apartmentLLM.get().getApartmentInfo();
-                                LOGGER.info("Adding apartment info to conversation memory {}",  apartmentInfo);
-                                conversationService.addContentToConversation(apartmentInfo, conversationId);
+            } else {
+                response = new ResultsResponse(messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale));
+            }
 
-                                var isFavourite = isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
-                                userSseService.getUserSseConnection(session.getId())
-                                        .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get(), isFavourite)));
-                            }
-
-                        },
-                        error -> {
-                            LOGGER.error("Error: {}", error);
-                        },
-                        () -> {
-                            if (isFirst.get()){     // this means that we processed stream and we got no match
-                                userSseService.getUserSseConnection(session.getId())
-                                        .tryEmitNext(new Event("response",new ResponsePayload(
-                                                messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale)))
-                                        );
-                                LOGGER.info("Search completed with no results for description : {}", description);
-                            } else {
-                                userSseService.getUserSseConnection(session.getId())
-                                        .tryEmitNext(new Event("response", new ResponsePayload(
-                                                messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, currentLocale)))
-                                        );
-                                LOGGER.info("Search completed");
-                            }
-
-                        }
-                );
-
-        } else {
-            response = new ResultsResponse(messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale));
+            return response;
+        } catch (RuntimeException e){
+            return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
         }
-
-        return response;
     }
 
 
@@ -341,27 +347,32 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse respondToUserMessage(String userMessage) {
+        try {
+            var chatResponse = createNewChatClient()
+                    .prompt()
+                    .advisors (new Consumer<ChatClient.AdvisorSpec>() {
+                        @Override
+                        public void accept(ChatClient.AdvisorSpec advisorSpec) {
+                            advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationSession.getConversationId());
+                        }
+                    })
+                    .advisors(new Consumer<ChatClient.AdvisorSpec>() {
+                        @Override
+                        public void accept(ChatClient.AdvisorSpec advisorSpec) {
+                            advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
+                        }
+                    })
+                    // todo it would be nice to have this response formatted ...
+    //                .system("Please generate the response inside HTML code. Your response must not start with ```html and must not contain \\n or other newline characters. The response must be valid HTML code and must have a div as top element.")
+                    .user(userMessage)
+                    .call().content();
 
-        var chatResponse = createNewChatClient()
-                .prompt()
-                .advisors (new Consumer<ChatClient.AdvisorSpec>() {
-                    @Override
-                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
-                        advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationSession.getConversationId());
-                    }
-                })
-                .advisors(new Consumer<ChatClient.AdvisorSpec>() {
-                    @Override
-                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
-                        advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
-                    }
-                })
-                // todo it would be nice to have this response formatted ...
-//                .system("Please generate the response inside HTML code. Your response must not start with ```html and must not contain \\n or other newline characters. The response must be valid HTML code and must have a div as top element.")
-                .user(userMessage)
-                .call().content();
-
-        return new ResultsResponse(chatResponse);
+            return new ResultsResponse(chatResponse);
+        } catch (Exception e) {
+            // Catch-all for unexpected errors
+            LOGGER.error("Unexpected error while calling LLM: {}", e.getMessage(), e);
+            return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
+        }
     }
 
 
