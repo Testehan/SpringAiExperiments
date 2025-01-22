@@ -17,6 +17,7 @@ $(document).ready(function () {
             autoHeight: true,
             pagination: {
                 el: ".swiper-pagination",
+                clickable: true
             }
         });
     }

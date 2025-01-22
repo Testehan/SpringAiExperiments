@@ -87,14 +87,14 @@
     </div>
 </div>
 
-<div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+<div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 shadow-lg rounded-lg mt-10" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
     <div th:replace="~{fragments :: disabled_listing}"></div>
 
-    <div class="bg-white shadow-lg rounded-lg overflow-hidden mt-10">
+    <div class="bg-white overflow-hidden">
         <div th:replace="~{fragments :: listing_images}"></div>
     </div>
 
-    <div class="max-w-md mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" >
+    <div class="max-w-md mx-auto bg-white overflow-hidden" >
         <div class="w-full p-3">
 
             <div class="flex justify-between items-center">
@@ -142,7 +142,7 @@
 </div>
 
 <!-- Blur effect -->
-<div th:if="${!apartment.active}" th:fragment="disabled_listing" class="absolute top-0 left-0 w-full h-full backdrop-blur-sm bg-white/50 pointer-events-none">
+<div th:if="${!apartment.active}" th:fragment="disabled_listing" class="absolute z-50 top-0 left-0 w-full h-full backdrop-blur-sm bg-white/50 pointer-events-none">
     <span th:text="#{listing.inactive}" class="absolute top-[20%] left-1/2 transform -translate-x-1/2 p-4 text-red-500 border border-red-500 bg-transparent font-bold text-3xl rounded">
         Inactive
     </span>
@@ -192,9 +192,9 @@
         </div>
     </div>
 
+    <!-- This is for small screens only-->
     <div class="block sm:hidden">
         <div class="swiper">
-            <!-- Additional required wrapper -->
             <div class="swiper-wrapper">
                 <!-- Slides -->
                 <div th:each="image : ${apartment.images}" class="swiper-slide">
@@ -208,8 +208,7 @@
                          alt="Image Not Found" />
                 </div>
             </div>
-            <!-- If we need pagination -->
-            <div class="swiper-pagination"></div>
+            <div class="swiper-pagination custom-pagination"></div>
         </div>
     </div>
 

@@ -56,3 +56,16 @@
         flex-direction: row;
     }
 }
+
+.swiper .swiper-pagination.custom-pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px; /* Adjust spacing between bullets */
+    width: max-content; /* Ensures the width only fits the bullets */
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 10px; /* Adjust positioning */
+    background: rgba(255, 255, 255, 0.5);
+    padding: 6px 10px;
+    border-radius: 8px;
+}
