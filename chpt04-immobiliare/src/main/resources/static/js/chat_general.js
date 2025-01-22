@@ -28,6 +28,18 @@ $(document).ready(function(){
 
             // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
             htmx.process($('#response-container')[0]);
+
+            setTimeout(() => {
+                initializeSwiperObjectOnSmallScreens(); // Call the function from swiper.js
+                if (!mySwiper || !$('.swiper-slide').length ) {
+                    console.warn("Swiper is not initialized! Calling initializeSwiperObjectOnSmallScreens...");
+                    initializeSwiperObjectOnSmallScreens(); // Call the function from swiper.js
+                } else if (mySwiper.update){
+                    console.log("Updating Swiper with new slides...");
+                    mySwiper.update();
+                    mySwiper.loopCreate();
+                }
+            }, 100); // Small delay to ensure new elements exist
         }
     });
 

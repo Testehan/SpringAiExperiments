@@ -614,6 +614,10 @@ video {
   top: 20%;
 }
 
+.z-40 {
+  z-index: 40;
+}
+
 .z-50 {
   z-index: 50;
 }
@@ -1505,8 +1509,7 @@ video {
   transform: translateX(-50%);
   bottom: 10px;
   /* Adjust positioning */
-  background: rgba(255, 255, 255, 0.3);
-  /* Optional background */
+  background: rgba(255, 255, 255, 0.5);
   padding: 6px 10px;
   border-radius: 8px;
 }
