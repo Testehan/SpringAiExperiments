@@ -9,6 +9,18 @@ $(document).ready(function () {
     $('#response-container').on('click', '.favouriteButton', function () {
         applyFavouriteStylingFor($(this));
     });
+
+    if ($(window).width() < 640) { // Only initialize Swiper on small screens
+        new Swiper('.swiper', {
+            direction: 'horizontal',
+            loop: true,
+            autoHeight: true,
+            pagination: {
+                el: ".swiper-pagination",
+            }
+        });
+    }
+
 });
 
 function applyFavouriteStylingFor(favouriteButton){

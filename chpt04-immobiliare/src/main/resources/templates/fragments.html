@@ -165,7 +165,7 @@
 
 <div th:fragment="listing_images">
     <div
-            class="grid gap-4 px-4 grid-cols-2" th:classappend="
+            class="hidden sm:grid gap-4 px-4 grid-cols-2" th:classappend="
             ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
             (${#lists.size(apartment.images) % 3 == 0} ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3' :
             (${#lists.size(apartment.images) % 2 == 0} ? 'sm:grid-cols-2 md:grid-cols-2' : 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'))">
@@ -191,6 +191,28 @@
                  alt="No Images Available">
         </div>
     </div>
+
+    <div class="block sm:hidden">
+        <div class="swiper">
+            <!-- Additional required wrapper -->
+            <div class="swiper-wrapper">
+                <!-- Slides -->
+                <div th:each="image : ${apartment.images}" class="swiper-slide">
+                    <img class="w-full h-auto"
+                         th:src="@{${image}}"
+                         th:unless="${#strings.isEmpty(image)}"/>
+
+                    <img class="w-full h-full max-h-[20vh] object-contain cursor-pointer"
+                         th:if="${#strings.isEmpty(image)}"
+                         src="https://st4.depositphotos.com/14953852/24787/v/380/depositphotos_247872612-stock-illustration-no-image-available-icon.vector.jpg"
+                         alt="Image Not Found" />
+                </div>
+            </div>
+            <!-- If we need pagination -->
+            <div class="swiper-pagination"></div>
+        </div>
+    </div>
+
 </div>
 
 <div th:fragment="listing_area">
