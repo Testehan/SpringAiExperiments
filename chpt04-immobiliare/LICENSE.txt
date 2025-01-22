@@ -1,0 +1,19 @@
+                           ALL RIGHTS RESERVED
+
+Copyright (c) 2025 Testehan Dan
+
+This source code, and any derivative works thereof, is the proprietary property of
+Testehan Dan and is provided solely for evaluation purposes. No part of this
+software may be reproduced, modified, distributed, or transmitted in any form or by any
+means, including photocopying, recording, or other electronic or mechanical methods, without
+the prior written permission of Testehan Dan.
+
+Unauthorized copying, reproduction, modification, distribution, or use of this software,
+in whole or in part, is strictly prohibited and may result in severe civil and criminal
+penalties.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

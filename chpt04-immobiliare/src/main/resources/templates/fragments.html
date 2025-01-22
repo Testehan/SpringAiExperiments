@@ -198,8 +198,7 @@
             <div class="swiper-wrapper">
                 <!-- Slides -->
                 <div th:each="image : ${apartment.images}" class="swiper-slide">
-                    <img class="w-full h-auto"
-                         th:src="@{${image}}"
+                    <img th:src="@{${image}}"
                          th:unless="${#strings.isEmpty(image)}"/>
 
                     <img class="w-full h-full max-h-[20vh] object-contain cursor-pointer"

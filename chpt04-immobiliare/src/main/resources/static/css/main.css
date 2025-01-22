@@ -1498,15 +1498,29 @@ video {
 }
 
 .swiper {
-  max-height: 300px;
+  max-height: 30vh;
   /* Set your desired max height */
+  max-width: 35vh;
+  /* Prevents it from exceeding the parent's width */
   overflow: hidden;
   /* Ensure content doesn't exceed the max height */
 }
 
+.swiper-slide {
+  width: auto;
+  /* Prevents Swiper from setting fixed widths */
+  max-width: 35vh;
+  display: flex;
+  /* Helps with image centering */
+  justify-content: center;
+  align-items: center;
+}
+
 .swiper-slide img {
-  max-height: 300px;
-  /* Adjust this value as needed */
+  /* max-height: 250px;  Adjust this value as needed */
+  max-height: 30vh;
+  /* 30 % of the viewport */
+  max-width: 35vh;
   width: auto;
   /* Keeps the original aspect ratio */
   height: auto;

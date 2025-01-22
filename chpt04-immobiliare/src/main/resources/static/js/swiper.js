@@ -7,7 +7,7 @@ function initializeSwiperObjectOnSmallScreens(swiperContainer) {
         const mySwiper = new Swiper(swiperContainer.get(0), {
             direction: 'horizontal',
             autoHeight: true,
-           loop: true,
+//           loop: true,
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true
