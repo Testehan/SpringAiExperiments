@@ -57,6 +57,20 @@
     }
 }
 
+.swiper {
+    max-height: 300px; /* Set your desired max height */
+    overflow: hidden; /* Ensure content doesn't exceed the max height */
+}
+
+.swiper-slide img {
+    max-height: 300px; /* Adjust this value as needed */
+    width: auto; /* Keeps the original aspect ratio */
+    height: auto; /* Ensures the aspect ratio is maintained */
+    object-fit: contain; /* Ensures the image fits within the slide */
+    display: block; /* Removes extra spacing issues */
+    margin: 0 auto; /* Centers the image horizontally */
+}
+
 .swiper .swiper-pagination.custom-pagination {
     display: flex;
     justify-content: center;

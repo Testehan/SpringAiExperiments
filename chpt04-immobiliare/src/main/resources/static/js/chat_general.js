@@ -30,16 +30,14 @@ $(document).ready(function(){
             htmx.process($('#response-container')[0]);
 
             setTimeout(() => {
-                initializeSwiperObjectOnSmallScreens(); // Call the function from swiper.js
-                if (!mySwiper || !$('.swiper-slide').length ) {
-                    console.warn("Swiper is not initialized! Calling initializeSwiperObjectOnSmallScreens...");
-                    initializeSwiperObjectOnSmallScreens(); // Call the function from swiper.js
-                } else if (mySwiper.update){
-                    console.log("Updating Swiper with new slides...");
-                    mySwiper.update();
-                    mySwiper.loopCreate();
-                }
-            }, 100); // Small delay to ensure new elements exist
+                initializeSwipers();
+
+                // Ensure the new slides are added before updating Swiper
+                swiperInstances.forEach(swiper => {
+                    swiper.update(); // Update each swiper instance
+                    swiper.pagination.update(); // Update pagination
+                });
+            }, 200); // Small delay to ensure new elements exist
         }
     });
 

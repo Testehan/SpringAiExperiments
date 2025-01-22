@@ -1,27 +1,46 @@
-let mySwiper; // Declare globally (but don't initialize yet)
+let swiperInstances = []; // Store all swiper instances
 
-function initializeSwiperObjectOnSmallScreens() {
+function initializeSwiperObjectOnSmallScreens(swiperContainer) {
     if ($(window).width() < 640) { // Only initialize Swiper on small screens
-        const swiperContainer = $('.swiper'); // Select .swiper elements
-        if (swiperContainer.length === 0) {
-            console.warn("No '.swiper' elements found. Skipping initialization.");
-            return;
-        }
 
         console.log("Initializing Swiper...");
-        mySwiper = new Swiper('.swiper', {
+        const mySwiper = new Swiper(swiperContainer.get(0), {
             direction: 'horizontal',
-            loop: true,
             autoHeight: true,
+           loop: true,
             pagination: {
                 el: ".swiper-pagination",
                 clickable: true
             }
         });
+
+        swiperInstances.push(mySwiper);
+        updateSwiper(mySwiper);
     }
 
 }
 
+function updateSwiper(swiper) {
+    console.log("Update Swiper...");
+    swiper.update(); // Updates the Swiper instance with the new slides
+    swiper.pagination.update(); // Updates pagination
+    swiper.pagination.render(); // Re-renders the pagination bullets
+    swiper.pagination.update(); // Ensure pagination is correctly updated
+}
+
+// Function to initialize Swipers when new elements are added dynamically
+function initializeSwipers() {
+    // Initialize Swipers for any .swiper containers on the page
+    $('.swiper').each(function () {
+        const swiperContainer = $(this);
+        if (!swiperContainer.data('swiper-initialized')) { // Check if Swiper has already been initialized
+            console.log('Initializing new Swiper for container:', swiperContainer);
+            initializeSwiperObjectOnSmallScreens(swiperContainer); // Initialize the Swiper instance
+            swiperContainer.data('swiper-initialized', true); // Mark this swiper as initialized
+        }
+    });
+}
+
 $(document).ready(function () {
-    initializeSwiperObjectOnSmallScreens();
+    initializeSwipers();
 });
