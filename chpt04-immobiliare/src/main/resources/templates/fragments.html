@@ -45,7 +45,9 @@
             <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
         </div>
         <div class="flex justify-between mt-2">
-            <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price} + ' &euro;'"/>
+            <p class="text-gray-600 mt-2">
+                <b th:text="#{listing.price} + ': '" />[[${apartment.price}]]  &euro;
+            </p>
             <button class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md"
                     th:onclick="shareOnSocialMedia([[${apartment.getIdString}]], [[${apartment.name}]], [[${apartment.price}]])"
 
@@ -55,7 +57,9 @@
                 </svg>
             </button>
         </div>
-        <p class="text-gray-600 mt-2" th:text="#{listing.location} + ': ' + ${apartment.city}"/>
+        <p class="text-gray-600 mt-2">
+            <b th:text="#{listing.location}+ ': '"/>[[${apartment.city}]]
+        </p>
 
         <div th:replace="~{fragments :: listing_area}"></div>
 
@@ -64,12 +68,20 @@
             <span th:text="${#strings.substring(apartment.shortDescription, 0, 250)} + '...'"></span>
             <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{{appUrl}/view/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}">See Full Description</a>
         </p>
-        <p class="text-gray-600 mt-2" th:text="#{listing.surface} + ': ' + ${apartment.surface} + ' ' + #{listing.surface.measured.in}"/>
-        <p class="text-gray-600 mt-2" th:text="#{listing.no.rooms} + ': ' + ${apartment.noOfRooms}" />
-        <p class="text-gray-600 mt-2" th:text="#{listing.floor} + ': ' + ${apartment.floor}"/>
-        <p class="text-gray-600 mt-2" th:text="#{listing.last.update} + ': ' + ${apartment.lastUpdateDateTime}"/>
+        <p class="text-gray-600 mt-2">
+            <b th:text="#{listing.surface} + ': '" />[[${apartment.surface} + ' ' + #{listing.surface.measured.in}]]
+        </p>
+        <p class="text-gray-600 mt-2">
+            <b  th:text="#{listing.no.rooms} + ': '" />[[${apartment.noOfRooms}]]
+        </p>
+        <p th:if="${apartment.floor != null and !#strings.isEmpty(apartment.floor)}" class="text-gray-600 mt-2">
+            <b th:text="#{listing.floor} + ': ' "/>[[${apartment.floor}]]
+        </p>
+        <p class="text-gray-600 mt-2">
+            <b th:text="#{listing.last.update} + ': '"/>[[${apartment.lastUpdateDateTime}]]
+        </p>
 
-        <p class="text-gray-600 mt-2">Tags:
+        <p class="text-gray-600 mt-2"><b>Tags:</b>
             <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
         </p>
 
@@ -102,7 +114,9 @@
                 <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
             </div>
             <div class="flex justify-between mt-2">
-                <p class="text-gray-600 mt-2" th:text="#{listing.price} + ': ' + ${apartment.price} + ' &euro;'"/>
+                <p class="text-gray-600 mt-2">
+                    <b th:text="#{listing.price} + ': '" />[[${apartment.price} + ' &euro;']]
+                </p>
                 <button class="inline-flex items-center justify-center px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md"
                         th:onclick="shareOnSocialMedia([[${apartment.getIdString}]], [[${apartment.name}]], [[${apartment.price}]])"
 
@@ -112,18 +126,28 @@
                     </svg>
                 </button>
             </div>
-            <p class="text-gray-600 mt-2" th:text="#{listing.location} + ': ' + ${apartment.city}"/>
+            <p class="text-gray-600 mt-2">
+                <b th:text="#{listing.location} + ': '" />[[${apartment.city}]]
+            </p>
 
             <div th:replace="~{fragments :: listing_area}"></div>
 
-            <p class="text-gray-600 mt-2" th:text="#{listing.surface} + ': ' + ${apartment.surface} + ' ' + #{listing.surface.measured.in}"/>
-            <p class="text-gray-600 mt-2" th:text="#{listing.no.rooms} + ': ' + ${apartment.noOfRooms}" />
-            <p class="text-gray-600 mt-2" th:text="#{listing.floor} + ': ' + ${apartment.floor}"/>
-            <p class="text-gray-600 mt-2" th:text="#{listing.last.update} + ': ' + ${apartment.lastUpdateDateTime}"/>
+            <p class="text-gray-600 mt-2" >
+                <b th:text="#{listing.surface} + ': '" />[[${apartment.surface} + ' ' + #{listing.surface.measured.in}]]
+            </p>
+            <p class="text-gray-600 mt-2">
+                <b th:text="#{listing.no.rooms} + ': '" />[[${apartment.noOfRooms}]]
+            </p>
+            <p th:if="${apartment.floor != null and !#strings.isEmpty(apartment.floor)}" class="text-gray-600 mt-2">
+                <b th:text="#{listing.floor} + ': ' "/>[[${apartment.floor}]]
+            </p>
+            <p class="text-gray-600 mt-2">
+                <b th:text="#{listing.last.update} + ': '"/>[[${apartment.lastUpdateDateTime}]]
+            </p>
             <p th:replace="~{fragments :: listing_contact}"></p>
             <p class="text-gray-600 mt-2" th:text="${apartment.shortDescription}"></p>
 
-            <p class="text-gray-600 mt-2">Tags:
+            <p class="text-gray-600 mt-2"><b>Tags:</b>
                 <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
             </p>
 
@@ -215,7 +239,9 @@
 
 <div th:fragment="listing_area">
     <div class="flex justify-between mt-2">
-        <p class="flex-1 text-left text-gray-600" th:text="#{listing.area} + ': ' + ${apartment.area}" />
+        <p class="flex-1 text-left text-gray-600">
+            <b th:text="#{listing.area} + ': '" />[[${apartment.area}]]
+        </p>
         <span class="basis-1/5 text-right ">
             <button
                     class="openMapButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
