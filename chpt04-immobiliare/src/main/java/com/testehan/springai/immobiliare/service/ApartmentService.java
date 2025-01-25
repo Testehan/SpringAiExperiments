@@ -35,6 +35,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.testehan.springai.immobiliare.util.ImageConverter.convertToWebPInputStream;
+
 @Service
 public class ApartmentService {
 
@@ -174,13 +176,20 @@ public class ApartmentService {
             var amazonS3BaseUri = amazonS3Util.getS3_BASE_URI();
             for (ApartmentImage extraImage : apartmentImages) {
 
-                var filename = extraImage.name();
-                amazonS3Util.uploadFile(uploadDir, filename, extraImage.data(), extraImage.contentType());
+                var filename = extraImage.name().replaceFirst("[.][^.]+$", "") + ".webp";
+                var contentType = "image/webp";
 
-                apartment.getImages().add(amazonS3BaseUri + "/" + uploadDir + "/" + filename);
+                try {
+                    InputStream webPImageInputStream = convertToWebPInputStream(extraImage.data());
+                    amazonS3Util.uploadFile(uploadDir, filename, webPImageInputStream, contentType);
 
-                imagesWereUploaded = true;
-                LOGGER.info("Image {} uploaded to S3 for apartment {}", filename, apartment.getName());
+                    apartment.getImages().add(amazonS3BaseUri + "/" + uploadDir + "/" + filename);
+
+                    imagesWereUploaded = true;
+                    LOGGER.info("Image {} uploaded to S3 for apartment {}", filename, apartment.getName());
+                } catch (Exception e){
+                    LOGGER.info("Image {} could not be uploaded to S3 for apartment {}. Error: {}", filename, apartment.getName(), e.getMessage());
+                }
             }
 
         }

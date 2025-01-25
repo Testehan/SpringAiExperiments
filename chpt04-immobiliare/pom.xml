@@ -25,7 +25,7 @@
         <amazon.aws.version>2.21.0</amazon.aws.version>
 
         <!-- added this so that i can use the latest stuff from spring ai  -->
-        <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
+        <spring-ai.version>1.0.0-M5</spring-ai.version>
     </properties>
 
     <repositories>
@@ -146,6 +146,18 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sns</artifactId>
+        </dependency>
+
+        <!-- used for image transformation -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.20</version>
+        </dependency>
+        <dependency>
+            <groupId>org.sejda.imageio</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>0.1.6</version>
         </dependency>
 
         <dependency>
