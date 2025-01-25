@@ -1,6 +1,11 @@
 package com.testehan.springai.immobiliare.util;
 
 import com.luciad.imageio.webp.WebPWriteParam;
+import net.coobird.thumbnailator.Thumbnails;
+import net.coobird.thumbnailator.geometry.Positions;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Component;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -12,13 +17,18 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+@Component
 public class ImageConverter {
 
-    // Method to convert image to WebP and return an InputStream
-    public static InputStream convertToWebPInputStream(InputStream imageInputStream) throws IOException {
+    @Value("classpath:static/images/logo_watermark.jpeg") // Inject image from classpath
+    private Resource watermarkResource;
 
+    // Method to convert image to WebP and return an InputStream
+    public InputStream convertToWebPInputStream(InputStream imageInputStream) throws IOException {
+
+        var imageWithWatermark = addWatermark(imageInputStream);
         // Read image from input stream
-        BufferedImage image = ImageIO.read(imageInputStream);
+        BufferedImage image = ImageIO.read(imageWithWatermark);
         if (image == null) {
             throw new IOException("Failed to read image. Input stream may be empty or unsupported format.");
         }
@@ -51,6 +61,26 @@ public class ImageConverter {
             throw new IOException("WebP conversion failed. Output is empty.");
         }
         return new ByteArrayInputStream(imageBytes);
+    }
+
+    public InputStream addWatermark(InputStream imageInputStream) throws IOException {
+
+        // Read images from input streams
+        BufferedImage image = ImageIO.read(imageInputStream);
+//        BufferedImage watermark = ImageIO.read(watermarkInputStream);
+
+        BufferedImage watermarkImage = ImageIO.read(watermarkResource.getInputStream());
+
+        // Process image with watermark
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Thumbnails.of(image)
+                .size(image.getWidth(), image.getHeight()) // Maintain original size
+                .watermark(Positions.CENTER, watermarkImage, 0.3f) // 50% opacity
+                .outputQuality(0.9)
+                .outputFormat("jpg")
+                .toOutputStream(baos);
+
+        return new ByteArrayInputStream(baos.toByteArray());
     }
 
 }

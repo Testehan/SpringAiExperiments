@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
+import com.testehan.springai.immobiliare.util.ImageConverter;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
@@ -35,7 +36,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.testehan.springai.immobiliare.util.ImageConverter.convertToWebPInputStream;
 
 @Service
 public class ApartmentService {
@@ -48,15 +48,18 @@ public class ApartmentService {
     private final UserService userService;
     private final LocaleUtils localeUtils;
     private final AmazonS3Util amazonS3Util;
+    private final ImageConverter imageConverter;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel,
-                            UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util) {
+                            UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
+                            ImageConverter imageConverter) {
         this.apartmentsRepository = apartmentsRepository;
         this.embedder = embedder;
         this.chatModel = chatModel;
         this.userService = userService;
         this.localeUtils = localeUtils;
         this.amazonS3Util = amazonS3Util;
+        this.imageConverter = imageConverter;
     }
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
@@ -180,7 +183,7 @@ public class ApartmentService {
                 var contentType = "image/webp";
 
                 try {
-                    InputStream webPImageInputStream = convertToWebPInputStream(extraImage.data());
+                    InputStream webPImageInputStream = imageConverter.convertToWebPInputStream(extraImage.data());
                     amazonS3Util.uploadFile(uploadDir, filename, webPImageInputStream, contentType);
 
                     apartment.getImages().add(amazonS3BaseUri + "/" + uploadDir + "/" + filename);
