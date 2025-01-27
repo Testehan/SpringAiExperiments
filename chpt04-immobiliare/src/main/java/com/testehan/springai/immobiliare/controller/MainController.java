@@ -137,6 +137,9 @@ public class MainController {
 		List<Apartment> listOfProperties = getListOfProperties(user);
 
 		model.addAttribute("listOfProperties", listOfProperties);
+		if (!user.getPhoneNumber().isEmpty()){
+			apartment.setContact(user.getPhoneNumber());		// default contact is the phone number of the user
+		}
 
 		return "add";
 	}
