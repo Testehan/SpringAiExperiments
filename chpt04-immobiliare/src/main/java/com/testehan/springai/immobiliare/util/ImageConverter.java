@@ -16,6 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Random;
 
 @Component
 public class ImageConverter {
@@ -67,7 +68,6 @@ public class ImageConverter {
 
         // Read images from input streams
         BufferedImage image = ImageIO.read(imageInputStream);
-//        BufferedImage watermark = ImageIO.read(watermarkInputStream);
 
         BufferedImage watermarkImage = ImageIO.read(watermarkResource.getInputStream());
 
@@ -75,12 +75,18 @@ public class ImageConverter {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         Thumbnails.of(image)
                 .size(image.getWidth(), image.getHeight()) // Maintain original size
-                .watermark(Positions.CENTER, watermarkImage, 0.3f) // 50% opacity
+                .watermark(getRandomPosition(), watermarkImage, 0.3f) // 50% opacity
                 .outputQuality(0.9)
                 .outputFormat("jpg")
                 .toOutputStream(baos);
 
         return new ByteArrayInputStream(baos.toByteArray());
+    }
+
+    private Positions getRandomPosition() {
+        Random random = new Random();
+        int randomIndex = random.nextInt(8);
+        return Positions.values()[randomIndex];
     }
 
 }
