@@ -13,4 +13,15 @@ $(document).ready(function () {
         $answer.slideToggle();
         $(this).closest(".faq-question").find(".chevron").toggleClass("rotate-180");
       });
+
+     // Check if the URL has a hash (e.g., #faq2)
+    const hash = window.location.hash;
+    if (hash) {
+        // Find the FAQ item with the corresponding ID
+        const faqItem = $(hash);
+        if (faqItem.length) {
+            // Find the answer within that FAQ item and remove the 'hidden' class to show it
+            faqItem.find('.faq-answer').removeClass('hidden');
+        }
+    }
 });
