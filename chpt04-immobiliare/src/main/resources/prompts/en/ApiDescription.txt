@@ -133,4 +133,8 @@ Examples:
   - API Call: `/default`
   - Parameters: `\{"message": "when is the best time to rent and apartment?"\}`
 
+- User Input: "Can you compare apartment listing named A with apartment listing named B?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "Can you compare apartment listing named A with apartment listing named B?"\}`
+
 {format}

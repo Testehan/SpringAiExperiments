@@ -141,4 +141,8 @@ Exemple:
   - API Call: `/default`
   - Parameters: `\{"message": "când este cel mai bun moment pentru închiriere și apartament?"\}`
 
+- Intrarea utilizatorului: „Puteți compara apartamentul numit A cu apartamentul B?"
+  - Apel API: `/default`
+  - Parametri: `\{"message": "Puteți compara apartamentul numit A cu apartamentul B?"\}`
+
 {format}
