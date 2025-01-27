@@ -21,6 +21,11 @@
                     <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline bg-slate-200" th:field="*{email}"  readonly />
                 </div>
+                <div th:if="*{phoneNumber != null and phoneNumber != ''}" class="mb-4">
+                    <label for="name" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.phoneNo}">Phone number:</label>
+                    <input type="text" id="phoneNo" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+     focus:shadow-outline bg-slate-200" th:field="*{phoneNumber}"  readonly />
+                </div>
                 <div class="mb-4">
                     <label for="city" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.city}"/>
                     <select id="city" th:field="*{city}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none

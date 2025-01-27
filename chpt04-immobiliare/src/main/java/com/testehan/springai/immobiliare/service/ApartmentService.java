@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.AmazonS3Util;
+import com.testehan.springai.immobiliare.util.ContactValidator;
 import com.testehan.springai.immobiliare.util.ImageConverter;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.apache.logging.log4j.util.Strings;
@@ -126,13 +127,22 @@ public class ApartmentService {
 
         saveApartment(apartment);
 
-        if (isPropertyNew) {
-            user.getListedProperties().add(apartment.getId().toString());
-            user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
+        var contact = apartment.getContact();
+        if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){
+            user.setPhoneNumber(contact);
             userService.updateUser(user);
+        }
+        if (isPropertyNew) {
+            updateUserInfo(apartment, user);
         }
 
         LOGGER.info("Apartment was added with success!");
+    }
+
+    private void updateUserInfo(Apartment apartment, ImmobiliareUser user) {
+        user.getListedProperties().add(apartment.getId().toString());
+        user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
+        userService.updateUser(user);
     }
 
     private static boolean isPropertyNew(Apartment apartment) {

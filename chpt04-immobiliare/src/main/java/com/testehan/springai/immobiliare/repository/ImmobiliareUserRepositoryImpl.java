@@ -53,6 +53,7 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
         // Create a document
         Document document = new Document("name", user.getName())
                 .append("email", user.getEmail())
+                .append("phoneNumber", user.getPhoneNumber())
                 .append("password", user.getPassword())
                 .append("refreshToken", user.getRefreshToken())
                 .append("authenticationType", user.getAuthenticationType())
@@ -80,6 +81,7 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
         Document update = new Document("$set",
                 new Document("name", user.getName())
                         .append("email", user.getEmail())
+                        .append("phoneNumber",user.getPhoneNumber())
                         .append("password", user.getPassword())
                         .append("refreshToken", user.getRefreshToken())
                         .append("authenticationType", user.getAuthenticationType())
