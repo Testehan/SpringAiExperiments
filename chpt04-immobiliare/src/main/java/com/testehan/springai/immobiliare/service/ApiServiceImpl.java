@@ -364,6 +364,9 @@ public class ApiServiceImpl implements ApiService{
                     })
                     // todo it would be nice to have this response formatted ...
     //                .system("Please generate the response inside HTML code. Your response must not start with ```html and must not contain \\n or other newline characters. The response must be valid HTML code and must have a div as top element.")
+                    .system("Please provide the following response formatted in HTML.Your response must not start with ```html and must not contain \\n or other newline characters The response should be styled as follows:\n" +
+                            "Bold the headers or key parts (e.g., Price, Location).\n" +
+                            "Use ul for lists and li for each item.")
                     .user(userMessage)
                     .call().content();
 
