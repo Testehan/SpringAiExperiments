@@ -21,29 +21,157 @@
     <main class="flex flex-col bg-white p-2 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-2 h-full overflow-auto">
             <div class="mx-auto p-2 pb-6 bg-white shadow rounded-lg">
-                <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{add.title}"/>
+                <div class="flex justify-between items-center px-6">
+                    <a href="#faq1" class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{help.title.renters}"/>
+                    <a href="#faq11" class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{help.title.owners}"/>
+                </div>
 
-                <div class="faq-item border-b border-gray-300">
+                <div id="faq1" class="faq-item border-b border-gray-300">
                     <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
-                        <span class="font-semibold">What is your refund policy?</span>
+                        <span class="font-semibold" th:text="#{help.renters.faq0.question}"></span>
                         <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <div class="faq-answer hidden pb-4 text-gray-600">
-                        We offer a full refund within 30 days of purchase, no questions asked.
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq0.answer}">
                     </div>
                 </div>
 
-                <div class="faq-item border-b border-gray-300">
+                <div id="faq2" class="faq-item border-b border-gray-300">
                     <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
-                        <span class="font-semibold">How do I track my order?</span>
+                        <span class="font-semibold" th:text="#{help.renters.faq1.question}"></span>
                         <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <div class="faq-answer hidden pb-4 text-gray-600">
-                        You can track your order using the tracking number sent to your email after purchase.
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq1.answer}">
+                    </div>
+                </div>
+
+                <div id="faq3" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq2.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq2.answer}">
+                    </div>
+                </div>
+
+                <div id="faq4" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq3.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq3.answer}">
+                    </div>
+                </div>
+
+                <div id="faq5" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq4.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq4.answer}">
+                    </div>
+                </div>
+
+                <div id="faq6" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq5.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq5.answer}">
+                    </div>
+                </div>
+
+                <div id="faq7" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq6.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq6.answer}">
+                    </div>
+                </div>
+
+                <div id="faq8" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq7.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq7.answer}">
+                    </div>
+                </div>
+
+                <div id="faq9" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq8.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq8.answer}">
+                    </div>
+                </div>
+
+                <div id="faq10" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.renters.faq9.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.renters.faq9.answer}">
+                    </div>
+                </div>
+
+
+                <br />
+                <br />
+
+                <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{help.title.owners}"/>
+
+                <div id="faq11" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.owners.faq1.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.owners.faq1.answer}">
+                    </div>
+                </div>
+
+                <div id="faq12" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.owners.faq2.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.owners.faq2.answer}">
+                    </div>
+                </div>
+
+                <div id="faq13" class="faq-item border-b border-gray-300">
+                    <div class="faq-question flex justify-between items-center py-4 cursor-pointer">
+                        <span class="font-semibold" th:text="#{help.owners.faq3.question}"></span>
+                        <svg class="chevron w-5 h-5 text-gray-600 transform transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.293l3.71-4.06a.75.75 0 111.08 1.04l-4.25 4.657a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="faq-answer hidden pb-4 text-gray-600" th:text="#{help.owners.faq3.answer}">
                     </div>
                 </div>
 
