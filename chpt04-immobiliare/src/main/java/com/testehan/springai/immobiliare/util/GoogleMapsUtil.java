@@ -6,6 +6,7 @@ import com.google.maps.GeocodingApi;
 import com.google.maps.PlacesApi;
 import com.google.maps.model.*;
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
+import com.testehan.springai.immobiliare.model.Amenity;
 import com.testehan.springai.immobiliare.model.AmenityCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,13 +50,13 @@ public class GoogleMapsUtil {
                 amenityCategory.setItems(new ArrayList<>());
 
                 for (PlacesSearchResult placeResult : placesMap.get(placeType)){
-                    StringBuilder sb = new StringBuilder();
                     var distance = distanceBetweenCoordinates(addressCoordinates, placeResult.geometry.location);
-                    sb.append(placeResult.name);
+                    var amenity = new Amenity();
+                    amenity.setName(placeResult.name);
                     if (distance.isPresent()){
-                        sb.append(" (" + distance.get() + ") ");
+                        amenity.setDistance(" (" + distance.get() + ") ");
                     }
-                    amenityCategory.getItems().add(sb.toString());
+                    amenityCategory.getItems().add(amenity);
                 }
 
                 placeTypesToPlaces.add(amenityCategory);

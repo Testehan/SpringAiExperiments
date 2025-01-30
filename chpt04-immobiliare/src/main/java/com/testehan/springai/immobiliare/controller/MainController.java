@@ -220,7 +220,7 @@ public class MainController {
 			var translatedCategory = messageSource.getMessage(
 					"listing.nearby.amenities." + messageCode,  null, locale);
 
-			translatedAmenities.add(new AmenityCategory(translatedCategory, category.getItems()));
+			translatedAmenities.add(new AmenityCategory(category.getCategory(),category.getItems(), translatedCategory));
 		}
 		apartment.setNearbyAmenities(translatedAmenities);
 	}

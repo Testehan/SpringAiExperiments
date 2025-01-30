@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.annotation.Transient;
 
 import java.util.List;
 
@@ -13,9 +14,12 @@ import java.util.List;
 @Setter
 public class AmenityCategory {
     private String category;
-    private List<String> items;
+    private List<Amenity> items;
+
+    @Transient // This field will not be persisted to MongoDB
+    private String categoryTranslated;
 
     public AmenityCategory copy() {  // Copy constructor or clone method in your object class
-        return new AmenityCategory(this.category, this.items);
+        return new AmenityCategory(this.category, this.items, this.categoryTranslated);
     }
 }
