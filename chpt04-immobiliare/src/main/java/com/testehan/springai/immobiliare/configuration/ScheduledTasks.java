@@ -38,7 +38,7 @@ public class ScheduledTasks {
         this.localeUtils = localeUtils;
     }
 
-    @Scheduled(cron = "0 00 12 * * ?")          // Code to run at 12 PM every day
+    @Scheduled(cron = "0 0 2 * * ?")         // Code to run at 2 am every day
     public void resetSearchesAvailableForNonAdminUsers() {
         userService.resetSearchesAvailable();
         log.info("Scheduled Task - The user available searches number was reset");

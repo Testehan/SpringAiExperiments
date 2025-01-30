@@ -22,10 +22,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.thymeleaf.util.StringUtils;
 
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -137,7 +134,7 @@ public class MainController {
 		List<Apartment> listOfProperties = getListOfProperties(user);
 
 		model.addAttribute("listOfProperties", listOfProperties);
-		if (!user.getPhoneNumber().isEmpty()){
+		if (Objects.nonNull(user.getPhoneNumber()) && !user.getPhoneNumber().isEmpty()){
 			apartment.setContact(user.getPhoneNumber());		// default contact is the phone number of the user
 		}
 
