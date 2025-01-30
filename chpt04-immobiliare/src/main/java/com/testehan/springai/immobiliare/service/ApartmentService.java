@@ -7,10 +7,7 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
-import com.testehan.springai.immobiliare.util.AmazonS3Util;
-import com.testehan.springai.immobiliare.util.ContactValidator;
-import com.testehan.springai.immobiliare.util.ImageConverter;
-import com.testehan.springai.immobiliare.util.LocaleUtils;
+import com.testehan.springai.immobiliare.util.*;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,10 +47,11 @@ public class ApartmentService {
     private final LocaleUtils localeUtils;
     private final AmazonS3Util amazonS3Util;
     private final ImageConverter imageConverter;
+    private final GoogleMapsUtil googleMapsUtil;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel,
                             UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
-                            ImageConverter imageConverter) {
+                            ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil) {
         this.apartmentsRepository = apartmentsRepository;
         this.embedder = embedder;
         this.chatModel = chatModel;
@@ -61,6 +59,7 @@ public class ApartmentService {
         this.localeUtils = localeUtils;
         this.amazonS3Util = amazonS3Util;
         this.imageConverter = imageConverter;
+        this.googleMapsUtil = googleMapsUtil;
     }
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
@@ -117,6 +116,13 @@ public class ApartmentService {
         var imagesWereDeleted = deleteUploadedImages(apartment);
         if (imagesWereUploaded || imagesWereDeleted) {
             generateImageMetadata(apartment);
+        }
+
+
+        if (isPropertyNew) {
+            var pointsOfInterest = googleMapsUtil.getPointsOfInterest(apartment.getArea() + " " + apartment.getCity());
+            // todo this should be set in the apartment, and getApartmentInfoToEmbedd
+            // todo also, display this information in the view map, and maybe 1 entry from each category in the maps dialog..
         }
 
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
