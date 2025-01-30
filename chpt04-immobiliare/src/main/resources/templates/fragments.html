@@ -147,6 +147,19 @@
             <p th:replace="~{fragments :: listing_contact}"></p>
             <p class="text-gray-600 mt-2" th:text="${apartment.shortDescription}"></p>
 
+            <p class="text-gray-600 mt-2">
+                <b th:text="#{listing.nearby.amenities} + ': '"/>
+                <ul>
+                    <li th:each="category : ${apartment.nearbyAmenities}">
+                        <strong th:text="${category.category}"></strong>
+                        <ul>
+                            <li th:each="item : ${category.items}" th:text="${item}" th:title="${item}"
+                                class="truncate w-48 block overflow-hidden whitespace-nowrap text-ellipsis" />
+                        </ul>
+                    </li>
+                </ul>
+            </p>
+
             <p class="text-gray-600 mt-2"><b>Tags:</b>
                 <span th:each="tag : ${apartment.tags}" class="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2">#[[${tag}]]</span>
             </p>

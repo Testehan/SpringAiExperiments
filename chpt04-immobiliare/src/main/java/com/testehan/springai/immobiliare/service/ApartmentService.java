@@ -120,9 +120,10 @@ public class ApartmentService {
 
 
         if (isPropertyNew) {
-            var pointsOfInterest = googleMapsUtil.getPointsOfInterest(apartment.getArea() + " " + apartment.getCity());
-            // todo this should be set in the apartment, and getApartmentInfoToEmbedd
+            var nearbyAmenities = googleMapsUtil.getNearbyAmenities(apartment.getArea() + " " + apartment.getCity());
+            // todo this should be set getApartmentInfoToEmbedd
             // todo also, display this information in the view map, and maybe 1 entry from each category in the maps dialog..
+            apartment.setNearbyAmenities(nearbyAmenities);
         }
 
         var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
