@@ -1,10 +1,12 @@
 package com.testehan.springai.immobiliare.util;
 
+import com.google.maps.DistanceMatrixApi;
 import com.google.maps.GeoApiContext;
 import com.google.maps.GeocodingApi;
 import com.google.maps.PlacesApi;
 import com.google.maps.model.*;
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
+import com.testehan.springai.immobiliare.model.AmenityCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -32,26 +34,37 @@ public class GoogleMapsUtil {
         this.localeUtils = localeUtils;
     }
 
-    // todo we need to also calculate the distance to each point of interest, and add that to the result
-    //  of this method ..see example in GeocodingExample on how to calculate distance between 2 points using coordinates..
-
-    public String getPointsOfInterest(final String address){
+    public List<AmenityCategory> getNearbyAmenities(final String address){
         var optionalCoordinates = getCoordinatesOfAddress(address);
-        StringBuilder sb = new StringBuilder();
+
+        List<AmenityCategory> placeTypesToPlaces = new ArrayList<>();
+
         if (optionalCoordinates.isPresent()){
-            Map<PlaceType, List<PlacesSearchResult>> placesMap = getNearbyPointsOfInterest(optionalCoordinates.get());
+            var addressCoordinates = optionalCoordinates.get();
+            Map<PlaceType, List<PlacesSearchResult>> placesMap = getNearbyAmenities(addressCoordinates);
             for (PlaceType placeType : PLACE_TYPES_TO_SEARCH){
-                sb.append(placeType.toString() + ": ");
+
+                var amenityCategory = new AmenityCategory();
+                amenityCategory.setCategory(placeType.toString());
+                amenityCategory.setItems(new ArrayList<>());
+
                 for (PlacesSearchResult placeResult : placesMap.get(placeType)){
-                    sb.append(placeResult.name + ", ");
+                    StringBuilder sb = new StringBuilder();
+                    var distance = distanceBetweenCoordinates(addressCoordinates, placeResult.geometry.location);
+                    sb.append(placeResult.name);
+                    if (distance.isPresent()){
+                        sb.append(" (" + distance.get() + ") ");
+                    }
+                    amenityCategory.getItems().add(sb.toString());
                 }
-                sb.append("\n");
+
+                placeTypesToPlaces.add(amenityCategory);
             }
 
         } else {
             LOGGER.warn("No coordinates found for the address: {}", address);
         }
-        return sb.toString();
+        return placeTypesToPlaces;
     }
 
     public Optional<LatLng> getCoordinatesOfAddress(final String address){
@@ -78,7 +91,7 @@ public class GoogleMapsUtil {
         return Optional.empty();
     }
 
-    public Map<PlaceType, List<PlacesSearchResult>> getNearbyPointsOfInterest(LatLng addressCoordinates){
+    public Map<PlaceType, List<PlacesSearchResult>> getNearbyAmenities(LatLng addressCoordinates){
 
         var result = new HashMap<PlaceType, List<PlacesSearchResult>>();
 
@@ -117,15 +130,6 @@ public class GoogleMapsUtil {
                             }
                             result.get(placeType).add(placesSearchResult);
                         }
-                        // Process the result (e.g., print details, add to a list)
-//                        System.out.println("Name: " + placesSearchResult.name);
-//                        System.out.println("Address: " + placesSearchResult.formattedAddress);
-//                        System.out.println("Latitude: " + placesSearchResult.geometry.location.lat);
-//                        System.out.println("Longitude: " + placesSearchResult.geometry.location.lng);
-//                        System.out.println("Rating: " + placesSearchResult.rating); // Print rating if available
-//                        System.out.println("Permanently closed: " + placesSearchResult.permanentlyClosed); // Print rating if available
-//                        System.out.println("Business status: " + placesSearchResult.businessStatus); // Print rating if available
-//                        System.out.println("--------------------");
                     }
 
                 } else {
@@ -139,6 +143,34 @@ public class GoogleMapsUtil {
         }
 
         return result;
+    }
+
+    public Optional<String> distanceBetweenCoordinates(final LatLng origin, final LatLng destination) {
+        Optional<String> result;
+
+        GeoApiContext context = new GeoApiContext.Builder()
+                .apiKey(beanConfig.getGoogleMapsApiKey())
+                .build();
+
+        try {
+            var distanceMatrix = DistanceMatrixApi.getDistanceMatrix(context, new String[]{origin.toString()}, new String[]{destination.toString()})
+                    .mode(TravelMode.WALKING)
+                    .await();
+
+            if (distanceMatrix.rows[0].elements[0].status.toString().equals("OK")) {
+                result = distanceMatrix.rows[0].elements[0].distance.humanReadable.describeConstable();
+            } else {
+                LOGGER.error("Error calculating distance: {}", distanceMatrix.rows[0].elements[0].status);
+                result = Optional.empty();
+            }
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            result = Optional.empty();
+        } finally {
+            context.shutdown();
+        }
+
+        return  result;
     }
 
 }

@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
+import com.testehan.springai.immobiliare.model.AmenityCategory;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
@@ -187,6 +188,8 @@ public class MainController {
 				favouritesText = messageSource.getMessage("listing.favourites",null,locale);
 			}
 
+			translateAmenityCategoryName(locale, apartment);
+
 			model.addAttribute("apartment", apartment);
 			model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 			model.addAttribute("favouriteButtonStartMessage", favouritesText);
@@ -201,6 +204,25 @@ public class MainController {
 			return "error-404";
 		}
 
+	}
+
+	private void translateAmenityCategoryName(Locale locale, Apartment apartment) {
+		List<AmenityCategory> translatedAmenities = new ArrayList<>();
+		for (AmenityCategory category : apartment.getNearbyAmenities()) {
+			String messageCode = "";
+			if (!category.getCategory().equalsIgnoreCase("school") &&
+					!category.getCategory().equalsIgnoreCase("university")) {
+				messageCode = category.getCategory();
+			} else {
+				messageCode = "education";
+			}
+
+			var translatedCategory = messageSource.getMessage(
+					"listing.nearby.amenities." + messageCode,  null, locale);
+
+			translatedAmenities.add(new AmenityCategory(translatedCategory, category.getItems()));
+		}
+		apartment.setNearbyAmenities(translatedAmenities);
 	}
 
 	@GetMapping("/help")

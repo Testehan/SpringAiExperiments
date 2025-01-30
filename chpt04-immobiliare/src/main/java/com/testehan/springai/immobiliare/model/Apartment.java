@@ -20,7 +20,8 @@ public class Apartment {
     private ObjectId id;
     private String name;
     private String city;
-    private String area;
+    private String area;                // TODO Consider renaming this to address..
+    private List<AmenityCategory> nearbyAmenities = new ArrayList<>();
     private String shortDescription;
     private Integer price;
     private PropertyType propertyType;
@@ -46,6 +47,7 @@ public class Apartment {
     private String activationToken;
     private boolean active = true;  // i want properties to be visible by default
 
+    // TODO move these to ListingUtil, and make that class a Bean ...and translate the below info
     @JsonIgnore
     public String getApartmentInfoToEmbedd(){
         return name + "\n" +
