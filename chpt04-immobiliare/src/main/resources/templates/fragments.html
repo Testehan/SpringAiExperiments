@@ -147,7 +147,7 @@
             <p th:replace="~{fragments :: listing_contact}"></p>
             <p class="text-gray-600 mt-2" th:text="${apartment.shortDescription}"></p>
 
-            <p class="text-gray-600 mt-2">
+            <p th:if="${not #lists.isEmpty(apartment.nearbyAmenities)}" class="text-gray-600 mt-2">
                 <b th:text="#{listing.nearby.amenities} + ': '"/>
                 <ul class="ml-4">
                     <li th:each="category : ${apartment.nearbyAmenities}">
@@ -162,7 +162,7 @@
                         </span>
                         <span th:text="${category.categoryTranslated}"></span>
                         <ul class="ml-4">
-                            <li th:each="amenity : ${category.items}" class="flex justify-between items-center w-full before:content-['-'] before:mr-2">
+                            <li th:each="amenity : ${category.items}" class="flex items-center w-full before:content-['-'] before:mr-2">
                                 <span th:text="${amenity.name}" th:title="${amenity.name}"
                                       class="truncate w-48 block overflow-hidden whitespace-nowrap text-ellipsis" />
                                 [[${amenity.distance}]]

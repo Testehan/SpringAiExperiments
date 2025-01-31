@@ -119,7 +119,7 @@ public class ApartmentService {
         }
 
 
-        if (isPropertyNew) {
+        if (isPropertyNew || apartment.getNearbyAmenities().isEmpty()) {
             var nearbyAmenities = googleMapsUtil.getNearbyAmenities(apartment.getArea() + " " + apartment.getCity());
             // todo this should be set getApartmentInfoToEmbedd
             // todo also, display this information in the view map, and maybe 1 entry from each category in the maps dialog..

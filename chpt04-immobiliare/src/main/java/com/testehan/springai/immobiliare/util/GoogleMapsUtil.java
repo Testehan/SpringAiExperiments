@@ -19,8 +19,8 @@ public class GoogleMapsUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GoogleMapsUtil.class);
 
-    // Search radius in meters...doesn't seem very accurate so we'll put a smaller number
-    public static final int RADIUS = 500;
+    // Search radius in meters.
+    public static final List<Integer> RADII = List.of(500, 1000, 2000);
     // The maximum number of results you want per category
     public static final int MAX_RESULTS = 3;
 
@@ -45,21 +45,23 @@ public class GoogleMapsUtil {
             Map<PlaceType, List<PlacesSearchResult>> placesMap = getNearbyAmenities(addressCoordinates);
             for (PlaceType placeType : PLACE_TYPES_TO_SEARCH){
 
-                var amenityCategory = new AmenityCategory();
-                amenityCategory.setCategory(placeType.toString());
-                amenityCategory.setItems(new ArrayList<>());
+                if (Objects.nonNull(placesMap.get(placeType)) && !placesMap.get(placeType).isEmpty()) {
+                    var amenityCategory = new AmenityCategory();
+                    amenityCategory.setCategory(placeType.toString());
+                    amenityCategory.setItems(new ArrayList<>());
 
-                for (PlacesSearchResult placeResult : placesMap.get(placeType)){
-                    var distance = distanceBetweenCoordinates(addressCoordinates, placeResult.geometry.location);
-                    var amenity = new Amenity();
-                    amenity.setName(placeResult.name);
-                    if (distance.isPresent()){
-                        amenity.setDistance(" (" + distance.get() + ") ");
+                    for (PlacesSearchResult placeResult : placesMap.get(placeType)) {
+                        var distance = distanceBetweenCoordinates(addressCoordinates, placeResult.geometry.location);
+                        var amenity = new Amenity();
+                        amenity.setName(placeResult.name);
+                        if (distance.isPresent()) {
+                            amenity.setDistance(" (" + distance.get() + ") ");
+                        }
+                        amenityCategory.getItems().add(amenity);
                     }
-                    amenityCategory.getItems().add(amenity);
-                }
 
-                placeTypesToPlaces.add(amenityCategory);
+                    placeTypesToPlaces.add(amenityCategory);
+                }
             }
 
         } else {
@@ -101,40 +103,44 @@ public class GoogleMapsUtil {
                 .build();
         try {
             for (PlaceType placeType : PLACE_TYPES_TO_SEARCH) {
+                for (Integer radius : RADII) {
+                    PlacesSearchResponse response = PlacesApi.nearbySearchQuery(context, addressCoordinates)
+                            .radius(radius)
+                            .type(placeType)
+                            .rankby(RankBy.PROMINENCE)
+                            .language(localeUtils.getCurrentLocale().getLanguage())
+                            .await();
 
-                PlacesSearchResponse response = PlacesApi.nearbySearchQuery(context, addressCoordinates)
-                        .radius(RADIUS)
-                        .type(placeType)
-                        .rankby(RankBy.PROMINENCE)
-                        .language(localeUtils.getCurrentLocale().getLanguage())
-                        .await();
+                    if (response.results != null) {
+                        int numResultsToProcess = Math.min(response.results.length, MAX_RESULTS);
+                        Arrays.sort(response.results, (o1, o2) -> {
+                            // 1. Compare by userRatingsTotal (descending)
+                            int totalComparison = Integer.compare(o2.userRatingsTotal, o1.userRatingsTotal); // Note the order for descending sort
 
-                if (response.results != null) {
-                    int numResultsToProcess = Math.min(response.results.length, MAX_RESULTS);
-                    Arrays.sort(response.results, (o1, o2) -> {
-                        // 1. Compare by userRatingsTotal (descending)
-                        int totalComparison = Integer.compare(o2.userRatingsTotal, o1.userRatingsTotal); // Note the order for descending sort
-
-                        if (totalComparison != 0) {
-                            return totalComparison; // If totals are different, sort by totals
-                        } else {
-                            // 2. If userRatingsTotal is the same, compare by rating (descending)
-                            return Double.compare(o2.rating, o1.rating); // Note the order for descending sort
-                        }
-                    });
-
-                    for (int i = 0; i < numResultsToProcess; i++) {
-                        PlacesSearchResult placesSearchResult = response.results[i];
-                        if (!placesSearchResult.permanentlyClosed){
-                            if (!result.containsKey(placeType)){
-                                result.put(placeType, new ArrayList<>());
+                            if (totalComparison != 0) {
+                                return totalComparison; // If totals are different, sort by totals
+                            } else {
+                                // 2. If userRatingsTotal is the same, compare by rating (descending)
+                                return Double.compare(o2.rating, o1.rating); // Note the order for descending sort
                             }
-                            result.get(placeType).add(placesSearchResult);
-                        }
-                    }
+                        });
 
-                } else {
-                    LOGGER.warn("No {} found for given coordinates.",placeType.toString());
+                        for (int i = 0; i < numResultsToProcess; i++) {
+                            PlacesSearchResult placesSearchResult = response.results[i];
+                            if (!placesSearchResult.permanentlyClosed) {
+                                if (!result.containsKey(placeType)) {
+                                    result.put(placeType, new ArrayList<>());
+                                }
+                                result.get(placeType).add(placesSearchResult);
+                            }
+                        }
+
+                        if (numResultsToProcess>0){
+                            break;  // means that for current place type we found something nearby so the search will not be extended
+                        }
+                    } else {
+                        LOGGER.warn("No {} found for given coordinates. Will increase radius", placeType.toString());
+                    }
                 }
             }
         } catch (Exception e) {
