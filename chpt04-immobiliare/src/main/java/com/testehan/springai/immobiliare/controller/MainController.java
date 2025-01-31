@@ -232,7 +232,8 @@ public class MainController {
 					messageCode = "education";
 					var translatedCategory = messageSource.getMessage("listing.nearby.amenities." + messageCode,  null, locale);
 					Collections.shuffle(educationAmenities);
-					translatedAmenities.add(new AmenityCategory(category.getCategory(),educationAmenities.subList(0,3), translatedCategory));
+					var maximumNumberOfEducation = Math.min(3,educationAmenities.size());
+					translatedAmenities.add(new AmenityCategory(category.getCategory(),educationAmenities.subList(0,maximumNumberOfEducation), translatedCategory));
 				}
 			}
 
@@ -307,6 +308,11 @@ public class MainController {
 			return "terms-en";
 		}
 
+	}
+
+	@GetMapping("/error-login")
+	public String loginModal() {
+		return "error-login";
 	}
 
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
