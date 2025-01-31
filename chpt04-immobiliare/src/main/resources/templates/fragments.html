@@ -149,7 +149,7 @@
 
             <p class="text-gray-600 mt-2">
                 <b th:text="#{listing.nearby.amenities} + ': '"/>
-                <ul>
+                <ul class="ml-4">
                     <li th:each="category : ${apartment.nearbyAmenities}">
                         <!-- Icon based on category type -->
                         <span class="text-gray-500">
@@ -160,9 +160,9 @@
                             <i th:if="${category.category == 'gym'}" >&#128170;</i>
                             <i th:if="${category.category == 'park'}" >&#127795;</i>
                         </span>
-                        <strong th:text="${category.categoryTranslated}"></strong>
-                        <ul>
-                            <li th:each="amenity : ${category.items}" class="flex justify-between items-center w-full">
+                        <span th:text="${category.categoryTranslated}"></span>
+                        <ul class="ml-4">
+                            <li th:each="amenity : ${category.items}" class="flex justify-between items-center w-full before:content-['-'] before:mr-2">
                                 <span th:text="${amenity.name}" th:title="${amenity.name}"
                                       class="truncate w-48 block overflow-hidden whitespace-nowrap text-ellipsis" />
                                 [[${amenity.distance}]]

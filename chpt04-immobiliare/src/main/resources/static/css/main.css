@@ -1569,6 +1569,16 @@ video {
   border-radius: 8px;
 }
 
+.before\:mr-2::before {
+  content: var(--tw-content);
+  margin-right: 0.5rem;
+}
+
+.before\:content-\[\'-\'\]::before {
+  --tw-content: '-';
+  content: var(--tw-content);
+}
+
 .hover\:bg-blue-600:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(37 99 235 / var(--tw-bg-opacity));
