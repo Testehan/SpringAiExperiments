@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
+import com.testehan.springai.immobiliare.model.Amenity;
 import com.testehan.springai.immobiliare.model.AmenityCategory;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.SupportedCity;
@@ -208,19 +209,31 @@ public class MainController {
 
 	private void translateAmenityCategoryName(Locale locale, Apartment apartment) {
 		List<AmenityCategory> translatedAmenities = new ArrayList<>();
+		List<Amenity> educationAmenities = new ArrayList<>();
+
 		for (AmenityCategory category : apartment.getNearbyAmenities()) {
-			String messageCode = "";
+			String messageCode;
 			if (!category.getCategory().equalsIgnoreCase("school") &&
-					!category.getCategory().equalsIgnoreCase("university")) {
+				!category.getCategory().equalsIgnoreCase("university"))
+			{
 				messageCode = category.getCategory();
+				var translatedCategory = messageSource.getMessage("listing.nearby.amenities." + messageCode,  null, locale);
+				translatedAmenities.add(new AmenityCategory(category.getCategory(),category.getItems(), translatedCategory));
 			} else {
-				messageCode = "education";
+				// from school and university categories we want to display just a few random amenities and
+				// have an Education category in the UI containing elements from these 2 categories
+				if (!category.getItems().isEmpty()){
+					educationAmenities.addAll(category.getItems());
+				}
+
+				if (category.getCategory().equalsIgnoreCase("university")){
+					messageCode = "education";
+					var translatedCategory = messageSource.getMessage("listing.nearby.amenities." + messageCode,  null, locale);
+					Collections.shuffle(educationAmenities);
+					translatedAmenities.add(new AmenityCategory(category.getCategory(),educationAmenities.subList(0,3), translatedCategory));
+				}
 			}
 
-			var translatedCategory = messageSource.getMessage(
-					"listing.nearby.amenities." + messageCode,  null, locale);
-
-			translatedAmenities.add(new AmenityCategory(category.getCategory(),category.getItems(), translatedCategory));
 		}
 		apartment.setNearbyAmenities(translatedAmenities);
 	}
