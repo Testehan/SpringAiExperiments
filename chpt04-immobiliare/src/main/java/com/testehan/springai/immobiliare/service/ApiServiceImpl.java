@@ -7,6 +7,7 @@ import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.*;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
@@ -33,7 +34,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
-import static com.testehan.springai.immobiliare.util.ListingUtil.isApartmentAlreadyFavourite;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
@@ -58,12 +58,13 @@ public class ApiServiceImpl implements ApiService{
     private UserSseService userSseService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
+    private final ListingUtil listingUtil;
 
     public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService,
                           ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
                           ConversationSession conversationSession, ConversationService conversationService,
                           UserSseService userSseService,
-                          MessageSource messageSource, LocaleUtils localeUtils) {
+                          MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil) {
         this.immobiliareApiService = immobiliareApiService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;
@@ -75,6 +76,7 @@ public class ApiServiceImpl implements ApiService{
 
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
+        this.listingUtil = listingUtil;
     }
 
     @Override
@@ -116,7 +118,7 @@ public class ApiServiceImpl implements ApiService{
             var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, description);
 
             LOGGER.info("Apartments found from vector store semantic search:");
-            apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), ap.getApartmentInfo()));
+            apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), listingUtil.getApartmentInfo(ap)));
 
             ResultsResponse response = new ResultsResponse("");
 
@@ -145,11 +147,11 @@ public class ApiServiceImpl implements ApiService{
                                         // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
                                         // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
 
-                                        var apartmentInfo = apartmentLLM.get().getApartmentInfo();
+                                        var apartmentInfo = listingUtil.getApartmentInfo(apartmentLLM.get());
                                         LOGGER.info("Adding apartment info to conversation memory {}", apartmentInfo);
                                         conversationService.addContentToConversation(apartmentInfo, conversationId);
 
-                                        var isFavourite = isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
+                                        var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
                                         userSseService.getUserSseConnection(session.getId())
                                                 .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get(), isFavourite)));
                                     }
@@ -233,7 +235,7 @@ public class ApiServiceImpl implements ApiService{
     private String formatApartmentsFound(List<Apartment> apartments) {
         var stringBuilder = new StringBuilder();
         for (Apartment apartment : apartments){
-            stringBuilder.append("Apartment " + apartment.getId() + " :" + apartment.getApartmentInfo() + "\n");
+            stringBuilder.append("Apartment " + apartment.getId() + " :" + listingUtil.getApartmentInfo(apartment) + "\n");
         }
 
         return stringBuilder.toString();

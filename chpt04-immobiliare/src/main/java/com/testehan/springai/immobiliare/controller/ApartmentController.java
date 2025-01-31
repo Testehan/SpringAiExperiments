@@ -47,11 +47,12 @@ public class ApartmentController {
     private final MessageSource messageSource;
 
     private final LocaleUtils localeUtils;
+    private final ListingUtil listingUtil;
 
     public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
                                UserService userService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
-                               MessageSource messageSource, LocaleUtils localeUtils)
+                               MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.apartmentService = apartmentService;
         this.conversationSession = conversationSession;
@@ -61,6 +62,7 @@ public class ApartmentController {
         this.userService = userService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
+        this.listingUtil = listingUtil;
     }
 
     @PostMapping("/save")
@@ -255,7 +257,7 @@ public class ApartmentController {
         Set<String> selectors = new HashSet<>();
         var apartment = ((Map<String, Object>)eventPayload.getPayload()).get("apartment");
         var isFavourite = (boolean)((Map<String, Object>)eventPayload.getPayload()).get("isFavourite");
-        var favouritesText = ListingUtil.getFavouritesText(isFavourite);
+        var favouritesText = listingUtil.getFavouritesText(isFavourite);
         if (favouritesText.equalsIgnoreCase("listing.favourites")){
             favouritesText = messageSource.getMessage("listing.favourites",null,locale);
         }

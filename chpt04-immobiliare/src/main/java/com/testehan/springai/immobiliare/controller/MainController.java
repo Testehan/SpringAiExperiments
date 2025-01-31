@@ -38,15 +38,17 @@ public class MainController {
 	private final UserSseService userSseService;
 	private final MessageSource messageSource;
 	private final BeanConfig beanConfig;
+	private final ListingUtil listingUtil;
 
 	public MainController(ApartmentService apartmentService, ConversationSession conversationSession,
 						  UserSseService userSseService, MessageSource messageSource,
-						  BeanConfig beanConfig) {
+						  BeanConfig beanConfig, ListingUtil listingUtil) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
 		this.messageSource = messageSource;
 		this.beanConfig = beanConfig;
+		this.listingUtil = listingUtil;
 	}
 
 	@GetMapping("/")
@@ -183,8 +185,8 @@ public class MainController {
 		if (!apartmentOptional.isEmpty()) {
 			var apartment = apartmentOptional.get();
 			var user = conversationSession.getImmobiliareUser();
-			var isFavourite = ListingUtil.isApartmentAlreadyFavourite(apartmentId, user);
-			var favouritesText = ListingUtil.getFavouritesText(isFavourite);
+			var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentId, user);
+			var favouritesText = listingUtil.getFavouritesText(isFavourite);
 			if (favouritesText.equalsIgnoreCase("listing.favourites")){
 				favouritesText = messageSource.getMessage("listing.favourites",null,locale);
 			}

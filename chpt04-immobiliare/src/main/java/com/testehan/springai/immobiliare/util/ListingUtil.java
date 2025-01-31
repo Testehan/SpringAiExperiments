@@ -1,24 +1,67 @@
 package com.testehan.springai.immobiliare.util;
 
+import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import org.springframework.context.MessageSource;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ListingUtil {
 
-    public static boolean isApartmentAlreadyFavourite(String listingId, ImmobiliareUser immobiliareUser) {
+    private final MessageSource messageSource;
+    private final LocaleUtils localeUtils;
+
+    public ListingUtil(MessageSource messageSource, LocaleUtils localeUtils){
+        this.messageSource = messageSource;
+        this.localeUtils = localeUtils;
+    }
+
+    public boolean isApartmentAlreadyFavourite(final String listingId, final ImmobiliareUser immobiliareUser) {
         if (immobiliareUser.getFavouriteProperties().contains(listingId)){
             return true;
         }
         return false;
     }
 
-
-    public static String getFavouritesText(boolean isFavourite) {
+    public String getFavouritesText(final boolean isFavourite) {
         if (isFavourite){
             var heartSymbol = "♥";
             return heartSymbol;
         } else {
             return "listing.favourites";
         }
+    }
+
+    public String getApartmentInfoToEmbedd(final Apartment apartment){
+        return messageSource.getMessage("listing.embedded.data", new Object[]{
+                apartment.getName(),
+                apartment.getCity(),
+                apartment.getArea(),
+                apartment.getShortDescription(),
+                apartment.getSurface(),
+                apartment.getPrice(),
+                apartment.getNoOfRooms(),
+                apartment.getFloor(),
+                apartment.getTags(),
+                apartment.getImagesGeneratedDescription()
+        }, localeUtils.getCurrentLocale());
+
+    }
+
+    public String getApartmentInfo(final Apartment apartment){
+
+        return messageSource.getMessage("listing.info", new Object[]{
+                apartment.getName(),
+                apartment.getCity(),
+                apartment.getArea(),
+                apartment.getShortDescription(),
+                apartment.getSurface(),
+                apartment.getPrice(),
+                apartment.getNoOfRooms(),
+                apartment.getFloor(),
+                apartment.getTags(),
+                apartment.getImagesGeneratedDescription()
+        }, localeUtils.getCurrentLocale());
     }
 
 }

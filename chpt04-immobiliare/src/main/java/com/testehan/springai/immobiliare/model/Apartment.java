@@ -1,6 +1,5 @@
 package com.testehan.springai.immobiliare.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,32 +45,6 @@ public class Apartment {
 
     private String activationToken;
     private boolean active = true;  // i want properties to be visible by default
-
-    // TODO move these to ListingUtil, and make that class a Bean ...and translate the below info
-    @JsonIgnore
-    public String getApartmentInfoToEmbedd(){
-        return name + "\n" +
-                "The apartment is located in the city " + city + ", area or neighbourhood " + area + ". " +
-                shortDescription +
-                "It has a surface of " + surface + " square meters." +
-                "The price is " + price + " euro. " +
-                "Number of rooms is " + noOfRooms + ". " +
-                "Located at floor " + floor + ". " +
-                "Additional keywords for this apartment are " + tags + ". " +
-                "Description of provided images: " + imagesGeneratedDescription;
-    }
-
-    @JsonIgnore
-    public String getApartmentInfo(){
-        return "The apartment called \"" + name + "\" is located in the city " + city + ", area or neighbourhood " + area + ". " +
-                shortDescription +
-                "It has a surface of " + surface + " square meters." +
-                "The price is " + price + " euro. " +
-                "Number of rooms is " + noOfRooms + ". " +
-                "Located at floor " + floor + ". " +
-                "Additional keywords for this apartment are " + tags + ". " +
-                "Description of provided images: " + imagesGeneratedDescription;
-    }
 
     @Override
     public String toString() {

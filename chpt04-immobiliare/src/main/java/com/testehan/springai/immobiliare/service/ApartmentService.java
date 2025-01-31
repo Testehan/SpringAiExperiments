@@ -48,10 +48,11 @@ public class ApartmentService {
     private final AmazonS3Util amazonS3Util;
     private final ImageConverter imageConverter;
     private final GoogleMapsUtil googleMapsUtil;
+    private final ListingUtil listingUtil;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel,
                             UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
-                            ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil) {
+                            ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil, ListingUtil listingUtil) {
         this.apartmentsRepository = apartmentsRepository;
         this.embedder = embedder;
         this.chatModel = chatModel;
@@ -60,6 +61,7 @@ public class ApartmentService {
         this.amazonS3Util = amazonS3Util;
         this.imageConverter = imageConverter;
         this.googleMapsUtil = googleMapsUtil;
+        this.listingUtil = listingUtil;
     }
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
@@ -122,11 +124,10 @@ public class ApartmentService {
         if (isPropertyNew || apartment.getNearbyAmenities().isEmpty()) {
             var nearbyAmenities = googleMapsUtil.getNearbyAmenities(apartment.getArea() + " " + apartment.getCity());
             // todo this should be set getApartmentInfoToEmbedd
-            // todo also, display this information in the view map, and maybe 1 entry from each category in the maps dialog..
             apartment.setNearbyAmenities(nearbyAmenities);
         }
 
-        var apartmentInfoToEmbed = apartment.getApartmentInfoToEmbedd();
+        var apartmentInfoToEmbed = listingUtil.getApartmentInfoToEmbedd(apartment);
         var mono = embedder.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
 
