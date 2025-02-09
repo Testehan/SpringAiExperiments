@@ -98,10 +98,8 @@ public class ApartmentService {
         apartmentsRepository.deactivateApartments(date);
     }
 
-    public boolean saveApartment(Apartment apartment){
-        var isPropertyNew = isPropertyNew(apartment);
+    public void saveApartment(Apartment apartment){
         apartmentsRepository.saveApartment(apartment);
-        return isPropertyNew;
     }
 
     public void deleteApartmentsByIds(List<String> apartmentIds){
@@ -112,19 +110,25 @@ public class ApartmentService {
     public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user) throws IOException {
         apartment.setShortDescription(apartment.getShortDescription().replace("\n", " ")); // no newlines in description
 
-        var isPropertyNew = saveApartment(apartment);
+        var isPropertyNew = isPropertyNew(apartment);
+        if (isPropertyNew){
+            getAmenitiesAndSetInApartment(apartment);
+            saveApartment(apartment);
+        } else {
+            var optionalApartment = findApartmentById(apartment.getIdString());
+            if (optionalApartment.isPresent()){
+                var hasAddressChange = !optionalApartment.get().getArea().equalsIgnoreCase(apartment.getArea());
+                if (hasAddressChange){
+                    // means that address changed and we need to set amenities again
+                    getAmenitiesAndSetInApartment(apartment);
+                }
+            }
+        }
 
         var imagesWereUploaded = saveUploadedImages(apartment, apartmentImages);
         var imagesWereDeleted = deleteUploadedImages(apartment);
         if (imagesWereUploaded || imagesWereDeleted) {
             generateImageMetadata(apartment);
-        }
-
-
-        if (isPropertyNew || apartment.getNearbyAmenities().isEmpty()) {
-            var nearbyAmenities = googleMapsUtil.getNearbyAmenities(apartment.getArea() + " " + apartment.getCity());
-            // todo this should be set getApartmentInfoToEmbedd
-            apartment.setNearbyAmenities(nearbyAmenities);
         }
 
         var apartmentInfoToEmbed = listingUtil.getApartmentInfoToEmbedd(apartment);
@@ -147,13 +151,18 @@ public class ApartmentService {
         LOGGER.info("Apartment was added with success!");
     }
 
+    private void getAmenitiesAndSetInApartment(Apartment apartment) {
+        var nearbyAmenities = googleMapsUtil.getNearbyAmenities(apartment.getArea() + " " + apartment.getCity());
+        apartment.setNearbyAmenities(nearbyAmenities);
+    }
+
     private void updateUserInfo(Apartment apartment, ImmobiliareUser user) {
         user.getListedProperties().add(apartment.getId().toString());
         user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
         userService.updateUser(user);
     }
 
-    private static boolean isPropertyNew(Apartment apartment) {
+    private boolean isPropertyNew(Apartment apartment) {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String formattedDateCustom = now.format(customFormatter);
