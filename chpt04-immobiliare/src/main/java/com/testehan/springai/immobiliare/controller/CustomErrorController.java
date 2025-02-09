@@ -3,13 +3,24 @@ package com.testehan.springai.immobiliare.controller;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.testehan.springai.immobiliare.util.LocaleUtils;
+
 @Controller
 public class CustomErrorController implements ErrorController {
+
+    private final MessageSource messageSource;
+    private final LocaleUtils localeUtils;
+
+    public CustomErrorController(MessageSource messageSource, LocaleUtils localeUtils) {
+        this.messageSource = messageSource;
+        this.localeUtils = localeUtils;
+    }
 
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
@@ -19,12 +30,12 @@ public class CustomErrorController implements ErrorController {
             Integer statusCode = Integer.valueOf(status.toString());
 
             if(statusCode == HttpStatus.NOT_FOUND.value() || statusCode == HttpStatus.FORBIDDEN.value()) {
-                model.addAttribute("errorMessage", "It seems the page you're looking for doesn't exist or you don't have access.");
+                model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null, localeUtils.getCurrentLocale()));
                 return "error-404";
             }
         }
 
-        model.addAttribute("errorMessage", "Something went wrong. You can contact me and i will try to investigate the issue ASAP.");
+        model.addAttribute("errorMessage", messageSource.getMessage("error.unknown",null, localeUtils.getCurrentLocale()));
         return "error";
     }
 }
