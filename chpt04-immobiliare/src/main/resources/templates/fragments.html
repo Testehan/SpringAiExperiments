@@ -106,8 +106,7 @@
         <div th:replace="~{fragments :: listing_images}"></div>
     </div>
 
-    <div class="max-w-md mx-auto bg-white overflow-hidden" >
-        <div class="w-full p-3">
+    <div class="w-full p-3">
 
             <div class="flex justify-between items-center">
                 <h2 class="text-2xl font-bold text-gray-900">[[${apartment.name}]]</h2>
@@ -161,10 +160,10 @@
                             <i th:if="${category.category == 'park'}" >&#127795;</i>
                         </span>
                         <span th:text="${category.categoryTranslated}"></span>
-                        <ul class="ml-4">
+                        <ul class="ml-2">
                             <li th:each="amenity : ${category.items}" class="flex items-center w-full before:content-['-'] before:mr-2">
                                 <span th:text="${amenity.name}" th:title="${amenity.name}"
-                                      class="truncate w-48 block overflow-hidden whitespace-nowrap text-ellipsis" />
+                                      class="truncate w-[70%] block overflow-hidden whitespace-nowrap text-ellipsis" />
                                 [[${amenity.distance}]]
                             </li>
                         </ul>
@@ -186,7 +185,7 @@
                  </span>
             </p>
         </div>
-    </div>
+
 
 </div>
 
