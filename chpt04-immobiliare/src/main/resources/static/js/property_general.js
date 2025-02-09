@@ -27,23 +27,23 @@ function getPhoneNumber(showContactButton){
         success: function(response) {
             var phoneNumber = response;
 
-            // Construct the WhatsApp link
-            var whatsappLink = 'https://wa.me/' + '4' + phoneNumber;
-
             var $parentSpan = $button.closest('span');
             // Remove the button
             $button.remove();
 
-            // Create a new element (like a span or p) to display the phone number
             var $phoneNumberElement = $('<span>').text(phoneNumber).css('line-height', '32px');
-
-            // Find the corresponding WhatsApp link element and update it
-            var $whatsappLink = $parentSpan.closest('span').find('.whatsapp-link');
-            $whatsappLink.attr('href', whatsappLink).show(); // Set the href and show the link
-
-            // Append the WhatsApp link inside the parent span
             $parentSpan.append($phoneNumberElement);
-            $parentSpan.append($whatsappLink);
+
+            if (response !== 'No apartment found!'){
+                // Construct the WhatsApp link
+                var whatsappLink = 'https://wa.me/' + '4' + phoneNumber;
+
+                // Find the corresponding WhatsApp link element and update it
+                var $whatsappLink = $parentSpan.closest('span').find('.whatsapp-link');
+                $whatsappLink.attr('href', whatsappLink).show(); // Set the href and show the link
+
+                $parentSpan.append($whatsappLink);
+            }
 
         },
         error: function() {
