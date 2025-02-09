@@ -10,7 +10,48 @@ $(document).ready(function () {
         applyFavouriteStylingFor($(this));
     });
 
+    $('button[data-apartment-id]').on('click', function() {
+        getPhoneNumber($(this));
+    });
+
 });
+
+function getPhoneNumber(showContactButton){
+    var $button = showContactButton; // The button that was clicked
+    var apartmentId = $button.data('apartment-id'); // Get the apartment ID
+
+    // Make the AJAX request to get the phone number
+    $.ajax({
+        url: APP_URL + '/api/apartments/contact/' + apartmentId, // Make sure this is the correct endpoint
+        method: 'GET', // Assuming a GET request
+        success: function(response) {
+            var phoneNumber = response;
+
+            // Construct the WhatsApp link
+            var whatsappLink = 'https://wa.me/' + '4' + phoneNumber;
+
+            var $parentSpan = $button.closest('span');
+            // Remove the button
+            $button.remove();
+
+            // Create a new element (like a span or p) to display the phone number
+            var $phoneNumberElement = $('<span>').text(phoneNumber).css('line-height', '32px');
+
+            // Find the corresponding WhatsApp link element and update it
+            var $whatsappLink = $parentSpan.closest('span').find('.whatsapp-link');
+            $whatsappLink.attr('href', whatsappLink).show(); // Set the href and show the link
+
+            // Append the WhatsApp link inside the parent span
+            $parentSpan.append($phoneNumberElement);
+            $parentSpan.append($whatsappLink);
+
+        },
+        error: function() {
+            console.error('Failed to get phone number');
+        }
+    });
+}
+
 
 function applyFavouriteStylingFor(favouriteButton){
     if (favouriteButton.text() === saveFavouritesTranslated) {

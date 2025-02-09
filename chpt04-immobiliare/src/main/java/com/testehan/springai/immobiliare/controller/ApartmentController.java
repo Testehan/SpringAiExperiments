@@ -119,14 +119,13 @@ public class ApartmentController {
     }
 
     @GetMapping("/contact/{apartmentId}")
-    @HxRequest
     public String contact(@PathVariable(value = "apartmentId") String apartmentId) {
         var apartmentOptional = apartmentService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
             var listing = apartmentOptional.get();
             listing.setNoOfContact(listing.getNoOfContact()+1);
             apartmentService.saveApartment(listing);
-            return "Contact: " + apartmentOptional.get().getContact();
+            return apartmentOptional.get().getContact();
         } else {
             LOGGER.error("No apartment with id {} was found" , apartmentId);
             return "No apartment found!";
