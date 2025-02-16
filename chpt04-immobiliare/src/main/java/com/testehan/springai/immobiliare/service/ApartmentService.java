@@ -41,7 +41,7 @@ public class ApartmentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentService.class);
 
     private final ApartmentsRepository apartmentsRepository;
-    private final OpenAiService embedder;
+    private final OpenAiService openAiService;
     private final ChatModel chatModel ;
     private final UserService userService;
     private final LocaleUtils localeUtils;
@@ -50,11 +50,11 @@ public class ApartmentService {
     private final GoogleMapsUtil googleMapsUtil;
     private final ListingUtil listingUtil;
 
-    public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService embedder, ChatModel chatModel,
+    public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService openAiService, ChatModel chatModel,
                             UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
                             ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil, ListingUtil listingUtil) {
         this.apartmentsRepository = apartmentsRepository;
-        this.embedder = embedder;
+        this.openAiService = openAiService;
         this.chatModel = chatModel;
         this.userService = userService;
         this.localeUtils = localeUtils;
@@ -64,9 +64,8 @@ public class ApartmentService {
         this.listingUtil = listingUtil;
     }
 
-    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, String apartmentDescription) {
-        var embedding = embedder.createEmbedding(apartmentDescription).block();
-        var listings = apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, embedding);
+    public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, List<Double> apartmentDescriptionEmbedding) {
+        var listings = apartmentsRepository.findApartmentsByVector(propertyType, city, apartment, apartmentDescriptionEmbedding);
 
         // later in the call, these results are further filtered by the llm...so assuming that the maxContacted
         // listing or maxFavourite listing are filtered out by the llm, then those badges will not be displayed
@@ -132,7 +131,7 @@ public class ApartmentService {
         }
 
         var apartmentInfoToEmbed = listingUtil.getApartmentInfoToEmbedd(apartment);
-        var mono = embedder.createEmbedding(apartmentInfoToEmbed);
+        var mono = openAiService.createEmbedding(apartmentInfoToEmbed);
         List<Double> embeddings = mono.block();
 
         apartment.setPlot_embedding(embeddings);

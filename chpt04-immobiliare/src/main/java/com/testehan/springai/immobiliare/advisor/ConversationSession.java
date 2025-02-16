@@ -113,12 +113,12 @@ public class ConversationSession {
     public void clearConversation() {
         setRentOrSale("");
         setCity(UNSUPPORTED);
-        clearChatMemoryAndConversation();
+        clearChatMemory();
+        conversationService.deleteConversation(getConversationId());
     }
 
-    public void clearChatMemoryAndConversation() {
+    public void clearChatMemory() {
         getChatMemory().clear(getConversationId());
-        conversationService.deleteConversation(getConversationId());
     }
 
 }

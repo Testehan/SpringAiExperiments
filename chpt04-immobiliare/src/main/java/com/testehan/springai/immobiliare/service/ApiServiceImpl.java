@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -44,6 +46,7 @@ public class ApiServiceImpl implements ApiService{
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiServiceImpl.class);
 
     private ImmobiliareApiService immobiliareApiService;
+    private final OpenAiService openAiService;
 
     private ApartmentService apartmentService;
 
@@ -56,16 +59,18 @@ public class ApiServiceImpl implements ApiService{
     private ConversationSession conversationSession;
     private ConversationService conversationService;
     private UserSseService userSseService;
+
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, ApartmentService apartmentService,
+    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, OpenAiService openAiService, ApartmentService apartmentService,
                           ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
                           ConversationSession conversationSession, ConversationService conversationService,
                           UserSseService userSseService,
                           MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil) {
         this.immobiliareApiService = immobiliareApiService;
+        this.openAiService = openAiService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;
         this.vectorStore = vectorStore;
@@ -81,7 +86,9 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public ResultsResponse getChatResponse(String message, HttpSession session) {
+        LOGGER.info("Performance -1 -----------------------");
         var serviceCall = immobiliareApiService.whichApiToCall(message);
+        LOGGER.info("Performance 0 -----------------------");
 
         switch (serviceCall.apiCall()) {
             case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
@@ -104,18 +111,35 @@ public class ApiServiceImpl implements ApiService{
         try {
             session.setAttribute("sseIndex", 0);
             conversationSession.setLastPropertyDescription(description);
+
             // we do this clearing because we want our chat memory to contain only the latest listing results, on which
             // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
             // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
-            conversationSession.clearChatMemoryAndConversation();
-            var apartmentDescription = immobiliareApiService.extractApartmentInformationFromProvidedDescription(description);
+            var convId = conversationSession.getConversationId();
+            conversationSession.clearChatMemory();
+            CompletableFuture<Void> clearChatMemoryFuture = CompletableFuture.runAsync(() -> {
+                conversationService.deleteConversation(convId);
+            });
+
+            LOGGER.info("Performance 1 -----------------------");
+
+            CompletableFuture<ApartmentDescription> getListingDescriptionFuture =
+                    CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(description));
+
+            CompletableFuture<List<Double>> getDescriptionEmbeddingFuture =
+                    CompletableFuture.supplyAsync(() -> openAiService.createEmbedding(description).block());
+
+            final ApartmentDescription apartmentDescription = getListingDescriptionFuture.get();
+            clearChatMemoryFuture.get();
+            LOGGER.info("Performance 2 -----------------------");
 
             var rentOrSale = conversationSession.getRentOrSale();
             // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
             var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
             var conversationId = conversationSession.getConversationId();
             final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
-            var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, description);
+            var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
+            LOGGER.info("Performance 3 -----------------------");
 
             LOGGER.info("Apartments found from vector store semantic search:");
             apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), listingUtil.getApartmentInfo(ap)));
@@ -143,6 +167,7 @@ public class ApiServiceImpl implements ApiService{
                                                             messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, currentLocale)))
                                                     );
                                         }
+                                        LOGGER.info("Performance 4 -----------------------");
                                         LOGGER.info("Found apartment id {}", apartmentLLM.get().getId());
                                         // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
                                         // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
@@ -184,7 +209,7 @@ public class ApiServiceImpl implements ApiService{
             }
 
             return response;
-        } catch (RuntimeException e){
+        } catch (RuntimeException | InterruptedException | ExecutionException e){
             return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
         }
     }
@@ -211,7 +236,7 @@ public class ApiServiceImpl implements ApiService{
     private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
         try {
             // users will have time to look over the first results and in the mean time more listings are displayed
-            Thread.sleep(2000);
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
