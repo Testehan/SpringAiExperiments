@@ -70,6 +70,7 @@ public class ApartmentController {
                                                 @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
 
         var user = conversationSession.getImmobiliareUser();
+
         if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
             LOGGER.warn("User {} tried to edit property with id {} that was not owned", user.getEmail(), apartment.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)

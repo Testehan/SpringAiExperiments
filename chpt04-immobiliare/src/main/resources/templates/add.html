@@ -122,6 +122,12 @@
                                th:field="*{contact}"
                                th:placeholder="#{add.placeholder.contact}"/>
                     </div>
+                    <div class="mb-4">
+                        <label for="whatsapp" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.whatsapp}" />:
+                        </label>
+                        <input type="checkbox" id="whatsapp" th:field="*{whatsapp}" />
+                    </div>
                     <div th:if="${apartment.creationDateTime != null}" class="mb-4">
                         <label for="creationDateTime" class="block text-gray-700 font-bold mb-2">
                             <span th:text="#{add.label.creationdate}"/>:

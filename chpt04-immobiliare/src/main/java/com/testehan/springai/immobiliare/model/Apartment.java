@@ -32,6 +32,7 @@ public class Apartment {
     private String imagesGeneratedDescription;
 
     private String contact;
+    private Boolean whatsapp;
     private String creationDateTime;
     private String lastUpdateDateTime;
 
