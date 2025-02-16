@@ -46,7 +46,7 @@ public class ApiServiceImpl implements ApiService{
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiServiceImpl.class);
 
     private ImmobiliareApiService immobiliareApiService;
-    private final OpenAiService openAiService;
+    private final EmbeddingService embeddingService;
 
     private ApartmentService apartmentService;
 
@@ -64,13 +64,13 @@ public class ApiServiceImpl implements ApiService{
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, OpenAiService openAiService, ApartmentService apartmentService,
+    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, EmbeddingService embeddingService, ApartmentService apartmentService,
                           ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
                           ConversationSession conversationSession, ConversationService conversationService,
                           UserSseService userSseService,
                           MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil) {
         this.immobiliareApiService = immobiliareApiService;
-        this.openAiService = openAiService;
+        this.embeddingService = embeddingService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;
         this.vectorStore = vectorStore;
@@ -127,7 +127,7 @@ public class ApiServiceImpl implements ApiService{
                     CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(description));
 
             CompletableFuture<List<Double>> getDescriptionEmbeddingFuture =
-                    CompletableFuture.supplyAsync(() -> openAiService.createEmbedding(description).block());
+                    CompletableFuture.supplyAsync(() -> embeddingService.getOrComputeEmbedding(description));
 
             final ApartmentDescription apartmentDescription = getListingDescriptionFuture.get();
             clearChatMemoryFuture.get();

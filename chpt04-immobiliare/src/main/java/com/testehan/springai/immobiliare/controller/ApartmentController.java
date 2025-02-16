@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
+import com.testehan.springai.immobiliare.service.EmbeddingService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringWebFluxTemplateEngine;
+import org.thymeleaf.util.StringUtils;
 import reactor.core.publisher.Flux;
 
 import java.io.IOException;
@@ -41,6 +43,7 @@ public class ApartmentController {
     private final ApartmentService apartmentService;
     private final ConversationSession conversationSession;
     private final UserService userService;
+    private final EmbeddingService embeddingService;
     private final UserSseService userSseService;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
@@ -50,7 +53,7 @@ public class ApartmentController {
     private final ListingUtil listingUtil;
 
     public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
-                               UserService userService, ApiService apiService,
+                               UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
                                MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
@@ -60,6 +63,7 @@ public class ApartmentController {
         this.templateEngine = templateEngine;
         this.userSseService = userSseService;
         this.userService = userService;
+        this.embeddingService = embeddingService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
         this.listingUtil = listingUtil;
@@ -144,7 +148,7 @@ public class ApartmentController {
                 suggestions = getStep2Suggestions(locale);
                 break;
             case 3:
-                suggestions = getStep3Suggestions(locale);
+                suggestions = getStep3Suggestions();
                 break;
             default:
                 return suggestions;
@@ -168,27 +172,23 @@ public class ApartmentController {
         return suggestions;
     }
 
-    private List<String> getStep3Suggestions(Locale locale)
+    private List<String> getStep3Suggestions()
     {
         var user = conversationSession.getImmobiliareUser();
+        var lastPropertyDescription = user.getLastPropertyDescription();
 
-        // TODO this is with low priority but i would add the top 10 searches of the users in the DB
-        // and randomly add some of them to the suggestions list that is returned
         List<String> promptIdeas = new ArrayList<>();
-        promptIdeas.add(messageSource.getMessage("prompt.ideas.1", null,locale));
-        promptIdeas.add(messageSource.getMessage("prompt.ideas.2", null,locale));
-        promptIdeas.add(messageSource.getMessage("prompt.ideas.3", null,locale));
-        promptIdeas.add(messageSource.getMessage("prompt.ideas.4", null,locale));
-        promptIdeas.add(messageSource.getMessage("prompt.ideas.5", null,locale));
-        promptIdeas.add(messageSource.getMessage("prompt.ideas.6", null,locale));
+        embeddingService.getTopEmbeddingsByUsageCount().forEach(embedding -> promptIdeas.add(embedding.getText()));
 
-        if (promptIdeas.contains(user.getLastPropertyDescription())){
-            promptIdeas.remove(user.getLastPropertyDescription());
+        if (!StringUtils.isEmpty(lastPropertyDescription) && promptIdeas.contains(lastPropertyDescription)){
+            promptIdeas.remove(lastPropertyDescription);
         }
 
         Collections.shuffle(promptIdeas, new Random());
-        var suggestions = promptIdeas.subList(0, 2);
-        suggestions.add(user.getLastPropertyDescription());
+        var suggestions = promptIdeas.subList(0, Math.min(2,promptIdeas.size()));
+        if (!StringUtils.isEmpty(lastPropertyDescription)) {
+            suggestions.add(lastPropertyDescription);
+        }
 
         return suggestions;
     }

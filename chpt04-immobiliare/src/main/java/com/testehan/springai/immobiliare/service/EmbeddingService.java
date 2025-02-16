@@ -2,6 +2,11 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.TextEmbedding;
 import com.testehan.springai.immobiliare.repository.TextEmbeddingRepository;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -12,16 +17,18 @@ import java.util.Optional;
 @Service
 public class EmbeddingService {
 
-    private TextEmbeddingRepository embeddingRepository;
+    private final TextEmbeddingRepository embeddingRepository;
+    private final OpenAiService openAiService;
+    private final MongoTemplate mongoTemplate;
 
-    private OpenAiService openAiService;
-
-    public EmbeddingService(TextEmbeddingRepository embeddingRepository, OpenAiService openAiService) {
+    public EmbeddingService(TextEmbeddingRepository embeddingRepository, OpenAiService openAiService, MongoTemplate mongoTemplate) {
         this.embeddingRepository = embeddingRepository;
         this.openAiService = openAiService;
+        this.mongoTemplate = mongoTemplate;
     }
 
-    // Hash function for text
+    // Instead of searching by text, we hash the text and use it as _id.
+    // MongoDB automatically indexes _id, making lookups very fast.
     private String hashText(String text) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -37,11 +44,12 @@ public class EmbeddingService {
     }
 
     public List<Double> getOrComputeEmbedding(String text) {
-        var textHash = hashText(text);
+        var hashedText = hashText(text);
 
         // Check if embedding exists
-        Optional<TextEmbedding> existing = embeddingRepository.findById(textHash);
+        Optional<TextEmbedding> existing = embeddingRepository.findById(hashedText);
         if (existing.isPresent()) {
+            incrementUsageCount(hashedText);
             return existing.get().getEmbedding();
         }
 
@@ -49,9 +57,23 @@ public class EmbeddingService {
         List<Double> newEmbedding = openAiService.createEmbedding(text).block();
 
         // Save it to DB
-        var textEmbedding = new TextEmbedding(textHash, text, newEmbedding);
+        var textEmbedding = new TextEmbedding(hashedText, text, newEmbedding);
         embeddingRepository.save(textEmbedding);
 
         return newEmbedding;
+    }
+
+    public List<TextEmbedding> getTopEmbeddingsByUsageCount() {
+        Query query = new Query()
+                .with(Sort.by(Sort.Order.desc("usageCount")))
+                .limit(3);
+
+        return mongoTemplate.find(query, TextEmbedding.class);
+    }
+
+    private void incrementUsageCount(String id) {
+        Query query = new Query(Criteria.where("_id").is(id));
+        Update update = new Update().inc("usageCount", 1);
+        mongoTemplate.updateFirst(query, update, TextEmbedding.class);
     }
 }
