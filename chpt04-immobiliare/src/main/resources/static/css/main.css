@@ -1465,12 +1465,6 @@ video {
   display: none;
 }
 
-#message:valid {
-  ~ #sendMessageButton {
-    display: block;
-  }
-}
-
 .menu-container {
   display: flex;
   flex-direction: column;

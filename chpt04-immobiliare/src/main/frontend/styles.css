@@ -11,11 +11,6 @@
   display: none;
 }
 
-#message:valid {
-  ~ #sendMessageButton {
-    display: block;
-  }
-}
 
 .menu-container {
     display: flex;

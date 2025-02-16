@@ -10,6 +10,14 @@ $(document).ready(function(){
         }
     });
 
+    $("#message").on("input", function() {
+        if ($(this)[0].checkValidity()) {
+            $("#sendMessageButton").show();
+        } else {
+            $("#sendMessageButton").hide();
+        }
+    });
+
 
     console.log("SSE ID:", sseId);
     const eventSourceUrl = "/api/apartments/stream/"+sseId;
