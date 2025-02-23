@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.EmbeddingResponse;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.annotation.PostConstruct;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.openai.OpenAiAudioTranscriptionModel;
@@ -26,9 +27,11 @@ public class OpenAiService {
     private WebClient webClient;
 
     private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
+    private LocaleUtils localeUtils;
 
-    public OpenAiService(OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel){
+    public OpenAiService(OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel, LocaleUtils localeUtils){
         this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
+        this.localeUtils = localeUtils;
     }
 
     @PostConstruct
@@ -59,10 +62,11 @@ public class OpenAiService {
         var responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
 
         var transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-                .language("en")
+                .model("whisper-1")
+                .language(localeUtils.getCurrentLocale().getLanguage())
                 .temperature(0f)
                 .responseFormat(responseFormat)
-                .prompt("You must transcribe the audio in either English or Romanian. No other language is supported.")
+                .prompt(localeUtils.getLocalizedPrompt("system_transcribeAudio"))
                 .build();
         var transcriptionRequest = new AudioTranscriptionPrompt(audioFile, transcriptionOptions);
         var response = openAiAudioTranscriptionModel.call(transcriptionRequest);
