@@ -62,10 +62,10 @@ public class MainController {
 		var sessionId = session.getId();
 		if (StringUtils.isEmpty(user.getPropertyType())) {
 			model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
-		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.valueOf(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
+		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.getByName(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
 			model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
 		} else {
-			var city = SupportedCity.valueOf(user.getCity()).getName();
+			var city = SupportedCity.getByName(user.getCity()).getName();
 			var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
 			model.addAttribute("initialMessage",
 					messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, city}, locale) +

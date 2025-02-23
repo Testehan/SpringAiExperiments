@@ -274,6 +274,7 @@ public class ApiServiceImpl implements ApiService{
 
     private ResultsResponse setCity(ServiceCall serviceCall) {
         SupportedCity supportedCity = getSupportedCity(serviceCall.message());
+
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
             var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
@@ -289,7 +290,7 @@ public class ApiServiceImpl implements ApiService{
 
     private SupportedCity getSupportedCity(String city) {
         SupportedCity supportedCity = SupportedCity.getByName(city);
-        conversationSession.setCity(supportedCity);
+        conversationSession.setCity(city);
         return supportedCity;
     }
 

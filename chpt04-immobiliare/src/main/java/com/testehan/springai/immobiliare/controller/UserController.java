@@ -35,7 +35,7 @@ public class UserController {
     @PostMapping("/save")
     public String saveUserProfile(UserProfile userProfile)throws IOException {
         SupportedCity supportedCity = SupportedCity.getByName(userProfile.city());
-        conversationSession.setCity(supportedCity);
+        conversationSession.setCity(supportedCity.getName());
         conversationSession.setRentOrSale(userProfile.propertyType());
         conversationSession.setLastPropertyDescription(userProfile.lastPropertyDescription());
 

@@ -6,15 +6,15 @@ API-uri disponibile:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă este menționat un nume de oraș, acest API ar trebui apelat. Sunt acceptate doar Cluj-Napoca și București, așa că dacă este menționat un alt nume de oraș trebuie să răspundeți cu "Unsupported city".
+2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă este menționat un nume de oraș, acest API ar trebui apelat.
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-3. **Vânzare sau închiriere și oraș de interes API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze și, de asemenea, orașul care îl interesează. Dacă se menționează numele orașului și tipul de proprietate, adică închiriere sau cumpărare, acest API ar trebui să fie apelat. Sunt acceptate doar Cluj-Napoca și București, așa că dacă este menționat un alt nume de oraș trebuie să răspundeți cu "Unsupported city". Răspunsul dvs. trebuie să aibă formatul "rent,city name" sau "buy,city name". Deci separatorul celor 2 valori este virgula.
+3. **Vânzare sau închiriere și oraș de interes API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze și, de asemenea, orașul care îl interesează. Dacă se menționează numele orașului și tipul de proprietate, adică închiriere sau cumpărare, acest API ar trebui să fie apelat. Răspunsul dvs. trebuie să aibă formatul "rent,city name" sau "buy,city name". Deci separatorul celor 2 valori este virgula.
      - **Endpoint**: `/setRentOrBuyAndCity`
      - **Parameters**: `message` (string)
 
-4.**Vânzare sau închiriere, oraș de interes și descrierea proprietății API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze, de asemenea orașul care îl interesează pe utilizator și o descriere a proprietății de interes. Dacă se menționează numele unui oraș, tipul proprietății și descrierea proprietății, acest API ar trebui apelat. Sunt acceptate doar Cluj-Napoca și București, așa că dacă este menționat un alt nume de oraș trebuie să răspundeți cu „Oraș nesuportat”. Răspunsul dvs. trebuie să aibă formatul „închiriere,numele orașului,descrierea proprietății” sau „cumpărare,numele orașului,descrierea proprietății”. Deci separatorul celor 3 valori este virgula.
+4.**Vânzare sau închiriere, oraș de interes și descrierea proprietății API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze, de asemenea orașul care îl interesează pe utilizator și o descriere a proprietății de interes. Dacă se menționează numele unui oraș, tipul proprietății și descrierea proprietății, acest API ar trebui apelat. Răspunsul dvs. trebuie să aibă formatul „închiriere,numele orașului,descrierea proprietății” sau „cumpărare,numele orașului,descrierea proprietății”. Deci separatorul celor 3 valori este virgula.
     - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
     - **Parameters**: `message` (string)
 
@@ -83,7 +83,7 @@ Exemple:
 
 - Intrare utilizator: „Vreau să caut în New-York”
   - API Call: `/setCity`
-  - Parameters: `\{"message": "Unsupported city"\}`
+  - Parameters: `\{"message": "New-York"\}`
 
 - Intrare utilizator: „Caut un apartament de închiriat în Cluj-Napoca.”
   - API Call: `/setRentOrBuyAndCity`

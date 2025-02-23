@@ -42,7 +42,7 @@ public class ConversationSession {
         this.userService = userService;
         this.city = getImmobiliareUser() != null ?
                 StringUtils.isNotEmpty(getImmobiliareUser().getCity()) ?
-                        SupportedCity.valueOf(getImmobiliareUser().getCity()) : SupportedCity.UNSUPPORTED
+                        SupportedCity.getByName(getImmobiliareUser().getCity()) : SupportedCity.UNSUPPORTED
                 : SupportedCity.UNSUPPORTED;
         this.rentOrSale = getImmobiliareUser() != null ?  getImmobiliareUser().getPropertyType() : null;
         this.chatMemory = chatMemory;
@@ -68,11 +68,11 @@ public class ConversationSession {
         return city.getName();
     }
 
-    public void setCity(SupportedCity city) {
+    public void setCity(String city) {
         var user = getImmobiliareUser();
-        user.setCity(city.name().toString());
+        user.setCity(city);
         userService.updateUser(user);
-        this.city = city;
+        this.city = SupportedCity.getByName(city);
     }
 
     public String getRentOrSale() {
@@ -112,7 +112,7 @@ public class ConversationSession {
 
     public void clearConversation() {
         setRentOrSale("");
-        setCity(UNSUPPORTED);
+        setCity(UNSUPPORTED.name());
         clearChatMemory();
         conversationService.deleteConversation(getConversationId());
     }

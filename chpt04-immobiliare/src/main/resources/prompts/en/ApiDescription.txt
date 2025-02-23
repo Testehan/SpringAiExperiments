@@ -6,15 +6,15 @@ Available APIs:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city".
+2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called.
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-3.**Sale or rent and city of interest API**: Determines if the user wants to buy or rent and also the city that interests the user. If a city name and the type of property, meaning rent or buy is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city". Your reply must have the format "rent,city name" or "buy,city name". So the separator of the 2 values is the comma.
+3.**Sale or rent and city of interest API**: Determines if the user wants to buy or rent and also the city that interests the user. If a city name and the type of property, meaning rent or buy is mentioned this API should be called. Your reply must have the format "rent,city name" or "buy,city name". So the separator of the 2 values is the comma.
      - **Endpoint**: `/setRentOrBuyAndCity`
      - **Parameters**: `message` (string)
 
-4.**Sale or rent, city of interest and description of the property API**: Determines if the user wants to buy or rent, also the city that interests the user and a description of the property of interest. If a city name, the type of property and description of property is mentioned this API should be called. Only Cluj-Napoca and Bucharest are supported, so if another city name is mentioned you must reply with "Unsupported city". Your reply must have the format "rent,city name,property description" or "buy,city name,property description". So the separator of the 3 values is the comma.
+4.**Sale or rent, city of interest and description of the property API**: Determines if the user wants to buy or rent, also the city that interests the user and a description of the property of interest. If a city name, the type of property and description of property is mentioned this API should be called. Your reply must have the format "rent,city name,property description" or "buy,city name,property description". So the separator of the 3 values is the comma.
      - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
      - **Parameters**: `message` (string)
 
@@ -83,7 +83,7 @@ Examples:
 
 - User Input: "I want to search in New-York"
   - API Call: `/setCity`
-  - Parameters: `\{"message": "Unsupported city"\}`
+  - Parameters: `\{"message": "New-York"\}`
 
 - User Input: "I'm looking for an apartment to rent in Cluj-Napoca."
   - API Call: `/setRentOrBuyAndCity`
