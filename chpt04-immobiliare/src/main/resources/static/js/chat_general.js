@@ -1,4 +1,7 @@
-let suggestionsStep = 1;;
+let suggestionsStep = 1;
+let eventSource;
+let pingTimeout;
+let isCheckingInternet = false;
 
 $(document).ready(function(){
     // after voice message is transcribed, or text message is added to chat, send a request to obtain a response
@@ -19,46 +22,7 @@ $(document).ready(function(){
     });
 
 
-    console.log("SSE ID:", sseId);
-    const eventSourceUrl = "/api/apartments/stream/"+sseId;
-    console.log("eventSourceUrl" + eventSourceUrl)
-    const eventSource = new EventSource(eventSourceUrl);
-
-    eventSource.addEventListener('apartment', function(event) {
-        if (event.lastEventId === sseId) {
-             // Dynamically insert the fragment into the response container
-            const container = $('.responseFragmentWithApartments').last()
-            const newFragment = event.data;
-            $('#spinner').hide();
-            container.append(newFragment);
-
-            applyFavouriteButtonStylingDependingOnText($('.favouriteButton').last());
-
-            // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
-            htmx.process($('#response-container')[0]);
-
-            setTimeout(() => {
-                initializeSwipers();
-
-                // Ensure the new slides are added before updating Swiper
-                swiperInstances.forEach(swiper => {
-                    swiper.update(); // Update each swiper instance
-                    swiper.pagination.update(); // Update pagination
-                });
-            }, 200); // Small delay to ensure new elements exist
-        }
-    });
-
-    eventSource.addEventListener('response', function(event) {
-         if (event.lastEventId === sseId) {
-            // Dynamically insert the fragment into the response container
-            const container = $("#response-container").last()
-            const newFragment = event.data;
-            $('#spinner').hide();
-            container.append(newFragment);
-        }
-
-    });
+   connectToSSE();
 
    setCurrentStep();
    setUpScrollingToLastUserMessage();
@@ -71,6 +35,105 @@ $(document).ready(function(){
     });
 
 });
+
+function reconnect() {
+    $("#status").text("Reconnecting...");
+
+    if (eventSource) {
+        eventSource.close();
+    }
+     setTimeout(() => {
+        connectToSSE();
+    }, 3000);
+}
+
+function checkInternetAndReconnect() {
+    if (isCheckingInternet) return; // Prevent multiple intervals
+    isCheckingInternet = true;
+
+    let internetCheckInterval = setInterval(() => {
+        if (navigator.onLine) {
+            clearInterval(internetCheckInterval); // Stop checking
+            isCheckingInternet = false;
+            console.log("Internet restored! Reconnecting...");
+            reconnect();
+        } else {
+            $("#status").text("No Internet");
+        }
+    }, 5000);
+}
+
+function connectToSSE() {
+    try {
+        console.log("SSE ID:", sseId);
+        const eventSourceUrl = "/api/apartments/stream/" + sseId;
+        console.log("eventSourceUrl" + eventSourceUrl)
+        eventSource = new EventSource(eventSourceUrl);
+
+        eventSource.onopen = function () {
+            console.log("SSE Connected");
+            $("#status").text("Connected");
+        };
+
+        eventSource.addEventListener('apartment', function(event) {
+            if (event.lastEventId === sseId) {
+                 // Dynamically insert the fragment into the response container
+                const container = $('.responseFragmentWithApartments').last()
+                const newFragment = event.data;
+                $('#spinner').hide();
+                container.append(newFragment);
+
+                applyFavouriteButtonStylingDependingOnText($('.favouriteButton').last());
+
+                // we need this in order to have the Contact and Favourite working when obtaining html string containing htmx from server
+                htmx.process($('#response-container')[0]);
+
+                setTimeout(() => {
+                    initializeSwipers();
+
+                    // Ensure the new slides are added before updating Swiper
+                    swiperInstances.forEach(swiper => {
+                        swiper.update(); // Update each swiper instance
+                        swiper.pagination.update(); // Update pagination
+                    });
+                }, 200); // Small delay to ensure new elements exist
+            }
+        });
+
+        eventSource.addEventListener('response', function(event) {
+             if (event.lastEventId === sseId) {
+                // Dynamically insert the fragment into the response container
+                const container = $("#response-container").last()
+                const newFragment = event.data;
+                $('#spinner').hide();
+                container.append(newFragment);
+            }
+
+        });
+
+        eventSource.addEventListener('keep-alive', function(event) {
+            if (event.data === 'ping') {
+                clearTimeout(pingTimeout); // Prevent multiple timeouts
+                pingTimeout = setTimeout(() => {
+                    console.warn("No ping received for 35 seconds. Reconnecting...");
+                    checkInternetAndReconnect();
+                }, 35000); // Wait 35 seconds before assuming the connection is lost
+            }
+
+        });
+
+        eventSource.onerror = function() {
+            console.log("Connection lost. Reconnecting...");
+            $("#status").text("Disconnected");
+            checkInternetAndReconnect();
+        };
+    } catch (error) {
+          console.error("Failed to initialize SSE:", error);
+          $("#status").text("Disconnected");
+          setTimeout(checkInternetAndReconnect, 3000);
+    }
+
+}
 
 function fetchSuggestions() {
     if (suggestionsStep<4){

@@ -218,8 +218,19 @@ public class ApartmentController {
     @GetMapping(value = "/stream/{sseId}", produces = "text/event-stream")
     public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession, Locale locale) {
         userSseService.addUserSseId(httpSession.getId());
-        return apiService.getServerSideEventsFlux(httpSession)
+
+        Flux<ServerSentEvent<String>> responsesStream = apiService.getServerSideEventsFlux(httpSession)
                 .map(event -> renderServerSideEventData(httpSession, event, sseId, locale));
+
+        // Heartbeat (ping) stream every 25 seconds
+        Flux<ServerSentEvent<String>> heartbeatStream = Flux.interval(Duration.ofSeconds(20))
+                .map(tick -> ServerSentEvent.<String>builder()
+                        .id(sseId)
+                        .event("keep-alive")
+                        .data("ping")
+                        .build());
+
+        return Flux.merge(responsesStream, heartbeatStream);
 
     }
 
