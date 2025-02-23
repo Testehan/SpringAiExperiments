@@ -36,15 +36,40 @@ $(document).ready(function(){
 
 });
 
+function showToast(message, durationMillis, type = "info") {
+    if ($(".toastify").length === 0) {
+        let bgColor;
+        if (type === "error") {
+            bgColor = "linear-gradient(to right, #fd0713, #ff7675)";
+        } else if (type === "info") {
+            bgColor = "linear-gradient(to right, #7ea82b, #c6e28c)";
+        } else {
+            bgColor = "linear-gradient(to right, #e67e22, #f39c12)"; // Default to "warning"
+        }
+
+        Toastify({
+            text: message,
+            duration: durationMillis, // -1 value Keep it until dismissed
+            backgroundColor: bgColor,
+            gravity: "top", // Position it at the top
+            position: "center", // Center it horizontally
+            close: true
+        }).showToast();
+    }
+}
+
+function dismissToast() {
+    $(".toastify").remove();
+}
+
 function reconnect() {
-    $("#status").text("Reconnecting...");
+    showToast(TOASTIFY_RECONNECTING, -1, "warn");
 
     if (eventSource) {
         eventSource.close();
     }
-     setTimeout(() => {
-        connectToSSE();
-    }, 3000);
+
+    connectToSSE();
 }
 
 function checkInternetAndReconnect() {
@@ -56,11 +81,16 @@ function checkInternetAndReconnect() {
             clearInterval(internetCheckInterval); // Stop checking
             isCheckingInternet = false;
             console.log("Internet restored! Reconnecting...");
+            dismissToast();
             reconnect();
         } else {
-            $("#status").text("No Internet");
+            let toastText = $(".toastify").text().trim();
+           if (!toastText.includes(TOASTIFY_NO_INTERNET)) {
+                dismissToast();
+                showToast(TOASTIFY_NO_INTERNET, -1, "error");
+            }
         }
-    }, 5000);
+    }, 2000);
 }
 
 function connectToSSE() {
@@ -71,8 +101,10 @@ function connectToSSE() {
         eventSource = new EventSource(eventSourceUrl);
 
         eventSource.onopen = function () {
-            console.log("SSE Connected");
-            $("#status").text("Connected");
+            if ($(".toastify").length !== 0) {  // means we had a warn or error toast before, so we want to announce the user that the connection is restored
+                dismissToast();
+                showToast(TOASTIFY_CONNECTED, 2000, "info");
+            }
         };
 
         eventSource.addEventListener('apartment', function(event) {
@@ -123,14 +155,14 @@ function connectToSSE() {
         });
 
         eventSource.onerror = function() {
-            console.log("Connection lost. Reconnecting...");
-            $("#status").text("Disconnected");
+            console.error("Connection lost. Reconnecting...");
+            showToast(TOASTIFY_DISCONNECTED, -1, "warn");
             checkInternetAndReconnect();
         };
     } catch (error) {
-          console.error("Failed to initialize SSE:", error);
-          $("#status").text("Disconnected");
-          setTimeout(checkInternetAndReconnect, 3000);
+        console.error("Failed to initialize SSE:", error);
+        showToast(TOASTIFY_DISCONNECTED, -1, "warn");
+        checkInternetAndReconnect();
     }
 
 }

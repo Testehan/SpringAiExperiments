@@ -80,6 +80,12 @@ public class MainController {
 		model.addAttribute("M03_DETAILS_PART_2", messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
 		model.addAttribute("M04_APARTMENTS_FOUND_START", messageSource.getMessage("M04_APARTMENTS_FOUND_START",  null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
+
+		model.addAttribute("toastifyConnected", messageSource.getMessage("toastify.connected",  null,locale));
+		model.addAttribute("toastifyDisconnected", messageSource.getMessage("toastify.disconnected",  null,locale));
+		model.addAttribute("toastifyNointernet", messageSource.getMessage("toastify.nointernet",  null,locale));
+		model.addAttribute("toastifyReconnecting", messageSource.getMessage("toastify.reconnecting",  null,locale));
+
 		model.addAttribute("appUrl", appUrl);
 
 		return "chat";
