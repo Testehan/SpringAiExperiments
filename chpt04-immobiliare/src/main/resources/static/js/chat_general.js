@@ -1,7 +1,11 @@
 let suggestionsStep = 1;
+
 let eventSource;
 let pingTimeout;
 let isCheckingInternet = false;
+
+let mediaRecorder;
+let audioChunks = [];
 
 $(document).ready(function(){
     // after voice message is transcribed, or text message is added to chat, send a request to obtain a response
@@ -21,20 +25,94 @@ $(document).ready(function(){
         }
     });
 
+    connectToSSE();
 
-   connectToSSE();
+//    // todo i am trying to see if this fixes the issue on iphone ???
+//    window.addEventListener('online', function() {
+//        dismissToast();
+//        reconnect();
+//    });
 
-   setCurrentStep();
-   setUpScrollingToLastUserMessage();
+    setCurrentStep();
+    setUpScrollingToLastUserMessage();
 
-   $(document).on("click", ".suggestion-btn", function (e) {
+    $(document).on("click", ".suggestion-btn", function (e) {
         const suggestionText = $(this).text(); // Get button text
         $("#message").val(suggestionText); // Populate input box
         $('#spinner').show();
         $("#sendMessageButton").click();
     });
 
+    setUpAudioRecording();
+
 });
+
+function setUpAudioRecording(){
+    // Request access to the user's microphone
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            mediaRecorder = new MediaRecorder(stream);
+
+            // When data is available (while recording)
+            mediaRecorder.addEventListener("dataavailable", event => {
+                audioChunks.push(event.data);
+            });
+
+            // When recording stops
+            mediaRecorder.addEventListener("stop", () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                const audioURL = URL.createObjectURL(audioBlob);
+
+                // Attach audio file to the form as a hidden file input
+                const audioInput =  $("#audioFile");
+                const file = new File([audioBlob], "voiceRecording.wav");
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                audioInput[0].files = dataTransfer.files;
+
+                audioChunks = [];  // Clear the chunks
+
+                 $("#sendMessageButton").click();   // send request once recording stops
+                 $('#message').attr('required', true);
+            });
+        });
+}
+
+function setOnClickForRecordAudio(){
+    // Start and stop recording on button click
+    $("#recordVoiceButton").on('click', function() {
+         $('#spinner').show();
+        if (mediaRecorder.state === "inactive") {
+            mediaRecorder.start();
+            $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );
+        } else {
+            mediaRecorder.stop();
+            $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
+            $("#message").removeAttr("required");
+        }
+    });
+}
+
+function removeOnClickForRecordAudio(){
+     $("#recordVoiceButton").off("click");
+}
+
+function disableChatInput(){
+    $("#message").prop("disabled", true);
+    $(".suggestion-btn").prop("disabled", true);
+    $("#sendMessageButton").prop("disabled", true);
+    $("#recordVoiceButton").prop("disabled", false);
+    removeOnClickForRecordAudio();
+    $('#spinner').hide();
+}
+
+function enableChatInput(){
+    $("#message").prop("disabled", false);
+    $(".suggestion-btn").prop("disabled", false);
+    $("#sendMessageButton").prop("disabled", false);
+    $("#recordVoiceButton").prop("disabled", false);
+    setOnClickForRecordAudio();
+}
 
 function showToast(message, durationMillis, type = "info") {
     if ($(".toastify").length === 0) {
@@ -88,6 +166,7 @@ function checkInternetAndReconnect() {
            if (!toastText.includes(TOASTIFY_NO_INTERNET)) {
                 dismissToast();
                 showToast(TOASTIFY_NO_INTERNET, -1, "error");
+                disableChatInput();
             }
         }
     }, 2000);
@@ -104,6 +183,7 @@ function connectToSSE() {
             if ($(".toastify").length !== 0) {  // means we had a warn or error toast before, so we want to announce the user that the connection is restored
                 dismissToast();
                 showToast(TOASTIFY_CONNECTED, 2000, "info");
+                enableChatInput();
             }
         };
 
@@ -157,11 +237,13 @@ function connectToSSE() {
         eventSource.onerror = function() {
             console.error("Connection lost. Reconnecting...");
             showToast(TOASTIFY_DISCONNECTED, -1, "warn");
+            disableChatInput();
             checkInternetAndReconnect();
         };
     } catch (error) {
         console.error("Failed to initialize SSE:", error);
         showToast(TOASTIFY_DISCONNECTED, -1, "warn");
+        disableChatInput();
         checkInternetAndReconnect();
     }
 
