@@ -11,6 +11,7 @@ import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
+import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -39,16 +40,18 @@ public class MainController {
 	private final MessageSource messageSource;
 	private final BeanConfig beanConfig;
 	private final ListingUtil listingUtil;
+	private final LocaleUtils localeUtils;
 
 	public MainController(ApartmentService apartmentService, ConversationSession conversationSession,
 						  UserSseService userSseService, MessageSource messageSource,
-						  BeanConfig beanConfig, ListingUtil listingUtil) {
+						  BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
 		this.apartmentService = apartmentService;
 		this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
 		this.messageSource = messageSource;
 		this.beanConfig = beanConfig;
 		this.listingUtil = listingUtil;
+		this.localeUtils = localeUtils;
 	}
 
 	@GetMapping("/")
@@ -57,9 +60,11 @@ public class MainController {
 	}
 
 	@GetMapping("/chat")
-	public String chat(Model model, HttpSession session, Locale locale) {
+	public String chat(Model model, HttpSession session) {
+		var locale = localeUtils.getCurrentLocale();
 		var user = conversationSession.getImmobiliareUser();
 		var sessionId = session.getId();
+
 		if (StringUtils.isEmpty(user.getPropertyType())) {
 			model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
 		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.getByName(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
@@ -71,6 +76,12 @@ public class MainController {
 					messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, city}, locale) +
 					messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
 		}
+
+		var searchQueriesAvailable = user.getSearchesAvailable();
+		if (searchQueriesAvailable <= 5){
+			model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
+		}
+
 		var userSseId = userSseService.addUserSseId(sessionId);
 		model.addAttribute("sseId", userSseId);
 		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
