@@ -84,12 +84,13 @@ function setUpAudioRecording(){
 function setOnClickForRecordAudio(){
     // Start and stop recording on button click
     $("#recordVoiceButton").on('click', function() {
-         $('#spinner').show();
+         $("#audioRecProgress").show();
         if (mediaRecorder.state === "inactive") {
             mediaRecorder.start();
             $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );
         } else {
             mediaRecorder.stop();
+            $('#audioRecProgress').hide();
             $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
             $("#message").removeAttr("required");
         }
@@ -189,8 +190,8 @@ function connectToSSE(sseId) {
             if ($(".toastify").length !== 0) {  // means we had a warn or error toast before, so we want to announce the user that the connection is restored
                 dismissToast();
                 showToast(TOASTIFY_CONNECTED, 2000, "info");
-                enableChatInput();
             }
+            enableChatInput();
         };
 
         eventSource.addEventListener('apartment', function(event) {
@@ -235,7 +236,7 @@ function connectToSSE(sseId) {
                 pingTimeout = setTimeout(() => {
                     console.warn("No ping received for 35 seconds. Reconnecting...");
                     checkInternetAndReconnect();
-                }, 35000); // Wait 35 seconds before assuming the connection is lost
+                }, 15000); // Wait 35 seconds before assuming the connection is lost
             }
 
         });
