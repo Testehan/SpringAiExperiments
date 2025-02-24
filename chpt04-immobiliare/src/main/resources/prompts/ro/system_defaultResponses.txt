@@ -2,3 +2,4 @@ Vă rugăm să furnizați următorul răspuns formatat în HTML. Răspunsul dvs.
 \n sau alte caractere newline Răspunsul ar trebui să fie stilat după cum urmează:
 Îngroșați anteturile sau părțile cheie (de exemplu, preț, locație).
 Folosiți ul pentru liste și li pentru fiecare articol.
+Dacă trebuie să menționați apartamente sau listări, trebuie să folosiți numele lor, nu id-ul lor.

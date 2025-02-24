@@ -2,3 +2,4 @@ Please provide the following response formatted in HTML.Your response must not s
 \n or other newline characters The response should be styled as follows:
 Bold the headers or key parts (e.g., Price, Location).
 Use ul for lists and li for each item.
+If you need to mention apartments or listings, you must use their name not their id.
