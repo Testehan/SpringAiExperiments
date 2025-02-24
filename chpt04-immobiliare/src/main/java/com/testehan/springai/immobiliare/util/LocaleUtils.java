@@ -3,7 +3,6 @@ package com.testehan.springai.immobiliare.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
@@ -28,8 +27,9 @@ public class LocaleUtils {
 
     public String getLocalizedPrompt(String promptFileName) {
         var locale =  getCurrentLocale();
-        Resource resource = resourceLoader.getResource(getLocalizedPromptFilePath(promptFileName, locale));
-        try (InputStream inputStream = resource.getInputStream()) {
+        var path = getLocalizedPromptFilePath(promptFileName, locale);
+
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(path)) {
             return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             LOGGER.error("Prompt file {} with locale {} could not be read",promptFileName, locale);
@@ -38,7 +38,9 @@ public class LocaleUtils {
     }
 
     public String getLocalizedPromptFilePath(String promptFileName, Locale locale) {
-        String language = locale.getLanguage();
-        return String.format("classpath:/prompts/%s/%s.txt", language, promptFileName);
+        var language = locale.getLanguage();
+        var path =  String.format("prompts/%s/%s.txt", language, promptFileName);
+        LOGGER.info("Looking for prompt file at: {}", path);
+        return path;
     }
 }

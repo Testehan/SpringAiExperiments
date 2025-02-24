@@ -1,14 +1,11 @@
-#FROM google/cloud-sdk:slim
-
-FROM openjdk:17
+# Use an OpenJDK image
+FROM openjdk:17-jdk-alpine
 
 # Add the application's JAR to the container
 COPY target/chpt04-immobiliare-0.0.1-SNAPSHOT.jar app.jar
-COPY src/main/resources/docker-google-ai-key.json service-account-key.json
 
 # Set environment variables
 ENV SPRING_PROFILES_ACTIVE=prod
-ENV GOOGLE_APPLICATION_CREDENTIALS="/service-account-key.json"
 
 # Expose the port your app runs on
 #EXPOSE 8080
@@ -16,8 +13,8 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="/service-account-key.json"
 # heroku needs this port from what i read
 EXPOSE 5000
 
-# Run the app locally in docker
+# Run the app
 #ENTRYPOINT ["java", "-jar", "/app.jar"]
 
 # Run the app on heroku
-CMD ["sh", "-c", "java -Dserver.port=$PORT -Dio.netty.noNativeTransport=true -jar /app.jar"]
+CMD ["sh", "-c", "java -Dserver.port=$PORT -jar /app.jar"]

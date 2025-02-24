@@ -49,7 +49,9 @@ public class ImmobiliareApiService {
                     .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
                     .call().chatResponse();
 
-            ServiceCall serviceCall = outputParser.convert(assistantResponse.getResult().getOutput().getContent());
+            var response = assistantResponse.getResult().getOutput().getContent();
+            LOGGER.info(response);
+            ServiceCall serviceCall = outputParser.convert(response);
             return serviceCall;
         } catch (Exception e) {
             // Catch-all for unexpected errors

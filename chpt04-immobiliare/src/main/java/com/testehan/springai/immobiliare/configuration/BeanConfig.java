@@ -6,9 +6,9 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
@@ -57,17 +57,17 @@ public class BeanConfig {
         return new OpenAiEmbeddingModel(new OpenAiApi(OPENAI_API_KEY));
     }
 
-//    @Bean         // this doesn't work in a docker container see Spring AI Notes.txt
-//    @Primary
-//    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
-//        return vertexAiGeminiChatModel;
-//    }
-
-    @Bean
+    @Bean         // this doesn't work in a docker container see Spring AI Notes.txt
     @Primary
-    public ChatModel getOpenAiChatModel(OpenAiChatModel openAiChatModel){
-        return openAiChatModel;
+    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
+        return vertexAiGeminiChatModel;
     }
+
+//    @Bean
+//    @Primary
+//    public ChatModel getOpenAiChatModel(OpenAiChatModel openAiChatModel){
+//        return openAiChatModel;
+//    }
 
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder) {
