@@ -25,7 +25,10 @@ $(document).ready(function(){
         }
     });
 
-    connectToSSE();
+    getNewSseId(function(newSseId) {
+        console.log("Got new SSEid calling the endpoint " + newSseId.sseId);
+        connectToSSE(newSseId.sseId);
+    });
 
 //    // todo i am trying to see if this fixes the issue on iphone ???
 //    window.addEventListener('online', function() {
@@ -147,7 +150,10 @@ function reconnect() {
         eventSource.close();
     }
 
-    connectToSSE();
+    getNewSseId(function(newSseId) {
+        console.log("Got new SSEid calling the endpoint " + newSseId.sseId);
+        connectToSSE(newSseId.sseId);
+    });
 }
 
 function checkInternetAndReconnect() {
@@ -172,7 +178,7 @@ function checkInternetAndReconnect() {
     }, 2000);
 }
 
-function connectToSSE() {
+function connectToSSE(sseId) {
     try {
         console.log("SSE ID:", sseId);
         const eventSourceUrl = "/api/apartments/stream/" + sseId;
@@ -247,6 +253,15 @@ function connectToSSE() {
         checkInternetAndReconnect();
     }
 
+}
+
+function getNewSseId(callback) {
+    $.get("/api/sse-id", function(response) {
+        console.log("New SSE ID received:", response);
+        if (callback) callback(response);
+    }).fail(function(xhr, status, error) {
+        console.error("Failed to get new SSE ID:", error);
+    });
 }
 
 function fetchSuggestions() {

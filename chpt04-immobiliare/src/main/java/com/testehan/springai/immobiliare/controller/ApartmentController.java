@@ -5,6 +5,7 @@ import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
+import com.testehan.springai.immobiliare.security.SessionCleanupListener;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentService;
 import com.testehan.springai.immobiliare.service.ApiService;
@@ -45,6 +46,7 @@ public class ApartmentController {
     private final UserService userService;
     private final EmbeddingService embeddingService;
     private final UserSseService userSseService;
+    private final SessionCleanupListener sessionCleanupListener;
     private final ApiService apiService;
     private final SpringWebFluxTemplateEngine templateEngine;
     private final MessageSource messageSource;
@@ -55,6 +57,7 @@ public class ApartmentController {
     public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
                                UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
+                               SessionCleanupListener sessionCleanupListener,
                                MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.apartmentService = apartmentService;
@@ -62,6 +65,7 @@ public class ApartmentController {
         this.apiService = apiService;
         this.templateEngine = templateEngine;
         this.userSseService = userSseService;
+        this.sessionCleanupListener = sessionCleanupListener;
         this.userService = userService;
         this.embeddingService = embeddingService;
         this.messageSource = messageSource;
@@ -219,6 +223,9 @@ public class ApartmentController {
     public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession, Locale locale) {
         userSseService.addUserSseId(httpSession.getId());
 
+//        Flux<String> sessionDestroyedFlux = sessionCleanupListener.getSessionDestroyedFlux()
+//                .filter(session -> session.equals(httpSession.getId()));
+
         Flux<ServerSentEvent<String>> responsesStream = apiService.getServerSideEventsFlux(httpSession)
                 .map(event -> renderServerSideEventData(httpSession, event, sseId, locale));
 
@@ -229,8 +236,12 @@ public class ApartmentController {
                         .event("keep-alive")
                         .data("ping")
                         .build());
+//                .takeUntilOther(sessionDestroyedFlux);
 
-        return Flux.merge(responsesStream, heartbeatStream);
+        return Flux.merge(responsesStream, heartbeatStream);//.doOnCancel(() -> {
+//            LOGGER.info("Client disconnected: " + sseId);
+//            userSseService.removeUserSseId(httpSession.getId());
+//        });
 
     }
 

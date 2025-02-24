@@ -10,9 +10,8 @@ public class SecuredPaths {
             "/favourites",
             "/add",
             "/edit/**",
-            "/api/apartments/**",
             "/actuator/**",
-            "/api/user/**",
+            "/api/**",
             "/profile",
             "/view/**"
     );

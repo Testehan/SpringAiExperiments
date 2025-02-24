@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Sinks;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,24 +25,34 @@ public class UserSseService {
     public Sinks.Many<Event> getUserSseConnection(String sessionId) {
         LOGGER.info("Getting user SSE connection for {}", sessionId );
         var sseUuid = userSseUuids.get(sessionId);
+        if (Objects.isNull(sseUuid)){
+            sseUuid = addUserSseId(sessionId);
+        }
         LOGGER.info("SSE uuid = {} and connection exists = {}", sseUuid, userSseConnections.containsKey(sseUuid) );
         return userSseConnections.get(sseUuid);
     }
 
     public String addUserSseId(String userSessionId) {
         if (!userSseUuids.containsKey(userSessionId)) {
+            LOGGER.info("User session {} does not contain a SSE id", userSessionId );
             UUID userSseId = UUID.randomUUID();
             userSseUuids.put(userSessionId, userSseId.toString());
             Sinks.Many<Event> sink =  Sinks.many().multicast().onBackpressureBuffer();
             userSseConnections.put(userSseId.toString(), sink);
             return userSseId.toString();
         } else {
+            LOGGER.info("User session {} already contains a SSE id", userSessionId );
             return userSseUuids.get(userSessionId);
         }
     }
 
     public void removeUserSseId(String userSessionId) {
-        userSseUuids.remove(userSessionId);
+        String sseUuid = userSseUuids.remove(userSessionId);
+        if (sseUuid != null) {
+            var sink = userSseConnections.remove(sseUuid);
+        }
+
+
     }
 
     public boolean isUserLoggedIn(String userSessionId) {

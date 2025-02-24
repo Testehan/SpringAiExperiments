@@ -162,6 +162,7 @@ public class ApiServiceImpl implements ApiService{
                                             .findFirst();
                                     if (!apartmentLLM.isEmpty()) {
                                         if (isFirst.getAndSet(false)) {
+                                            LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                             userSseService.getUserSseConnection(session.getId())
                                                     .tryEmitNext(new Event("response", new ResponsePayload(
                                                             messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, currentLocale)))
@@ -177,6 +178,7 @@ public class ApiServiceImpl implements ApiService{
                                         conversationService.addContentToConversation(apartmentInfo, conversationId);
 
                                         var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
+                                        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                         userSseService.getUserSseConnection(session.getId())
                                                 .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get(), isFavourite)));
                                     }
@@ -188,12 +190,14 @@ public class ApiServiceImpl implements ApiService{
                                 },
                                 () -> {
                                     if (isFirst.get()) {     // this means that we processed stream and we got no match
+                                        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                         userSseService.getUserSseConnection(session.getId())
                                                 .tryEmitNext(new Event("response", new ResponsePayload(
                                                         messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale)))
                                                 );
                                         LOGGER.info("Search completed with no results for description : {}", description);
                                     } else {
+                                        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                         userSseService.getUserSseConnection(session.getId())
                                                 .tryEmitNext(new Event("response", new ResponsePayload(
                                                         messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, currentLocale)))
