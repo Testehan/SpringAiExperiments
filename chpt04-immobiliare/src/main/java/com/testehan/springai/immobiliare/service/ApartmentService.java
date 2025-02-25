@@ -78,6 +78,10 @@ public class ApartmentService {
         return apartmentsRepository.findApartmentById(apartmentId);
     }
 
+    public boolean isPhoneValid(String phoneNumber) {
+        return apartmentsRepository.isPhoneValid(phoneNumber);
+    }
+
     public List<Apartment> findAll(){
         return apartmentsRepository.findAll();
     }

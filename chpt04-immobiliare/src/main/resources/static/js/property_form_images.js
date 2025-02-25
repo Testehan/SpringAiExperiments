@@ -11,8 +11,8 @@ const schema = Joi.object({
     surface: Joi.number().positive().required().label('Surface'),
     noOfRooms: Joi.number().positive().required().label('Number of rooms'),
     contact: Joi.alternatives().try(
-                Joi.string().email({ tlds: { allow: false } }),      // either an email
-                Joi.string().regex(/^\d{10,13}$/)                   // or a phone number
+                //Joi.string().email({ tlds: { allow: false } }),      // either an email
+                Joi.string().regex(/^\d{10,13}$/).message('Phone number must be between 10 and 13 digits long')
            ).required().label('Contact')
 });
 
@@ -42,10 +42,10 @@ $(document).ready(function(){
 
 });
 
-function handleSubmit(event){
+async function handleSubmit(event){
     event.preventDefault();
 
-    var valid = isFormValid();
+    var valid = await isFormValid();
 
     if (valid){
         const formData = new FormData(event.target);
@@ -90,7 +90,7 @@ function handleSubmit(event){
 
 }
 
-function isFormValid(){
+async function isFormValid(){
 
      // Extract form data that needs validation
     const formData = {
@@ -119,7 +119,45 @@ function isFormValid(){
         })
         return false;
     }
-    return true;
+
+    const isValid = await isPhoneValid($('#contact').val());
+    if (!isValid){
+         Toastify({
+            text: "Phone number is not valid",
+            duration: 5000,
+            style: {
+                background: "linear-gradient(to right, #fd0713, #ff7675)",
+                color: "white"
+              }
+        }).showToast();
+        return false;
+    }
+
+    return isValid && !error;
+}
+
+async function isPhoneValid(phoneNumber){
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: APP_URL + "/api/apartments/validate/" + phoneNumber ,
+            type: "GET",
+            success: function (response) {
+                resolve(response);
+            },
+            error: function () {
+                 Toastify({
+                    text: "Error checking phone number.",
+                    duration: 5000,
+                    style: {
+                        background: "linear-gradient(to right, #fd0713, #ff7675)",
+                        color: "white"
+                      }
+                }).showToast();
+                reject(false);
+            }
+        });
+    });
+
 }
 
 function showImageThumbnail(fileInput, index){
@@ -171,9 +209,7 @@ function addExtraImageSection(index){
     var elementWithSpecificName = divImagePrevious.find('[name="linkRemoveImage"]');
 
     if (elementWithSpecificName.length > 0) {
-    // todo this can be removed
-//      var divImageCurrent= $("#divImage" + imagesCount);
-//       divImageCurrent.append(htmlLinkRemove);
+
     } else {
         // we select the previous image section in order to add the remove button
         divImagePrevious.append(htmlLinkRemove);

@@ -12,6 +12,7 @@ public interface ApartmentsRepository {
     List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, ApartmentDescription apartment, List<Double> embedding);
 
     Optional<Apartment> findApartmentById(String apartmentId);
+    boolean isPhoneValid(String phoneNumber);
 
     List<Apartment> findAll();
 

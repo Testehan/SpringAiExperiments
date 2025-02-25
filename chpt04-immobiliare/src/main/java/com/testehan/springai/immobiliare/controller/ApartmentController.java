@@ -141,6 +141,11 @@ public class ApartmentController {
         }
     }
 
+    @GetMapping("/validate/{phoneNumber}")
+    public boolean isPhoneValid(@PathVariable(value = "phoneNumber") String phoneNumber) {
+        return apartmentService.isPhoneValid(phoneNumber);
+    }
+
     @GetMapping("/suggestions/{suggestionStep}")
     public List<String> suggestions(@PathVariable(value = "suggestionStep") Integer suggestionStep, Locale locale) {
         List<String> suggestions = new ArrayList<String>();

@@ -22,6 +22,7 @@ import java.util.*;
 
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
+import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.search.SearchPath.fieldPath;
@@ -63,10 +64,10 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         // https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-stage/
 
         List<Bson> filters = new ArrayList<>();
-        filters.add(Filters.eq("propertyType", propertyType));
-        filters.add(Filters.eq("active", true));
+        filters.add(eq("propertyType", propertyType));
+        filters.add(eq("active", true));
         if (Objects.nonNull(city)){
-            filters.add(Filters.eq("city", city));
+            filters.add(eq("city", city));
         }
 
         // optional filters depending on user input
@@ -137,6 +138,17 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
+    public boolean isPhoneValid(String phoneNumber) {
+        var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
+        Bson filter = eq("contact", phoneNumber); // Create the filter
+
+        long count = mongoCollection.countDocuments(filter); // Count matching documents
+
+        return count < 1; // Return true if no documents exist
+
+    }
+
+    @Override
     public List<Apartment> findAll() {
         List<Apartment> apartments = new ArrayList<>();
         getApartmentCollection().find().forEach(a -> apartments.add(a));
@@ -149,7 +161,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         var formattedDateCustom = getFormattedDateCustom(date);
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
-        Bson condition2 = Filters.eq("active", true);
+        Bson condition2 = eq("active", true);
         Bson combinedFilter = Filters.and(condition1, condition2);
 
         List<Apartment> result = new ArrayList<>();
@@ -175,7 +187,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         var formattedDateCustom = getFormattedDateCustom(date);
 
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
-        Bson condition2 = Filters.eq("active", true);
+        Bson condition2 = eq("active", true);
         Bson combinedFilter = Filters.and(condition1, condition2);
 
         var listOfUpdates = new ArrayList<Bson>();
