@@ -79,6 +79,13 @@ public class ApartmentController {
 
         var user = conversationSession.getImmobiliareUser();
 
+        var isPhoneValid = isPhoneValid(apartment.getContact());
+        if (!isPhoneValid){
+            LOGGER.warn("User {} tried to add phone number {} that already exists", user.getEmail(), apartment.getContact());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("You can't perform this operation!");
+        }
+
         if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
             LOGGER.warn("User {} tried to edit property with id {} that was not owned", user.getEmail(), apartment.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -143,7 +150,12 @@ public class ApartmentController {
 
     @GetMapping("/validate/{phoneNumber}")
     public boolean isPhoneValid(@PathVariable(value = "phoneNumber") String phoneNumber) {
-        return apartmentService.isPhoneValid(phoneNumber);
+        var user = conversationSession.getImmobiliareUser();
+        if (user.isAdmin()){
+            return true;    // admins can post as many numbers as they want with same phonenumber
+        } else {
+            return apartmentService.isPhoneValid(phoneNumber);
+        }
     }
 
     @GetMapping("/suggestions/{suggestionStep}")
