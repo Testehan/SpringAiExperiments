@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.service;
 import com.testehan.springai.immobiliare.events.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Sinks;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class UserSseService {
@@ -50,9 +52,29 @@ public class UserSseService {
         String sseUuid = userSseUuids.remove(userSessionId);
         if (sseUuid != null) {
             var sink = userSseConnections.remove(sseUuid);
+            if (sink != null) {
+                // Stop emitting further events
+                sink.tryEmitComplete();
+                LOGGER.info("Removed SSE connection for session {}", userSessionId);
+            }
         }
 
 
+    }
+
+    @Scheduled(fixedRate = 80, timeUnit = TimeUnit.MINUTES)
+    public void cleanupUnusedConnections() {
+        LOGGER.info("Starting cleanup of unused SSE connections...");
+        for (String sseUuid : userSseConnections.keySet()) {
+            var sink = userSseConnections.get(sseUuid);
+            if (sink != null && sink.currentSubscriberCount() == 0) {
+                // If there are no subscribers, clean up this connection
+                LOGGER.info("No subscribers found for SSE connection with UUID {}. Cleaning up.", sseUuid);
+                userSseConnections.remove(sseUuid);
+                // Stop emitting further events
+                sink.tryEmitComplete();
+            }
+        }
     }
 
     public boolean isUserLoggedIn(String userSessionId) {

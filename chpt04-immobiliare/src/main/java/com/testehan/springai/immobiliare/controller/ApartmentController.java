@@ -230,7 +230,7 @@ public class ApartmentController {
                 .map(event -> renderServerSideEventData(httpSession, event, sseId, locale));
 
         // Heartbeat (ping) stream every 25 seconds
-        Flux<ServerSentEvent<String>> heartbeatStream = Flux.interval(Duration.ofSeconds(20))
+        Flux<ServerSentEvent<String>> heartbeatStream = Flux.interval(Duration.ofSeconds(5))
                 .map(tick -> ServerSentEvent.<String>builder()
                         .id(sseId)
                         .event("keep-alive")
