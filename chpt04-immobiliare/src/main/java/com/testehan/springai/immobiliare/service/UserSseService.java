@@ -73,6 +73,14 @@ public class UserSseService {
                 userSseConnections.remove(sseUuid);
                 // Stop emitting further events
                 sink.tryEmitComplete();
+
+                // we also need to clean up the userSseUuid of the removed sseUuid
+                for (Map.Entry<String, String> me : userSseUuids.entrySet()){
+                    if (me.getValue().equalsIgnoreCase(sseUuid)){
+                        userSseUuids.remove(me.getKey());
+                        LOGGER.info("Cleaning up userSseUuids {} for session id {}", sseUuid, me.getKey());
+                    }
+                }
             }
         }
     }
