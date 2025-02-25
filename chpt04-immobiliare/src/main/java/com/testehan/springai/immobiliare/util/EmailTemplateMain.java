@@ -9,7 +9,8 @@ public class EmailTemplateMain {
 
 //        createWelcomeTemplate();
 //        deleteTemplate("ReactivateListingEmailTemplate");
-        createReactivateTemplate_RO();
+//        createReactivateTemplate_RO();
+        createWelcomeTemplate_ro();
     }
 
     private static void deleteTemplate(String templateName){
@@ -43,6 +44,38 @@ public class EmailTemplateMain {
             String htmlBody = "<h1>Welcome, {{name}}!</h1><p>Thank you for joining our service. " +
                     "We hope that you will find the right property or the right customer &#128522;.</p>";
             String textBody = "Welcome, {{name}}!\nThank you for joining our service.";
+
+            // Create the request
+            CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
+                    .template(Template.builder()
+                            .templateName(templateName)
+                            .subjectPart(subjectPart)
+                            .htmlPart(htmlBody)
+                            .textPart(textBody)
+                            .build())
+                    .build();
+
+            // Call SES to create the template
+            CreateTemplateResponse response = sesClient.createTemplate(createTemplateRequest);
+            System.out.println("Template created successfully: " + response);
+
+        } catch (SesException e) {
+            System.err.println("Error creating template: " + e.awsErrorDetails().errorMessage());
+        } finally {
+            sesClient.close();
+        }
+    }
+
+    private static void createWelcomeTemplate_ro() {
+        SesClient sesClient = buildSesClient();
+
+        try {
+            // Define the email template
+            String templateName = "WelcomeEmailTemplate_RO";
+            String subjectPart = "Bun venit pe CasaMia.ai!";
+            String htmlBody = "<h1>Bine ați venit, {{name}}!</h1><p>Vă mulțumim că v-ați alăturat serviciului nostru. " +
+                    "Sperăm că veți găsi proprietatea potrivită sau clientul potrivit &#128522;.</p>";
+            String textBody = "Bun venit, {{name}}!\n Vă mulțumim că v-ați alăturat serviciului nostru.";
 
             // Create the request
             CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
