@@ -62,8 +62,22 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
             }
         }
 
+        handleRegistrationOfDeletedUser(userEmail);
+
+
         super.onAuthenticationSuccess(request, response, authentication);
 
+    }
+
+    private void handleRegistrationOfDeletedUser(String userEmail) {
+        var optionalDeletedUser = userService.findDeletedUserByEmail(userEmail);
+        if (optionalDeletedUser.isPresent()){
+            var deletedUser = optionalDeletedUser.get();
+            var newUser = userService.getImmobiliareUserByEmail(userEmail).get();
+            newUser.setSearchesAvailable(deletedUser.getSearchesAvailable());
+            userService.updateUser(newUser);
+            userService.deleteDeletedUserByEmail(userEmail);
+        }
     }
 
     private void persistGoogleRefreshToken(Authentication authentication, Optional<ImmobiliareUser> userOptional) {

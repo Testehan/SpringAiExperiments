@@ -1,7 +1,9 @@
 package com.testehan.springai.immobiliare.security;
 
 import com.testehan.springai.immobiliare.model.auth.AuthenticationType;
+import com.testehan.springai.immobiliare.model.auth.DeletedUser;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.repository.DeletedUserRepository;
 import com.testehan.springai.immobiliare.repository.ImmobiliareUserRepository;
 import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
@@ -11,7 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -21,14 +26,18 @@ public class UserService {
     private final HttpServletResponse response;
     private final EmailService emailService;
     private final ImmobiliareUserRepository immobiliareUserRepository;
+    private final DeletedUserRepository deletedUserRepository;
+    private final MongoRememberMeTokenRepository rememberMeTokenRepository;
     private final LocaleUtils localeUtils;
 
-    public UserService( HttpServletRequest request, HttpServletResponse response,
-                       EmailService emailService, ImmobiliareUserRepository immobiliareUserRepository, LocaleUtils localeUtils) {
+    public UserService(HttpServletRequest request, HttpServletResponse response,
+                       EmailService emailService, ImmobiliareUserRepository immobiliareUserRepository, DeletedUserRepository deletedUserRepository, MongoRememberMeTokenRepository rememberMeTokenRepository, LocaleUtils localeUtils) {
         this.request = request;
         this.response = response;
         this.emailService = emailService;
         this.immobiliareUserRepository = immobiliareUserRepository;
+        this.deletedUserRepository = deletedUserRepository;
+        this.rememberMeTokenRepository = rememberMeTokenRepository;
         this.localeUtils = localeUtils;
     }
 
@@ -47,7 +56,14 @@ public class UserService {
         immobiliareUserRepository.update(user);
     }
 
+    @Transactional
     public void deleteUser(ImmobiliareUser user){
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDateCustom = now.format(customFormatter);
+
+        deletedUserRepository.save(new DeletedUser(user.getEmail(), user.getSearchesAvailable(), formattedDateCustom));
+        rememberMeTokenRepository.removeUserTokens(user.getEmail());
         immobiliareUserRepository.deleteById(user.getId());
         logoutUser();
     }
@@ -60,6 +76,13 @@ public class UserService {
         immobiliareUserRepository.resetSearchesAvailable();
     }
 
+    public Optional<DeletedUser> findDeletedUserByEmail(String email){
+        return deletedUserRepository.findById(email);
+    }
+
+    public void deleteDeletedUserByEmail(String email){
+        deletedUserRepository.deleteById(email);
+    }
 
     public void addNewCustomerAfterOAuth2Login(String name, String email, AuthenticationType authenticationType) {
         var user = new ImmobiliareUser();

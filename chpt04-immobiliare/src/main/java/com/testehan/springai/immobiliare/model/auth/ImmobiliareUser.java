@@ -53,7 +53,7 @@ public class ImmobiliareUser {
         this.city = "";
         this.propertyType = "";
         this.lastPropertyDescription = "";
-        this.searchesAvailable = 100;           // Todo this is for now ..in the future it will be a smaller number
+        this.searchesAvailable = 10;
     }
 
     public boolean isAdmin(){
