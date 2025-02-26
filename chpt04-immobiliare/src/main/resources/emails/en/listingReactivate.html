@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Listing Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            background: #f6f8f7;
+            color: #000000;
+            padding: 20px;
+            font-size: 24px;
+            border-radius: 8px 8px 0 0;
+        }
+        .logo {
+            max-width: 120px;
+            margin-bottom: 10px;
+        }
+        .content {
+            padding: 20px;
+            color: #333;
+            line-height: 1.6;
+        }
+        .button-view {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            text-align: center;
+            background: #87ac29;
+            color: #ffffff;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .button-edit {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            text-align: center;
+            background: #f36719;
+            color: #ffffff;
+            padding: 12px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 12px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <img src="https://casamia-ai-25b8700443e8.herokuapp.com/images/logo_simple.jpeg" alt="CasaMia.ai Logo" class="logo">
+        <br>
+        Keep the listing active
+    </div>
+    <div class="content">
+        <p>Hello <strong>{{userName}}</strong>,</p>
+        <p>It has been a while since your listing "<strong>{{listingTitle}}</strong>" was published..</p>
+        <p>Is it still available? If so, please click on the link below to let potential customers know this &#128522;.</p>
+        <a href="{{reactivateListingUrl}}" class="button-view">Keep the listing active</a>
+        <p>If it is not available anymore, <b>it will be deactivated automatically in the following days</b>.</p>
+
+        <p>If you have any questions, feel free to contact us.</p>
+        <p>Best regards,<br><strong>CasaMia.ai</strong></p>
+    </div>
+    <div class="footer">
+        &copy; 2025 CasaMia.ai All rights reserved.
+    </div>
+</div>
+</body>
+</html>
