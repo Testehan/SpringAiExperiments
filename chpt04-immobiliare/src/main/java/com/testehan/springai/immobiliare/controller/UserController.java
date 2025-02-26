@@ -67,7 +67,7 @@ public class UserController {
             return "error";
         }
 
-        return "redirect:/logout";
+        return "redirect:/";
 
     }
 }

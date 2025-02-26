@@ -50,10 +50,16 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
             userService.updateAuthenticationType(userOptional.get(), authenticationType);
         }
 
+        userOptional = userService.getImmobiliareUserByEmail(userEmail);
+
         if (authenticationType.equals(AuthenticationType.GOOGLE)) {
-            persistGoogleRefreshToken(authentication, userOptional);
+            if (userOptional.isPresent()) {
+                persistGoogleRefreshToken(authentication, userOptional);
+            }
         } else {
-            persistFacebookRefreshToken(authentication, userOptional);
+            if (userOptional.isPresent()) {
+                persistFacebookRefreshToken(authentication, userOptional);
+            }
         }
 
         super.onAuthenticationSuccess(request, response, authentication);

@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.rememberme.CookieTheftException;
 import org.springframework.security.web.authentication.rememberme.PersistentRememberMeToken;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.util.LinkedMultiValueMap;
@@ -53,7 +54,12 @@ public class AutoRememberMeServices extends PersistentTokenBasedRememberMeServic
     @Override
     public Authentication autoLogin(HttpServletRequest request, HttpServletResponse response) {
         // Check the remember-me cookie (this is already handled by the parent class)
-        Authentication authentication = super.autoLogin(request, response);
+        Authentication authentication = null;
+        try {
+            authentication = super.autoLogin(request, response);
+        } catch (CookieTheftException ex){
+            logger.error(ex.getMessage());
+        }
 
         // If the user is authenticated, try refreshing the access token using the refresh token
         if (authentication != null && authentication.isAuthenticated()) {

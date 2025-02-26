@@ -26,7 +26,7 @@ public class EmailService {
 
     public void sendEmail(String from, String to, String subject, String body) {
         SendEmailRequest request = SendEmailRequest.builder()
-                .source(from)
+                .source("CasaMia.ai" + " <" + from+">")
                 .destination(Destination.builder().toAddresses(to).build())
                 .message(Message.builder()
                         .subject(Content.builder().data(subject).build())
@@ -39,13 +39,13 @@ public class EmailService {
         sesClient.sendEmail(request);
     }
 
-    public void sendWelcomeEmail(String to, String name){
+    public void sendWelcomeEmail(String to, String name, Locale locale){
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
-                .source("admin@casamia.ai") // Replace with a verified email
+                .source("CasaMia.ai" +" "+ "<admin@casamia.ai>") // Replace with a verified email
                 .destination(Destination.builder()
                         .toAddresses(to)
                         .build())
-                .template("WelcomeEmailTemplate") // Template name
+                .template(getWelcomeEmailTemplate(locale)) // Template name
                 .templateData("{\"name\":\""+name+"\"}") // JSON string to replace placeholders
                 .build();
 
@@ -54,7 +54,7 @@ public class EmailService {
 
     public void sendReactivateListingEmail(String to, String name, String listingName, String reactivateLink, Locale locale){
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
-                .source("admin@casamia.ai") // Replace with a verified email
+                .source("CasaMia.ai" + " " +"<admin@casamia.ai>") // Replace with a verified email
                 .destination(Destination.builder()
                         .toAddresses(to)
                         .build())
@@ -70,5 +70,12 @@ public class EmailService {
             return "ReactivateListingEmailTemplate_RO";
         }
         return "ReactivateListingEmailTemplate";
+    }
+
+    private static String getWelcomeEmailTemplate(Locale locale) {
+        if (locale.getLanguage().equals("ro")) {
+            return "WelcomeEmailTemplate_RO";
+        }
+        return "WelcomeEmailTemplate";
     }
 }

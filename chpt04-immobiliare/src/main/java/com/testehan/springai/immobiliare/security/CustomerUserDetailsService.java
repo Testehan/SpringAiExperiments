@@ -8,8 +8,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-
 // service used for the login of customers
 @Service
 public class CustomerUserDetailsService implements UserDetailsService {
@@ -20,7 +18,7 @@ public class CustomerUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         var customer = immobiliareUserRepository.findUserByEmail(email);
-        if (Objects.nonNull(customer)) {
+        if (customer.isPresent()) {
             return new CustomerUserDetails(customer.get());
         } else {
             throw new UsernameNotFoundException("Customer with email " + email + " does not exist");

@@ -40,11 +40,12 @@ public class ConversationSession {
     public ConversationSession(ChatMemory chatMemory, UserService userService, ConversationService conversationService) {
         this.authentication = SecurityContextHolder.getContext().getAuthentication();
         this.userService = userService;
-        this.city = getImmobiliareUser() != null ?
-                StringUtils.isNotEmpty(getImmobiliareUser().getCity()) ?
-                        SupportedCity.getByName(getImmobiliareUser().getCity()) : SupportedCity.UNSUPPORTED
+        var user = getImmobiliareUser();
+        this.city = user != null ?
+                StringUtils.isNotEmpty(user.getCity()) ?
+                        SupportedCity.getByName(user.getCity()) : SupportedCity.UNSUPPORTED
                 : SupportedCity.UNSUPPORTED;
-        this.rentOrSale = getImmobiliareUser() != null ?  getImmobiliareUser().getPropertyType() : null;
+        this.rentOrSale = user!= null ? user.getPropertyType() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
     }
