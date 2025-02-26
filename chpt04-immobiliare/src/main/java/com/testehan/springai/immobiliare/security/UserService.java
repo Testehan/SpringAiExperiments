@@ -84,6 +84,10 @@ public class UserService {
         deletedUserRepository.deleteById(email);
     }
 
+    public void deleteDeletedUsers(LocalDateTime date) {
+        deletedUserRepository.deleteDeletedUsers(date);
+    }
+
     public void addNewCustomerAfterOAuth2Login(String name, String email, AuthenticationType authenticationType) {
         var user = new ImmobiliareUser();
 

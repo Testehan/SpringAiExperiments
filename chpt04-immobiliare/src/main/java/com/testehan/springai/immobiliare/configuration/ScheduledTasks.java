@@ -51,6 +51,15 @@ public class ScheduledTasks {
         log.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
     }
 
+    @Scheduled(cron = "0 0 4 * * ?")        // Code to run at 4 AM every day
+//    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
+    public void deleteDeletedUsersMoreThan1DayAgo() {
+        LocalDateTime oneDayAgo = LocalDateTime.now().minus(1, ChronoUnit.DAYS);
+        userService.deleteDeletedUsers(oneDayAgo);
+        log.info("Scheduled Task - The deleted users were removed.", oneDayAgo);
+    }
+
+
     @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationEmailOrSMS() {
