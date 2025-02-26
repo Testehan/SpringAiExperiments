@@ -27,6 +27,7 @@ $(document).ready(function(){
 
     getNewSseId(function(newSseId) {
         console.log("Got new SSEid calling the endpoint " + newSseId.sseId);
+        $("#testing-sse-id").text(newSseId.sseId);
         connectToSSE(newSseId.sseId);
     });
 
@@ -153,6 +154,7 @@ function reconnect() {
 
     getNewSseId(function(newSseId) {
         console.log("Got new SSEid calling the endpoint " + newSseId.sseId);
+         $("#testing-sse-id").text(newSseId.sseId);
         connectToSSE(newSseId.sseId);
     });
 }
