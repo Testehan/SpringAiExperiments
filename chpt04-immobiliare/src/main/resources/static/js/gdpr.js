@@ -46,4 +46,15 @@ $(document).ready(function () {
       },
     });
   }
+
+  $('#deleteUserForm').submit(function(event) {
+    event.preventDefault();
+
+    // Remove specific items from localStorage
+    localStorage.removeItem(consentKey);
+    localStorage.removeItem(consentSavedInDBKey);
+
+    this.submit();
+  });
+
 });
