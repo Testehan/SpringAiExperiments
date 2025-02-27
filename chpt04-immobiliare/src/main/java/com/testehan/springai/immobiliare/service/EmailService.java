@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
@@ -12,6 +13,9 @@ import java.util.Locale;
 
 @Service
 public class EmailService {
+
+    @Value("${app.url}")
+    private String appUrl;
 
     private final SesClient sesClient;
 
@@ -40,26 +44,29 @@ public class EmailService {
     }
 
     public void sendWelcomeEmail(String to, String name, Locale locale){
+        var chatUrl = appUrl + "/chat";
+        var addUrl = appUrl + "/add";
+
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
                 .source("CasaMia.ai" +" "+ "<admin@casamia.ai>") // Replace with a verified email
                 .destination(Destination.builder()
                         .toAddresses(to)
                         .build())
                 .template(getWelcomeEmailTemplate(locale)) // Template name
-                .templateData("{\"name\":\""+name+"\"}") // JSON string to replace placeholders
+                .templateData("{\"userName\":\""+name+"\", \"chatUrl\":\""+chatUrl+"\", \"addUrl\":\""+addUrl+"\" }") // JSON string to replace placeholders
                 .build();
 
         sesClient.sendTemplatedEmail(request);
     }
 
-    public void sendReactivateListingEmail(String to, String name, String listingName, String reactivateLink, Locale locale){
+    public void sendReactivateListingEmail(String to, String name, String listingTitle, String reactivateListingUrl, Locale locale){
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
                 .source("CasaMia.ai" + " " +"<admin@casamia.ai>") // Replace with a verified email
                 .destination(Destination.builder()
                         .toAddresses(to)
                         .build())
                 .template(getReactivateListingEmailTemplate(locale)) // Template name
-                .templateData("{\"name\":\""+name+"\",\"listingName\":\""+listingName+"\",\"reactivateLink\":\""+reactivateLink+"\"}")
+                .templateData("{\"userName\":\""+name+"\",\"listingTitle\":\""+listingTitle+"\",\"reactivateListingUrl\":\""+reactivateListingUrl+"\"}")
                 .build();
 
         sesClient.sendTemplatedEmail(request);

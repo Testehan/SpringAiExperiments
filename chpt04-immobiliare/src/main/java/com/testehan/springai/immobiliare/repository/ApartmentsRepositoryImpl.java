@@ -8,6 +8,7 @@ import com.mongodb.client.model.search.VectorSearchOptions;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.PropertyType;
+import com.testehan.springai.immobiliare.util.FormattingUtil;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -17,8 +18,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import static com.mongodb.client.model.Aggregates.project;
 import static com.mongodb.client.model.Aggregates.vectorSearch;
@@ -159,7 +162,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     public List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date) {
         var listings = mongoDatabase.getCollection("apartments", Apartment.class);
 
-        var formattedDateCustom = getFormattedDateCustom(date);
+        var formattedDateCustom = FormattingUtil.getFormattedDateCustom(date);
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
         Bson condition2 = eq("active", true);
         Bson combinedFilter = Filters.and(condition1, condition2);
@@ -168,11 +171,6 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         listings.find(combinedFilter).forEach(listing -> result.add(listing));
 
         return result;
-    }
-
-    private static String getFormattedDateCustom(LocalDateTime date) {
-        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return date.format(customFormatter);
     }
 
     @Override
@@ -184,7 +182,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     public void deactivateApartments(LocalDateTime date) {
         var listings = mongoDatabase.getCollection("apartments", Apartment.class);
 
-        var formattedDateCustom = getFormattedDateCustom(date);
+        var formattedDateCustom = FormattingUtil.getFormattedDateCustom(date);
 
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
         Bson condition2 = eq("active", true);

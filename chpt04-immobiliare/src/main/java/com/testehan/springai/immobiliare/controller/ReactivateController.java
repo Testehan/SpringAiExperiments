@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.util.FormattingUtil;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -67,6 +69,8 @@ public class ReactivateController {
 
     private boolean reactivateListing(Apartment apartment) {
         try {
+            var lastUpdatedTime = FormattingUtil.getFormattedDateCustom(LocalDateTime.now());
+            apartment.setLastUpdateDateTime(lastUpdatedTime);
             apartment.setActive(true);
             apartmentService.saveApartment(apartment);
             return true;

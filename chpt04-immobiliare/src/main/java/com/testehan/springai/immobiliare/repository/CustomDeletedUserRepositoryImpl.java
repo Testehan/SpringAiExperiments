@@ -4,11 +4,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.testehan.springai.immobiliare.model.auth.DeletedUser;
+import com.testehan.springai.immobiliare.util.FormattingUtil;
 import org.bson.conversions.Bson;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Repository
 public class CustomDeletedUserRepositoryImpl implements CustomDeletedUserRepository{
@@ -26,16 +26,12 @@ public class CustomDeletedUserRepositoryImpl implements CustomDeletedUserReposit
     public void deleteDeletedUsers(LocalDateTime date) {
         var listings = getDeletedUsersCollection();
 
-        var formattedDateCustom = getFormattedDateCustom(date);
+        var formattedDateCustom = FormattingUtil.getFormattedDateCustom(date);
 
         Bson deleteOlderEntries = Filters.lt("deletionDate", formattedDateCustom);
 
         listings.deleteMany(deleteOlderEntries);
     }
 
-    // TODO mOVE TO Util class all usages
-    private static String getFormattedDateCustom(LocalDateTime date) {
-        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return date.format(customFormatter);
-    }
+
 }

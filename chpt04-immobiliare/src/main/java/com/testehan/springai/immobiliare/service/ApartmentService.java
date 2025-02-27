@@ -112,6 +112,9 @@ public class ApartmentService {
     @Async
     public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user) throws IOException {
         apartment.setShortDescription(apartment.getShortDescription().replace("\n", " ")); // no newlines in description
+        if (Objects.isNull(apartment.getContactEmail())) {
+            apartment.setContactEmail(user.getEmail());
+        }
 
         var isPropertyNew = isPropertyNew(apartment);
         if (isPropertyNew){

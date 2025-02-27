@@ -71,12 +71,14 @@ public class ScheduledTasks {
 
         for (Apartment listing : listings){
             log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
-            var contact = listing.getContact();
+            var contact = listing.getContactEmail();
             var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
 
             if (ContactValidator.isValidEmail(contact)){
                 emailService.sendReactivateListingEmail(contact,"",listing.getName(),reactivateLink, localeUtils.getCurrentLocale());
             }
+
+            // TODO Think about when sending an sms is really needed..
             if (ContactValidator.isValidPhoneNumber(contact,"RO")){
                 var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
                 if (phoneWithPrefix.isEmpty()){
