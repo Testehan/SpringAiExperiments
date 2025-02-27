@@ -4,13 +4,18 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
-public class EmailTemplateMain {
-    public static void main(String[] args) {
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
 
-//        createWelcomeTemplate();
-//        deleteTemplate("ReactivateListingEmailTemplate");
-//        createReactivateTemplate_RO();
-        createWelcomeTemplate_ro();
+public class EmailTemplateMain {
+    public static void main(String[] args) throws IOException {
+
+        deleteTemplats();
+        createTemplates();
+
     }
 
     private static void deleteTemplate(String templateName){
@@ -34,135 +39,43 @@ public class EmailTemplateMain {
         }
     }
 
-    private static void createWelcomeTemplate() {
-        SesClient sesClient = buildSesClient();
-
-        try {
-            // Define the email template
-            String templateName = "WelcomeEmailTemplate";
-            String subjectPart = "Welcome to CasaMia.ai!";
-            String htmlBody = "<h1>Welcome, {{name}}!</h1><p>Thank you for joining our service. " +
-                    "We hope that you will find the right property or the right customer &#128522;.</p>";
-            String textBody = "Welcome, {{name}}!\nThank you for joining our service.";
-
-            // Create the request
-            CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
-                    .template(Template.builder()
-                            .templateName(templateName)
-                            .subjectPart(subjectPart)
-                            .htmlPart(htmlBody)
-                            .textPart(textBody)
-                            .build())
-                    .build();
-
-            // Call SES to create the template
-            CreateTemplateResponse response = sesClient.createTemplate(createTemplateRequest);
-            System.out.println("Template created successfully: " + response);
-
-        } catch (SesException e) {
-            System.err.println("Error creating template: " + e.awsErrorDetails().errorMessage());
-        } finally {
-            sesClient.close();
-        }
+    private static void deleteTemplats() throws IOException {
+        deleteTemplate("WelcomeEmailTemplate");
+        deleteTemplate("ReactivateListingEmailTemplate");
+        deleteTemplate("ReactivateListingEmailTemplate_RO");
+        deleteTemplate("WelcomeEmailTemplate_RO");
+        deleteTemplate("ListingAddedEmailTemplate");
+        deleteTemplate("ListingAddedEmailTemplate_RO");
     }
 
-    private static void createWelcomeTemplate_ro() {
-        SesClient sesClient = buildSesClient();
+    private static void createTemplates() throws IOException {
+        createTemplate("WelcomeEmailTemplate", "Welcome to CasaMia.ai!", readFileFromResources("emails/en/welcome.html"));
+        createTemplate("WelcomeEmailTemplate_RO", "Bun venit pe CasaMia.ai!", readFileFromResources("emails/ro/welcome.html"));
 
-        try {
-            // Define the email template
-            String templateName = "WelcomeEmailTemplate_RO";
-            String subjectPart = "Bun venit pe CasaMia.ai!";
-            String htmlBody = "<h1>Bine ați venit, {{name}}!</h1><p>Vă mulțumim că v-ați alăturat serviciului nostru. " +
-                    "Sperăm că veți găsi proprietatea potrivită sau clientul potrivit &#128522;.</p>";
-            String textBody = "Bun venit, {{name}}!\n Vă mulțumim că v-ați alăturat serviciului nostru.";
+        createTemplate("ReactivateListingEmailTemplate", "Keep the listing active", readFileFromResources("emails/en/listingReactivate.html"));
+        createTemplate("ReactivateListingEmailTemplate_RO", "Menține anunțul activ", readFileFromResources("emails/ro/listingReactivate.html"));
 
-            // Create the request
-            CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
-                    .template(Template.builder()
-                            .templateName(templateName)
-                            .subjectPart(subjectPart)
-                            .htmlPart(htmlBody)
-                            .textPart(textBody)
-                            .build())
-                    .build();
-
-            // Call SES to create the template
-            CreateTemplateResponse response = sesClient.createTemplate(createTemplateRequest);
-            System.out.println("Template created successfully: " + response);
-
-        } catch (SesException e) {
-            System.err.println("Error creating template: " + e.awsErrorDetails().errorMessage());
-        } finally {
-            sesClient.close();
-        }
+        createTemplate("ListingAddedEmailTemplate", "Listing Added Successfully!", readFileFromResources("emails/en/listingAdded.html"));
+        createTemplate("ListingAddedEmailTemplate_RO", "Anunț Adăugat cu Succes!", readFileFromResources("emails/ro/listingAdded.html"));
     }
 
-    private static void createReactivateTemplate() {
-        SesClient sesClient = buildSesClient();
-
-        try {
-            // Define the email template
-            String templateName = "ReactivateListingEmailTemplate";
-            String subjectPart = "Reactivate your listing on CasaMia.ai";
-            String htmlBody = "<h1>Hi, {{name}}!</h1>" +
-                    "<p>It has been a while since your listing \"{{listingName}}\" was published. " +
-                    "Is it still available? If so, please click on the link below to let potential customers know this &#128522;.</p>" +
-                    "<a href=\"{{reactivateLink}}\" style=\"display: inline-block; background-color: #28a745; color: white; " +
-                    "text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold;\">" +
-                    "My listing is still available</a>";
-            String textBody = "Hi, {{name}}!\nIt has been a while since your listing \"{{listingName}}\" was published.\n" +
-                    "Is it still available ? If so please click on the link from below to let potential customers know this. If" +
-                    "link is not clickable, copy paste it in a browser.\n"+
-                    "{{reactivateLink}}";
-
-            // Create the request
-            CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
-                    .template(Template.builder()
-                            .templateName(templateName)
-                            .subjectPart(subjectPart)
-                            .htmlPart(htmlBody)
-                            .textPart(textBody)
-                            .build())
-                    .build();
-
-            // Call SES to create the template
-            CreateTemplateResponse response = sesClient.createTemplate(createTemplateRequest);
-            System.out.println("Template created successfully: " + response);
-
-        } catch (SesException e) {
-            System.err.println("Error creating template: " + e.awsErrorDetails().errorMessage());
-        } finally {
-            sesClient.close();
-        }
+    private static String readFileFromResources(String filePath) throws IOException {
+        ClassLoader classLoader = EmailTemplateMain.class.getClassLoader();
+        Path path = Paths.get(Objects.requireNonNull(classLoader.getResource(filePath)).getPath());
+        return Files.readString(path);
     }
 
-    private static void createReactivateTemplate_RO() {
+    private static void createTemplate(String templateName, String subject, String htmlBody) {
         SesClient sesClient = buildSesClient();
 
         try {
-            // Define the email template
-            String templateName = "ReactivateListingEmailTemplate_RO";
-            String subjectPart = "Reactivați anunțul dvs. pe CasaMia.ai";
-            String htmlBody = "<h1>Bună, {{name}}!</h1>" +
-                    "<p>A trecut ceva timp de când anunțul dvs. \"{{listingName}}\" a fost publicat. " +
-                    "Este încă disponibil? Dacă da, vă rugăm să faceți clic pe linkul de mai jos pentru a anunța potențialii clienți acest lucru &#128522;.</p>" +
-                    "<a href=\"{{reactivateLink}}\" style=\"display: inline-block; background-color: #28a745; color: white; " +
-                    "text-decoration: none; padding: 10px 20px; border-radius: 5px; font-size: 16px; font-weight: bold;\">" +
-                    "Anunțul meu este încă disponibil</a>";
-            String textBody = "Bună, {{name}}!\nA trecut ceva timp de când anunțul dvs. \"{{listingName}}\" a fost publicat.\n" +
-                    "Este încă disponibil? Dacă da, vă rugăm să faceți clic pe linkul de mai jos pentru a anunța potențialii clienți acest lucru. Dacă " +
-                    "linkul nu este clickable, copiați-l într-un browser.\n" +
-                    "{{reactivateLink}}";
-
 
             // Create the request
             CreateTemplateRequest createTemplateRequest = CreateTemplateRequest.builder()
                     .template(Template.builder()
                             .templateName(templateName)
-                            .subjectPart(subjectPart)
+                            .subjectPart(subject)
                             .htmlPart(htmlBody)
-                            .textPart(textBody)
                             .build())
                     .build();
 
