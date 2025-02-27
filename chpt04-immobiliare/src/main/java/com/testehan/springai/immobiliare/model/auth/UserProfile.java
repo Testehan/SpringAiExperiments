@@ -8,5 +8,6 @@ public record UserProfile(
         String propertyType,
         String lastPropertyDescription,
         Integer searchesAvailable,
+        String inviteUuid,
         Integer maxNumberOfListedProperties) {
 }

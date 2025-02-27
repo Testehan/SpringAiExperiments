@@ -9,6 +9,8 @@ import java.util.Optional;
 public interface ImmobiliareUserRepository {
     Optional<ImmobiliareUser> findUserByEmail(String email);
 
+    Optional<ImmobiliareUser> findUserByInviteUuid(String inviteUuid);
+
     void updateAuthenticationType(ObjectId id, AuthenticationType authenticationType);
 
     void save(ImmobiliareUser user);

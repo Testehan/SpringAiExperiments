@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class UserService {
@@ -72,6 +73,10 @@ public class UserService {
         return immobiliareUserRepository.findUserByEmail(email);
     }
 
+    public Optional<ImmobiliareUser> getImmobiliareUserByInviteUuid(String inviteUuid){
+        return immobiliareUserRepository.findUserByInviteUuid(inviteUuid);
+    }
+
     public void resetSearchesAvailable(){
         immobiliareUserRepository.resetSearchesAvailable();
     }
@@ -96,6 +101,7 @@ public class UserService {
         user.setAuthenticationType(authenticationType);
         user.setPassword("");
         user.setIsAdmin("false");
+        user.setInviteUuid(UUID.randomUUID().toString());
 
         immobiliareUserRepository.save(user);
         emailService.sendWelcomeEmail(email, name, localeUtils.getCurrentLocale());

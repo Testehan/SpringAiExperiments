@@ -271,10 +271,12 @@ public class MainController {
 	@GetMapping("/profile")
 	public String profile(Model model) {
 		var user = conversationSession.getImmobiliareUser();
+		var inviteUrl = appUrl + "/invite/" + user.getInviteUuid();
 
 		UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.getByName(user.getCity()).getName(),
 				user.getPropertyType(),user.getLastPropertyDescription(),
-				user.getSearchesAvailable(), user.getMaxNumberOfListedProperties());
+				user.getSearchesAvailable(), inviteUrl,
+				user.getMaxNumberOfListedProperties());
 
 		model.addAttribute("user", userProfile);
 
@@ -290,7 +292,7 @@ public class MainController {
 			var user = conversationSession.getImmobiliareUser();
 			UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.valueOf(user.getCity()).getName(),
 					user.getPropertyType(),user.getLastPropertyDescription(),
-					user.getSearchesAvailable(), user.getMaxNumberOfListedProperties());
+					user.getSearchesAvailable(), user.getInviteUuid(), user.getMaxNumberOfListedProperties());
 
 			model.addAttribute("user", userProfile);
 		} else {

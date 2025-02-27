@@ -9,15 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
-
 @Controller
-@RequestMapping("/api/user")
 public class UserController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
@@ -32,7 +28,7 @@ public class UserController {
         this.conversationSession = conversationSession;
     }
 
-    @PostMapping("/save")
+    @PostMapping("/api/user/save")
     public String saveUserProfile(UserProfile userProfile)throws IOException {
         SupportedCity supportedCity = SupportedCity.getByName(userProfile.city());
         conversationSession.setCity(supportedCity.getName());
@@ -43,7 +39,7 @@ public class UserController {
 
     }
 
-    @PostMapping("/delete")
+    @PostMapping("/api/user/delete")
     public String deleteUserAccount(@RequestParam String confirmDeletionEmail, Model model)throws IOException {
         var userFoundFromEmail = userService.getImmobiliareUserByEmail(confirmDeletionEmail);
         var loggedInUser = conversationSession.getImmobiliareUser();
@@ -69,5 +65,24 @@ public class UserController {
 
         return "redirect:/";
 
+    }
+
+    @GetMapping("/invite/{inviteUuid}")
+    public String invite(@PathVariable(value = "inviteUuid") String inviteUuid) {
+        var loggedInUser =conversationSession.getImmobiliareUser();
+        LOGGER.info("User {} accepted an invitation {} ", loggedInUser.getEmail(), inviteUuid);
+
+        var userOptional = userService.getImmobiliareUserByInviteUuid(inviteUuid);
+        if (userOptional.isPresent()){
+            var user = userOptional.get();
+            if (user.getMaxSearchesAvailable()<25) {        // we don't want abuses :)
+                user.setMaxSearchesAvailable(user.getMaxSearchesAvailable() + 1);
+                userService.updateUser(user);
+            } else {
+                LOGGER.info("Invitation limit! More than 15 invitations using {} were accepted.", inviteUuid);
+            }
+        }
+
+        return "redirect:/";
     }
 }

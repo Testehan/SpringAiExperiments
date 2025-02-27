@@ -3,6 +3,8 @@
 
 <head th:replace="~{fragments :: page_head('none')}" />
 
+<script th:src="@{/js/profile.js}"></script>
+
 <body class="h-screen bg-gray-100" >
 
 <div th:replace="~{navigation :: header_menu}" />
@@ -53,6 +55,24 @@
                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                               th:field="*{lastPropertyDescription}"></textarea>
                 </div>
+
+                <div class="mb-4">
+                    <label for="inviteOthers" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.invite}"/>
+                    <div class="relative w-full">
+                        <input type="text" id="inviteOthers" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+                            focus:shadow-outline bg-slate-200" th:field="*{inviteUuid}" readonly />
+                        <div class="absolute right-2 top-1/2 transform -translate-y-1/2 flex space-x-2">
+                            <button id="copyButton" type="button" onclick="copyToClipboard()" class="hover:bg-gray-300 p-2 rounded w-8 h-8 p-2 ml-2">
+                                <img src="/images/copyButton.svg"/>
+                            </button>
+                            <button id="shareButton" type="button" onclick="shareOnSocialMedia()" class="hover:bg-gray-300 p-2 rounded w-8 h-8 p-2 ml-2">
+                                <img src="/images/shareButton.svg"/>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+
                 <div class="mb-4">
                     <label for="searchesAvailable" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.searches}"/>
                     <input type="text" id="searchesAvailable" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none

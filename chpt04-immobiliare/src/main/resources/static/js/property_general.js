@@ -102,4 +102,4 @@ function shareOnSocialMedia(id, title, price) {
       // Fallback for browsers that don't support the Web Share API
       alert(SHARE_ERROR);
     }
-  }
+}

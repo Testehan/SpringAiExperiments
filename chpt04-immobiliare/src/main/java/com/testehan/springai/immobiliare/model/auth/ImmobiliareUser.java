@@ -40,6 +40,8 @@ public class ImmobiliareUser {
     private String lastPropertyDescription;
 
     private Integer searchesAvailable;      // a way to limit user usage of the app
+    private Integer maxSearchesAvailable;
+    private String inviteUuid;
 
     private String isAdmin;
 
@@ -54,6 +56,7 @@ public class ImmobiliareUser {
         this.propertyType = "";
         this.lastPropertyDescription = "";
         this.searchesAvailable = 10;
+        this.maxSearchesAvailable = 10;
     }
 
     public boolean isAdmin(){

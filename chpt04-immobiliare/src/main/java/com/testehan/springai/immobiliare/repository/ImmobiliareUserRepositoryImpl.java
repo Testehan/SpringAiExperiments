@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,10 +30,22 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
     @Override
     public Optional<ImmobiliareUser> findUserByEmail(String email) {
         var mongoCollection = mongoDatabase.getCollection("users", ImmobiliareUser.class);
-        var customer = mongoCollection.find(new Document("email", email)).first();
+        var user = mongoCollection.find(new Document("email", email)).first();
 
-        if (customer != null) {
-            return Optional.of(customer);
+        if (user != null) {
+            return Optional.of(user);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<ImmobiliareUser> findUserByInviteUuid(String inviteUuid) {
+        var mongoCollection = mongoDatabase.getCollection("users", ImmobiliareUser.class);
+        var user = mongoCollection.find(new Document("inviteUuid", inviteUuid)).first();
+
+        if (user != null) {
+            return Optional.of(user);
         } else {
             return Optional.empty();
         }
@@ -64,6 +77,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                 .append("propertyType",user.getPropertyType())
                 .append("lastPropertyDescription",user.getLastPropertyDescription())
                 .append("searchesAvailable",user.getSearchesAvailable())
+                .append("maxSearchesAvailable",user.getMaxSearchesAvailable())
+                .append("inviteUuid",user.getInviteUuid())
                 .append("isAdmin",user.getIsAdmin());
 
         // Insert the document
@@ -92,6 +107,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
                         .append("propertyType",user.getPropertyType())
                         .append("lastPropertyDescription",user.getLastPropertyDescription())
                         .append("searchesAvailable",user.getSearchesAvailable())
+                        .append("maxSearchesAvailable",user.getMaxSearchesAvailable())
+                        .append("inviteUuid",user.getInviteUuid())
                         .append("isAdmin",user.getIsAdmin())
                         .append("gdprConsent",user.getGdprConsent())
                         .append("gdprTimestamp",user.getGdprTimestamp())
@@ -118,7 +135,10 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
        // should update all users that are not admin
         Document filter = new Document("isAdmin", "false");
 
-        Document update = new Document("$set", new Document("searchesAvailable",10));
+        // Sets searchesAvailable to the value of maxSearchesAvailable if it exists.
+        // otherwise it defaults to 10
+        Document update = new Document("$set", new Document("searchesAvailable",
+                new Document("$ifNull", List.of("$maxSearchesAvailable", 10))));
 
         collection.updateMany(filter,update);
 
