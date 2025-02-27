@@ -72,6 +72,29 @@ public class EmailService {
         sesClient.sendTemplatedEmail(request);
     }
 
+    public void sendListingAddedEmail(String to, String userName, String listingName, String viewUrl, String editUrl, Locale locale) {
+        SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
+                .source("CasaMia.ai" + " " +"<admin@casamia.ai>") // Replace with a verified email
+                .destination(Destination.builder()
+                        .toAddresses(to)
+                        .build())
+                .template(getListingAddedEmailTemplate(locale)) // Template name
+                .templateData("{\"userName\":\""+userName+"\"," +
+                                "\"listingTitle\":\""+listingName +
+                                "\",\"viewListingUrl\":\""+viewUrl +
+                                "\", \"editListingUrl\":\""+editUrl+"\"}")
+                .build();
+
+        sesClient.sendTemplatedEmail(request);
+    }
+
+    private static String getListingAddedEmailTemplate(Locale locale) {
+        if (locale.getLanguage().equals("ro")) {
+            return "ListingAddedEmailTemplate_RO";
+        }
+        return "ListingAddedEmailTemplate";
+    }
+
     private static String getReactivateListingEmailTemplate(Locale locale) {
         if (locale.getLanguage().equals("ro")) {
             return "ReactivateListingEmailTemplate_RO";

@@ -17,6 +17,7 @@ import org.springframework.ai.chat.messages.SystemMessage;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.Media;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -40,10 +41,14 @@ public class ApartmentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentService.class);
 
+    @Value("${app.url}")
+    private String appUrl;
+
     private final ApartmentsRepository apartmentsRepository;
     private final OpenAiService openAiService;
     private final ChatModel chatModel ;
     private final UserService userService;
+    private final EmailService emailService;
     private final LocaleUtils localeUtils;
     private final AmazonS3Util amazonS3Util;
     private final ImageConverter imageConverter;
@@ -51,12 +56,13 @@ public class ApartmentService {
     private final ListingUtil listingUtil;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService openAiService, ChatModel chatModel,
-                            UserService userService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
+                            UserService userService, EmailService emailService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
                             ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil, ListingUtil listingUtil) {
         this.apartmentsRepository = apartmentsRepository;
         this.openAiService = openAiService;
         this.chatModel = chatModel;
         this.userService = userService;
+        this.emailService = emailService;
         this.localeUtils = localeUtils;
         this.amazonS3Util = amazonS3Util;
         this.imageConverter = imageConverter;
@@ -101,8 +107,8 @@ public class ApartmentService {
         apartmentsRepository.deactivateApartments(date);
     }
 
-    public void saveApartment(Apartment apartment){
-        apartmentsRepository.saveApartment(apartment);
+    public Apartment saveApartment(Apartment apartment){
+        return apartmentsRepository.saveApartment(apartment);
     }
 
     public void deleteApartmentsByIds(List<String> apartmentIds){
@@ -143,7 +149,7 @@ public class ApartmentService {
 
         apartment.setPlot_embedding(embeddings);
 
-        saveApartment(apartment);
+        var savedListing = saveApartment(apartment);
 
         var contact = apartment.getContact();
         if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){
@@ -152,6 +158,7 @@ public class ApartmentService {
         }
         if (isPropertyNew) {
             updateUserInfo(apartment, user);
+            sendListingAddedEmail(savedListing, user);
         }
 
         LOGGER.info("Apartment was added with success!");
@@ -313,5 +320,12 @@ public class ApartmentService {
                 listing.setMostContacted(false);
             }
         });
+    }
+
+    private void sendListingAddedEmail(Apartment listing, ImmobiliareUser user) {
+        var listingId = listing.getId().toString();
+        var viewUrl = appUrl + "/view/" + listingId;
+        var editUrl = appUrl + "/edit/" + listingId;
+        emailService.sendListingAddedEmail(user.getEmail(), user.getName(), listing.getName(), viewUrl, editUrl ,localeUtils.getCurrentLocale());
     }
 }

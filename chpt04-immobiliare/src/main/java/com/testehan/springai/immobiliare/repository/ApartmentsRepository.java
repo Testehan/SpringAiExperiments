@@ -18,7 +18,7 @@ public interface ApartmentsRepository {
 
     List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date);
 
-    void saveApartment(Apartment apartment);
+    Apartment saveApartment(Apartment apartment);
 
     void deactivateApartments(LocalDateTime date);
 

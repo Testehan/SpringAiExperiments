@@ -174,8 +174,8 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public void saveApartment(Apartment apartment) {
-        mongoTemplate.save(apartment, "apartments");
+    public Apartment saveApartment(Apartment apartment) {
+        return mongoTemplate.save(apartment, "apartments");
     }
 
     @Override
