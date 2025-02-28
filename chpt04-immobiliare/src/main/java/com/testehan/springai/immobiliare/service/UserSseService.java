@@ -62,7 +62,7 @@ public class UserSseService {
 
     }
 
-    @Scheduled(fixedRate = 80, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedRate = 10, timeUnit = TimeUnit.MINUTES)
     public void cleanupUnusedConnections() {
         LOGGER.info("Starting cleanup of unused SSE connections...");
         for (String sseUuid : userSseConnections.keySet()) {

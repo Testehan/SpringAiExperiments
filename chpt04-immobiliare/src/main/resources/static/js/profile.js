@@ -3,7 +3,7 @@ var fullInviteUrl;
 $(document).ready(function() {
     var input = $('#inviteOthers');
     fullInviteUrl = input.val();
-    var truncatedText = fullInviteUrl.substring(0, 30) + "...";
+    var truncatedText = fullInviteUrl.substring(0, 20) + "...";
     input.val(truncatedText);
 
 });

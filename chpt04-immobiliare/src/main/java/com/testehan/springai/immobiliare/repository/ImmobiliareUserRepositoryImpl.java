@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -137,10 +138,12 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
 
         // Sets searchesAvailable to the value of maxSearchesAvailable if it exists.
         // otherwise it defaults to 10
-        Document update = new Document("$set", new Document("searchesAvailable",
-                new Document("$ifNull", List.of("$maxSearchesAvailable", 10))));
+        List<Document> updatePipeline = Arrays.asList(
+            new Document("$set", new Document("searchesAvailable",
+                new Document("$ifNull", List.of("$maxSearchesAvailable", 10))))
+        );
 
-        collection.updateMany(filter,update);
+        collection.updateMany(filter,updatePipeline);
 
     }
 }

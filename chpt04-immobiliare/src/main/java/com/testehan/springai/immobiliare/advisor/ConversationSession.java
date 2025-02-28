@@ -45,7 +45,7 @@ public class ConversationSession {
                 StringUtils.isNotEmpty(user.getCity()) ?
                         SupportedCity.getByName(user.getCity()) : SupportedCity.UNSUPPORTED
                 : SupportedCity.UNSUPPORTED;
-        this.rentOrSale = user!= null ? user.getPropertyType() : null;
+        this.rentOrSale = user != null ? user.getPropertyType() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
     }

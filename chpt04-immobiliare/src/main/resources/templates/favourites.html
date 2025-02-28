@@ -26,8 +26,12 @@
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-2 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-2 h-full overflow-auto">
-            <div th:if="${apartments.isEmpty()}">
-                You have no favourite properties.
+            <div class="flex justify-center items-center min-h-screen">
+                <div class="max-w-md text-center bg-white p-6 rounded-lg shadow-md">
+                    <span th:if="${apartments.isEmpty()}" class="text-lg font-serif leading-relaxed" th:text="#{favourites.nofavourites}">
+                        You have no favourite properties.
+                    </span>
+                </div>
             </div>
 
             <div th:replace="~{fragments :: apartments_list('&hearts;', 'favourites')}" />
