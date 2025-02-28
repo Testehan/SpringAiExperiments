@@ -2,7 +2,6 @@ package com.testehan.springai.immobiliare.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class LocaleUtils {
     }
 
     public Locale getCurrentLocale() {
-        return LocaleContextHolder.getLocale();
+        return Locale.getDefault();
     }
 
     public String getLocalizedPrompt(String promptFileName) {

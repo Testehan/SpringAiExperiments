@@ -214,6 +214,7 @@ public class ApiServiceImpl implements ApiService{
 
             return response;
         } catch (RuntimeException | InterruptedException | ExecutionException e){
+            LOGGER.error(e.getMessage());
             return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
         }
     }
