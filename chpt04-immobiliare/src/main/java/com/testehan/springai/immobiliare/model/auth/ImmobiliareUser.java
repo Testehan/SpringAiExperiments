@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare.model.auth;
 
+import com.testehan.springai.immobiliare.model.PropertyType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,8 +53,8 @@ public class ImmobiliareUser {
         this.favouriteProperties = new ArrayList<>();
         this.maxNumberOfListedProperties = 1;
         this.listedProperties = new ArrayList<>();
-        this.city = "";
-        this.propertyType = "";
+        this.city = "Cluj-Napoca";
+        this.propertyType = PropertyType.rent.name();
         this.lastPropertyDescription = "";
         this.searchesAvailable = 10;
         this.maxSearchesAvailable = 10;

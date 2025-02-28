@@ -166,7 +166,7 @@ public class ApartmentController {
                 suggestions = getStep1Suggestions(locale);
                 break;
             case 2:
-                suggestions = getStep2Suggestions(locale);
+                suggestions = getStep2Suggestions();
                 break;
             case 3:
                 suggestions = getStep3Suggestions();
@@ -178,17 +178,17 @@ public class ApartmentController {
     }
 
     private List<String> getStep1Suggestions(Locale locale) {
-        var suggestions = new ArrayList<String>(); // todo when the suggestion are clicked in the ui, their text is sent to the server back...so maybe the llm will not know how to interpret the translated message...
+        var suggestions = new ArrayList<String>();
         suggestions.add(messageSource.getMessage("rent", null,locale));
-        suggestions.add(messageSource.getMessage("buy", null,locale));
+//        suggestions.add(messageSource.getMessage("buy", null,locale));
 
         return suggestions;
     }
 
-    private List<String> getStep2Suggestions(Locale locale) {
+    private List<String> getStep2Suggestions() {
         var suggestions = new ArrayList<String>();
         suggestions.add("Cluj-Napoca");
-        suggestions.add("Bucharest");
+//        suggestions.add("Bucharest");
 
         return suggestions;
     }
