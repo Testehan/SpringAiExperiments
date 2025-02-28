@@ -97,4 +97,12 @@ public class Apartment {
     public String getIdString(){
         return id.toString();
     }
+
+    public String getPropertyType() {
+        return propertyType.name();
+    }
+
+    public void setPropertyType(String propertyType) {
+        this.propertyType = PropertyType.valueOf(propertyType);
+    }
 }

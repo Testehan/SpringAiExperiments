@@ -1,6 +1,7 @@
 let suggestionsStep = 1;
 
 let eventSource;
+let lastPingTime = new Date(); // Store the last received ping time
 let pingTimeout;
 let isCheckingInternet = false;
 
@@ -30,12 +31,6 @@ $(document).ready(function(){
         $("#testing-sse-id").text(newSseId.sseId);
         connectToSSE(newSseId.sseId);
     });
-
-//    // todo i am trying to see if this fixes the issue on iphone ???
-//    window.addEventListener('online', function() {
-//        dismissToast();
-//        reconnect();
-//    });
 
     setCurrentStep();
     setUpScrollingToLastUserMessage();
@@ -172,7 +167,7 @@ function checkInternetAndReconnect() {
             reconnect();
         } else {
             let toastText = $(".toastify").text().trim();
-           if (!toastText.includes(TOASTIFY_NO_INTERNET)) {
+            if (!toastText.includes(TOASTIFY_NO_INTERNET)) {
                 dismissToast();
                 showToast(TOASTIFY_NO_INTERNET, -1, "error");
                 disableChatInput();
@@ -235,6 +230,7 @@ function connectToSSE(sseId) {
         eventSource.addEventListener('keep-alive', function(event) {
             if (event.data === 'ping') {
                 clearTimeout(pingTimeout); // Prevent multiple timeouts
+                lastPingTime = new Date();
                 pingTimeout = setTimeout(() => {
                     console.warn("No ping received for 35 seconds. Reconnecting...");
                     checkInternetAndReconnect();
@@ -257,6 +253,22 @@ function connectToSSE(sseId) {
     }
 
 }
+
+// Function to check if last ping is older than 15 seconds
+function checkPingTimeout() {
+    const now = new Date();
+    const timeDifference = (now - lastPingTime) / 1000; // Convert to seconds
+
+    if (timeDifference > 15) {
+        console.log("Ping timeout! Taking action...");
+         showToast(TOASTIFY_DISCONNECTED, -1, "warn");
+        // Add your reconnection or error-handling logic here
+        checkInternetAndReconnect();
+    }
+}
+
+// Check for ping timeout every 10 seconds
+setInterval(checkPingTimeout, 10000);
 
 function getNewSseId(callback) {
     $.get("/api/sse-id", function(response) {

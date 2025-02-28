@@ -129,10 +129,13 @@ public class ApartmentService {
         } else {
             var optionalApartment = findApartmentById(apartment.getIdString());
             if (optionalApartment.isPresent()){
-                var hasAddressChange = !optionalApartment.get().getArea().equalsIgnoreCase(apartment.getArea());
-                if (hasAddressChange){
+                var apartmentCurrentlySaved = optionalApartment.get();
+                var hasAddressChange = !apartmentCurrentlySaved.getArea().equalsIgnoreCase(apartment.getArea());
+                if (hasAddressChange || apartmentCurrentlySaved.getNearbyAmenities().isEmpty()){
                     // means that address changed and we need to set amenities again
                     getAmenitiesAndSetInApartment(apartment);
+                } else {
+                    apartment.setNearbyAmenities(apartmentCurrentlySaved.getNearbyAmenities());
                 }
             }
         }

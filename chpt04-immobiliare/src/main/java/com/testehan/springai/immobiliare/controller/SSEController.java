@@ -26,6 +26,7 @@ public class SSEController {
     @GetMapping("/sse-id")
     public ResponseEntity<Map<String, String>> getSseId(HttpSession session){
         var sseId = userSseService.addUserSseId(session.getId());
+        LOGGER.info("Obtained new SSE id {} for session {}", sseId, session.getId());
         return ResponseEntity.ok(Map.of("sseId",sseId));
     }
 
