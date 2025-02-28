@@ -2,7 +2,7 @@ Descrierea sarcinii:
 Vi se oferă diferite tipuri de intrări ale utilizatorului și sarcina dvs. este să decideți ce API să apelați în funcție de intrare. Mai jos sunt API-urile disponibile și descrierile acestora.
 
 API-uri disponibile:
-1. **Sale or rent API**: Stabilește dacă utilizatorul dorește să închirieze sau să cumpere un apartament. Dacă utilizatorul menționează cumpărare sau vânzare, atunci răspunsul dvs. trebuie să fie „vânzare”.
+1. **Sale or rent API**: Stabilește dacă utilizatorul dorește să închirieze sau să cumpere un apartament. Dacă utilizatorul menționează cumpărare sau vânzare, atunci răspunsul dvs. trebuie să fie „buy”.
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 

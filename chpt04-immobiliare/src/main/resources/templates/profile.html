@@ -43,10 +43,14 @@
                     <label for="propertyType" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.propertyType}"/>
                     <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline">
-                        <option value="" th:selected="${propertyType == null}" th:text="#{profile.dropdown.city.default}"/>
-                        <th:block th:each="propertyType: ${listPropertyTypes}">
-                            <option th:value="${propertyType}">[[${propertyType}]]</option>
-                        </th:block>
+
+                        <!-- Show default text if propertyType is null -->
+                        <option value="" th:if="*{propertyType == null || propertyType ==''}" th:text="#{profile.dropdown.city.default}" selected></option>
+                        <option value="rent" th:if="*{propertyType == null || propertyType ==''}" th:text="#{rent}"></option>
+
+                        <!-- Show existing propertyType if it's not null -->
+                        <option value="rent" th:if="*{propertyType == 'rent'}" th:text="#{rent}" selected></option>
+
                     </select>
                 </div>
                 <div class="mb-4">

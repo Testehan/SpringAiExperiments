@@ -140,7 +140,7 @@ public class MainController {
 
 		var apartment = new Apartment();
 		model.addAttribute("listCities",SupportedCity.getSupportedCities());
-		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
+		model.addAttribute("listPropertyTypes",List.of(messageSource.getMessage("rent", null,locale) ));   //"sale"
 		model.addAttribute("apartment", apartment);
 		model.addAttribute("numberOfExistingImages", 0);
 		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
@@ -188,7 +188,7 @@ public class MainController {
 		}
 
 		model.addAttribute("listCities",SupportedCity.getSupportedCities());
-		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
+		model.addAttribute("listPropertyTypes",List.of(messageSource.getMessage("rent", null,locale))); // "sale"
 
 		List<Apartment> listOfProperties = getListOfProperties(user);;
 		model.addAttribute("listOfProperties", listOfProperties);
@@ -269,7 +269,7 @@ public class MainController {
 	}
 
 	@GetMapping("/profile")
-	public String profile(Model model) {
+	public String profile(Model model, Locale locale) {
 		var user = conversationSession.getImmobiliareUser();
 		var inviteUrl = appUrl + "/invite/" + user.getInviteUuid();
 
@@ -281,7 +281,11 @@ public class MainController {
 		model.addAttribute("user", userProfile);
 
 		model.addAttribute("listCities", SupportedCity.getSupportedCities());
-		model.addAttribute("listPropertyTypes",List.of("rent", "sale"));
+//		if (Objects.isNull(user.getPropertyType()) || StringUtils.isEmpty(user.getPropertyType())) {
+//			model.addAttribute("listPropertyTypes", List.of(messageSource.getMessage("rent", null, locale)));  //, "sale"
+//		} else {
+//			model.addAttribute("listPropertyTypes", List.of());
+//		}
 
 		return "profile";
 	}

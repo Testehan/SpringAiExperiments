@@ -12,7 +12,7 @@ const schema = Joi.object({
     noOfRooms: Joi.number().positive().required().label('Number of rooms'),
     contact: Joi.alternatives().try(
                 //Joi.string().email({ tlds: { allow: false } }),      // either an email
-                Joi.string().regex(/^\d{10,13}$/).message('Phone number must be between 10 and 13 digits long')
+                Joi.string().regex(/^\d{9,10}$/).message('Phone number must be 9 or 10 digits long')
            ).required().label('Contact')
 });
 
