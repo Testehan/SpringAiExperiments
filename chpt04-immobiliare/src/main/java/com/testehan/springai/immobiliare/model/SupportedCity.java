@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 // In the future, if needed, this list will be stored in the DB.
 public enum SupportedCity {
     CLUJ_NAPOCA("Cluj-Napoca"),
-    BUCHAREST("Bucharest"),
+//    BUCHAREST("Bucharest"),
     UNSUPPORTED("Unsupported city");
 
     private final String name;
