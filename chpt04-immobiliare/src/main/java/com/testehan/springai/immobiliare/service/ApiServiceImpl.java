@@ -124,9 +124,7 @@ public class ApiServiceImpl implements ApiService{
             });
 
             LOGGER.info("Performance 1 -----------------------");
-            var budget = conversationSession.getBudget();
-            // TODO Translate this
-            var budgetInfo = ". The price or budget that the user is looking for is : " + budget;
+            var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
 
             CompletableFuture<ApartmentDescription> getListingDescriptionFuture =
                     CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(description + budgetInfo));

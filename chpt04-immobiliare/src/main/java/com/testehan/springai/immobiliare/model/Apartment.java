@@ -19,7 +19,7 @@ public class Apartment {
     private ObjectId id;
     private String name;
     private String city;
-    private String area;                // TODO Consider renaming this to address..
+    private String area;
     private List<AmenityCategory> nearbyAmenities = new ArrayList<>();
     private String shortDescription;
     private Integer price;

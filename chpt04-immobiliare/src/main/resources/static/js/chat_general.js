@@ -319,7 +319,7 @@ function setUpScrollingToLastUserMessage(){
                     if (node.nodeType === Node.ELEMENT_NODE && node.childNodes[1].classList.contains('assistantResponse')) {
                         $('#spinner').hide();
                         setCurrentStep();
-                        if (node.childNodes[1].innerText === M04_APARTMENTS_FOUND_START){
+                        if (node.childNodes[1].innerText === M05_APARTMENTS_FOUND_START){
                             $('#suggestions').hide(); // at this point we don't care about suggestions anymore because the user enters his description
                         }
                     }
@@ -390,12 +390,12 @@ function setCurrentStep(){
         $('#suggestions').show();
     }
     if (lastAssistantMessage.includes(M04_DETAILS_PART_2))
-        {
-            suggestionsStep = 4;
-            $('#suggestions').empty();
-            fetchSuggestions();
-            $('#suggestions').show();
-        }
+    {
+        suggestionsStep = 4;
+        $('#suggestions').empty();
+        fetchSuggestions();
+        $('#suggestions').show();
+    }
 }
 
 function logCallHierarchy() {
