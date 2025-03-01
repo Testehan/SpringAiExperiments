@@ -6,8 +6,10 @@ console.log(typeof Joi);
 const schema = Joi.object({
     name: Joi.string().required().label('Title'),
     area: Joi.string().required().label('Area / Neighbourhood'),
+    propertyType: Joi.string().required().label('Property Type'),
     description: Joi.string().required().label('Description'),
     price: Joi.number().positive().required().label('Price'),
+    availableFrom: Joi.string().required().label('Available from'),
     surface: Joi.number().positive().required().label('Surface'),
     noOfRooms: Joi.number().positive().required().label('Number of rooms'),
     contact: Joi.alternatives().try(
@@ -38,6 +40,12 @@ $(document).ready(function(){
 
     $("#addForm").submit(function(event) {
         handleSubmit(event);
+    });
+
+    $("#availableFrom").flatpickr({
+        dateFormat: "Y-m-d", // Format like 2025-02-22
+        allowInput: false,
+        locale: "ro", // TODO This should be parameterizable
     });
 
 });
@@ -96,8 +104,10 @@ async function isFormValid(){
     const formData = {
         name: $('#name').val(),
         area: $('#area').val(),
+        propertyType: $('#propertyType').val(),
         description: $('#description').val(),
         price: $('#price').val(),
+        availableFrom: $('#availableFrom').val(),
         surface: $('#surface').val(),
         noOfRooms: $('#noOfRooms').val(),
         contact: $('#contact').val(),

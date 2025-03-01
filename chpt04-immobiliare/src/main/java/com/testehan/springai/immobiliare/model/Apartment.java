@@ -23,6 +23,7 @@ public class Apartment {
     private List<AmenityCategory> nearbyAmenities = new ArrayList<>();
     private String shortDescription;
     private Integer price;
+    private String availableFrom;
     private PropertyType propertyType;
     private Integer surface;
     private Integer noOfRooms;
@@ -57,6 +58,7 @@ public class Apartment {
                 ", area='" + area + '\'' +
                 ", shortDescription='" + shortDescription + '\'' +
                 ", price=" + price +
+                ", availableFrom=" + availableFrom +
                 ", propertyType=" + propertyType +
                 ", surface=" + surface +
                 ", noOfRooms=" + noOfRooms +

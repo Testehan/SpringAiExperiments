@@ -57,6 +57,9 @@
                 </svg>
             </button>
         </div>
+        <p class="text-gray-600 mt-2" th:if="${apartment.availableFrom != null and apartment.availableFrom != ''}">
+            <b th:text="#{listing.available.from} + ': '" />[[${apartment.availableFrom}]]
+        </p>
         <p class="text-gray-600 mt-2">
             <b th:text="#{listing.location}+ ': '"/>[[${apartment.city}]]
         </p>
@@ -125,6 +128,9 @@
                     </svg>
                 </button>
             </div>
+            <p class="text-gray-600 mt-2" th:if="${apartment.availableFrom != null and apartment.availableFrom != ''}">
+                <b th:text="#{listing.available.from} + ': '" />[[${apartment.availableFrom}]]
+            </p>
             <p class="text-gray-600 mt-2">
                 <b th:text="#{listing.location} + ': '" />[[${apartment.city}]]
             </p>

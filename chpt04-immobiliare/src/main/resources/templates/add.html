@@ -2,6 +2,10 @@
 <html lang="en" xmlns:th="https://www.thymeleaf.org">
 
 <head th:replace="~{fragments :: page_head('none')}" />
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ro.js"></script>
+
 <script th:src="@{/js/property_form_images.js}"></script>
 <script th:src="@{/js/property_deletion.js}"></script>
 <script type="text/javascript">
@@ -64,8 +68,7 @@
                             <span th:text="#{add.label.propertyType}"></span>
                             <span class="text-red-500">*</span>:
                         </label>
-                        <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
-         focus:shadow-outline">
+                        <select id="propertyType" th:field="*{propertyType}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
                             <!-- Show default text if propertyType is null -->
                             <option value="" th:if="*{propertyType == null || propertyType ==''}" th:text="#{profile.dropdown.city.default}" selected></option>
                             <option value="rent" th:if="*{propertyType == null || propertyType ==''}" th:text="#{rent}"></option>
@@ -76,21 +79,18 @@
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label for="description" class="block text-gray-700 font-bold mb-2">
-                            <span th:text="#{add.label.description}"></span>
-                            <span class="text-red-500">*</span>:
-                        </label>
-                        <textarea id="description"
-                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
-                                  th:field="*{shortDescription}"
-                                  th:placeholder="#{add.placeholder.description}"></textarea>
-                    </div>
-                    <div class="mb-4">
                         <label for="price" class="block text-gray-700 font-bold mb-2">
                             <span th:text="#{add.label.price}"></span>
                             <span class="text-red-500">*</span>:
                         </label>
                         <input type="number" id="price" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{price}">
+                    </div>
+                    <div class="mb-4">
+                        <label for="availableFrom" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.available.from}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <input type="text" id="availableFrom" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-300" th:field="*{availableFrom}">
                     </div>
                     <div class="mb-4">
                         <label for="surface" class="block text-gray-700 font-bold mb-2">
@@ -106,6 +106,18 @@
                         </label>
                         <input type="number" id="noOfRooms" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{noOfRooms}">
                     </div>
+
+                    <div class="mb-4">
+                        <label for="description" class="block text-gray-700 font-bold mb-2">
+                            <span th:text="#{add.label.description}"></span>
+                            <span class="text-red-500">*</span>:
+                        </label>
+                        <textarea id="description"
+                                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
+                                  th:field="*{shortDescription}"
+                                  th:placeholder="#{add.placeholder.description}"></textarea>
+                    </div>
+
                     <div class="mb-4">
                         <label for="floor" class="block text-gray-700 font-bold mb-2">
                             <span th:text="#{add.label.floor}"></span>:
