@@ -24,10 +24,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -89,6 +86,10 @@ public class ApiServiceImpl implements ApiService{
         LOGGER.info("Performance -1 -----------------------");
         var serviceCall = immobiliareApiService.whichApiToCall(message);
         LOGGER.info("Performance 0 -----------------------");
+
+        if (Objects.isNull(serviceCall.apiCall())){
+            return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
+        }
 
         switch (serviceCall.apiCall()) {
             case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}

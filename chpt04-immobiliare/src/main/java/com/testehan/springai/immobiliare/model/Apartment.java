@@ -99,7 +99,7 @@ public class Apartment {
     }
 
     public String getPropertyType() {
-        return propertyType.name();
+        return propertyType != null ? propertyType.name() : null;
     }
 
     public void setPropertyType(String propertyType) {

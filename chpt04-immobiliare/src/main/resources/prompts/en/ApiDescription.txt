@@ -18,7 +18,7 @@ Available APIs:
      - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
      - **Parameters**: `message` (string)
 
-5. **Apartments description API**: Displays a list of apartments available based on a description or a list of criteria or attributes or properties the user provides for the search.
+5. **Apartments description API**: Displays a list of apartments available based on a description or a list of criteria or attributes or properties the user provides for the search. This can also contain sorting information.
    - **Endpoint**: `/getApartments`
    - **Parameters**: `message` (string)
 
@@ -106,6 +106,10 @@ Examples:
   - Parameters: `\{"message": "I want a big appartment with a south orientation in Marasti neighbourhood"\}`
 
 - User Input: "i want something with bedside lamps"
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "i want something with bedside lamps"\}`
+
+- User Input: "i am looking for a 2 room apartment. Display the results sorted by surface descending"
   - API Call: `/getApartments`
   - Parameters: `\{"message": "i want something with bedside lamps"\}`
 

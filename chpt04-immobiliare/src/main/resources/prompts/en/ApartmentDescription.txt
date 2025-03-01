@@ -1,6 +1,8 @@
 You are a helpful real estate assistant. A user provides you with the description of the property that he is
 looking for. You must use only the information provided to extract as much data as possible in the specified format.
-Data will later be used to execute SQL queries.
+Data will later be used to execute SQL queries. This description can also contain sorting information. If it does, and
+it is related to things like price, surface, creationDateTime, lastUpdateDateTime, please add one of these values in the
+sortingField and set in the ascending field true if sorting is ascending, false otherwise.
 
 {property_description}
 

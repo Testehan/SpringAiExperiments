@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Repository;
+import org.thymeleaf.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,19 +24,20 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.mongodb.client.model.Aggregates.project;
-import static com.mongodb.client.model.Aggregates.vectorSearch;
+import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.set;
 import static com.mongodb.client.model.search.SearchPath.fieldPath;
 import static com.mongodb.client.model.search.VectorSearchOptions.vectorSearchOptions;
-import static java.util.Arrays.asList;
 
 @Repository
 public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
     private static final double PERCENTAGE_INTERVAL = 0.1;  //10%
+
+    private static final List<String> ALLOWED_SORTING_FIELDS = List.of("price", "surface","creationDateTime","lastUpdateDateTime");
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentsRepositoryImpl.class);
 
@@ -101,17 +103,28 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
 
         VectorSearchOptions options = vectorSearchOptions().filter(combinedFilters);
 
-        List<Bson> pipeline = asList(
+        List<Bson> pipeline = new ArrayList<>();
+        pipeline.add(
                 vectorSearch(
                         fieldPath("plot_embedding"),
                         embedding,
                         indexName,
                         numCandidates,
                         limit,
-                        options),
+                        options));
+        pipeline.add(project(fields( exclude("plot_embedding"), metaVectorSearchScore("score"))));
 
-                project(fields( exclude("plot_embedding"), metaVectorSearchScore("score")))
-        );
+
+        // Apply sorting only if it's present
+        if (!StringUtils.isEmpty(apartment.getSortingField())) {
+            if (ALLOWED_SORTING_FIELDS.contains(apartment.getSortingField())) {
+                Bson sortCriteria = apartment.isAscending() ? ascending(apartment.getSortingField()) : descending(apartment.getSortingField());
+                pipeline.add(sort(orderBy(sortCriteria)));
+                LOGGER.info("Sorting field {} ", apartment.getSortingField());
+            } else {
+                LOGGER.error("Sorting field {} is invalid", apartment.getSortingField());
+            }
+        }
 
         List<Apartment> apartments = new ArrayList<>();
         getApartmentCollection().aggregate(pipeline).spliterator().forEachRemaining(a->apartments.add(a));

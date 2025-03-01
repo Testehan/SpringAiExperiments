@@ -22,4 +22,6 @@ public class ApartmentDescription {
     private Integer maximumNumberOfRooms;
     private String floor;       // TODO think about this if you want it to be a string or a number so that you can easily compare..
 
+    private String sortingField;
+    private boolean ascending = true;        // Sorting direction (true = ASC, false = DESC)
 }
