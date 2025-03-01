@@ -94,6 +94,7 @@ public class ApiServiceImpl implements ApiService{
         switch (serviceCall.apiCall()) {
             case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
             case SET_CITY : { return setCity(serviceCall); }
+            case SET_BUDGET : { return setBudget(serviceCall); }
             case SET_RENT_OR_BUY_AND_CITY: {return setRentOrBuyAndCity(serviceCall);}
             case SET_RENT_OR_BUY_AND_CITY_AND_DESCRIPTION: {return setRentOrBuyAndCityAndDescription(serviceCall, session);}
             case GET_APARTMENTS:{ return getApartments(message, session); }
@@ -123,9 +124,12 @@ public class ApiServiceImpl implements ApiService{
             });
 
             LOGGER.info("Performance 1 -----------------------");
+            var budget = conversationSession.getBudget();
+            // TODO Translate this
+            var budgetInfo = ". The price or budget that the user is looking for is : " + budget;
 
             CompletableFuture<ApartmentDescription> getListingDescriptionFuture =
-                    CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(description));
+                    CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(description + budgetInfo));
 
             CompletableFuture<List<Double>> getDescriptionEmbeddingFuture =
                     CompletableFuture.supplyAsync(() -> embeddingService.getOrComputeEmbedding(description));
@@ -166,7 +170,7 @@ public class ApiServiceImpl implements ApiService{
                                             LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                             userSseService.getUserSseConnection(session.getId())
                                                     .tryEmitNext(new Event("response", new ResponsePayload(
-                                                            messageSource.getMessage("M04_APARTMENTS_FOUND_START", null, currentLocale)))
+                                                            messageSource.getMessage("M05_APARTMENTS_FOUND_START", null, currentLocale)))
                                                     );
                                         }
                                         LOGGER.info("Performance 4 -----------------------");
@@ -194,14 +198,14 @@ public class ApiServiceImpl implements ApiService{
                                         LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                         userSseService.getUserSseConnection(session.getId())
                                                 .tryEmitNext(new Event("response", new ResponsePayload(
-                                                        messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale)))
+                                                        messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, currentLocale)))
                                                 );
                                         LOGGER.info("Search completed with no results for description : {}", description);
                                     } else {
                                         LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
                                         userSseService.getUserSseConnection(session.getId())
                                                 .tryEmitNext(new Event("response", new ResponsePayload(
-                                                        messageSource.getMessage("M04_APARTMENTS_FOUND_END", null, currentLocale)))
+                                                        messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, currentLocale)))
                                                 );
                                         LOGGER.info("Search completed");
                                     }
@@ -210,7 +214,7 @@ public class ApiServiceImpl implements ApiService{
                         );
 
             } else {
-                response = new ResultsResponse(messageSource.getMessage("M04_NO_APARTMENTS_FOUND", null, currentLocale));
+                response = new ResultsResponse(messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, currentLocale));
             }
 
             return response;
@@ -273,7 +277,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private ResultsResponse restartConversation() {
-        conversationSession.clearConversation();
+        conversationSession.clearConversationAndPreferences();
         return new ResultsResponse(messageSource.getMessage("M01_INITIAL_MESSAGE", null, localeUtils.getCurrentLocale()));
 
     }
@@ -281,18 +285,26 @@ public class ApiServiceImpl implements ApiService{
     private ResultsResponse setCity(ServiceCall serviceCall) {
         SupportedCity supportedCity = getSupportedCity(serviceCall.message());
 
-        var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
             conversationSession.setCity(serviceCall.message());
-            var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
-            return new ResultsResponse(
-                    messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, localeUtils.getCurrentLocale()) +
-                    messageSource.getMessage("M03_DETAILS_PART_2",  null, localeUtils.getCurrentLocale())
-            );
+            return new ResultsResponse(messageSource.getMessage("M03_BUDGET",  null, localeUtils.getCurrentLocale()));
         } else {
             var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
             return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
         }
+    }
+
+    private ResultsResponse setBudget(ServiceCall serviceCall) {
+
+        var user = conversationSession.getImmobiliareUser();
+        var budget = serviceCall.message();
+        conversationSession.setBudget(budget);
+        var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
+        return new ResultsResponse(
+            messageSource.getMessage("M04_DETAILS",  new Object[]{propertyType, user.getCity(), budget}, localeUtils.getCurrentLocale()) +
+            messageSource.getMessage("M04_DETAILS_PART_2",  null, localeUtils.getCurrentLocale())
+        );
+
     }
 
     private SupportedCity getSupportedCity(String city) {

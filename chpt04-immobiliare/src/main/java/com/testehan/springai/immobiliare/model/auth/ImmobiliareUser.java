@@ -38,6 +38,8 @@ public class ImmobiliareUser {
 
     private String propertyType;
 
+    private String budget;
+
     private String lastPropertyDescription;
 
     private Integer searchesAvailable;      // a way to limit user usage of the app

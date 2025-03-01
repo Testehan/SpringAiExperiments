@@ -33,6 +33,7 @@ public class UserController {
         SupportedCity supportedCity = SupportedCity.getByName(userProfile.city());
         conversationSession.setCity(supportedCity.getName());
         conversationSession.setRentOrSale(userProfile.propertyType());
+        conversationSession.setBudget(userProfile.budget());
         conversationSession.setLastPropertyDescription(userProfile.lastPropertyDescription());
 
         return "redirect:/profile";
@@ -54,7 +55,7 @@ public class UserController {
         if (loggedInUser.getEmail().equalsIgnoreCase(userFoundFromEmail.get().getEmail())){
             // do deletion of listed properties, conversations and the user
             apartmentService.deleteApartmentsByIds(loggedInUser.getListedProperties());
-            conversationSession.clearConversation();
+            conversationSession.clearConversationAndPreferences();
             userService.deleteUser(loggedInUser);
 
         } else {

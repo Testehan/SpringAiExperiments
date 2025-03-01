@@ -34,6 +34,7 @@ public class ConversationSession {
     private final ConversationService conversationService;
     private SupportedCity city;
     private String rentOrSale;
+    private String budget;
     private String lastPropertyDescription;
 
 
@@ -46,6 +47,7 @@ public class ConversationSession {
                         SupportedCity.getByName(user.getCity()) : SupportedCity.UNSUPPORTED
                 : SupportedCity.UNSUPPORTED;
         this.rentOrSale = user != null ? user.getPropertyType() : null;
+        this.budget = user != null ? user.getBudget() : null;
         this.chatMemory = chatMemory;
         this.conversationService = conversationService;
     }
@@ -74,6 +76,17 @@ public class ConversationSession {
         user.setCity(city);
         userService.updateUser(user);
         this.city = SupportedCity.getByName(city);
+    }
+
+    public void setBudget(String budget){
+        var user = getImmobiliareUser();
+        user.setBudget(budget);
+        userService.updateUser(user);
+        this.budget = budget;
+    }
+
+    public String getBudget() {
+        return budget;
     }
 
     public String getRentOrSale() {
@@ -111,9 +124,15 @@ public class ConversationSession {
         return user.get();
     }
 
-    public void clearConversation() {
+    public void clearConversationAndPreferences() {
         setRentOrSale("");
         setCity(UNSUPPORTED.name());
+        setBudget("");
+        clearChatMemory();
+        conversationService.deleteConversation(getConversationId());
+    }
+
+    public void clearConversation() {
         clearChatMemory();
         conversationService.deleteConversation(getConversationId());
     }

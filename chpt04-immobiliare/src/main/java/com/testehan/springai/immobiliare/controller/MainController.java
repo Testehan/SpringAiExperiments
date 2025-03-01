@@ -69,12 +69,14 @@ public class MainController {
 			model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
 		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.getByName(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
 			model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
+		} else if (StringUtils.isEmpty(user.getBudget())){
+			model.addAttribute("initialMessage", messageSource.getMessage("M03_BUDGET", null, locale));
 		} else {
 			var city = SupportedCity.getByName(user.getCity()).getName();
 			var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
 			model.addAttribute("initialMessage",
-					messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, city}, locale) +
-					messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
+					messageSource.getMessage("M04_DETAILS",  new Object[]{propertyType, city, user.getBudget()}, locale) +
+					messageSource.getMessage("M04_DETAILS_PART_2",  null,locale));
 		}
 
 		var searchQueriesAvailable = user.getSearchesAvailable();
@@ -88,8 +90,9 @@ public class MainController {
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("M01_INITIAL_MESSAGE", messageSource.getMessage("M01_INITIAL_MESSAGE",null,locale));
 		model.addAttribute("M02_CITY", messageSource.getMessage("M02_CITY",null,locale));
-		model.addAttribute("M03_DETAILS_PART_2", messageSource.getMessage("M03_DETAILS_PART_2",  null,locale));
-		model.addAttribute("M04_APARTMENTS_FOUND_START", messageSource.getMessage("M04_APARTMENTS_FOUND_START",  null,locale));
+		model.addAttribute("M03_BUDGET", messageSource.getMessage("M03_BUDGET",null,locale));
+		model.addAttribute("M04_DETAILS_PART_2", messageSource.getMessage("M04_DETAILS_PART_2",  null,locale));
+		model.addAttribute("M05_APARTMENTS_FOUND_START", messageSource.getMessage("M05_APARTMENTS_FOUND_START",  null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
 
 		model.addAttribute("toastifyConnected", messageSource.getMessage("toastify.connected",  null,locale));
@@ -274,7 +277,7 @@ public class MainController {
 		var inviteUrl = appUrl + "/invite/" + user.getInviteUuid();
 
 		UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.getByName(user.getCity()).getName(),
-				user.getPropertyType(),user.getLastPropertyDescription(),
+				user.getPropertyType(),user.getBudget(), user.getLastPropertyDescription(),
 				user.getSearchesAvailable(), inviteUrl,
 				user.getMaxNumberOfListedProperties());
 
@@ -295,7 +298,7 @@ public class MainController {
 		if (principal != null) {
 			var user = conversationSession.getImmobiliareUser();
 			UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.valueOf(user.getCity()).getName(),
-					user.getPropertyType(),user.getLastPropertyDescription(),
+					user.getPropertyType(),user.getBudget(), user.getLastPropertyDescription(),
 					user.getSearchesAvailable(), user.getInviteUuid(), user.getMaxNumberOfListedProperties());
 
 			model.addAttribute("user", userProfile);

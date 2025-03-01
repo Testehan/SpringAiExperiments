@@ -6,6 +6,7 @@ public record UserProfile(
         String name,
         String city,
         String propertyType,
+        String budget,
         String lastPropertyDescription,
         Integer searchesAvailable,
         String inviteUuid,

@@ -10,6 +10,10 @@ API-uri disponibile:
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
+2. **Budget API**: determină bugetul de care dispune utilizatorul.
+ - **Endpoint**: `/setBudget`
+ - **Parameters**: `message` (string)
+
 3. **Vânzare sau închiriere și oraș de interes API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze și, de asemenea, orașul care îl interesează. Dacă se menționează numele orașului și tipul de proprietate, adică închiriere sau cumpărare, acest API ar trebui să fie apelat. Răspunsul dvs. trebuie să aibă formatul "rent,city name" sau "buy,city name". Deci separatorul celor 2 valori este virgula.
      - **Endpoint**: `/setRentOrBuyAndCity`
      - **Parameters**: `message` (string)
@@ -84,6 +88,18 @@ Exemple:
 - Intrare utilizator: „Vreau să caut în New-York”
   - API Call: `/setCity`
   - Parameters: `\{"message": "New-York"\}`
+
+- Intrare utilizator: „Sub 400 $”
+ - API Call: `/setBudget`
+ - Parameters: `\{"message": "Sub 400 $"\}`
+
+- Intrare utilizator: „între 400 și 700 $”
+ - API Call: `/setBudget`
+ - Parameters: `\{"mesaj": "între 400 și 700 $"\}`
+
+- Intrare utilizator: "> 1000 $"
+ - API Call: `/setBudget`
+ - Parameters: `\{"message": "> 1000 $"\}`
 
 - Intrare utilizator: „Caut un apartament de închiriat în Cluj-Napoca.”
   - API Call: `/setRentOrBuyAndCity`

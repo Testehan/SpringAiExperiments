@@ -171,6 +171,9 @@ public class ApartmentController {
             case 3:
                 suggestions = getStep3Suggestions();
                 break;
+            case 4:
+                suggestions = getStep4Suggestions();
+                break;
             default:
                 return suggestions;
         }
@@ -193,7 +196,17 @@ public class ApartmentController {
         return suggestions;
     }
 
-    private List<String> getStep3Suggestions()
+    private List<String> getStep3Suggestions(){
+        var suggestions = new ArrayList<String>();
+        suggestions.add("< 300 €");
+        suggestions.add("300 € < 550 €");
+        suggestions.add("550 € < 800 €");
+        suggestions.add("800 € <");
+
+        return suggestions;
+    }
+
+    private List<String> getStep4Suggestions()
     {
         var user = conversationSession.getImmobiliareUser();
         var lastPropertyDescription = user.getLastPropertyDescription();

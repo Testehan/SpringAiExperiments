@@ -280,7 +280,7 @@ function getNewSseId(callback) {
 }
 
 function fetchSuggestions() {
-    if (suggestionsStep<4){
+    if (suggestionsStep<5){
         $.get('/api/apartments/suggestions/' + suggestionsStep, function(response) {
             console.log("fetching suggestions ");
             if (Array.isArray(response)) {
@@ -382,13 +382,20 @@ function setCurrentStep(){
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.includes(M03_DETAILS_PART_2))
+    if (lastAssistantMessage.includes(M03_BUDGET))
     {
         suggestionsStep = 3;
         $('#suggestions').empty();
         fetchSuggestions();
         $('#suggestions').show();
     }
+    if (lastAssistantMessage.includes(M04_DETAILS_PART_2))
+        {
+            suggestionsStep = 4;
+            $('#suggestions').empty();
+            fetchSuggestions();
+            $('#suggestions').show();
+        }
 }
 
 function logCallHierarchy() {
