@@ -151,6 +151,11 @@ public class ApartmentService {
         List<Double> embeddings = mono.block();
 
         apartment.setPlot_embedding(embeddings);
+        if (Objects.isNull(apartment.getPlot_embedding()) || apartment.getPlot_embedding().isEmpty()) {
+            // todo having plot embedding empty means that vector search will not work as expected... need to figure out why this happens..
+            // probably when trying to create multiple listings quickly ?
+            LOGGER.error("###################### apartment {} has no plot embedding ", apartment.getName());
+        }
 
         var savedListing = saveApartment(apartment);
 

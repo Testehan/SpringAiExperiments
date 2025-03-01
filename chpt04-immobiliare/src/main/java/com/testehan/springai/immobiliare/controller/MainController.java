@@ -280,7 +280,7 @@ public class MainController {
 
 		model.addAttribute("user", userProfile);
 
-		model.addAttribute("listCities", SupportedCity.getSupportedCities());
+		model.addAttribute("listCities", List.of(SupportedCity.CLUJ_NAPOCA.getName())); //SupportedCity.getSupportedCities()
 //		if (Objects.isNull(user.getPropertyType()) || StringUtils.isEmpty(user.getPropertyType())) {
 //			model.addAttribute("listPropertyTypes", List.of(messageSource.getMessage("rent", null, locale)));  //, "sale"
 //		} else {

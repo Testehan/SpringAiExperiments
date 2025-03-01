@@ -142,8 +142,8 @@ public class ApiServiceImpl implements ApiService{
             var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
             LOGGER.info("Performance 3 -----------------------");
 
-            LOGGER.info("Apartments found from vector store semantic search:");
-            apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), listingUtil.getApartmentInfo(ap)));
+            LOGGER.info("Apartments found from vector store semantic search: {}" , apartmentsFromSemanticSearch.size());
+            apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), ap.getName()));
 
             ResultsResponse response = new ResultsResponse("");
 
@@ -175,7 +175,7 @@ public class ApiServiceImpl implements ApiService{
                                         // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
 
                                         var apartmentInfo = listingUtil.getApartmentInfo(apartmentLLM.get());
-                                        LOGGER.info("Adding apartment info to conversation memory {}", apartmentInfo);
+                                        LOGGER.info("Adding apartment info to conversation memory {}", apartmentLLM.get().getName());
                                         conversationService.addContentToConversation(apartmentInfo, conversationId);
 
                                         var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
@@ -283,6 +283,7 @@ public class ApiServiceImpl implements ApiService{
 
         var user = conversationSession.getImmobiliareUser();
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
+            conversationSession.setCity(serviceCall.message());
             var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
             return new ResultsResponse(
                     messageSource.getMessage("M03_DETAILS",  new Object[]{propertyType, supportedCity.getName()}, localeUtils.getCurrentLocale()) +
@@ -295,9 +296,7 @@ public class ApiServiceImpl implements ApiService{
     }
 
     private SupportedCity getSupportedCity(String city) {
-        SupportedCity supportedCity = SupportedCity.getByName(city);
-        conversationSession.setCity(city);
-        return supportedCity;
+        return SupportedCity.getByName(city);
     }
 
     private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
@@ -322,6 +321,7 @@ public class ApiServiceImpl implements ApiService{
         SupportedCity supportedCity = getSupportedCity(cityName);
         var description = parts[2];
         if (supportedCity.compareTo(UNSUPPORTED) != 0) {
+            conversationSession.setCity(cityName);
             return getApartments(description, session);
         } else {
             var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
@@ -333,8 +333,9 @@ public class ApiServiceImpl implements ApiService{
         return ChatClient
                 .builder(chatmodel)
                 .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
-                        new SimpleLoggerAdvisor()
+                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory())//,
+//                        new SimpleLoggerAdvisor() // todo commented this out for now as it adds long log texts,
+//                         and makes things difficult to follow in the log. But when needed this should be uncommnented
                 )
                 .build();
     }
