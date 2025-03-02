@@ -117,7 +117,14 @@ public class AutoRememberMeServices extends PersistentTokenBasedRememberMeServic
     @Override
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         if (authentication != null) {
-            String email = ((DefaultOAuth2User)authentication.getPrincipal()).getAttribute("email");
+            Object principal = authentication.getPrincipal();
+            String email = "";
+            if (principal instanceof DefaultOAuth2User) {
+                email = ((DefaultOAuth2User) principal).getAttribute("email");
+            }
+            if (principal instanceof CustomerUserDetails){
+                email = ((CustomerUserDetails) principal).getImmobiliareUser().getEmail();
+            }
             this.rememberMeTokenRepository.removeUserTokens(email);
         }
         cancelCookie(request, response);
