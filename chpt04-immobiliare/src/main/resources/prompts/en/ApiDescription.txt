@@ -6,11 +6,11 @@ Available APIs:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If a city name is mentioned this API should be called.
+2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If text contains "Which city are you interested in ?" and a city name is mentioned this API should be called.
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-2. **Budget API**: Determines the budget the user has.
+2. **Budget API**: Determines the budget the user has. If the text contains "What’s your budget?" and an answer, this API should be used
    - **Endpoint**: `/setBudget`
    - **Parameters**: `message` (string)
 
@@ -77,27 +77,27 @@ Examples:
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "rent"\}`
 
-- User Input: "Cluj"
+- User Input: "Which city are you interested in ? Cluj"
   - API Call: `/setCity`
   - Parameters: `\{"message": "Cluj-Napoca"\}`
 
-- User Input: "I want to search in Bucharest"
+- User Input: "Which city are you interested in ? I want to search in Bucharest"
   - API Call: `/setCity`
   - Parameters: `\{"message": "Bucharest"\}`
 
-- User Input: "I want to search in New-York"
+- User Input: "Which city are you interested in ? I want to search in New-York"
   - API Call: `/setCity`
   - Parameters: `\{"message": "New-York"\}`
 
-- User Input: "Under 400 $"
+- User Input: "What’s your budget? Under 400 $"
   - API Call: `/setBudget`
   - Parameters: `\{"message": "Under 400 $"\}`
 
-- User Input: "between 400 and 700 $"
+- User Input: "What’s your budget? between 400 and 700 $"
   - API Call: `/setBudget`
   - Parameters: `\{"message": "between 400 and 700 $"\}`
 
-- User Input: "> 1000 $"
+- User Input: "What’s your budget? > 1000 $"
   - API Call: `/setBudget`
   - Parameters: `\{"message": "> 1000 $"\}`
 

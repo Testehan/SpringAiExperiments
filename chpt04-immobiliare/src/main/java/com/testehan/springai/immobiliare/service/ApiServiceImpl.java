@@ -140,6 +140,9 @@ public class ApiServiceImpl implements ApiService{
             // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
             var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
             var conversationId = conversationSession.getConversationId();
+
+            conversationService.addContentToConversation(description + budgetInfo, conversationId);
+
             final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
             var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
             LOGGER.info("Performance 3 -----------------------");

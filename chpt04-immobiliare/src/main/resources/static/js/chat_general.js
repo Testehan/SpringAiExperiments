@@ -1,4 +1,5 @@
 let suggestionsStep = 1;
+let lastAssistantMessage;
 
 let eventSource;
 let lastPingTime = new Date(); // Store the last received ping time
@@ -303,6 +304,10 @@ function askForResponse() {
         showToast(TOASTIFY_REQUEST_TAKING_LONGER, -1, "warn");
     }, 15000);
 
+    if (suggestionsStep < 5){
+        userMessage = lastAssistantMessage.trim() + " " + userMessage;
+    }
+
     htmx.ajax('POST', '/respond', {
         target: '#response-container',
         swap: 'beforeend',
@@ -383,7 +388,7 @@ function applyFavouriteButtonStylingDependingOnText(favouriteButton){
 }
 
 function setCurrentStep(){
-    const lastAssistantMessage = $('.assistantResponse:last').text();
+    lastAssistantMessage = $('.assistantResponse:last').text();
     if (lastAssistantMessage.trim() === M01_INITIAL_MESSAGE){
         suggestionsStep = 1;
         $('#suggestions').empty();
@@ -397,7 +402,7 @@ function setCurrentStep(){
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.includes(M03_BUDGET))
+    if (lastAssistantMessage.trim() === M03_BUDGET)
     {
         suggestionsStep = 3;
         $('#suggestions').empty();

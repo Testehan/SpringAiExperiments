@@ -6,11 +6,11 @@ API-uri disponibile:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă este menționat un nume de oraș, acest API ar trebui apelat.
+2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă textul contine "Ce oraș te interesează?" si un nume de oraș, acest API ar trebui apelat.
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-2. **Budget API**: determină bugetul de care dispune utilizatorul.
+2. **Budget API**: determină bugetul de care dispune utilizatorul. Daca textul contine "Care este bugetul tău?" si un raspuns, acest API trebuie folosit.
  - **Endpoint**: `/setBudget`
  - **Parameters**: `message` (string)
 
@@ -77,27 +77,27 @@ Exemple:
   - API Call: `/setRentOrBuy`
   - Parameters: `\{"message": "rent"\}`
 
-- Intrare utilizator: „Cluj”
+- Intrare utilizator: „Ce oraș te interesează? Cluj”
   - API Call: `/setCity`
   - Parameters: `\{"message": "Cluj-Napoca"\}`
 
-- Intrare utilizator: „Vreau să caut în București”
+- Intrare utilizator: „Ce oraș te interesează? Vreau să caut în București”
   - API Call: `/setCity`
   - Parameters: `\{"message": "Bucharest"\}`
 
-- Intrare utilizator: „Vreau să caut în New-York”
+- Intrare utilizator: „Ce oraș te interesează? Vreau să caut în New-York”
   - API Call: `/setCity`
   - Parameters: `\{"message": "New-York"\}`
 
-- Intrare utilizator: „Sub 400 $”
+- Intrare utilizator: „Care este bugetul tău? Sub 400 $”
  - API Call: `/setBudget`
  - Parameters: `\{"message": "Sub 400 $"\}`
 
-- Intrare utilizator: „între 400 și 700 $”
+- Intrare utilizator: „Care este bugetul tău? între 400 și 700 $”
  - API Call: `/setBudget`
  - Parameters: `\{"mesaj": "între 400 și 700 $"\}`
 
-- Intrare utilizator: "> 1000 $"
+- Intrare utilizator: "Care este bugetul tău? > 1000 $"
  - API Call: `/setBudget`
  - Parameters: `\{"message": "> 1000 $"\}`
 

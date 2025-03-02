@@ -160,7 +160,7 @@ public class ApartmentController {
 
     @GetMapping("/suggestions/{suggestionStep}")
     public List<String> suggestions(@PathVariable(value = "suggestionStep") Integer suggestionStep, Locale locale) {
-        List<String> suggestions = new ArrayList<String>();
+        List<String> suggestions = new ArrayList<>();
         switch (suggestionStep) {
             case 1:
                 suggestions = getStep1Suggestions(locale);
