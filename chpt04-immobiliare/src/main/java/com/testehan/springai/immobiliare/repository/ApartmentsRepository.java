@@ -12,6 +12,8 @@ public interface ApartmentsRepository {
     List<Apartment> findApartmentsByVector(PropertyType propertyType, String city, ApartmentDescription apartment, List<Double> embedding);
 
     Optional<Apartment> findApartmentById(String apartmentId);
+    Optional<String> findApartmentIdBySocialId(String socialId);
+
     boolean isPhoneValid(String phoneNumber);
 
     List<Apartment> findAll();
@@ -23,4 +25,5 @@ public interface ApartmentsRepository {
     void deactivateApartments(LocalDateTime date);
 
     void deleteApartmentsByIds(List<String> apartmentIds);
+
 }

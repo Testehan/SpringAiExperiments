@@ -154,6 +154,36 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
+    public Optional<String> findApartmentIdBySocialId(final String socialId) {
+
+        var mongoCollection = mongoDatabase.getCollection("apartments");
+        String apartmentId = null;
+        try {
+
+            Document projection = new Document("_id", 1);
+            Document result = mongoCollection
+                    .find(new Document("socialId", socialId))
+                    .projection(projection)
+                    .first();
+            if (result != null) {
+                ObjectId objectId = result.getObjectId("_id"); // Extract ObjectId properly
+                apartmentId = objectId.toHexString(); // Convert ObjectId to String
+            }
+            
+        } catch (IllegalArgumentException ex){
+            LOGGER.error("Social id {} is not valid.", socialId);
+            return Optional.empty();
+        }
+
+        if (apartmentId != null) {
+            return Optional.of(apartmentId);
+        } else {
+            LOGGER.error("Social id {} was not found.", socialId);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public boolean isPhoneValid(String phoneNumber) {
         var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
         Bson filter = eq("contact", phoneNumber); // Create the filter

@@ -17,6 +17,7 @@ import java.util.Objects;
 public class Apartment {
 
     private ObjectId id;
+    private String socialId;
     private String name;
     private String city;
     private String area;

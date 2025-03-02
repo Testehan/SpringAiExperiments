@@ -336,4 +336,8 @@ public class ApartmentService {
         var editUrl = appUrl + "/edit/" + listingId;
         emailService.sendListingAddedEmail(user.getEmail(), user.getName(), listing.getName(), viewUrl, editUrl ,localeUtils.getCurrentLocale());
     }
+
+    public Optional<String> findApartmentIdBySocialId(String socialId) {
+        return apartmentsRepository.findApartmentIdBySocialId(socialId);
+    }
 }

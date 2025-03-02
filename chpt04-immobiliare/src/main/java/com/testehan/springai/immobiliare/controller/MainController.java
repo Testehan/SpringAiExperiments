@@ -224,10 +224,21 @@ public class MainController {
 
 			return "view";
 		} else {
-			model.addAttribute("errorMessage", "It seems the page you're looking for doesn't exist or you don't have access.");
+			model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null,locale));
 			return "error-404";
 		}
 
+	}
+
+	@GetMapping("/s/{socialId}")
+	public String social(@PathVariable(value = "socialId") String socialId, Model model, Locale locale) {
+		var apartmentId = apartmentService.findApartmentIdBySocialId(socialId);
+		if (apartmentId.isPresent()) {
+			return view(apartmentId.get(), model, locale);
+		} else {
+			model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null,locale));
+			return "error-404";
+		}
 	}
 
 	private void translateAmenityCategoryName(Locale locale, Apartment apartment) {
