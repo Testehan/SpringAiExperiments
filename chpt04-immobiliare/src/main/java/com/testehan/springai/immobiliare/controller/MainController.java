@@ -99,6 +99,7 @@ public class MainController {
 		model.addAttribute("toastifyDisconnected", messageSource.getMessage("toastify.disconnected",  null,locale));
 		model.addAttribute("toastifyNointernet", messageSource.getMessage("toastify.nointernet",  null,locale));
 		model.addAttribute("toastifyReconnecting", messageSource.getMessage("toastify.reconnecting",  null,locale));
+		model.addAttribute("toastifyRequestTakingLong", messageSource.getMessage("toastify.request.too.long",  null,locale));
 
 		model.addAttribute("appUrl", appUrl);
 

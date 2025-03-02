@@ -296,10 +296,25 @@ function fetchSuggestions() {
 }
 
 function askForResponse() {
-    console.log("asking for response");
     let userMessage = $('#response-container div:last').text();
     $('#message').val('');
-    htmx.ajax('POST', '/respond', {target: '#response-container', swap: 'beforeend', values: {message: userMessage}});
+
+    let timeout = setTimeout(() => {
+        showToast(TOASTIFY_REQUEST_TAKING_LONGER, -1, "warn");
+    }, 15000);
+
+    htmx.ajax('POST', '/respond', {
+        target: '#response-container',
+        swap: 'beforeend',
+        values: {message: userMessage}
+    });
+
+     // Listen for the HTMX response and clear timeout if successful
+    $(document).on('htmx:afterRequest', function(event) {
+        clearTimeout(timeout); // Clear the timeout
+        dismissToast();
+    });
+
 }
 
 function setUpScrollingToLastUserMessage(){

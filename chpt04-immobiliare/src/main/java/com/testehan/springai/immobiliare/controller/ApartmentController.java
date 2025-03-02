@@ -169,7 +169,7 @@ public class ApartmentController {
                 suggestions = getStep2Suggestions();
                 break;
             case 3:
-                suggestions = getStep3Suggestions();
+                suggestions = getStep3Suggestions(locale);
                 break;
             case 4:
                 suggestions = getStep4Suggestions();
@@ -196,12 +196,13 @@ public class ApartmentController {
         return suggestions;
     }
 
-    private List<String> getStep3Suggestions(){
+    private List<String> getStep3Suggestions(Locale locale){
         var suggestions = new ArrayList<String>();
-        suggestions.add("< 300 €");
-        suggestions.add("300 € < 550 €");
+        suggestions.add("< 550 €");
         suggestions.add("550 € < 800 €");
         suggestions.add("800 € <");
+
+        suggestions.add(messageSource.getMessage("prompt.noBudget",null,locale));
 
         return suggestions;
     }
