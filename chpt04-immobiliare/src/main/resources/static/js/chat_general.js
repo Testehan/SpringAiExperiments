@@ -8,6 +8,7 @@ let isCheckingInternet = false;
 
 let mediaRecorder;
 let audioChunks = [];
+let recordingTimeout;
 
 $(document).ready(function(){
     // after voice message is transcribed, or text message is added to chat, send a request to obtain a response
@@ -60,6 +61,8 @@ function setUpAudioRecording(){
 
             // When recording stops
             mediaRecorder.addEventListener("stop", () => {
+                clearTimeout(recordingTimeout); // Clear timeout if stopped manually
+
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 const audioURL = URL.createObjectURL(audioBlob);
 
@@ -85,8 +88,19 @@ function setOnClickForRecordAudio(){
         if (mediaRecorder.state === "inactive") {
             mediaRecorder.start();
             $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );
+            // **Set a timeout to auto-stop after 40 seconds**
+            recordingTimeout = setTimeout(() => {
+                if (mediaRecorder.state === "recording") {
+                    mediaRecorder.stop();
+                    $('#audioRecProgress').hide();
+                    $("#recordMicrophone").attr('src', '/images/microphone.svg');
+                    $("#message").removeAttr("required");
+                }
+            }, 40000); // 40 seconds
+
         } else {
             mediaRecorder.stop();
+            clearTimeout(recordingTimeout); // If stopped manually, clear timeout
             $('#audioRecProgress').hide();
             $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
             $("#message").removeAttr("required");
