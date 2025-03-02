@@ -55,12 +55,14 @@
                 </div>
                 <div th:if="*{budget != null and budget != ''}" class="mb-4">
                     <label for="budget" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.budget}">Budget:</label>
-                    <input type="text" id="budget" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+                    <input type="text" id="budget" maxlength="50" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
      focus:shadow-outline" th:field="*{budget}" />
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-gray-700 font-bold mb-2" th:text="#{profile.label.description}"/>
                     <textarea id="description"
+                              maxlength="200"
+                              pattern="[a-zA-Z0-9\\s\.\';,-]+"
                               class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                               th:field="*{lastPropertyDescription}"></textarea>
                 </div>
@@ -104,7 +106,7 @@
                 <h2 class="text-gray-500 text-xl sm:text-2xl md:text-2xl mb-2" th:text="#{profile.title.delete}"/>
                 <div class="mb-4">
                     <label for="confirmDeletionEmail" class="block text-gray-700 font-bold mb-2">Email:</label>
-                    <input type="text" id="confirmDeletionEmail" name="confirmDeletionEmail" onpaste="return false;" th:placeholder="#{profile.input.delete.placeholder}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"   />
+                    <input type="text" id="confirmDeletionEmail" maxlength="100" name="confirmDeletionEmail" onpaste="return false;" th:placeholder="#{profile.input.delete.placeholder}" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"   />
                 </div>
 
                 <div class="flex items-center justify-between">

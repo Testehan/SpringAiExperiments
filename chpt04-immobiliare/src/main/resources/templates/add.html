@@ -41,7 +41,7 @@
                             <span th:text="#{add.label.title}"></span>
                             <span class="text-red-500">*</span>:
                         </label>
-                        <input type="text" id="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
+                        <input type="text" id="name" maxlength="100" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none
          focus:shadow-outline" th:field="*{name}" th:placeholder="#{add.placeholder.title}" />
                     </div>
                     <div class="mb-4">
@@ -60,7 +60,7 @@
                             <span th:text="#{add.label.area}"></span>
                             <span class="text-red-500">*</span>:
                         </label>
-                        <input type="text" id="area" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}"
+                        <input type="text" id="area" maxlength="100" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{Area}"
                                th:placeholder="#{add.placeholder.area}">
                     </div>
                     <div class="mb-4">
@@ -90,7 +90,7 @@
                             <span th:text="#{add.label.available.from}"></span>
                             <span class="text-red-500">*</span>:
                         </label>
-                        <input type="text" id="availableFrom" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-300" th:field="*{availableFrom}">
+                        <input type="text" id="availableFrom"  maxlength="15" class="border border-gray-300 rounded-lg px-3 py-2 w-full focus:ring focus:ring-blue-300" th:field="*{availableFrom}">
                     </div>
                     <div class="mb-4">
                         <label for="surface" class="block text-gray-700 font-bold mb-2">
@@ -112,7 +112,7 @@
                             <span th:text="#{add.label.description}"></span>
                             <span class="text-red-500">*</span>:
                         </label>
-                        <textarea id="description"
+                        <textarea id="description"  maxlength="1000"
                                   class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-20 md:h-28 lg:h-36"
                                   th:field="*{shortDescription}"
                                   th:placeholder="#{add.placeholder.description}"></textarea>
@@ -122,14 +122,14 @@
                         <label for="floor" class="block text-gray-700 font-bold mb-2">
                             <span th:text="#{add.label.floor}"></span>:
                         </label>
-                        <input type="text" id="floor" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}"
+                        <input type="text" id="floor" maxlength="15" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{floor}"
                                th:placeholder="#{add.placeholder.floor}">
                     </div>
                     <div class="mb-4">
                         <label for="tags" class="block text-gray-700 font-bold mb-2">
                             <span th:text="#{add.label.tags}"></span>:
                         </label>
-                        <input type="text" id="tags" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}"
+                        <input type="text" id="tags" maxlength="100" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" th:field="*{TagsWithSplit}"
                             th:placeholder="#{add.placeholder.tags}">
                     </div>
                     <div class="mb-4">
