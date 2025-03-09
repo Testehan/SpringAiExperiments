@@ -10,7 +10,7 @@ let mediaRecorder;
 let audioChunks = [];
 let recordingTimeout;
 let countdownInterval;
-const MAX_RECORDING_TIME = 40; // Maximum recording time in seconds
+const MAX_RECORDING_TIME = 30; // Maximum recording time in seconds
 
 $(document).ready(function(){
     // after voice message is transcribed, or text message is added to chat, send a request to obtain a response

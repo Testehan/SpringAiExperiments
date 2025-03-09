@@ -154,7 +154,7 @@ public class ApiServiceImpl implements ApiService{
 
             Locale currentLocale = localeUtils.getCurrentLocale();
             if (apartmentsFromSemanticSearch.size() > 0) {
-                int batchSize = 2;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
+                int batchSize = 5;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
                 AtomicBoolean isFirst = new AtomicBoolean(true);
 
                 var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
