@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.events.ApartmentPayload;
 import com.testehan.springai.immobiliare.events.Event;
+import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.*;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
@@ -42,8 +43,9 @@ public class ApiServiceImpl implements ApiService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiServiceImpl.class);
 
-    private ImmobiliareApiService immobiliareApiService;
+    private final ImmobiliareApiService immobiliareApiService;
     private final EmbeddingService embeddingService;
+    private final LLMCacheService llmCacheService;
 
     private ApartmentService apartmentService;
 
@@ -61,13 +63,15 @@ public class ApiServiceImpl implements ApiService{
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, EmbeddingService embeddingService, ApartmentService apartmentService,
+    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, EmbeddingService embeddingService,
+                          LLMCacheService llmCacheService, ApartmentService apartmentService,
                           ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
                           ConversationSession conversationSession, ConversationService conversationService,
                           UserSseService userSseService,
                           MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil) {
         this.immobiliareApiService = immobiliareApiService;
         this.embeddingService = embeddingService;
+        this.llmCacheService = llmCacheService;
         this.apartmentService = apartmentService;
         this.chatmodel = chatmodel;
         this.vectorStore = vectorStore;
@@ -113,118 +117,153 @@ public class ApiServiceImpl implements ApiService{
         try {
             session.setAttribute("sseIndex", 0);
             conversationSession.setLastPropertyDescription(description);
+            final String conversationId = conversationSession.getConversationId();
+            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
+
+            var rentOrSale = conversationSession.getRentOrSale();
+            var city = SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
+            var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
+            var descriptionWithBudgetInfo = description + budgetInfo;
+
+            conversationService.addContentToConversation(descriptionWithBudgetInfo, conversationId);
 
             // we do this clearing because we want our chat memory to contain only the latest listing results, on which
             // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
             // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
             var convId = conversationSession.getConversationId();
             conversationSession.clearChatMemory();
-            CompletableFuture<Void> clearChatMemoryFuture = CompletableFuture.runAsync(() -> {
-                conversationService.deleteConversation(convId);
-            });
-
-            LOGGER.info("Performance 1 -----------------------");
-            var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
-
-            CompletableFuture<ApartmentDescription> getListingDescriptionFuture =
-                    CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(description + budgetInfo));
-
-            CompletableFuture<List<Double>> getDescriptionEmbeddingFuture =
-                    CompletableFuture.supplyAsync(() -> embeddingService.getOrComputeEmbedding(description));
-
-            final ApartmentDescription apartmentDescription = getListingDescriptionFuture.get();
-            clearChatMemoryFuture.get();
-            LOGGER.info("Performance 2 -----------------------");
-
-            var rentOrSale = conversationSession.getRentOrSale();
-            // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
-            var city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
-            var conversationId = conversationSession.getConversationId();
-
-            conversationService.addContentToConversation(description + budgetInfo, conversationId);
-
-            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
-            var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
-            LOGGER.info("Performance 3 -----------------------");
-
-            LOGGER.info("Apartments found from vector store semantic search: {}" , apartmentsFromSemanticSearch.size());
-            apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), ap.getName()));
+            conversationService.deleteConversation(convId);
 
             ResultsResponse response = new ResultsResponse("");
 
-            Locale currentLocale = localeUtils.getCurrentLocale();
-            if (apartmentsFromSemanticSearch.size() > 0) {
-                int batchSize = 5;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
-                AtomicBoolean isFirst = new AtomicBoolean(true);
+            // the hash will be for all these items
+            final String llmCacheKey = rentOrSale + city + descriptionWithBudgetInfo;
+            var cachedResponse = llmCacheService.getCachedResponse(llmCacheKey);
+            if (cachedResponse.isPresent()){
+                LOGGER.info("Performance Cache 1 -----------------------");
+                String[] listingIds = cachedResponse.get().split("\\,");
+                sendResultsFoundResponse(session);
 
-                var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
-                bestMatchingApartmentIds
-                        .filter(id -> ObjectId.isValid(id))
-                        .distinct()
-                        .subscribe(
-                                apId -> {
-                                    var apartmentLLM = apartmentsFromSemanticSearch.stream()
-                                            .filter(item -> apId.equals(item.getId().toString()))
-                                            .findFirst();
-                                    if (!apartmentLLM.isEmpty()) {
-                                        if (isFirst.getAndSet(false)) {
-                                            LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
-                                            userSseService.getUserSseConnection(session.getId())
-                                                    .tryEmitNext(new Event("response", new ResponsePayload(
-                                                            messageSource.getMessage("M05_APARTMENTS_FOUND_START", null, currentLocale)))
-                                                    );
-                                        }
-                                        LOGGER.info("Performance 4 -----------------------");
-                                        LOGGER.info("Found apartment id {}", apartmentLLM.get().getId());
-                                        // basically adding the returned result apartments to the conversation; TODO this needs to be tested out for example what happens when there are multiple apartments added to the conversation vectorestore... does that screw up the conversation ?
-                                        // TODO i think we should only call this method, when a property is favourited... so that only those are in the context. Otherwise..there will be a very big context
+                var listingsFound = apartmentService.findApartmentsByIds(List.of(listingIds));
+                for (Apartment listing : listingsFound){
+                    sendListing(session.getId(), listing, conversationId, immobiliareUser);
+                }
 
-                                        var apartmentInfo = listingUtil.getApartmentInfo(apartmentLLM.get());
-                                        LOGGER.info("Adding apartment info to conversation memory {}", apartmentLLM.get().getName());
-                                        conversationService.addContentToConversation(apartmentInfo, conversationId);
+                sendSearchComplete(session.getId());
 
-                                        var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentLLM.get().getId().toString(), immobiliareUser);
-                                        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
-                                        userSseService.getUserSseConnection(session.getId())
-                                                .tryEmitNext(new Event("apartment", new ApartmentPayload(apartmentLLM.get(), isFavourite)));
-                                    }
-
-                                },
-                                error -> {
-                                    LOGGER.error("Error: {}", error);
-                                    throw new RuntimeException(error.getMessage());
-                                },
-                                () -> {
-                                    if (isFirst.get()) {     // this means that we processed stream and we got no match
-                                        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
-                                        userSseService.getUserSseConnection(session.getId())
-                                                .tryEmitNext(new Event("response", new ResponsePayload(
-                                                        messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, currentLocale)))
-                                                );
-                                        LOGGER.info("Search completed with no results for description : {}", description);
-                                    } else {
-                                        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(session.getId()));
-                                        userSseService.getUserSseConnection(session.getId())
-                                                .tryEmitNext(new Event("response", new ResponsePayload(
-                                                        messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, currentLocale)))
-                                                );
-                                        LOGGER.info("Search completed");
-                                    }
-
-                                }
-                        );
-
+                LOGGER.info("Performance Cache 2 -----------------------");
+                return response;
             } else {
-                response = new ResultsResponse(messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, currentLocale));
-            }
 
-            return response;
+                LOGGER.info("Performance 1 -----------------------");
+
+                CompletableFuture<ApartmentDescription> getListingDescriptionFuture =
+                        CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(descriptionWithBudgetInfo));
+
+                CompletableFuture<List<Double>> getDescriptionEmbeddingFuture =
+                        CompletableFuture.supplyAsync(() -> embeddingService.getOrComputeEmbedding(description));
+
+                final ApartmentDescription apartmentDescription = getListingDescriptionFuture.get();
+                LOGGER.info("Performance 2 -----------------------");
+
+                // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
+//                city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
+
+                var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
+                LOGGER.info("Performance 3 -----------------------");
+
+                LOGGER.info("Apartments found from vector store semantic search: {}" , apartmentsFromSemanticSearch.size());
+                apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), ap.getName()));
+
+                Locale currentLocale = localeUtils.getCurrentLocale();
+                StringBuilder resultsToCache = new StringBuilder();
+                if (apartmentsFromSemanticSearch.size() > 0) {
+                    int batchSize = 5;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
+                    AtomicBoolean isFirst = new AtomicBoolean(true);
+
+                    var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
+                    bestMatchingApartmentIds
+                            .filter(id -> ObjectId.isValid(id))
+                            .distinct()
+                            .subscribe(
+                                    apId -> {
+                                        var apartmentLLM = apartmentsFromSemanticSearch.stream()
+                                                .filter(item -> apId.equals(item.getId().toString()))
+                                                .findFirst();
+                                        if (!apartmentLLM.isEmpty()) {
+                                            if (isFirst.getAndSet(false)) {
+                                                sendResultsFoundResponse(session);
+                                            }
+                                            resultsToCache.append(apartmentLLM.get().getId().toString()).append(",");
+                                            sendListing(session.getId(), apartmentLLM.get(), conversationId, immobiliareUser);
+                                        }
+
+                                    },
+                                    error -> {
+                                        LOGGER.error("Error: {}", error);
+                                        throw new RuntimeException(error.getMessage());
+                                    },
+                                    () -> {
+                                        if (isFirst.get()) {     // this means that we processed stream and we got no match
+                                            sendSearchCompletedNoResults(description, session.getId());
+                                        } else {
+                                            sendSearchComplete(session.getId());
+                                            llmCacheService.saveToCache(city,PropertyType.valueOf(rentOrSale),llmCacheKey, resultsToCache.toString());
+                                        }
+
+                                    }
+                            );
+
+                } else {
+                    response = new ResultsResponse(messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, currentLocale));
+                }
+
+                return response;
+            }
         } catch (RuntimeException | InterruptedException | ExecutionException e){
             LOGGER.error(e.getMessage());
             return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
         }
+
     }
 
+    private void sendSearchCompletedNoResults(String description, String sessionId) {
+        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
+        var payload = messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, localeUtils.getCurrentLocale());
+        emitEvent(sessionId, "response", new ResponsePayload(payload));
+        LOGGER.info("Search completed with no results for description : {}", description);
+    }
+
+    private void sendListing(String sessionId, Apartment listingFound, String conversationId, ImmobiliareUser immobiliareUser) {
+        LOGGER.info("Performance 4 -----------------------");
+        LOGGER.info("Found apartment id {}", listingFound.getId());
+
+        var apartmentInfo = listingUtil.getApartmentInfo(listingFound);
+        LOGGER.info("Adding apartment info to conversation memory {}", listingFound.getName());
+        conversationService.addContentToConversation(apartmentInfo, conversationId);
+
+        var isFavourite = listingUtil.isApartmentAlreadyFavourite(listingFound.getId().toString(), immobiliareUser);
+        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
+        emitEvent(sessionId, "apartment",new ApartmentPayload(listingFound, isFavourite));
+    }
+
+    private void sendResultsFoundResponse(HttpSession session) {
+        var sessionId = session.getId();
+        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
+        var payload = messageSource.getMessage("M05_APARTMENTS_FOUND_START", null, localeUtils.getCurrentLocale());
+        emitEvent(sessionId, "response", new ResponsePayload(payload));
+    }
+
+    private void sendSearchComplete(String sessionId){
+        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
+        var payload = messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, localeUtils.getCurrentLocale());
+        emitEvent(sessionId, "response", new ResponsePayload(payload));
+        LOGGER.info("Search completed");
+    }
+
+    private void emitEvent(String sessionId, String eventType, EventPayload eventPayload) {
+        userSseService.getUserSseConnection(sessionId).tryEmitNext(new Event(eventType, eventPayload));
+    }
 
 
     private boolean propertyIdContainsComma(String propertyId) {

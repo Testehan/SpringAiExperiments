@@ -7,6 +7,9 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
 @Component
 public class ListingUtil {
 
@@ -84,6 +87,20 @@ public class ListingUtil {
         }
 
         return sb.toString();
+    }
+
+    public String hashText(String text) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] encodedHash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder(2 * encodedHash.length);
+            for (byte b : encodedHash) {
+                hexString.append(String.format("%02x", b));
+            }
+            return hexString.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error hashing text", e);
+        }
     }
 
 }
