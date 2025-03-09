@@ -40,7 +40,6 @@ public class ImmobiliareApiService {
             var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
             PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
             Map<String, Object> promptParameters = new HashMap<>();
-//        promptParameters.put("input_here", message);
             promptParameters.put("format", format);
             Prompt prompt = promptTemplate.create(promptParameters);
 

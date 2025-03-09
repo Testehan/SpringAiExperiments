@@ -49,6 +49,8 @@ public class ApartmentService {
     private final ChatModel chatModel ;
     private final UserService userService;
     private final EmailService emailService;
+    private final LLMCacheService llmCacheService;
+
     private final LocaleUtils localeUtils;
     private final AmazonS3Util amazonS3Util;
     private final ImageConverter imageConverter;
@@ -56,13 +58,14 @@ public class ApartmentService {
     private final ListingUtil listingUtil;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService openAiService, ChatModel chatModel,
-                            UserService userService, EmailService emailService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
+                            UserService userService, EmailService emailService, LLMCacheService llmCacheService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
                             ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil, ListingUtil listingUtil) {
         this.apartmentsRepository = apartmentsRepository;
         this.openAiService = openAiService;
         this.chatModel = chatModel;
         this.userService = userService;
         this.emailService = emailService;
+        this.llmCacheService = llmCacheService;
         this.localeUtils = localeUtils;
         this.amazonS3Util = amazonS3Util;
         this.imageConverter = imageConverter;
@@ -168,6 +171,8 @@ public class ApartmentService {
             updateUserInfo(apartment, user);
             sendListingAddedEmail(savedListing, user);
         }
+
+        llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
 
         LOGGER.info("Apartment was added with success!");
     }

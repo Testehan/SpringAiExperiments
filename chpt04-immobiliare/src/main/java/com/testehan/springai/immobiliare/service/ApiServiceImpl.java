@@ -120,7 +120,7 @@ public class ApiServiceImpl implements ApiService{
             final String conversationId = conversationSession.getConversationId();
             final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
 
-            var rentOrSale = conversationSession.getRentOrSale();
+            var propertyType = conversationSession.getRentOrSale();
             var city = SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
             var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
             var descriptionWithBudgetInfo = description + budgetInfo;
@@ -137,7 +137,7 @@ public class ApiServiceImpl implements ApiService{
             ResultsResponse response = new ResultsResponse("");
 
             // the hash will be for all these items
-            final String llmCacheKey = rentOrSale + city + descriptionWithBudgetInfo;
+            final String llmCacheKey = propertyType + city + descriptionWithBudgetInfo;
             var cachedResponse = llmCacheService.getCachedResponse(llmCacheKey);
             if (cachedResponse.isPresent()){
                 LOGGER.info("Performance Cache 1 -----------------------");
@@ -169,7 +169,7 @@ public class ApiServiceImpl implements ApiService{
                 // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
 //                city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
 
-                var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(rentOrSale), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
+                var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(propertyType), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
                 LOGGER.info("Performance 3 -----------------------");
 
                 LOGGER.info("Apartments found from vector store semantic search: {}" , apartmentsFromSemanticSearch.size());
@@ -208,7 +208,7 @@ public class ApiServiceImpl implements ApiService{
                                             sendSearchCompletedNoResults(description, session.getId());
                                         } else {
                                             sendSearchComplete(session.getId());
-                                            llmCacheService.saveToCache(city,PropertyType.valueOf(rentOrSale),llmCacheKey, resultsToCache.toString());
+                                            llmCacheService.saveToCache(city,propertyType,llmCacheKey, resultsToCache.toString());
                                         }
 
                                     }
@@ -269,7 +269,6 @@ public class ApiServiceImpl implements ApiService{
     private boolean propertyIdContainsComma(String propertyId) {
         LOGGER.info("Current list of ids from llm: {}", propertyId);
         return true;
-//        return propertyId.contains(",") && propertyId.charAt(propertyId.length() - 1) == ',';
     }
 
     public Flux<Event> getServerSideEventsFlux(HttpSession session) {

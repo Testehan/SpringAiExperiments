@@ -19,13 +19,6 @@ public class CachedResponse {
     private long createdAt;
 
     private String city;
-    private PropertyType propertyType;
+    private String propertyType;
 
-    public String getPropertyType() {
-        return propertyType != null ? propertyType.name() : null;
-    }
-
-    public void setPropertyType(String propertyType) {
-        this.propertyType = PropertyType.valueOf(propertyType);
-    }
 }
