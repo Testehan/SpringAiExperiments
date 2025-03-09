@@ -1,19 +1,17 @@
 package com.testehan.springai.immobiliare.repository;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import com.mongodb.client.result.UpdateResult;
 import com.testehan.springai.immobiliare.model.auth.AuthenticationType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,108 +20,44 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ImmobiliareUserRepositoryImpl.class);
 
-    private MongoDatabase mongoDatabase;
+    private final MongoTemplate mongoTemplate;
 
-    public ImmobiliareUserRepositoryImpl(MongoDatabase mongoDatabase) {
-        this.mongoDatabase = mongoDatabase;
+    public ImmobiliareUserRepositoryImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
     public Optional<ImmobiliareUser> findUserByEmail(String email) {
-        var mongoCollection = mongoDatabase.getCollection("users", ImmobiliareUser.class);
-        var user = mongoCollection.find(new Document("email", email)).first();
-
-        if (user != null) {
-            return Optional.of(user);
-        } else {
-            return Optional.empty();
-        }
+        return findUserByField("email", email);
     }
 
     @Override
     public Optional<ImmobiliareUser> findUserByInviteUuid(String inviteUuid) {
-        var mongoCollection = mongoDatabase.getCollection("users", ImmobiliareUser.class);
-        var user = mongoCollection.find(new Document("inviteUuid", inviteUuid)).first();
-
-        if (user != null) {
-            return Optional.of(user);
-        } else {
-            return Optional.empty();
-        }
+        return findUserByField("inviteUuid", inviteUuid);
     }
 
     @Override
     public void updateAuthenticationType(ObjectId id, AuthenticationType authenticationType) {
-        MongoCollection<Document> collection = mongoDatabase.getCollection("users");
-        UpdateResult result = collection.updateOne(
-                Filters.eq("_id", id),
-                Updates.set("authenticationType", authenticationType)
-        );
+        Query query = createIdQuery(id);
+        Update update = new Update().set("authenticationType", authenticationType);
+        mongoTemplate.updateFirst(query, update, ImmobiliareUser.class);
     }
 
     @Override
     public void save(ImmobiliareUser user) {
-        MongoCollection<Document> collection = mongoDatabase.getCollection("users");
-        // Create a document
-        Document document = new Document("name", user.getName())
-                .append("email", user.getEmail())
-                .append("phoneNumber", user.getPhoneNumber())
-                .append("password", user.getPassword())
-                .append("refreshToken", user.getRefreshToken())
-                .append("authenticationType", user.getAuthenticationType())
-                .append("favouriteProperties",user.getFavouriteProperties())
-                .append("maxNumberOfListedProperties",user.getMaxNumberOfListedProperties())
-                .append("listedProperties",user.getListedProperties())
-                .append("city", user.getCity())
-                .append("budget", user.getBudget())
-                .append("propertyType",user.getPropertyType())
-                .append("lastPropertyDescription",user.getLastPropertyDescription())
-                .append("searchesAvailable",user.getSearchesAvailable())
-                .append("maxSearchesAvailable",user.getMaxSearchesAvailable())
-                .append("inviteUuid",user.getInviteUuid())
-                .append("isAdmin",user.getIsAdmin());
-
-        // Insert the document
-        collection.insertOne(document);
+        mongoTemplate.save(user);
     }
 
     @Override
     public void update(ImmobiliareUser user) {
-        MongoCollection<Document> collection = mongoDatabase.getCollection("users");
-
-        // Filter to find the document to update
-        Document filter = new Document("_id", user.getId());
-
-        // Update multiple fields
-        Document update = new Document("$set",
-                new Document("name", user.getName())
-                        .append("email", user.getEmail())
-                        .append("phoneNumber",user.getPhoneNumber())
-                        .append("password", user.getPassword())
-                        .append("refreshToken", user.getRefreshToken())
-                        .append("authenticationType", user.getAuthenticationType())
-                        .append("favouriteProperties",user.getFavouriteProperties())
-                        .append("maxNumberOfListedProperties",user.getMaxNumberOfListedProperties())
-                        .append("listedProperties",user.getListedProperties())
-                        .append("city", user.getCity())
-                        .append("budget", user.getBudget())
-                        .append("propertyType",user.getPropertyType())
-                        .append("lastPropertyDescription",user.getLastPropertyDescription())
-                        .append("searchesAvailable",user.getSearchesAvailable())
-                        .append("maxSearchesAvailable",user.getMaxSearchesAvailable())
-                        .append("inviteUuid",user.getInviteUuid())
-                        .append("isAdmin",user.getIsAdmin())
-                        .append("gdprConsent",user.getGdprConsent())
-                        .append("gdprTimestamp",user.getGdprTimestamp())
-        );
-
-        UpdateResult result = collection.updateOne(filter, update);
+        mongoTemplate.save(user);
     }
 
+    @Override
     public void deleteById(final ObjectId id) {
 
-        var mongoCollection = mongoDatabase.getCollection("users");
-        var deleteResult = mongoCollection.deleteOne(new Document("_id", id));
+        Query query = createIdQuery(id);
+        var deleteResult = mongoTemplate.remove(query, ImmobiliareUser.class);
 
         if (deleteResult.getDeletedCount() > 0) {
             LOGGER.info("Successfully deleted user with id: {}", id);
@@ -134,18 +68,21 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
 
     @Override
     public void resetSearchesAvailable() {
-        MongoCollection<Document> collection = mongoDatabase.getCollection("users");
-       // should update all users that are not admin
-        Document filter = new Document("isAdmin", "false");
-
         // Sets searchesAvailable to the value of maxSearchesAvailable if it exists.
         // otherwise it defaults to 10
-        List<Document> updatePipeline = Arrays.asList(
-            new Document("$set", new Document("searchesAvailable",
-                new Document("$ifNull", List.of("$maxSearchesAvailable", 10))))
-        );
+        Update update = new Update().set("searchesAvailable",
+                new Document("$ifNull", List.of("$maxSearchesAvailable", 10)));
 
-        collection.updateMany(filter,updatePipeline);
+        Query query = new Query(Criteria.where("isAdmin").is("false"));
+        mongoTemplate.updateMulti(query, update, ImmobiliareUser.class);
+    }
 
+    private Optional<ImmobiliareUser> findUserByField(String fieldName, String fieldValue) {
+        Query query = new Query(Criteria.where(fieldName).is(fieldValue));
+        return Optional.ofNullable(mongoTemplate.findOne(query, ImmobiliareUser.class));
+    }
+
+    private Query createIdQuery(ObjectId id) {
+        return new Query(Criteria.where("_id").is(id));
     }
 }
