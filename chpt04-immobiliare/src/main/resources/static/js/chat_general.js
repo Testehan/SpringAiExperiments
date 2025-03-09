@@ -93,7 +93,10 @@ function setOnClickForRecordAudio(){
             $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );
 
             let timeLeft = MAX_RECORDING_TIME;
-            $("#audioRecProgress").append(" " + timeLeft + "s");
+            $("#audioRecProgress").text(function(_, currentText) {
+                return currentText.replace(/(\d+s)/, ""); // removed old timers from element
+            });
+            $("#audioRecProgress").append(" " + timeLeft + "s");    // add initial timer value
 
             countdownInterval = setInterval(() => {
                 timeLeft--;
