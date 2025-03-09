@@ -9,6 +9,8 @@ let isCheckingInternet = false;
 let mediaRecorder;
 let audioChunks = [];
 let recordingTimeout;
+let countdownInterval;
+const MAX_RECORDING_TIME = 40; // Maximum recording time in seconds
 
 $(document).ready(function(){
     // after voice message is transcribed, or text message is added to chat, send a request to obtain a response
@@ -62,6 +64,7 @@ function setUpAudioRecording(){
             // When recording stops
             mediaRecorder.addEventListener("stop", () => {
                 clearTimeout(recordingTimeout); // Clear timeout if stopped manually
+                clearInterval(countdownInterval);
 
                 const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
                 const audioURL = URL.createObjectURL(audioBlob);
@@ -88,6 +91,22 @@ function setOnClickForRecordAudio(){
         if (mediaRecorder.state === "inactive") {
             mediaRecorder.start();
             $("#recordMicrophone").attr( { 'src' : '/images/stop-microphone.svg' } );
+
+            let timeLeft = MAX_RECORDING_TIME;
+            $("#audioRecProgress").append(" " + timeLeft + "s");
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                // Append countdown seconds to the existing text
+                $("#audioRecProgress").text(function(_, currentText) {
+                    return currentText.replace(/(\d+s)/, `${timeLeft}s`); // Update countdown
+                });
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
+
             // **Set a timeout to auto-stop after 40 seconds**
             recordingTimeout = setTimeout(() => {
                 if (mediaRecorder.state === "recording") {
@@ -96,11 +115,12 @@ function setOnClickForRecordAudio(){
                     $("#recordMicrophone").attr('src', '/images/microphone.svg');
                     $("#message").removeAttr("required");
                 }
-            }, 40000); // 40 seconds
+            }, MAX_RECORDING_TIME * 1000);
 
         } else {
             mediaRecorder.stop();
             clearTimeout(recordingTimeout); // If stopped manually, clear timeout
+            clearInterval(countdownInterval);
             $('#audioRecProgress').hide();
             $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
             $("#message").removeAttr("required");
