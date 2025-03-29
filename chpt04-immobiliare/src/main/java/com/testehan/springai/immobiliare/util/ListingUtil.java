@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.List;
 
 @Component
 public class ListingUtil {
@@ -101,6 +102,33 @@ public class ListingUtil {
         } catch (Exception e) {
             throw new RuntimeException("Error hashing text", e);
         }
+    }
+
+    public void setIsMostFavouriteAndContacted(List<Apartment> listings){
+        final int[] maxFavourite = {0};
+        final int[] maxContacted = {0};
+        listings.stream().forEach(listing -> {
+            if (listing.getNoOfFavourite()> maxFavourite[0]){
+                maxFavourite[0] = listing.getNoOfFavourite();
+            }
+            if (listing.getNoOfContact()> maxContacted[0]){
+                maxContacted[0] = listing.getNoOfContact();
+            }
+        });
+
+        listings.stream().forEach(listing -> {
+            if (listing.getNoOfFavourite()==maxFavourite[0]){
+                listing.setMostFavourite(true);
+            } else {
+                listing.setMostFavourite(false);
+            }
+
+            if (listing.getNoOfContact()==maxContacted[0]){
+                listing.setMostContacted(true);
+            } else {
+                listing.setMostContacted(false);
+            }
+        });
     }
 
 }

@@ -79,7 +79,7 @@ public class ApartmentService {
         // later in the call, these results are further filtered by the llm...so assuming that the maxContacted
         // listing or maxFavourite listing are filtered out by the llm, then those badges will not be displayed
         // for the results...no harm as these are supposed to be 100% accurate
-        setIsMostFavouriteAndContacted(listings);
+        listingUtil.setIsMostFavouriteAndContacted(listings);
         return listings;
     }
 
@@ -308,32 +308,7 @@ public class ApartmentService {
         return processedImages;
     }
 
-    private void setIsMostFavouriteAndContacted(List<Apartment> listings){
-        final int[] maxFavourite = {0};
-        final int[] maxContacted = {0};
-        listings.stream().forEach(listing -> {
-            if (listing.getNoOfFavourite()> maxFavourite[0]){
-                maxFavourite[0] = listing.getNoOfFavourite();
-            }
-            if (listing.getNoOfContact()> maxContacted[0]){
-                maxContacted[0] = listing.getNoOfContact();
-            }
-        });
 
-        listings.stream().forEach(listing -> {
-            if (listing.getNoOfFavourite()==maxFavourite[0]){
-                listing.setMostFavourite(true);
-            } else {
-                listing.setMostFavourite(false);
-            }
-
-            if (listing.getNoOfContact()==maxContacted[0]){
-                listing.setMostContacted(true);
-            } else {
-                listing.setMostContacted(false);
-            }
-        });
-    }
 
     private void sendListingAddedEmail(Apartment listing, ImmobiliareUser user) {
         var listingId = listing.getId().toString();

@@ -118,6 +118,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                 sendResultsFoundResponse(session);
 
                 var listingsFound = apartmentService.findApartmentsByIds(List.of(listingIds));
+                listingUtil.setIsMostFavouriteAndContacted(listingsFound);
                 for (Apartment listing : listingsFound){
                     sendListing(session.getId(), listing, conversationId, immobiliareUser);
                 }
@@ -311,17 +312,6 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                 .map(buffer-> buffer.toString().replace("\\s+", "").split(","))
                 .flatMap(idsArray -> Flux.fromArray(idsArray));
     }
-
-//    private ChatClient createNewChatClientForStream(){
-//        return ChatClient
-//                .builder(chatmodel)
-//                .defaultAdvisors(
-//                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory())//,
-////                        new SimpleLoggerAdvisor() // todo commented this out for now as it adds long log texts,
-////                         and makes things difficult to follow in the log. But when needed this should be uncommnented
-//                )
-//                .build();
-//    }
 
     public ApartmentDescription extractApartmentInformationFromProvidedDescription(String apartmentDescription) {
 
