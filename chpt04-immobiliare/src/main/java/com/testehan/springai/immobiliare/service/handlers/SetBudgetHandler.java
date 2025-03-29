@@ -26,7 +26,7 @@ public class SetBudgetHandler implements ApiChatCallHandler {
 
     @Override
     public ResultsResponse handle(ServiceCall serviceCall, HttpSession session) {
-        var user = conversationSession.getImmobiliareUser();
+        var user = conversationSession.getImmobiliareUser().get();
         var budget = serviceCall.message();
         conversationSession.setBudget(budget);
         var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());

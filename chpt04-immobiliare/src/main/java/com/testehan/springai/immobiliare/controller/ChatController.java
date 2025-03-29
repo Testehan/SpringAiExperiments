@@ -45,12 +45,12 @@ public class ChatController {
     @PostMapping("/respond")
     public HtmxResponse respond(@RequestParam String message, Model model, HttpSession session) {
 
-        var user  = conversationSession.getImmobiliareUser();
+        var user  = conversationSession.getImmobiliareUser().get();
         var searchQueriesAvailable = user.getSearchesAvailable();
         if (searchQueriesAvailable > 0) {
             var response = apiService.getChatResponse(message, session);
 
-            user  = conversationSession.getImmobiliareUser();   // getting the user again, because it might have been updated during the chat call
+            user  = conversationSession.getImmobiliareUser().get();   // getting the user again, because it might have been updated during the chat call
             user.setSearchesAvailable(searchQueriesAvailable - 1);
             userService.updateUser(user);
 

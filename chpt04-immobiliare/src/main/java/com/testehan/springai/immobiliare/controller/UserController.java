@@ -43,7 +43,7 @@ public class UserController {
     @PostMapping("/api/user/delete")
     public String deleteUserAccount(@RequestParam String confirmDeletionEmail, Model model)throws IOException {
         var userFoundFromEmail = userService.getImmobiliareUserByEmail(confirmDeletionEmail);
-        var loggedInUser = conversationSession.getImmobiliareUser();
+        var loggedInUser = conversationSession.getImmobiliareUser().get();
 
         if (userFoundFromEmail.isEmpty()){
             // this means that the email provided by the user was not found in the DB.
@@ -70,7 +70,7 @@ public class UserController {
 
     @GetMapping("/invite/{inviteUuid}")
     public String invite(@PathVariable(value = "inviteUuid") String inviteUuid) {
-        var loggedInUser =conversationSession.getImmobiliareUser();
+        var loggedInUser =conversationSession.getImmobiliareUser().get();
         LOGGER.info("User {} accepted an invitation {} ", loggedInUser.getEmail(), inviteUuid);
 
         var userOptional = userService.getImmobiliareUserByInviteUuid(inviteUuid);

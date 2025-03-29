@@ -77,7 +77,7 @@ public class ApartmentController {
     public ResponseEntity<String> saveApartment(Apartment apartment,
                                                 @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
 
-        var user = conversationSession.getImmobiliareUser();
+        var user = conversationSession.getImmobiliareUser().get();
 
         var isPhoneValid = isPhoneValid(apartment.getContact());
         if (!isPhoneValid){
@@ -109,7 +109,7 @@ public class ApartmentController {
     @PostMapping("/delete/{listingId}")
     public ResponseEntity<String> deleteListing(@PathVariable(value = "listingId") String listingId) {
 
-        var user = conversationSession.getImmobiliareUser();
+        var user = conversationSession.getImmobiliareUser().get();
 
         if ((listingId != null && !user.getListedProperties().contains(listingId)) && !user.isAdmin()){ // make sure that only owners can delete the ap
             LOGGER.warn("User {} tried to delete property with id {} that was not owned", user.getEmail(), listingId);
@@ -150,7 +150,7 @@ public class ApartmentController {
 
     @GetMapping("/validate/{phoneNumber}")
     public boolean isPhoneValid(@PathVariable(value = "phoneNumber") String phoneNumber) {
-        var user = conversationSession.getImmobiliareUser();
+        var user = conversationSession.getImmobiliareUser().get();
         if (user.isAdmin()){
             return true;    // admins can post as many numbers as they want with same phonenumber
         } else {
@@ -209,7 +209,7 @@ public class ApartmentController {
 
     private List<String> getStep4Suggestions()
     {
-        var user = conversationSession.getImmobiliareUser();
+        var user = conversationSession.getImmobiliareUser().get();
         var lastPropertyDescription = user.getLastPropertyDescription();
 
         List<String> promptIdeas = new ArrayList<>();
@@ -231,7 +231,7 @@ public class ApartmentController {
     @PostMapping("/favourite/{apartmentId}")
     @HxRequest
     public void favourite(@PathVariable(value = "apartmentId") String apartmentId) {
-        var user = conversationSession.getImmobiliareUser();
+        var user = conversationSession.getImmobiliareUser().get();
         var apartmentOptional = apartmentService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
             var listing = apartmentOptional.get();

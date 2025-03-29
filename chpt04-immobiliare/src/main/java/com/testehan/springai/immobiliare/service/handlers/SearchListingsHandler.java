@@ -91,7 +91,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
 
             conversationSession.setLastPropertyDescription(description);
             final String conversationId = conversationSession.getConversationId();
-            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
+            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser().get();
 
             var propertyType = conversationSession.getRentOrSale();
             var city = SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();

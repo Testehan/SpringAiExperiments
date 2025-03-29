@@ -62,7 +62,7 @@ public class MainController {
 	@GetMapping("/chat")
 	public String chat(Model model, HttpSession session) {
 		var locale = localeUtils.getCurrentLocale();
-		var user = conversationSession.getImmobiliareUser();
+		var user = conversationSession.getImmobiliareUser().get();
 		var sessionId = session.getId();
 
 		if (StringUtils.isEmpty(user.getPropertyType())) {
@@ -108,7 +108,7 @@ public class MainController {
 
 	@GetMapping("/favourites")
 	public String favourites(Model model, Locale locale) {
-		var user = conversationSession.getImmobiliareUser();
+		var user = conversationSession.getImmobiliareUser().get();
 		List<Apartment> apartments = new ArrayList<>();
 		for (String apartmentId : user.getFavouriteProperties()){
 			if (!StringUtils.isEmpty(apartmentId)) {
@@ -155,7 +155,7 @@ public class MainController {
 		model.addAttribute("imageNoLabel", imageNoLabel);
 		model.addAttribute("appUrl", appUrl);
 
-		var user = conversationSession.getImmobiliareUser();
+		var user = conversationSession.getImmobiliareUser().get();
 		List<Apartment> listOfProperties = getListOfProperties(user);
 
 		model.addAttribute("listOfProperties", listOfProperties);
@@ -169,7 +169,7 @@ public class MainController {
 	@GetMapping("/edit/{apartmentId}")
 	public String edit(@PathVariable(value = "apartmentId") String apartmentId, Model model, Locale locale) {
 
-		var user = conversationSession.getImmobiliareUser();
+		var user = conversationSession.getImmobiliareUser().get();
 		model.addAttribute("apartment", new Apartment());
 		model.addAttribute("numberOfExistingImages", 0);
 		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
@@ -205,7 +205,7 @@ public class MainController {
 		var apartmentOptional = apartmentService.findApartmentById(apartmentId);
 		if (!apartmentOptional.isEmpty()) {
 			var apartment = apartmentOptional.get();
-			var user = conversationSession.getImmobiliareUser();
+			var user = conversationSession.getImmobiliareUser().get();
 			var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentId, user);
 			var favouritesText = listingUtil.getFavouritesText(isFavourite);
 			if (favouritesText.equalsIgnoreCase("listing.favourites")){
@@ -285,7 +285,7 @@ public class MainController {
 
 	@GetMapping("/profile")
 	public String profile(Model model, Locale locale) {
-		var user = conversationSession.getImmobiliareUser();
+		var user = conversationSession.getImmobiliareUser().get();
 		var inviteUrl = appUrl + "/invite/" + user.getInviteUuid();
 
 		UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.getByName(user.getCity()).getName(),
@@ -308,7 +308,7 @@ public class MainController {
 	@GetMapping("/contact")
 	public String contact(Model model, Principal principal) {
 		if (principal != null) {
-			var user = conversationSession.getImmobiliareUser();
+			var user = conversationSession.getImmobiliareUser().get();
 			UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.getByName(user.getCity()).getName(),
 					user.getPropertyType(),user.getBudget(), user.getLastPropertyDescription(),
 					user.getSearchesAvailable(), user.getInviteUuid(), user.getMaxNumberOfListedProperties());
