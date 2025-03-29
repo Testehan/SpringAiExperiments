@@ -1,41 +1,25 @@
 package com.testehan.springai.immobiliare.service;
 
-import com.testehan.springai.immobiliare.advisor.CaptureMemoryAdvisor;
-import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.events.ApartmentPayload;
 import com.testehan.springai.immobiliare.events.Event;
-import com.testehan.springai.immobiliare.events.EventPayload;
-import com.testehan.springai.immobiliare.events.ResponsePayload;
-import com.testehan.springai.immobiliare.model.*;
-import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
-import com.testehan.springai.immobiliare.util.ListingUtil;
+import com.testehan.springai.immobiliare.model.ApiCall;
+import com.testehan.springai.immobiliare.model.ResultsResponse;
+import com.testehan.springai.immobiliare.model.ServiceCall;
+import com.testehan.springai.immobiliare.service.handlers.ApiChatCallHandler;
+import com.testehan.springai.immobiliare.service.handlers.ApiChatCallHandlerFactory;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor;
-import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.MessageSource;
+import org.springframework.ai.converter.BeanOutputConverter;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-
-import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
-import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Service
@@ -43,422 +27,62 @@ public class ApiServiceImpl implements ApiService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApiServiceImpl.class);
 
-    private final ImmobiliareApiService immobiliareApiService;
-    private final EmbeddingService embeddingService;
-    private final LLMCacheService llmCacheService;
+    private final ApiChatCallHandlerFactory apiCallHandlerFactory;
 
-    private ApartmentService apartmentService;
-
-    private ChatModel chatmodel;
-
-    private VectorStore vectorStore;
-
-    private Executor executor;
-
-    private ConversationSession conversationSession;
-    private ConversationService conversationService;
-    private UserSseService userSseService;
-
-    private final MessageSource messageSource;
+    private final ChatClient chatClient;
+    private final UserSseService userSseService;
     private final LocaleUtils localeUtils;
-    private final ListingUtil listingUtil;
 
-    public ApiServiceImpl(ImmobiliareApiService immobiliareApiService, EmbeddingService embeddingService,
-                          LLMCacheService llmCacheService, ApartmentService apartmentService,
-                          ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor,
-                          ConversationSession conversationSession, ConversationService conversationService,
-                          UserSseService userSseService,
-                          MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil) {
-        this.immobiliareApiService = immobiliareApiService;
-        this.embeddingService = embeddingService;
-        this.llmCacheService = llmCacheService;
-        this.apartmentService = apartmentService;
-        this.chatmodel = chatmodel;
-        this.vectorStore = vectorStore;
-        this.executor = executor;
-        this.conversationSession = conversationSession;
-        this.conversationService = conversationService;
-        this.userSseService = userSseService;
-
-        this.messageSource = messageSource;
+    public ApiServiceImpl(ApiChatCallHandlerFactory apiCallHandlerFactory, ChatClient chatClient,
+                          UserSseService userSseService, LocaleUtils localeUtils) {
         this.localeUtils = localeUtils;
-        this.listingUtil = listingUtil;
+        this.apiCallHandlerFactory = apiCallHandlerFactory;
+        this.chatClient = chatClient;
+        this.userSseService = userSseService;
     }
 
     @Override
     public ResultsResponse getChatResponse(String message, HttpSession session) {
         LOGGER.info("Performance -1 -----------------------");
-        var serviceCall = immobiliareApiService.whichApiToCall(message);
+        var serviceCall = whichApiToCall(message);
         LOGGER.info("Performance 0 -----------------------");
 
-        if (Objects.isNull(serviceCall.apiCall())){
-            return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
-        }
-
-        switch (serviceCall.apiCall()) {
-            case SET_RENT_OR_BUY : { return setRentOrBuy(serviceCall);}
-            case SET_CITY : { return setCity(serviceCall); }
-            case SET_BUDGET : { return setBudget(serviceCall); }
-            case SET_RENT_OR_BUY_AND_CITY: {return setRentOrBuyAndCity(serviceCall);}
-            case SET_RENT_OR_BUY_AND_CITY_AND_DESCRIPTION: {return setRentOrBuyAndCityAndDescription(serviceCall, session);}
-            case GET_APARTMENTS:{ return getApartments(message, session); }
-            case RESTART_CONVERSATION : { return restartConversation(); }
-            case DEFAULT : return respondToUserMessage(message);
-            case NOT_SUPPORTED : return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, localeUtils.getCurrentLocale()));
-            case EXCEPTION: return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
-
-        }
-
-        return new ResultsResponse(messageSource.getMessage("M00_IRRELEVANT_PROMPT", null, localeUtils.getCurrentLocale()));
+        ApiChatCallHandler handler = apiCallHandlerFactory.getHandler(serviceCall.apiCall());
+        return handler.handle(serviceCall, session);
     }
 
-    private ResultsResponse getApartments(String description, HttpSession session) {
-
-        try {
-            session.setAttribute("sseIndex", 0);
-            conversationSession.setLastPropertyDescription(description);
-            final String conversationId = conversationSession.getConversationId();
-            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser();
-
-            var propertyType = conversationSession.getRentOrSale();
-            var city = SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
-            var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
-            var descriptionWithBudgetInfo = description + budgetInfo;
-
-            conversationService.addContentToConversation(descriptionWithBudgetInfo, conversationId);
-
-            // we do this clearing because we want our chat memory to contain only the latest listing results, on which
-            // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
-            // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
-            var convId = conversationSession.getConversationId();
-            conversationSession.clearChatMemory();
-            conversationService.deleteConversation(convId);
-
-            ResultsResponse response = new ResultsResponse("");
-
-            // the hash will be for all these items
-            final String llmCacheKey = propertyType + city + descriptionWithBudgetInfo;
-            var cachedResponse = llmCacheService.getCachedResponse(llmCacheKey);
-            if (cachedResponse.isPresent()){
-                LOGGER.info("Performance Cache 1 -----------------------");
-                String[] listingIds = cachedResponse.get().split("\\,");
-                sendResultsFoundResponse(session);
-
-                var listingsFound = apartmentService.findApartmentsByIds(List.of(listingIds));
-                for (Apartment listing : listingsFound){
-                    sendListing(session.getId(), listing, conversationId, immobiliareUser);
-                }
-
-                sendSearchComplete(session.getId());
-
-                LOGGER.info("Performance Cache 2 -----------------------");
-                return response;
-            } else {
-
-                LOGGER.info("Performance 1 -----------------------");
-
-                CompletableFuture<ApartmentDescription> getListingDescriptionFuture =
-                        CompletableFuture.supplyAsync(() -> immobiliareApiService.extractApartmentInformationFromProvidedDescription(descriptionWithBudgetInfo));
-
-                CompletableFuture<List<Double>> getDescriptionEmbeddingFuture =
-                        CompletableFuture.supplyAsync(() -> embeddingService.getOrComputeEmbedding(description));
-
-                final ApartmentDescription apartmentDescription = getListingDescriptionFuture.get();
-                LOGGER.info("Performance 2 -----------------------");
-
-                // MAYBE the apartment description contains the city, in which case we will use that city with a priority higher than what the user stored
-//                city = SupportedCity.getByName(apartmentDescription.getCity()) != UNSUPPORTED ? apartmentDescription.getCity() : SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
-
-                var apartmentsFromSemanticSearch = apartmentService.getApartmentsSemanticSearch(PropertyType.fromString(propertyType), city, apartmentDescription, getDescriptionEmbeddingFuture.get());
-                LOGGER.info("Performance 3 -----------------------");
-
-                LOGGER.info("Apartments found from vector store semantic search: {}" , apartmentsFromSemanticSearch.size());
-                apartmentsFromSemanticSearch.stream().forEach(ap -> LOGGER.info("Apartment {}  : {}", ap.getId(), ap.getName()));
-
-                Locale currentLocale = localeUtils.getCurrentLocale();
-                StringBuilder resultsToCache = new StringBuilder();
-                if (apartmentsFromSemanticSearch.size() > 0) {
-                    int batchSize = 5;  // apparently sending requests containing a smaller nr of apartment descriptions makes responses more accurate
-                    AtomicBoolean isFirst = new AtomicBoolean(true);
-
-                    var bestMatchingApartmentIds = sendIdsInBatches(apartmentsFromSemanticSearch, description, batchSize);
-                    bestMatchingApartmentIds
-                            .filter(id -> ObjectId.isValid(id))
-                            .distinct()
-                            .subscribe(
-                                    apId -> {
-                                        var apartmentLLM = apartmentsFromSemanticSearch.stream()
-                                                .filter(item -> apId.equals(item.getId().toString()))
-                                                .findFirst();
-                                        if (!apartmentLLM.isEmpty()) {
-                                            if (isFirst.getAndSet(false)) {
-                                                sendResultsFoundResponse(session);
-                                            }
-                                            resultsToCache.append(apartmentLLM.get().getId().toString()).append(",");
-                                            sendListing(session.getId(), apartmentLLM.get(), conversationId, immobiliareUser);
-                                        }
-
-                                    },
-                                    error -> {
-                                        LOGGER.error("Error: {}", error);
-                                        throw new RuntimeException(error.getMessage());
-                                    },
-                                    () -> {
-                                        if (isFirst.get()) {     // this means that we processed stream and we got no match
-                                            sendSearchCompletedNoResults(description, session.getId());
-                                        } else {
-                                            sendSearchComplete(session.getId());
-                                            llmCacheService.saveToCache(city,propertyType,llmCacheKey, resultsToCache.toString());
-                                        }
-
-                                    }
-                            );
-
-                } else {
-                    response = new ResultsResponse(messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, currentLocale));
-                }
-
-                return response;
-            }
-        } catch (RuntimeException | InterruptedException | ExecutionException e){
-            LOGGER.error(e.getMessage());
-            return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
-        }
-
-    }
-
-    private void sendSearchCompletedNoResults(String description, String sessionId) {
-        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
-        var payload = messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, localeUtils.getCurrentLocale());
-        emitEvent(sessionId, "response", new ResponsePayload(payload));
-        LOGGER.info("Search completed with no results for description : {}", description);
-    }
-
-    private void sendListing(String sessionId, Apartment listingFound, String conversationId, ImmobiliareUser immobiliareUser) {
-        LOGGER.info("Performance 4 -----------------------");
-        LOGGER.info("Found apartment id {}", listingFound.getId());
-
-        var apartmentInfo = listingUtil.getApartmentInfo(listingFound);
-        LOGGER.info("Adding apartment info to conversation memory {}", listingFound.getName());
-        conversationService.addContentToConversation(apartmentInfo, conversationId);
-
-        var isFavourite = listingUtil.isApartmentAlreadyFavourite(listingFound.getId().toString(), immobiliareUser);
-        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
-        emitEvent(sessionId, "apartment",new ApartmentPayload(listingFound, isFavourite));
-    }
-
-    private void sendResultsFoundResponse(HttpSession session) {
-        var sessionId = session.getId();
-        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
-        var payload = messageSource.getMessage("M05_APARTMENTS_FOUND_START", null, localeUtils.getCurrentLocale());
-        emitEvent(sessionId, "response", new ResponsePayload(payload));
-    }
-
-    private void sendSearchComplete(String sessionId){
-        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
-        var payload = messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, localeUtils.getCurrentLocale());
-        emitEvent(sessionId, "response", new ResponsePayload(payload));
-        LOGGER.info("Search completed");
-    }
-
-    private void emitEvent(String sessionId, String eventType, EventPayload eventPayload) {
-        userSseService.getUserSseConnection(sessionId).tryEmitNext(new Event(eventType, eventPayload));
-    }
-
-
-    private boolean propertyIdContainsComma(String propertyId) {
-        LOGGER.info("Current list of ids from llm: {}", propertyId);
-        return true;
-    }
-
+    @Override
     public Flux<Event> getServerSideEventsFlux(HttpSession session) {
         return  userSseService.getUserSseConnection(session.getId()).asFlux();
     }
 
-
-    private Flux<String> sendIdsInBatches(List<Apartment> apartments, String description, int batchSize) {
-        return Flux.fromIterable(apartments)
-                .buffer(batchSize)//.delayElements(Duration.ofSeconds(batchSize*5))
-                .flatMap(batchApartments -> getBestMatchingApartmentIds(batchApartments,description));  // Send each batch to the service
-    }
-
-    private Flux<String> getBestMatchingApartmentIds(List<Apartment> apartments, String description) {
+    private ServiceCall whichApiToCall(String message) {
         try {
-            // users will have time to look over the first results and in the mean time more listings are displayed
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        var listingIds = apartments.stream()
-                .map(Apartment::getId)
-                .map(String::valueOf)
-                .collect(Collectors.joining(","));
-        LOGGER.info("Sending apartments descriptions to LLM {}", listingIds);
-        var apartmentsFoundPrompt = localeUtils.getLocalizedPrompt("apartments_found");
+            ChatResponse assistantResponse;
 
-        var promptTemplate = new PromptTemplate(apartmentsFoundPrompt);
-        Map<String, Object> promptParameters = new HashMap<>();
-        promptParameters.put("apartmentsFound", formatApartmentsFound(apartments));
-        promptParameters.put("description", description);
-        var prompt = promptTemplate.create(promptParameters);
+            var outputParser = new BeanOutputConverter<>(ServiceCall.class);
+            String format = outputParser.getFormat();
 
-        return respondToUserMessageStream(prompt.getContents());
+            var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
+            PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
+            Map<String, Object> promptParameters = new HashMap<>();
+            promptParameters.put("format", format);
+            Prompt prompt = promptTemplate.create(promptParameters);
 
-    }
+            assistantResponse = chatClient.prompt()
+                    .system(prompt.getContents())   //Move large static content to the system message field
+                    .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
+                    .call().chatResponse();
 
-    private String formatApartmentsFound(List<Apartment> apartments) {
-        var stringBuilder = new StringBuilder();
-        for (Apartment apartment : apartments){
-            stringBuilder.append("Apartment " + apartment.getId() + " :" + listingUtil.getApartmentInfo(apartment) + "\n");
-        }
-
-        return stringBuilder.toString();
-    }
-
-    private ResultsResponse restartConversation() {
-        conversationSession.clearConversationAndPreferences();
-        return new ResultsResponse(messageSource.getMessage("M01_INITIAL_MESSAGE", null, localeUtils.getCurrentLocale()));
-
-    }
-
-    private ResultsResponse setCity(ServiceCall serviceCall) {
-        SupportedCity supportedCity = getSupportedCity(serviceCall.message());
-
-        if (supportedCity.compareTo(UNSUPPORTED) != 0) {
-            conversationSession.setCity(serviceCall.message());
-            return new ResultsResponse(messageSource.getMessage("M03_BUDGET",  null, localeUtils.getCurrentLocale()));
-        } else {
-            var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
-            return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
-        }
-    }
-
-    private ResultsResponse setBudget(ServiceCall serviceCall) {
-
-        var user = conversationSession.getImmobiliareUser();
-        var budget = serviceCall.message();
-        conversationSession.setBudget(budget);
-        var propertyType =  messageSource.getMessage(user.getPropertyType(), null, localeUtils.getCurrentLocale());
-        return new ResultsResponse(
-            messageSource.getMessage("M04_DETAILS",  new Object[]{propertyType, user.getCity(), budget}, localeUtils.getCurrentLocale()) +
-            messageSource.getMessage("M04_DETAILS_PART_2",  null, localeUtils.getCurrentLocale())
-        );
-
-    }
-
-    private SupportedCity getSupportedCity(String city) {
-        return SupportedCity.getByName(city);
-    }
-
-    private ResultsResponse setRentOrBuy(ServiceCall serviceCall) {
-        conversationSession.setRentOrSale(serviceCall.message());
-        return new ResultsResponse(messageSource.getMessage("M02_CITY", null, localeUtils.getCurrentLocale()));
-    }
-
-    private ResultsResponse setRentOrBuyAndCity(ServiceCall serviceCall) {
-        String[] parts = serviceCall.message().split(",");
-
-        conversationSession.setRentOrSale(parts[0]);
-        var cityName = parts[1];
-        return setCity(new ServiceCall(ApiCall.SET_RENT_OR_BUY_AND_CITY,cityName));
-    }
-
-    private ResultsResponse setRentOrBuyAndCityAndDescription(ServiceCall serviceCall, HttpSession session) {
-        String[] parts = serviceCall.message().split(",");
-
-        conversationSession.setRentOrSale(parts[0]);
-        var cityName = parts[1];
-
-        SupportedCity supportedCity = getSupportedCity(cityName);
-        var description = parts[2];
-        if (supportedCity.compareTo(UNSUPPORTED) != 0) {
-            conversationSession.setCity(cityName);
-            return getApartments(description, session);
-        } else {
-            var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
-            return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
-        }
-    }
-
-    private ChatClient createNewChatClientForStream(){
-        return ChatClient
-                .builder(chatmodel)
-                .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory())//,
-//                        new SimpleLoggerAdvisor() // todo commented this out for now as it adds long log texts,
-//                         and makes things difficult to follow in the log. But when needed this should be uncommnented
-                )
-                .build();
-    }
-
-    private ChatClient createNewChatClient(){
-        return ChatClient
-                .builder(chatmodel)
-                .defaultAdvisors(
-                        new MessageChatMemoryAdvisor(conversationSession.getChatMemory()),
-                        new CaptureMemoryAdvisor(  vectorStore, chatmodel, executor, localeUtils),
-//                        new QuestionAnswerAdvisor(      // TODO  this is an advisor to be used when you need RAG
-//                                vectorStore,            //  KEEP IN mind that if we use this for all DEFAULT requests, it will only use what it knows in the "context", and it will not use its whole knowledge..
-//                                SearchRequest.defaults().withSimilarityThreshold(.8)
-//                        ),
-                        new SimpleLoggerAdvisor()
-                        )
-//                .defaultSystem()        // conversationSession.promptResource()
-                .build();
-    }
-
-    private Flux<String> respondToUserMessageStream(String userMessage) {
-
-        var chatResponse = createNewChatClientForStream()
-                .prompt()
-                .advisors (new Consumer<ChatClient.AdvisorSpec>() {
-                    @Override
-                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
-                        advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationSession.getConversationId());
-                    }
-                })
-                .advisors(new Consumer<ChatClient.AdvisorSpec>() {
-                    @Override
-                    public void accept(ChatClient.AdvisorSpec advisorSpec) {
-                        advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
-                    }
-                })
-            .user(userMessage)
-                .stream().content();
-
-        return chatResponse.scan(new StringBuilder(), (acc, next) -> acc.append(next))  // Append characters
-                .filter(buffer -> propertyIdContainsComma(buffer.toString()))
-                .map(buffer-> buffer.toString().replace("\\s+", "").split(","))
-                .flatMap(idsArray -> Flux.fromArray(idsArray));
-    }
-
-    private ResultsResponse respondToUserMessage(String userMessage) {
-        try {
-            var chatResponse = createNewChatClient()
-                    .prompt()
-                    .advisors (new Consumer<ChatClient.AdvisorSpec>() {
-                        @Override
-                        public void accept(ChatClient.AdvisorSpec advisorSpec) {
-                            advisorSpec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, conversationSession.getConversationId());
-                        }
-                    })
-                    .advisors(new Consumer<ChatClient.AdvisorSpec>() {
-                        @Override
-                        public void accept(ChatClient.AdvisorSpec advisorSpec) {
-                            advisorSpec.param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 50);
-                        }
-                    })
-                    .system( localeUtils.getLocalizedPrompt("system_defaultResponses"))
-                    .user(userMessage)
-                    .call().content();
-
-            return new ResultsResponse(chatResponse);
+            var response = assistantResponse.getResult().getOutput().getContent();
+            LOGGER.info(response);
+            ServiceCall serviceCall = outputParser.convert(response);
+            return serviceCall;
         } catch (Exception e) {
             // Catch-all for unexpected errors
             LOGGER.error("Unexpected error while calling LLM: {}", e.getMessage(), e);
-            return new ResultsResponse(messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale()));
+            return new ServiceCall(ApiCall.EXCEPTION, "");
         }
     }
-
 
 }
