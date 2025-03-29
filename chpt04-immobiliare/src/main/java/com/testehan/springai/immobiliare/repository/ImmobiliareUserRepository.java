@@ -15,7 +15,7 @@ public interface ImmobiliareUserRepository {
 
     void save(ImmobiliareUser user);
 
-    void update(ImmobiliareUser user);
+    ImmobiliareUser update(ImmobiliareUser user);
 
     void deleteById(final ObjectId id);
 

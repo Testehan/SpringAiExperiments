@@ -53,8 +53,8 @@ public class UserService {
         }
     }
 
-    public void updateUser(ImmobiliareUser user){
-        immobiliareUserRepository.update(user);
+    public ImmobiliareUser updateUser(ImmobiliareUser user){
+        return immobiliareUserRepository.update(user);
     }
 
     @Transactional

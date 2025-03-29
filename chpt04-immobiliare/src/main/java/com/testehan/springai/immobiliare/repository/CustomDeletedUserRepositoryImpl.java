@@ -1,36 +1,36 @@
 package com.testehan.springai.immobiliare.repository;
 
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
 import com.testehan.springai.immobiliare.model.auth.DeletedUser;
-import com.testehan.springai.immobiliare.util.FormattingUtil;
-import org.bson.conversions.Bson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 
 @Repository
 public class CustomDeletedUserRepositoryImpl implements CustomDeletedUserRepository{
-    private final MongoDatabase mongoDatabase;
 
-    public CustomDeletedUserRepositoryImpl(MongoDatabase mongoDatabase) {
-        this.mongoDatabase = mongoDatabase;
-    }
+    private static final Logger LOGGER = LoggerFactory.getLogger(CustomDeletedUserRepositoryImpl.class);
 
-    private MongoCollection<DeletedUser> getDeletedUsersCollection() {
-        return mongoDatabase.getCollection("users_deleted", DeletedUser.class);
+    private final MongoTemplate mongoTemplate;
+
+    public CustomDeletedUserRepositoryImpl(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
     @Override
     public void deleteDeletedUsers(LocalDateTime date) {
-        var listings = getDeletedUsersCollection();
+        Query query = new Query(Criteria.where("deletionDate").lt(date));
+        var deleteResult = mongoTemplate.remove(query, DeletedUser.class);
 
-        var formattedDateCustom = FormattingUtil.getFormattedDateCustom(date);
-
-        Bson deleteOlderEntries = Filters.lt("deletionDate", formattedDateCustom);
-
-        listings.deleteMany(deleteOlderEntries);
+        if (deleteResult.getDeletedCount() > 0){
+            LOGGER.info("Successfully deleted {} users", deleteResult.getDeletedCount());
+        } else {
+            LOGGER.info("No user found for deletion before : {}", date);
+        }
     }
 
 

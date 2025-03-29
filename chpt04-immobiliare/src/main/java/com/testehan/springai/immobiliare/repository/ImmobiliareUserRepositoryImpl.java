@@ -49,8 +49,8 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
     }
 
     @Override
-    public void update(ImmobiliareUser user) {
-        mongoTemplate.save(user);
+    public ImmobiliareUser update(ImmobiliareUser user) {
+        return mongoTemplate.save(user);
     }
 
     @Override
