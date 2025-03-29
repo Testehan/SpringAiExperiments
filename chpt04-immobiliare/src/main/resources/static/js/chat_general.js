@@ -1,5 +1,6 @@
 let suggestionsStep = 1;
 let lastAssistantMessage;
+let lastHelperMessage;
 
 let eventSource;
 let lastPingTime = new Date(); // Store the last received ping time
@@ -342,7 +343,7 @@ function askForResponse() {
     }, 15000);
 
     if (suggestionsStep < 5){
-        userMessage = lastAssistantMessage.trim() + " " + userMessage;
+        userMessage =  lastHelperMessage.trim() + " " +userMessage; //
     }
 
     htmx.ajax('POST', '/respond', {
@@ -427,6 +428,7 @@ function applyFavouriteButtonStylingDependingOnText(favouriteButton){
 function setCurrentStep(){
     lastAssistantMessage = $('.assistantResponse:last').text();
     if (lastAssistantMessage.trim() === M01_INITIAL_MESSAGE){
+        lastHelperMessage = M01_INITIAL_MESSAGE;
         suggestionsStep = 1;
         $('#suggestions').empty();
         fetchSuggestions();
@@ -434,6 +436,7 @@ function setCurrentStep(){
     }
     if (lastAssistantMessage.trim() === M02_CITY)
     {
+        lastHelperMessage = M02_CITY;
         suggestionsStep = 2;
         $('#suggestions').empty();
         fetchSuggestions();
@@ -441,6 +444,7 @@ function setCurrentStep(){
     }
     if (lastAssistantMessage.trim() === M03_BUDGET)
     {
+        lastHelperMessage = M03_BUDGET;
         suggestionsStep = 3;
         $('#suggestions').empty();
         fetchSuggestions();
@@ -448,6 +452,7 @@ function setCurrentStep(){
     }
     if (lastAssistantMessage.includes(M04_DETAILS_PART_2))
     {
+        lastHelperMessage = "";
         suggestionsStep = 4;
         $('#suggestions').empty();
         fetchSuggestions();

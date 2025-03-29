@@ -31,14 +31,16 @@ public class ApiServiceImpl implements ApiService{
 
     private final ChatClient chatClient;
     private final UserSseService userSseService;
+    private final LLMCacheService llmCacheService;
     private final LocaleUtils localeUtils;
 
     public ApiServiceImpl(ApiChatCallHandlerFactory apiCallHandlerFactory, ChatClient chatClient,
-                          UserSseService userSseService, LocaleUtils localeUtils) {
+                          UserSseService userSseService,  LLMCacheService llmCacheService, LocaleUtils localeUtils) {
         this.localeUtils = localeUtils;
         this.apiCallHandlerFactory = apiCallHandlerFactory;
         this.chatClient = chatClient;
         this.userSseService = userSseService;
+        this.llmCacheService = llmCacheService;
     }
 
     @Override
@@ -58,26 +60,38 @@ public class ApiServiceImpl implements ApiService{
 
     private ServiceCall whichApiToCall(String message) {
         try {
-            ChatResponse assistantResponse;
+            var cachedResponse = llmCacheService.getCachedResponse(message);
+            if (cachedResponse.isPresent()) {
+                var response = cachedResponse.get();
+                String[] parts = response.split(",");
+                return new ServiceCall(ApiCall.getByValue(parts[0]), parts[1]);
+            } else {
 
-            var outputParser = new BeanOutputConverter<>(ServiceCall.class);
-            String format = outputParser.getFormat();
+                ChatResponse assistantResponse;
 
-            var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
-            PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
-            Map<String, Object> promptParameters = new HashMap<>();
-            promptParameters.put("format", format);
-            Prompt prompt = promptTemplate.create(promptParameters);
+                var outputParser = new BeanOutputConverter<>(ServiceCall.class);
+                String format = outputParser.getFormat();
 
-            assistantResponse = chatClient.prompt()
-                    .system(prompt.getContents())   //Move large static content to the system message field
-                    .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
-                    .call().chatResponse();
+                var apiDescriptionPrompt = localeUtils.getLocalizedPrompt("ApiDescription");
+                PromptTemplate promptTemplate = new PromptTemplate(apiDescriptionPrompt);
+                Map<String, Object> promptParameters = new HashMap<>();
+                promptParameters.put("format", format);
+                Prompt prompt = promptTemplate.create(promptParameters);
 
-            var response = assistantResponse.getResult().getOutput().getContent();
-            LOGGER.info(response);
-            ServiceCall serviceCall = outputParser.convert(response);
-            return serviceCall;
+                assistantResponse = chatClient.prompt()
+                        .system(prompt.getContents())   //Move large static content to the system message field
+                        .user(message)  // Keep dynamic elements in user messages, as system messages don't require repeating.
+                        .call().chatResponse();
+
+                var response = assistantResponse.getResult().getOutput().getContent();
+                LOGGER.info(response);
+                ServiceCall serviceCall = outputParser.convert(response);
+
+                var valueToBeCached = serviceCall.apiCall().toString() + "," + serviceCall.message();
+                llmCacheService.saveToCache("","",message, valueToBeCached);
+
+                return serviceCall;
+            }
         } catch (Exception e) {
             // Catch-all for unexpected errors
             LOGGER.error("Unexpected error while calling LLM: {}", e.getMessage(), e);
