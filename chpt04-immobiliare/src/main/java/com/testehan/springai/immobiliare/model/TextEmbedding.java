@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 
 import java.util.List;
 
+// if a user input already has an embedding calculated, we use it to speed things up
 @NoArgsConstructor
 @Getter
 @Setter

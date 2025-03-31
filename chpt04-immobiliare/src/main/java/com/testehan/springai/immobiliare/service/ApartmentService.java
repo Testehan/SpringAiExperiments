@@ -7,30 +7,14 @@ import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
-import com.testehan.springai.immobiliare.util.*;
-import org.apache.logging.log4j.util.Strings;
+import com.testehan.springai.immobiliare.util.ContactValidator;
+import com.testehan.springai.immobiliare.util.ListingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.SystemMessage;
-import org.springframework.ai.chat.messages.UserMessage;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.model.Media;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.util.MimeTypeUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -41,35 +25,27 @@ public class ApartmentService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentService.class);
 
-    @Value("${app.url}")
-    private String appUrl;
-
     private final ApartmentsRepository apartmentsRepository;
-    private final OpenAiService openAiService;
-    private final ChatModel chatModel ;
+    private final ListingEmbeddingService listingEmbeddingService;
+    private final ListingImageService listingImageService;
+    private final ListingNotificationService listingNotificationService;
+    private final ListingAmenitiesService listingAmenitiesService;
+
     private final UserService userService;
-    private final EmailService emailService;
     private final LLMCacheService llmCacheService;
 
-    private final LocaleUtils localeUtils;
-    private final AmazonS3Util amazonS3Util;
-    private final ImageConverter imageConverter;
-    private final GoogleMapsUtil googleMapsUtil;
     private final ListingUtil listingUtil;
 
-    public ApartmentService(ApartmentsRepository apartmentsRepository, OpenAiService openAiService, ChatModel chatModel,
-                            UserService userService, EmailService emailService, LLMCacheService llmCacheService, LocaleUtils localeUtils, AmazonS3Util amazonS3Util,
-                            ImageConverter imageConverter, GoogleMapsUtil googleMapsUtil, ListingUtil listingUtil) {
+    public ApartmentService(ApartmentsRepository apartmentsRepository, ListingEmbeddingService listingEmbeddingService, ListingImageService listingImageService,
+                            UserService userService, ListingNotificationService listingNotificationService, LLMCacheService llmCacheService,
+                            ListingAmenitiesService listingAmenitiesService, ListingUtil listingUtil) {
         this.apartmentsRepository = apartmentsRepository;
-        this.openAiService = openAiService;
-        this.chatModel = chatModel;
+        this.listingEmbeddingService = listingEmbeddingService;
+        this.listingImageService = listingImageService;
         this.userService = userService;
-        this.emailService = emailService;
+        this.listingNotificationService = listingNotificationService;
         this.llmCacheService = llmCacheService;
-        this.localeUtils = localeUtils;
-        this.amazonS3Util = amazonS3Util;
-        this.imageConverter = imageConverter;
-        this.googleMapsUtil = googleMapsUtil;
+        this.listingAmenitiesService = listingAmenitiesService;
         this.listingUtil = listingUtil;
     }
 
@@ -127,7 +103,7 @@ public class ApartmentService {
 
         var isPropertyNew = isPropertyNew(apartment);
         if (isPropertyNew){
-            getAmenitiesAndSetInApartment(apartment);
+            listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
             saveApartment(apartment);
         } else {
             var optionalApartment = findApartmentById(apartment.getIdString());
@@ -136,24 +112,20 @@ public class ApartmentService {
                 var hasAddressChange = !apartmentCurrentlySaved.getArea().equalsIgnoreCase(apartment.getArea());
                 if (hasAddressChange || apartmentCurrentlySaved.getNearbyAmenities().isEmpty()){
                     // means that address changed and we need to set amenities again
-                    getAmenitiesAndSetInApartment(apartment);
+                    listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
                 } else {
                     apartment.setNearbyAmenities(apartmentCurrentlySaved.getNearbyAmenities());
                 }
             }
         }
 
-        var imagesWereUploaded = saveUploadedImages(apartment, apartmentImages);
-        var imagesWereDeleted = deleteUploadedImages(apartment);
+        var imagesWereUploaded = listingImageService.saveUploadedImages(apartment, apartmentImages);
+        var imagesWereDeleted = listingImageService.deleteUploadedImages(apartment);
         if (imagesWereUploaded || imagesWereDeleted) {
-            generateImageMetadata(apartment);
+            listingImageService.generateImageMetadata(apartment);
         }
 
-        var apartmentInfoToEmbed = listingUtil.getApartmentInfoToEmbedd(apartment);
-        var mono = openAiService.createEmbedding(apartmentInfoToEmbed);
-        List<Double> embeddings = mono.block();
-
-        apartment.setPlot_embedding(embeddings);
+        apartment.setPlot_embedding(listingEmbeddingService.createEmbedding(apartment));
         if (Objects.isNull(apartment.getPlot_embedding()) || apartment.getPlot_embedding().isEmpty()) {
             // todo having plot embedding empty means that vector search will not work as expected... need to figure out why this happens..
             // probably when trying to create multiple listings quickly ?
@@ -169,7 +141,7 @@ public class ApartmentService {
         }
         if (isPropertyNew) {
             updateUserInfo(apartment, user);
-            sendListingAddedEmail(savedListing, user);
+            listingNotificationService.sendListingAddedEmail(savedListing, user);
         }
 
         llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
@@ -177,10 +149,6 @@ public class ApartmentService {
         LOGGER.info("Apartment was added with success!");
     }
 
-    private void getAmenitiesAndSetInApartment(Apartment apartment) {
-        var nearbyAmenities = googleMapsUtil.getNearbyAmenities(apartment.getArea() + " " + apartment.getCity());
-        apartment.setNearbyAmenities(nearbyAmenities);
-    }
 
     private void updateUserInfo(Apartment apartment, ImmobiliareUser user) {
         user.getListedProperties().add(apartment.getId().toString());
@@ -203,118 +171,6 @@ public class ApartmentService {
         apartment.setActivationToken(UUID.randomUUID().toString());
 
         return isPropertyNew;
-    }
-
-    public boolean deleteUploadedImages(Apartment apartment) {
-        boolean imagesWereDeleted = false;
-        var uploadDir = "apartment-images/" + apartment.getId().toString();
-
-        List<String> objectKeys = amazonS3Util.listFolder(uploadDir);
-        for (String key : objectKeys){
-            int lastIndexOfSlash = key.lastIndexOf("/");
-            var filename = key.substring(lastIndexOfSlash + 1);
-            if (apartment.getImages().stream().filter(imageURL -> {
-                int lastSlash = imageURL.lastIndexOf("/");
-                return imageURL.substring(lastSlash+1).equals(filename);
-            }).count()<1){
-                amazonS3Util.deleteFile(key);
-                imagesWereDeleted = true;
-            }
-        }
-
-        return imagesWereDeleted;
-    }
-
-    private boolean saveUploadedImages(Apartment apartment, List<ApartmentImage> apartmentImages) throws IOException {
-        boolean imagesWereUploaded = false;
-        if (apartmentImages.size()>0) {
-            var uploadDir = "apartment-images/" + apartment.getId();
-            var amazonS3BaseUri = amazonS3Util.getS3_BASE_URI();
-            for (ApartmentImage extraImage : apartmentImages) {
-
-                var filename = extraImage.name().replaceFirst("[.][^.]+$", "") + ".webp";
-                var contentType = "image/webp";
-
-                try {
-                    InputStream webPImageInputStream = imageConverter.convertToWebPInputStream(extraImage.data());
-                    amazonS3Util.uploadFile(uploadDir, filename, webPImageInputStream, contentType);
-
-                    apartment.getImages().add(amazonS3BaseUri + "/" + uploadDir + "/" + filename);
-
-                    imagesWereUploaded = true;
-                    LOGGER.info("Image {} uploaded to S3 for apartment {}", filename, apartment.getName());
-                } catch (Exception e){
-                    LOGGER.info("Image {} could not be uploaded to S3 for apartment {}. Error: {}", filename, apartment.getName(), e.getMessage());
-                }
-            }
-
-        }
-        return imagesWereUploaded;
-    }
-
-    private void generateImageMetadata(Apartment apartment) throws IOException {
-
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean imagesWereModified = false;
-
-        for (String apartmentImages : apartment.getImages()) {
-            URL url = new URL(apartmentImages);
-            try (InputStream inputStream = url.openStream()) {
-                ChatClient chatClient = ChatClient.builder(chatModel).build();
-                ChatClient.ChatClientRequestSpec chatClientRequest = chatClient.prompt();
-
-                imagesWereModified = true;
-                URLConnection connection = url.openConnection();
-                Resource imageResource = new InputStreamResource(inputStream);
-
-                var userPictureMetadataPrompt = localeUtils.getLocalizedPrompt("UserPictureMetadataGeneration");
-                var systemPictureMetadataPrompt = localeUtils.getLocalizedPrompt("SystemPictureMetadataGeneration");
-                Message userMessage = new UserMessage(
-                        userPictureMetadataPrompt,
-                        List.of(new Media(MimeTypeUtils.parseMimeType(connection.getContentType()), imageResource))
-                );
-                Message systemMessage = new SystemMessage(systemPictureMetadataPrompt);
-                chatClientRequest.messages(List.of(systemMessage, userMessage));
-                Map<String, Object> result = chatClientRequest.call().entity(new ParameterizedTypeReference<>() {});
-                stringBuilder.append(result.get("description"));
-
-                LOGGER.info("Image Metatada generated : {}", result.get("description"));
-            }
-        }
-        if (imagesWereModified) {
-            apartment.setImagesGeneratedDescription(stringBuilder.toString());
-        }
-        if (apartment.getImages().size()==0){   // means that user either removed images or didn't add any
-            apartment.setImagesGeneratedDescription(Strings.EMPTY);
-        }
-
-    }
-
-    public List<ApartmentImage> processImages(MultipartFile[] apartmentImages) {
-        List<ApartmentImage> processedImages = new ArrayList<>();
-        if (Objects.nonNull(apartmentImages)) {
-            for (MultipartFile extraImage : apartmentImages) {
-                if (extraImage.isEmpty()) continue;
-
-                var filename = StringUtils.cleanPath(extraImage.getOriginalFilename()).replace(" ", "-");
-                var contentType = extraImage.getContentType();
-                try {
-                    processedImages.add(new ApartmentImage(filename, contentType, extraImage.getInputStream()));
-                } catch (IOException ex) {
-                    LOGGER.error("File {} could not be read, hence it will be skipped", filename);
-                }
-            }
-        }
-        return processedImages;
-    }
-
-
-
-    private void sendListingAddedEmail(Apartment listing, ImmobiliareUser user) {
-        var listingId = listing.getId().toString();
-        var viewUrl = appUrl + "/view/" + listingId;
-        var editUrl = appUrl + "/edit/" + listingId;
-        emailService.sendListingAddedEmail(user.getEmail(), user.getName(), listing.getName(), viewUrl, editUrl ,localeUtils.getCurrentLocale());
     }
 
     public Optional<String> findApartmentIdBySocialId(String socialId) {

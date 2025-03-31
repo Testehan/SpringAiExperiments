@@ -7,10 +7,7 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.security.SessionCleanupListener;
 import com.testehan.springai.immobiliare.security.UserService;
-import com.testehan.springai.immobiliare.service.ApartmentService;
-import com.testehan.springai.immobiliare.service.ApiService;
-import com.testehan.springai.immobiliare.service.EmbeddingService;
-import com.testehan.springai.immobiliare.service.UserSseService;
+import com.testehan.springai.immobiliare.service.*;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
@@ -42,6 +39,7 @@ public class ApartmentController {
     private static final String TOP_CONTACTED_IMAGE_PATH = "/images/top-contacted.png";
 
     private final ApartmentService apartmentService;
+    private final ListingImageService listingImageService;
     private final ConversationSession conversationSession;
     private final UserService userService;
     private final EmbeddingService embeddingService;
@@ -54,13 +52,14 @@ public class ApartmentController {
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApartmentController(ApartmentService apartmentService, ConversationSession conversationSession,
+    public ApartmentController(ApartmentService apartmentService, ListingImageService listingImageService, ConversationSession conversationSession,
                                UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
                                SessionCleanupListener sessionCleanupListener,
                                MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.apartmentService = apartmentService;
+        this.listingImageService = listingImageService;
         this.conversationSession = conversationSession;
         this.apiService = apiService;
         this.templateEngine = templateEngine;
@@ -93,7 +92,7 @@ public class ApartmentController {
         }
 
         if (user.getMaxNumberOfListedProperties() > 0){
-            List<ApartmentImage> processedImages = apartmentService.processImages(apartmentImages);
+            List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
             apartmentService.saveApartmentAndImages(apartment, processedImages, user);
             LOGGER.info("User {} added/edited a property ", user.getEmail());
             // Return a response to the frontend
@@ -119,7 +118,7 @@ public class ApartmentController {
 
         var apartment = apartmentService.findApartmentById(listingId);
         if (apartment.isPresent()) {
-            apartmentService.deleteUploadedImages(apartment.get());
+            listingImageService.deleteUploadedImages(apartment.get());
             apartmentService.deleteApartmentsByIds(List.of(listingId));
             user.getListedProperties().remove(listingId);
             userService.updateUser(user);

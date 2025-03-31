@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Aggregates.*;
 import static com.mongodb.client.model.Filters.eq;
@@ -254,7 +255,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         if (deleteResult.getDeletedCount() > 0) {
             LOGGER.info("Deleted {} apartments.", deleteResult.getDeletedCount());
         } else {
-            LOGGER.warn("No apartments were deleted. Check if the IDs are correct.");
+            LOGGER.warn("No apartments were deleted for Ids {}. Check if the IDs are correct.", apartmentIds.stream().collect(Collectors.joining()));
         }
     }
 
