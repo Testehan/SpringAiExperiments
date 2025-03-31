@@ -2,7 +2,7 @@ package com.testehan.springai.immobiliare.configuration;
 
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
-import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.ApartmentCrudService;
 import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.SmsService;
 import com.testehan.springai.immobiliare.util.ContactValidator;
@@ -25,16 +25,16 @@ public class ScheduledTasks {
     private String appUrl;
 
     private final UserService userService;
-    private final ApartmentService apartmentService;
+    private final ApartmentCrudService apartmentCrudService;
     private final EmailService emailService;
     private final SmsService smsService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public ScheduledTasks(UserService userService, ApartmentService apartmentService, EmailService emailService, SmsService smsService, MessageSource messageSource,
+    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, EmailService emailService, SmsService smsService, MessageSource messageSource,
                           LocaleUtils localeUtils){
         this.userService = userService;
-        this.apartmentService = apartmentService;
+        this.apartmentCrudService = apartmentCrudService;
         this.emailService = emailService;
         this.smsService = smsService;
         this.messageSource = messageSource;
@@ -49,7 +49,7 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
     public void deactivatedListingsLastUpdatedMoreThan2WeeksAgo() {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
-        apartmentService.deactivateApartments(twoWeeksAgo);
+        apartmentCrudService.deactivateApartments(twoWeeksAgo);
         log.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
     }
 
@@ -68,7 +68,7 @@ public class ScheduledTasks {
         LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
         log.info("Scheduled Task - Reactivation emails will be send to owners.");
 
-        var listings = apartmentService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
+        var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
 
         for (Apartment listing : listings){
             log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
@@ -90,7 +90,7 @@ public class ScheduledTasks {
         LocalDateTime thirteenDaysAgo = LocalDateTime.now().minus(13, ChronoUnit.DAYS);
         log.info("Scheduled Task - Reactivation sms will be send to owners.");
 
-        var listings = apartmentService.findByLastUpdateDateTimeBefore(thirteenDaysAgo);
+        var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(thirteenDaysAgo);
 
         for (Apartment listing : listings){
             log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());

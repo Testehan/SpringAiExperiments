@@ -15,13 +15,10 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.converter.BeanOutputConverter;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
@@ -32,7 +29,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -46,17 +42,13 @@ public class SearchListingsHandler implements ApiChatCallHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchListingsHandler.class);
 
+    private final ApartmentCrudService apartmentCrudService;
     private final ApartmentService apartmentService;
     private final ChatClientService chatClientService;
     private final EmbeddingService embeddingService;
     private final LLMCacheService llmCacheService;
 
     private final ChatClient chatClient;
-    private final ChatModel chatmodel;
-
-    private final VectorStore vectorStore;
-
-    private final Executor executor;
 
     private final ConversationSession conversationSession;
     private final ConversationService conversationService;
@@ -66,15 +58,17 @@ public class SearchListingsHandler implements ApiChatCallHandler {
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public SearchListingsHandler(ApartmentService apartmentService, ChatClientService chatClientService, EmbeddingService embeddingService, LLMCacheService llmCacheService, ChatClient chatClient, ChatModel chatmodel, VectorStore vectorStore, @Qualifier("applicationTaskExecutor") Executor executor, ConversationSession conversationSession, ConversationService conversationService, UserSseService userSseService, MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil) {
+    public SearchListingsHandler(ApartmentCrudService apartmentCrudService, ApartmentService apartmentService,
+                                 ChatClientService chatClientService, EmbeddingService embeddingService,
+                                 LLMCacheService llmCacheService, ChatClient chatClient, ConversationSession conversationSession,
+                                 ConversationService conversationService, UserSseService userSseService, MessageSource messageSource,
+                                 LocaleUtils localeUtils, ListingUtil listingUtil) {
+        this.apartmentCrudService = apartmentCrudService;
         this.apartmentService = apartmentService;
         this.chatClientService = chatClientService;
         this.embeddingService = embeddingService;
         this.llmCacheService = llmCacheService;
         this.chatClient = chatClient;
-        this.chatmodel = chatmodel;
-        this.vectorStore = vectorStore;
-        this.executor = executor;
         this.conversationSession = conversationSession;
         this.conversationService = conversationService;
         this.userSseService = userSseService;
@@ -117,7 +111,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                 String[] listingIds = cachedResponse.get().split("\\,");
                 sendResultsFoundResponse(session);
 
-                var listingsFound = apartmentService.findApartmentsByIds(List.of(listingIds));
+                var listingsFound = apartmentCrudService.findApartmentsByIds(List.of(listingIds));
                 listingUtil.setIsMostFavouriteAndContacted(listingsFound);
                 for (Apartment listing : listingsFound){
                     sendListing(session.getId(), listing, conversationId, immobiliareUser);

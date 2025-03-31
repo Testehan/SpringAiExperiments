@@ -4,12 +4,15 @@ import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.security.UserService;
-import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.ApartmentCrudService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 
@@ -19,12 +22,12 @@ public class UserController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
-    private final ApartmentService apartmentService;
+    private final ApartmentCrudService apartmentCrudService;
     private final ConversationSession conversationSession;
 
-    public UserController(UserService userService,ApartmentService apartmentService, ConversationSession conversationSession) {
+    public UserController(UserService userService,ApartmentCrudService apartmentCrudService, ConversationSession conversationSession) {
         this.userService = userService;
-        this.apartmentService = apartmentService;
+        this.apartmentCrudService = apartmentCrudService;
         this.conversationSession = conversationSession;
     }
 
@@ -54,7 +57,7 @@ public class UserController {
 
         if (loggedInUser.getEmail().equalsIgnoreCase(userFoundFromEmail.get().getEmail())){
             // do deletion of listed properties, conversations and the user
-            apartmentService.deleteApartmentsByIds(loggedInUser.getListedProperties());
+            apartmentCrudService.deleteApartmentsByIds(loggedInUser.getListedProperties());
             conversationSession.clearConversationAndPreferences();
             userService.deleteUser(loggedInUser);
 

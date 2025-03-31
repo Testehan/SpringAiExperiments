@@ -8,7 +8,7 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
-import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.ApartmentCrudService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
@@ -34,7 +34,7 @@ public class MainController {
 	@Value("${app.url}")
 	private String appUrl;
 
-	private final ApartmentService apartmentService;
+	private final ApartmentCrudService apartmentCrudService;
 	private final ConversationSession conversationSession;
 	private final UserSseService userSseService;
 	private final MessageSource messageSource;
@@ -42,11 +42,11 @@ public class MainController {
 	private final ListingUtil listingUtil;
 	private final LocaleUtils localeUtils;
 
-	public MainController(ApartmentService apartmentService, ConversationSession conversationSession,
-						  UserSseService userSseService, MessageSource messageSource,
-						  BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
-		this.apartmentService = apartmentService;
-		this.conversationSession = conversationSession;
+	public MainController(ApartmentCrudService apartmentCrudService, ConversationSession conversationSession,
+                          UserSseService userSseService, MessageSource messageSource,
+                          BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
+        this.apartmentCrudService = apartmentCrudService;
+        this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
 		this.messageSource = messageSource;
 		this.beanConfig = beanConfig;
@@ -112,7 +112,7 @@ public class MainController {
 		List<Apartment> apartments = new ArrayList<>();
 		for (String apartmentId : user.getFavouriteProperties()){
 			if (!StringUtils.isEmpty(apartmentId)) {
-				apartmentService.findApartmentById(apartmentId).ifPresent(apartment -> apartments.add(apartment));
+				apartmentCrudService.findApartmentById(apartmentId).ifPresent(apartment -> apartments.add(apartment));
 			}
 		}
 
@@ -181,7 +181,7 @@ public class MainController {
 		model.addAttribute("appUrl", appUrl);
 
 		if (user.getListedProperties().contains(apartmentId) || user.isAdmin()) {
-			var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+			var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
 			if (!apartmentOptional.isEmpty()) {
 				var apartment = apartmentOptional.get();
 				model.addAttribute("apartment", apartment);
@@ -202,7 +202,7 @@ public class MainController {
 
 	@GetMapping("/view/{apartmentId}")
 	public String view(@PathVariable(value = "apartmentId") String apartmentId, Model model, Locale locale) {
-		var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+		var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
 		if (!apartmentOptional.isEmpty()) {
 			var apartment = apartmentOptional.get();
 			var user = conversationSession.getImmobiliareUser().get();
@@ -232,7 +232,7 @@ public class MainController {
 
 	@GetMapping("/s/{socialId}")
 	public String social(@PathVariable(value = "socialId") String socialId, Model model, Locale locale) {
-		var apartmentId = apartmentService.findApartmentIdBySocialId(socialId);
+		var apartmentId = apartmentCrudService.findApartmentIdBySocialId(socialId);
 		if (apartmentId.isPresent()) {
 			return view(apartmentId.get(), model, locale);
 		} else {
@@ -356,9 +356,9 @@ public class MainController {
 	private List<Apartment> getListOfProperties(ImmobiliareUser user) {
 		List<Apartment> listOfProperties;
 		if (user.isAdmin()){
-			listOfProperties = apartmentService.findAll();
+			listOfProperties = apartmentCrudService.findAll();
 		} else{
-			listOfProperties = apartmentService.findApartmentsByIds(user.getListedProperties());
+			listOfProperties = apartmentCrudService.findApartmentsByIds(user.getListedProperties());
 		}
 		return listOfProperties;
 	}

@@ -39,6 +39,7 @@ public class ApartmentController {
     private static final String TOP_CONTACTED_IMAGE_PATH = "/images/top-contacted.png";
 
     private final ApartmentService apartmentService;
+    private final ApartmentCrudService apartmentCrudService;
     private final ListingImageService listingImageService;
     private final ConversationSession conversationSession;
     private final UserService userService;
@@ -52,13 +53,14 @@ public class ApartmentController {
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApartmentController(ApartmentService apartmentService, ListingImageService listingImageService, ConversationSession conversationSession,
+    public ApartmentController(ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
                                UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
                                SessionCleanupListener sessionCleanupListener,
                                MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.apartmentService = apartmentService;
+        this.apartmentCrudService = apartmentCrudService;
         this.listingImageService = listingImageService;
         this.conversationSession = conversationSession;
         this.apiService = apiService;
@@ -116,10 +118,10 @@ public class ApartmentController {
                     .body("You can't perform this deletion!");
         }
 
-        var apartment = apartmentService.findApartmentById(listingId);
+        var apartment = apartmentCrudService.findApartmentById(listingId);
         if (apartment.isPresent()) {
             listingImageService.deleteUploadedImages(apartment.get());
-            apartmentService.deleteApartmentsByIds(List.of(listingId));
+            apartmentCrudService.deleteApartmentsByIds(List.of(listingId));
             user.getListedProperties().remove(listingId);
             userService.updateUser(user);
             LOGGER.info("User {} deleted a property ", user.getEmail());
@@ -135,11 +137,11 @@ public class ApartmentController {
 
     @GetMapping("/contact/{apartmentId}")
     public String contact(@PathVariable(value = "apartmentId") String apartmentId) {
-        var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+        var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
             var listing = apartmentOptional.get();
             listing.setNoOfContact(listing.getNoOfContact()+1);
-            apartmentService.saveApartment(listing);
+            apartmentCrudService.saveApartment(listing);
             return apartmentOptional.get().getContact();
         } else {
             LOGGER.error("No apartment with id {} was found" , apartmentId);
@@ -231,7 +233,7 @@ public class ApartmentController {
     @HxRequest
     public void favourite(@PathVariable(value = "apartmentId") String apartmentId) {
         var user = conversationSession.getImmobiliareUser().get();
-        var apartmentOptional = apartmentService.findApartmentById(apartmentId);
+        var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
             var listing = apartmentOptional.get();
             if (!user.getFavouriteProperties().contains(apartmentId)) {
@@ -242,7 +244,7 @@ public class ApartmentController {
                 user.getFavouriteProperties().remove(apartmentId);
             }
 
-            apartmentService.saveApartment(listing);
+            apartmentCrudService.saveApartment(listing);
             userService.updateUser(user);
         } else {
             LOGGER.error("No apartment with id {} was found" , apartmentId);

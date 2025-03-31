@@ -1,7 +1,7 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.ApartmentCrudService;
 import com.testehan.springai.immobiliare.util.FormattingUtil;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -26,11 +26,11 @@ public class ReactivateController {
     private String appUrl;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateController.class);
-    private final ApartmentService apartmentService;
+    private final ApartmentCrudService apartmentCrudService;
     private final MessageSource messageSource;
 
-    public ReactivateController(ApartmentService apartmentService, MessageSource messageSource) {
-        this.apartmentService = apartmentService;
+    public ReactivateController(ApartmentCrudService apartmentCrudService, MessageSource messageSource) {
+        this.apartmentCrudService = apartmentCrudService;
         this.messageSource = messageSource;
     }
 
@@ -72,7 +72,7 @@ public class ReactivateController {
             var lastUpdatedTime = FormattingUtil.getFormattedDateCustom(LocalDateTime.now());
             apartment.setLastUpdateDateTime(lastUpdatedTime);
             apartment.setActive(true);
-            apartmentService.saveApartment(apartment);
+            apartmentCrudService.saveApartment(apartment);
             return true;
         } catch (Exception e) {
             return false;
@@ -80,7 +80,7 @@ public class ReactivateController {
     }
 
     private Optional<Apartment> validateToken(String activationToken, String listingId) {
-        var listingOptional = apartmentService.findApartmentById(listingId);
+        var listingOptional = apartmentCrudService.findApartmentById(listingId);
         if (listingOptional.isPresent()){
             var listing = listingOptional.get();
             if (listing.getActivationToken().equals(activationToken)){

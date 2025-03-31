@@ -26,6 +26,7 @@ public class ApartmentService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentService.class);
 
     private final ApartmentsRepository apartmentsRepository;
+    private final ApartmentCrudService apartmentCrudService;
     private final ListingEmbeddingService listingEmbeddingService;
     private final ListingImageService listingImageService;
     private final ListingNotificationService listingNotificationService;
@@ -36,10 +37,11 @@ public class ApartmentService {
 
     private final ListingUtil listingUtil;
 
-    public ApartmentService(ApartmentsRepository apartmentsRepository, ListingEmbeddingService listingEmbeddingService, ListingImageService listingImageService,
+    public ApartmentService(ApartmentsRepository apartmentsRepository, ApartmentCrudService apartmentCrudService, ListingEmbeddingService listingEmbeddingService, ListingImageService listingImageService,
                             UserService userService, ListingNotificationService listingNotificationService, LLMCacheService llmCacheService,
                             ListingAmenitiesService listingAmenitiesService, ListingUtil listingUtil) {
         this.apartmentsRepository = apartmentsRepository;
+        this.apartmentCrudService = apartmentCrudService;
         this.listingEmbeddingService = listingEmbeddingService;
         this.listingImageService = listingImageService;
         this.userService = userService;
@@ -59,39 +61,8 @@ public class ApartmentService {
         return listings;
     }
 
-    public Optional<Apartment> findApartmentById(String apartmentId) {
-        return apartmentsRepository.findApartmentById(apartmentId);
-    }
-
     public boolean isPhoneValid(String phoneNumber) {
         return apartmentsRepository.isPhoneValid(phoneNumber);
-    }
-
-    public List<Apartment> findAll(){
-        return apartmentsRepository.findAll();
-    }
-
-    public List<Apartment> findApartmentsByIds(List<String> apartmentIds){
-        List<Apartment> apartments = new ArrayList<>();
-        for (String apartmentId : apartmentIds){
-            findApartmentById(apartmentId).ifPresent(apartment -> apartments.add(apartment));
-        }
-        return apartments;
-    }
-    public List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date){
-        return apartmentsRepository.findByLastUpdateDateTimeBefore(date);
-    }
-
-    public void deactivateApartments(LocalDateTime date) {
-        apartmentsRepository.deactivateApartments(date);
-    }
-
-    public Apartment saveApartment(Apartment apartment){
-        return apartmentsRepository.saveApartment(apartment);
-    }
-
-    public void deleteApartmentsByIds(List<String> apartmentIds){
-        apartmentsRepository.deleteApartmentsByIds(apartmentIds);
     }
 
     @Async
@@ -104,9 +75,9 @@ public class ApartmentService {
         var isPropertyNew = isPropertyNew(apartment);
         if (isPropertyNew){
             listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
-            saveApartment(apartment);
+            apartmentCrudService.saveApartment(apartment);
         } else {
-            var optionalApartment = findApartmentById(apartment.getIdString());
+            var optionalApartment = apartmentCrudService.findApartmentById(apartment.getIdString());
             if (optionalApartment.isPresent()){
                 var apartmentCurrentlySaved = optionalApartment.get();
                 var hasAddressChange = !apartmentCurrentlySaved.getArea().equalsIgnoreCase(apartment.getArea());
@@ -132,7 +103,7 @@ public class ApartmentService {
             LOGGER.error("###################### apartment {} has no plot embedding ", apartment.getName());
         }
 
-        var savedListing = saveApartment(apartment);
+        var savedListing = apartmentCrudService.saveApartment(apartment);
 
         var contact = apartment.getContact();
         if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){
@@ -171,9 +142,5 @@ public class ApartmentService {
         apartment.setActivationToken(UUID.randomUUID().toString());
 
         return isPropertyNew;
-    }
-
-    public Optional<String> findApartmentIdBySocialId(String socialId) {
-        return apartmentsRepository.findApartmentIdBySocialId(socialId);
     }
 }
