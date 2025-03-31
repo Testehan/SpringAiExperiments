@@ -2,7 +2,6 @@ package com.testehan.springai.immobiliare.repository;
 
 import com.testehan.springai.immobiliare.model.auth.AuthenticationType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,13 +67,18 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
 
     @Override
     public void resetSearchesAvailable() {
-        // Sets searchesAvailable to the value of maxSearchesAvailable if it exists.
-        // otherwise it defaults to 10
-        Update update = new Update().set("searchesAvailable",
-                new Document("$ifNull", List.of("$maxSearchesAvailable", 10)));
+        // Fetch all the users who are not admins
+        List<ImmobiliareUser> users = mongoTemplate.find(
+                new Query(Criteria.where("isAdmin").is("false")), ImmobiliareUser.class);
+// todo this can be improved to save all users at once..or to do it in another more efficient way
+        for (ImmobiliareUser user : users) {
+            // Set searchesAvailable to maxSearchesAvailable if it's present, otherwise 10
+            int searchesAvailable = (user.getMaxSearchesAvailable() != null) ?
+                    user.getMaxSearchesAvailable() : 10;
 
-        Query query = new Query(Criteria.where("isAdmin").is("false"));
-        mongoTemplate.updateMulti(query, update, ImmobiliareUser.class);
+            user.setSearchesAvailable(searchesAvailable);
+            mongoTemplate.save(user);
+        }
     }
 
     private Optional<ImmobiliareUser> findUserByField(String fieldName, String fieldValue) {

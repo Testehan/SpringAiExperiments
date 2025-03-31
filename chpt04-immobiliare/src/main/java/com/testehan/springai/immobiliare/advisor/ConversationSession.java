@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -17,7 +16,6 @@ import java.util.function.Consumer;
 import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
 
 @Component
-@SessionScope
 public class ConversationSession {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConversationSession.class);
