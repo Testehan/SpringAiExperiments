@@ -90,26 +90,12 @@ public class ApartmentService {
             }
         }
 
-        var imagesWereUploaded = listingImageService.saveUploadedImages(apartment, apartmentImages);
-        var imagesWereDeleted = listingImageService.deleteUploadedImages(apartment);
-        if (imagesWereUploaded || imagesWereDeleted) {
-            listingImageService.generateImageMetadata(apartment);
-        }
-
-        apartment.setPlot_embedding(listingEmbeddingService.createEmbedding(apartment));
-        if (Objects.isNull(apartment.getPlot_embedding()) || apartment.getPlot_embedding().isEmpty()) {
-            // todo having plot embedding empty means that vector search will not work as expected... need to figure out why this happens..
-            // probably when trying to create multiple listings quickly ?
-            LOGGER.error("###################### apartment {} has no plot embedding ", apartment.getName());
-        }
+        saveImagesAndMetadata(apartment, apartmentImages);
+        updateEmbeddings(apartment);
 
         var savedListing = apartmentCrudService.saveApartment(apartment);
 
-        var contact = apartment.getContact();
-        if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){
-            user.setPhoneNumber(contact);
-            userService.updateUser(user);
-        }
+        updateUserPhoneIfChanged(apartment, user);
         if (isPropertyNew) {
             updateUserInfo(apartment, user);
             listingNotificationService.sendListingAddedEmail(savedListing, user);
@@ -118,6 +104,31 @@ public class ApartmentService {
         llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
 
         LOGGER.info("Apartment was added with success!");
+    }
+
+    private void updateUserPhoneIfChanged(Apartment apartment, ImmobiliareUser user) {
+        var contact = apartment.getContact();
+        if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){
+            user.setPhoneNumber(contact);
+            userService.updateUser(user);
+        }
+    }
+
+    private void updateEmbeddings(Apartment apartment) {
+        apartment.setPlot_embedding(listingEmbeddingService.createEmbedding(apartment));
+        if (Objects.isNull(apartment.getPlot_embedding()) || apartment.getPlot_embedding().isEmpty()) {
+            // todo having plot embedding empty means that vector search will not work as expected... need to figure out why this happens..
+            // probably when trying to create multiple listings quickly ?
+            LOGGER.error("###################### apartment {} has no plot embedding ", apartment.getName());
+        }
+    }
+
+    private void saveImagesAndMetadata(Apartment apartment, List<ApartmentImage> apartmentImages) throws IOException {
+        var imagesWereUploaded = listingImageService.saveUploadedImages(apartment, apartmentImages);
+        var imagesWereDeleted = listingImageService.deleteUploadedImages(apartment);
+        if (imagesWereUploaded || imagesWereDeleted) {
+            listingImageService.generateImageMetadata(apartment);
+        }
     }
 
 
