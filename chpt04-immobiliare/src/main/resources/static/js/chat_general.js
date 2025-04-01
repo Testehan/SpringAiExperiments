@@ -111,7 +111,6 @@ function setOnClickForRecordAudio(){
                 }
             }, 1000);
 
-            // **Set a timeout to auto-stop after 40 seconds**
             recordingTimeout = setTimeout(() => {
                 if (mediaRecorder.state === "recording") {
                     mediaRecorder.stop();
@@ -129,6 +128,17 @@ function setOnClickForRecordAudio(){
             $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
             $("#message").removeAttr("required");
         }
+    });
+
+     $("#audioRecProgress").on('click', function() {
+         if (mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+            clearTimeout(recordingTimeout); // If stopped manually, clear timeout
+            clearInterval(countdownInterval);
+            $('#audioRecProgress').hide();
+            $("#recordMicrophone").attr( { 'src' : '/images/microphone.svg' } );
+            $("#message").removeAttr("required");
+         }
     });
 }
 

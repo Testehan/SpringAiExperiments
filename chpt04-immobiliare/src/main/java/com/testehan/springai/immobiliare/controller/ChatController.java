@@ -76,7 +76,12 @@ public class ChatController {
                                        Model model) {
         if (message.isEmpty()) {
             LOGGER.info("Audio file sent from user for transcription ");
-            message = openAiService.transcribeAudioMessage(audioFile.getResource());
+            var optionalMessage = openAiService.transcribeAudioMessage(audioFile.getResource());
+            if (optionalMessage.isPresent()) {
+                message = optionalMessage.get();
+            } else {
+                message =  messageSource.getMessage("chat.exception", null, localeUtils.getCurrentLocale());
+            }
         }
         model.addAttribute("message",message);
         return HtmxResponse.builder()

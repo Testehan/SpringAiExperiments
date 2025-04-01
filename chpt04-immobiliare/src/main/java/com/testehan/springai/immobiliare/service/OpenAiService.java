@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class OpenAiService {
@@ -58,20 +59,24 @@ public class OpenAiService {
                 .map(EmbeddingResponse::getEmbedding);
     }
 
-    public String transcribeAudioMessage(Resource audioFile){
-        var responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
+    public Optional<String> transcribeAudioMessage(Resource audioFile){
+        try {
+            var responseFormat = OpenAiAudioApi.TranscriptResponseFormat.TEXT;
 
-        var transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
-                .model("whisper-1")
-                .language(localeUtils.getCurrentLocale().getLanguage())
-                .temperature(0f)
-                .responseFormat(responseFormat)
-                .prompt(localeUtils.getLocalizedPrompt("system_transcribeAudio"))
-                .build();
-        var transcriptionRequest = new AudioTranscriptionPrompt(audioFile, transcriptionOptions);
-        var response = openAiAudioTranscriptionModel.call(transcriptionRequest);
+            var transcriptionOptions = OpenAiAudioTranscriptionOptions.builder()
+                    .model("whisper-1")
+                    .language(localeUtils.getCurrentLocale().getLanguage())
+                    .temperature(0f)
+                    .responseFormat(responseFormat)
+                    .prompt(localeUtils.getLocalizedPrompt("system_transcribeAudio"))
+                    .build();
+            var transcriptionRequest = new AudioTranscriptionPrompt(audioFile, transcriptionOptions);
+            var response = openAiAudioTranscriptionModel.call(transcriptionRequest);
 
-        var transcribedAudioMessage = response.getResult().getOutput();
-        return transcribedAudioMessage;
+            var transcribedAudioMessage = response.getResult().getOutput();
+            return Optional.of(transcribedAudioMessage);
+        } catch (Exception e){
+            return Optional.empty();
+        }
     }
 }
