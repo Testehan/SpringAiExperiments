@@ -111,7 +111,7 @@ public class ListingImageService {
                 Resource imageResource = new InputStreamResource(inputStream);
 
                 var userPictureMetadataPrompt = localeUtils.getLocalizedPrompt("UserPictureMetadataGeneration");
-                var systemPictureMetadataPrompt = localeUtils.getLocalizedPrompt("SystemPictureMetadataGeneration");
+                var systemPictureMetadataPrompt = localeUtils.getLocalizedPrompt("system_PictureMetadataGeneration");
                 Message userMessage = new UserMessage(
                         userPictureMetadataPrompt,
                         List.of(new Media(MimeTypeUtils.parseMimeType(connection.getContentType()), imageResource))
