@@ -208,6 +208,7 @@
 
             <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700 mr-10"
                     th:data-apartment-id="${apartment.id}"
+                    th:data-owner-name="${apartment.ownerName}"
                     th:text="#{listing.contact}" />
 
             <a th:if="${apartment.whatsapp}" class="whatsapp-link" href="#" target="_blank" style="display: none;" >

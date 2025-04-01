@@ -15,7 +15,8 @@ const schema = Joi.object({
     contact: Joi.alternatives().try(
                 //Joi.string().email({ tlds: { allow: false } }),      // either an email
                 Joi.string().regex(/^\d{9,10}$/).message('Phone number must be 9 or 10 digits long')
-           ).required().label('Contact')
+           ).required().label('Contact'),
+   ownerName: Joi.string().required().label('Owner Name')
 });
 
 $(document).ready(function(){
@@ -111,6 +112,7 @@ async function isFormValid(){
         surface: $('#surface').val(),
         noOfRooms: $('#noOfRooms').val(),
         contact: $('#contact').val(),
+        ownerName: $('#ownerName').val()
     };
 
     const { error } = schema.validate(formData, { abortEarly: false });

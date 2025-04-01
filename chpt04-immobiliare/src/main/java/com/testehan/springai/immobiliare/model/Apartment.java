@@ -36,6 +36,8 @@ public class Apartment {
     private String contact;
     private Boolean whatsapp;
     private String contactEmail;
+    private String ownerName;
+
     private String creationDateTime;
     private String lastUpdateDateTime;
 

@@ -22,6 +22,7 @@ $(document).ready(function () {
 function getPhoneNumber(showContactButton){
     var $button = showContactButton; // The button that was clicked
     var apartmentId = $button.data('apartment-id'); // Get the apartment ID
+    var ownerName = $button.data('owner-name');
 
     // Make the AJAX request to get the phone number
     $.ajax({
@@ -34,7 +35,12 @@ function getPhoneNumber(showContactButton){
             // Remove the button
             $button.remove();
 
-            var $phoneNumberElement = $('<span>').text(phoneNumber).css('line-height', '32px');
+            var $ownerNameElement = $('<span>').text(ownerName).css('line-height', '32px').addClass('mr-2');
+            var $phoneNumberElement = $('<a>')
+                .attr('href', 'tel:' + phoneNumber)
+                .css('line-height', '32px')
+                .text(phoneNumber);
+            $parentSpan.append($ownerNameElement);
             $parentSpan.append($phoneNumberElement);
 
             if (response !== 'No apartment found!'){

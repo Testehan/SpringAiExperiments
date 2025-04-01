@@ -157,8 +157,9 @@ public class MainController {
 
 		var user = conversationSession.getImmobiliareUser().get();
 		List<Apartment> listOfProperties = getListOfProperties(user);
-
 		model.addAttribute("listOfProperties", listOfProperties);
+
+		apartment.setOwnerName(user.getName());
 		if (Objects.nonNull(user.getPhoneNumber()) && !user.getPhoneNumber().isEmpty()){
 			apartment.setContact(user.getPhoneNumber());		// default contact is the phone number of the user
 		}
@@ -188,6 +189,11 @@ public class MainController {
 				model.addAttribute("numberOfExistingImages", apartment.getImages().size());
 				buttonMessage = messageSource.getMessage("add.button.update", null, locale);
 				model.addAttribute("buttonMessage", buttonMessage);
+
+				if (StringUtils.isEmpty(apartment.getOwnerName())){
+					apartment.setOwnerName(user.getName());
+				}
+
 			}
 		}
 
