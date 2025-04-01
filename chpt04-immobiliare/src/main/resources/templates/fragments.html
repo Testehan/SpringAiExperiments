@@ -229,11 +229,14 @@
 </p>
 
 <div th:fragment="listing_images">
-    <div
-            class="hidden sm:grid gap-4 px-4 grid-cols-2" th:classappend="
-            ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
-            (${#lists.size(apartment.images) % 3 == 0} ? 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3' :
-            (${#lists.size(apartment.images) % 2 == 0} ? 'sm:grid-cols-2 md:grid-cols-2' : 'sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3'))">
+    <div class="hidden sm:grid gap-4 px-4"
+         th:classappend="
+     ${#lists.size(apartment.images) == 1} ? 'grid-cols-1 place-items-center' :
+     (${#lists.size(apartment.images) == 2} ? 'grid-cols-2' :
+     (${#lists.size(apartment.images) <= 4} ? 'sm:grid-cols-2 md:grid-cols-3' :
+     (${#lists.size(apartment.images) <= 6} ? 'sm:grid-cols-3 md:grid-cols-3' :
+     (${#lists.size(apartment.images) <= 9} ? 'sm:grid-cols-3 md:grid-cols-3' :
+     'sm:grid-cols-4 md:grid-cols-4'))))">
 
         <div class="flex items-center justify-center overflow-hidden" th:each="image, iterStat : ${apartment.images}">
             <img class="w-full object-contain cursor-pointer"
