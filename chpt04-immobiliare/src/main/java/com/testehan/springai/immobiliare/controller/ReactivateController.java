@@ -28,10 +28,12 @@ public class ReactivateController {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateController.class);
     private final ApartmentCrudService apartmentCrudService;
     private final MessageSource messageSource;
+    private final FormattingUtil formattingUtil;
 
-    public ReactivateController(ApartmentCrudService apartmentCrudService, MessageSource messageSource) {
+    public ReactivateController(ApartmentCrudService apartmentCrudService, MessageSource messageSource, FormattingUtil formattingUtil) {
         this.apartmentCrudService = apartmentCrudService;
         this.messageSource = messageSource;
+        this.formattingUtil = formattingUtil;
     }
 
     @GetMapping("/reactivate")
@@ -69,7 +71,7 @@ public class ReactivateController {
 
     private boolean reactivateListing(Apartment apartment) {
         try {
-            var lastUpdatedTime = FormattingUtil.getFormattedDateCustom(LocalDateTime.now());
+            var lastUpdatedTime = formattingUtil.getFormattedDateCustom(LocalDateTime.now());
             apartment.setLastUpdateDateTime(lastUpdatedTime);
             apartment.setActive(true);
             apartmentCrudService.saveApartment(apartment);

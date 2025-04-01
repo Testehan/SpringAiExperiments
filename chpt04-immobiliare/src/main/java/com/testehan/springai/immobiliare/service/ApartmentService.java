@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.ContactValidator;
+import com.testehan.springai.immobiliare.util.FormattingUtil;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +17,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 
 @Service
@@ -36,10 +38,11 @@ public class ApartmentService {
     private final LLMCacheService llmCacheService;
 
     private final ListingUtil listingUtil;
+    private final FormattingUtil formattingUtil;
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, ApartmentCrudService apartmentCrudService, ListingEmbeddingService listingEmbeddingService, ListingImageService listingImageService,
                             UserService userService, ListingNotificationService listingNotificationService, LLMCacheService llmCacheService,
-                            ListingAmenitiesService listingAmenitiesService, ListingUtil listingUtil) {
+                            ListingAmenitiesService listingAmenitiesService, ListingUtil listingUtil, FormattingUtil formattingUtil) {
         this.apartmentsRepository = apartmentsRepository;
         this.apartmentCrudService = apartmentCrudService;
         this.listingEmbeddingService = listingEmbeddingService;
@@ -49,6 +52,7 @@ public class ApartmentService {
         this.llmCacheService = llmCacheService;
         this.listingAmenitiesService = listingAmenitiesService;
         this.listingUtil = listingUtil;
+        this.formattingUtil = formattingUtil;
     }
 
     public List<Apartment> getApartmentsSemanticSearch(PropertyType propertyType, String city, ApartmentDescription apartment, List<Double> apartmentDescriptionEmbedding) {
@@ -140,8 +144,7 @@ public class ApartmentService {
 
     private boolean isPropertyNew(Apartment apartment) {
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateCustom = now.format(customFormatter);
+        String formattedDateCustom = formattingUtil.getFormattedDateCustom(now);
 
         var isPropertyNew = false;
         if (Objects.isNull(apartment.getId())) {

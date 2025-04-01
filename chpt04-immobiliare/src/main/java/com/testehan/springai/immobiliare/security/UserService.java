@@ -6,6 +6,7 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.DeletedUserRepository;
 import com.testehan.springai.immobiliare.repository.ImmobiliareUserRepository;
 import com.testehan.springai.immobiliare.service.EmailService;
+import com.testehan.springai.immobiliare.util.FormattingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,10 +29,12 @@ public class UserService {
     private final ImmobiliareUserRepository immobiliareUserRepository;
     private final DeletedUserRepository deletedUserRepository;
     private final MongoRememberMeTokenRepository rememberMeTokenRepository;
+
     private final LocaleUtils localeUtils;
+    private final FormattingUtil formattingUtil;
 
     public UserService(HttpServletRequest request, HttpServletResponse response,
-                       EmailService emailService, ImmobiliareUserRepository immobiliareUserRepository, DeletedUserRepository deletedUserRepository, MongoRememberMeTokenRepository rememberMeTokenRepository, LocaleUtils localeUtils) {
+                       EmailService emailService, ImmobiliareUserRepository immobiliareUserRepository, DeletedUserRepository deletedUserRepository, MongoRememberMeTokenRepository rememberMeTokenRepository, LocaleUtils localeUtils, FormattingUtil formattingUtil) {
         this.request = request;
         this.response = response;
         this.emailService = emailService;
@@ -40,6 +42,7 @@ public class UserService {
         this.deletedUserRepository = deletedUserRepository;
         this.rememberMeTokenRepository = rememberMeTokenRepository;
         this.localeUtils = localeUtils;
+        this.formattingUtil = formattingUtil;
     }
 
     public boolean isEmailUnique(String email) {
@@ -60,8 +63,7 @@ public class UserService {
     @Transactional
     public void deleteUser(ImmobiliareUser user){
         LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        String formattedDateCustom = now.format(customFormatter);
+        String formattedDateCustom = formattingUtil.getFormattedDateCustom(now);
 
         deletedUserRepository.save(new DeletedUser(user.getEmail(), user.getSearchesAvailable(), formattedDateCustom));
         rememberMeTokenRepository.removeUserTokens(user.getEmail());

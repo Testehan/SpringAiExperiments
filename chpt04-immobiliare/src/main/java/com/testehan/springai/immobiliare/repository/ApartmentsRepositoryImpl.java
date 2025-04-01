@@ -43,12 +43,13 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentsRepositoryImpl.class);
 
     private final MongoDatabase mongoDatabase;
-
     private final MongoTemplate mongoTemplate;
+    private final FormattingUtil formattingUtil;
 
-    public ApartmentsRepositoryImpl(MongoDatabase mongoDatabase, MongoTemplate mongoTemplate) {
+    public ApartmentsRepositoryImpl(MongoDatabase mongoDatabase, MongoTemplate mongoTemplate, FormattingUtil formattingUtil) {
         this.mongoDatabase = mongoDatabase;
         this.mongoTemplate = mongoTemplate;
+        this.formattingUtil = formattingUtil;
     }
 
     private MongoCollection<Apartment> getApartmentCollection() {
@@ -206,7 +207,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     public List<Apartment> findByLastUpdateDateTimeBefore(LocalDateTime date) {
         var listings = mongoDatabase.getCollection("apartments", Apartment.class);
 
-        var formattedDateCustom = FormattingUtil.getFormattedDateCustom(date);
+        var formattedDateCustom = formattingUtil.getFormattedDateCustom(date);
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
         Bson condition2 = eq("active", true);
         Bson combinedFilter = Filters.and(condition1, condition2);
@@ -226,7 +227,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     public void deactivateApartments(LocalDateTime date) {
         var listings = mongoDatabase.getCollection("apartments", Apartment.class);
 
-        var formattedDateCustom = FormattingUtil.getFormattedDateCustom(date);
+        var formattedDateCustom = formattingUtil.getFormattedDateCustom(date);
 
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
         Bson condition2 = eq("active", true);
