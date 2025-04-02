@@ -1,0 +1,79 @@
+Task Description:
+You are given various types of requests or questions about a list of real estate listings. You must answer which of the
+fields of a class Apartment are relevant for the given request. You can choose from the following fields:
+- name  : name of the listing
+- area  : address or area of the listing
+- shortDescription  : this can contain all sorts of information about the listing
+- surface   : the surface of the listing
+- price     : price of listing
+- availableFrom : date when the listing is available for new customers
+- noOfRooms : number of rooms the listing has
+- floor : floor at which the listing resides
+- imagesGeneratedDescription : contains a description created by an LLM based on the images provided to the listing
+- nearby.amenities-transit_station : to be returned if requests are related to public transport near the listing
+- nearby.amenities-grocery_or_supermarket : to be returned if requests are related to supermarkets shops near the listing
+- nearby.amenities-school : to be returned if requests are related to schools near the listing
+- nearby.amenities-university : to be returned if requests are related to universities near the listing
+- nearby.amenities-gym : to be returned if requests are related to gyms near the listing
+- nearby.amenities-park : to be returned if requests are related to parks near the listing
+
+Your reply must contain just the field names, separated by commas. If you can't identify any fields related to the input
+you must return an empty string.
+
+Examples:
+
+Scenario 1:
+- User Input: "Which of these listings has the highest price?"
+- Result: name,price
+
+Scenario 2:
+- User Input: "Which of these listings has floor heating?"
+- Result: name,shortDescription
+
+Scenario 3:
+- User Input: "Which of these has the best natural light?"
+- Result: name,shortDescription,imagesGeneratedDescription
+
+Scenario 4:
+- User Input: "Which of these is available starting from date X ?"
+- Result: name,availableFrom
+
+Scenario 5:
+- User Input: "Which of these has a surface of Y?"
+- Result: name,surface
+
+Scenario 6:
+- User Input: "Are any of these apartments located on the first floor?"
+- Result: name,floor
+
+Scenario 7:
+- User Input: "Which of them have 2 rooms?"
+- Result: name,noOfRooms
+
+Scenario 8:
+- User Input: "Which of these has good-looking kitchen furniture?"
+- Result: name,shortDescription,imagesGeneratedDescription
+
+Scenario 9:
+- User Input: "Which of these is located in Z neighbourhood ?"
+- Result: name,shortDescription,area
+
+Scenario 10:
+- User Input: "Do any of these have a park close by ?"
+- Result: name,nearby.amenities-park
+
+Scenario 11:
+- User Input: "What are some amenities that these listings have nearby ?"
+- Result: name,nearby.amenities-transit_station,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-university,nearby.amenities-gym,nearby.amenities-park
+
+Scenario 12:
+- User Input: "Which of these are suited for a student ?"
+- Result: name,nearby.amenities-transit_station,nearby.amenities-university,nearby.amenities-gym,nearby.amenities-park
+
+Scenario 13:
+- User Input: "Which of these are suited for a family with a child?"
+- Result: name,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-park
+
+Scenario 14:
+- User Input: "Can you compare apartment listing named A with apartment listing named B?"
+- Result: name,area,shortDescription,surface,price,availableFrom,noOfRooms,floor,imagesGeneratedDescription,nearby.amenities-transit_station,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-university,nearby.amenities-park,nearby.amenities-gym

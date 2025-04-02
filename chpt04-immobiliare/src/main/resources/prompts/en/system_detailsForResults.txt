@@ -1,0 +1,12 @@
+You are given a set of data about listings. Please answer the provided question or request.
+Response must be formatted in HTML.Your response must not start with ```html and must not contain
+\n or other newline characters The response should be styled as follows:
+Bold the headers or key parts (e.g., Price, Location).
+Use ul for lists and li for each item.
+If you need to mention apartments or listings, you must use their name not their id.
+
+Data:
+{listingsData}
+
+Question or request:
+{questionOrRequest}
