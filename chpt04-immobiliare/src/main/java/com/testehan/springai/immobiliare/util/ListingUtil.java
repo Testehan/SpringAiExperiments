@@ -164,7 +164,8 @@ public class ListingUtil {
                     } else {
                         Field field = Apartment.class.getDeclaredField(fieldName);
                         field.setAccessible(true);
-                        Object value = field.get(apartment);
+                        var translatedFieldName = messageSource.getMessage("listing." + fieldName, null, localeUtils.getCurrentLocale());
+                        String value = translatedFieldName + " : " + field.get(apartment).toString();
                         apartmentData.put(fieldName, value);
                     }
                 } catch (NoSuchFieldException | IllegalAccessException e) {
@@ -183,7 +184,7 @@ public class ListingUtil {
 
         return apartmentDataList.stream()
                 .map(map -> map.entrySet().stream()
-                        .map(entry -> messageSource.getMessage("listing." + entry.getKey(), null, localeUtils.getCurrentLocale()) + ": " + entry.getValue())
+                        .map(entry -> entry.getValue().toString())
                         .collect(Collectors.joining(", ")))
                 .collect(Collectors.joining("\n"));
     }
