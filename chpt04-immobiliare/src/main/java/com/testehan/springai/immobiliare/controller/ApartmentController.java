@@ -94,6 +94,7 @@ public class ApartmentController {
         }
 
         if (user.getMaxNumberOfListedProperties() > 0){
+            LOGGER.info("User {} trying to add/edit a property called {}", user.getEmail(), apartment.getName());
             List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
             apartmentService.saveApartmentAndImages(apartment, processedImages, user);
             LOGGER.info("User {} added/edited a property ", user.getEmail());

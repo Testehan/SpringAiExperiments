@@ -100,6 +100,10 @@ public class Apartment {
     }
 
     public String getIdString(){
+        if (id == null) {
+            return null; // or return "" if you prefer
+        }
+
         return id.toString();
     }
 
