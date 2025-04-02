@@ -30,11 +30,15 @@ Available APIs:
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-7. **Last option API**: If the user has questions about the apartments displayed in previous calls, use this API. If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
+7. **Details API**: If the user has questions or wants more details about the apartments displayed in previous calls, use this API.  So if there is any reference to previous results this API must be used.
+   - **Endpoint**: `/details`
+   - **Parameters**: `message` (string)
+
+8. **General Real Estate API**: If the user has requests or questions about real estate domain that are not covered by the other APIs consider this as the default API.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
-8. **Last resort API**: If the user has requests or questions that are not related in any way to real estate domain this API must be used.
+9. **Last resort API**: If the user has requests or questions that are not related in any way to real estate domain this API must be used.
   - **Endpoint**: `/notSupported`
   - **Parameters**: `message` (string)
 
@@ -119,13 +123,13 @@ Examples:
 
 - User Input: "I want a big apartment with a south orientation in Marasti neighbourhood"
   - API Call: `/getApartments`
-  - Parameters: `\{"message": "I want a big appartment with a south orientation in Marasti neighbourhood"\}`
+  - Parameters: `\{"message": "I want a big apartment with a south orientation in Marasti neighbourhood"\}`
 
-- User Input: "i want something with bedside lamps"
+- User Input: "I want something with bedside lamps"
   - API Call: `/getApartments`
   - Parameters: `\{"message": "i want something with bedside lamps"\}`
 
-- User Input: "i am looking for a 2 room apartment. Display the results sorted by surface descending"
+- User Input: "I am looking for a 2 room apartment. Display the results sorted by surface descending"
   - API Call: `/getApartments`
   - Parameters: `\{"message": "i want something with bedside lamps"\}`
 
@@ -142,11 +146,11 @@ Examples:
   - Parameters: `\{"message": "restart"\}`
 
 - User Input: "which apartment has the largest terrace?"
-  - API Call: `/default`
+  - API Call: `/details`
   - Parameters: `\{"message": "which apartment has the largest terrace?"\}`
 
 - User Input: "which apartment allows pets?"
-  - API Call: `/default`
+  - API Call: `/details`
   - Parameters: `\{"message": "which apartment has the largest terrace?"\}`
 
 - User Input: "when is the best time to rent and apartment?"
@@ -154,7 +158,15 @@ Examples:
   - Parameters: `\{"message": "when is the best time to rent and apartment?"\}`
 
 - User Input: "Can you compare apartment listing named A with apartment listing named B?"
-  - API Call: `/default`
+  - API Call: `/details`
   - Parameters: `\{"message": "Can you compare apartment listing named A with apartment listing named B?"\}`
+
+- User Input: "Which of these apartments is close to a park / gym / public transport / school / universities?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "Which of these apartments is close to a park / gym / public transport / school / universities?"\}`
+
+- User Input: "Which of these are suited for a student ?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "Which of these are suited for a student ?"\}`
 
 {format}

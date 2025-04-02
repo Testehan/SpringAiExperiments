@@ -12,6 +12,7 @@ public enum ApiCall {
     SET_RENT_OR_BUY_AND_CITY("/setRentOrBuyAndCity"),
     SET_RENT_OR_BUY_AND_CITY_AND_DESCRIPTION("/setRentOrBuyAndCityAndDescription"),
     GET_APARTMENTS("/getApartments"),
+    GET_DETAILS("/details"),
     RESTART_CONVERSATION("/restart"),
     DEFAULT("/default"),
     NOT_SUPPORTED("/notSupported"),

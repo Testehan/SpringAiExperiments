@@ -30,11 +30,15 @@ API-uri disponibile:
    - **Endpoint**: `/restart`
    - **Parameters**: `message` (string)
 
-7. **General imobiliar API**: Dacă utilizatorul are întrebări despre apartamentele afișate în apelurile anterioare, utilizați acest API. Dacă utilizatorul are alte solicitări sau intrebari legate de domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați aceasta ca fiind API-ul implicit.
+7. **Detalii API**: Dacă utilizatorul are întrebări sau dorește mai multe detalii despre apartamentele afișate în apelurile anterioare, folosește acest API. Deci, dacă există vreo referire la rezultate anterioare, acest API trebuie utilizat.
+   - **Endpoint**: `/details`
+   - **Parameters**: `message` (string)
+
+8. **General Real Estate API**: Dacă utilizatorul are solicitări sau întrebări despre domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați-o ca fiind API-ul implicit.
    - **Endpoint**: `/default`
    - **Parameters**: `message` (string)
 
-8. **Ultima opțiune API**: Dacă utilizatorul are alte solicitări sau intrebari care nu au nici o legatura cu domeniul imobiliar acesta e API-ul care trebuie folosit.
+9. **Ultima opțiune API**: Dacă utilizatorul are alte solicitări sau intrebari care nu au nici o legatura cu domeniul imobiliar acesta e API-ul care trebuie folosit.
   - **Endpoint**: `/notSupported`
   - **Parameters**: `message` (string)
 
@@ -151,11 +155,11 @@ Exemple:
   - Parameters: `\{"message": "restart"\}`
 
 - Intrare utilizator: "care apartament are cea mai mare terasa?"
-  - API Call: `/default`
+  - API Call: `/details`
   - Parameters: `\{"message": "care apartament are cea mai mare terasa?"\}`
 
 - Intrare utilizator: „ce apartament acceptă animale de companie?”
-  - API Call: `/default`
+  - API Call: `/details`
   - Parameters: `\{"message": "ce apartament acceptă animale de companie?"\}`
 
 - Intrare utilizator: "când este cel mai bun moment pentru închiriere și apartament?"
@@ -163,7 +167,15 @@ Exemple:
   - Parameters: `\{"message": "când este cel mai bun moment pentru închiriere și apartament?"\}`
 
 - Intrarea utilizatorului: „Puteți compara apartamentul numit A cu apartamentul B?"
-  - Apel API: `/default`
+  - Apel API: `/details`
   - Parametri: `\{"message": "Puteți compara apartamentul numit A cu apartamentul B?"\}`
+
+- Intrarea utilizatorului: "Care dintre aceste apartamente este aproape de un parc / sală de sport / transport public / școală / universități?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "Care dintre aceste apartamente este aproape de un parc / sală de sport / transport public / școală / universități?"\}`
+
+- Intrarea utilizatorului: "Care dintre acestea sunt potrivite pentru un student?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "Care dintre acestea sunt potrivite pentru un student?"\}`
 
 {format}

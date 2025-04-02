@@ -7,9 +7,14 @@ import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ListingUtil {
@@ -78,16 +83,20 @@ public class ListingUtil {
         StringBuilder sb = new StringBuilder();
 
         for (AmenityCategory category : apartment.getNearbyAmenities()) {
-            String messageCode = category.getCategory();
-            var translatedCategory = messageSource.getMessage("listing.nearby.amenities." + messageCode, null, localeUtils.getCurrentLocale());
-            sb.append(translatedCategory).append(": ");
-            for (Amenity amenity : category.getItems()){
-                sb.append(amenity.getName()).append(" ").append(amenity.getDistance()).append(", ");
-            }
-            sb.append("\n");
+            translateAmenityCategory(category, sb);
         }
 
         return sb.toString();
+    }
+
+    private void translateAmenityCategory(AmenityCategory category, StringBuilder sb) {
+        String messageCode = category.getCategory();
+        var translatedCategory = messageSource.getMessage("listing.nearby.amenities." + messageCode, null, localeUtils.getCurrentLocale());
+        sb.append(translatedCategory).append(": ");
+        for (Amenity amenity : category.getItems()){
+            sb.append(amenity.getName()).append(" ").append(amenity.getDistance()).append(", ");
+        }
+        sb.append("\n");
     }
 
     public String hashText(String text) {
@@ -129,6 +138,54 @@ public class ListingUtil {
                 listing.setMostContacted(false);
             }
         });
+    }
+
+    public List<Map<String, Object>> getListingDataByFields(List<Apartment> listings, List<String> fields) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Apartment apartment : listings) {
+            Map<String, Object> apartmentData = new HashMap<>();
+            for (String fieldName : fields) {
+                try {
+                    if (fieldName.startsWith("nearby.amenities-")){
+                        String[] parts = fieldName.split("-");
+                        Field field = Apartment.class.getDeclaredField("nearbyAmenities");
+                        field.setAccessible(true);
+                        List<AmenityCategory> nearbyAmenities = (List<AmenityCategory>) field.get(apartment);
+                        var category = nearbyAmenities.stream()
+                                .filter(amenityCategory -> amenityCategory.getCategory().equalsIgnoreCase(parts[1]))
+                                .findFirst();
+
+                        if (category.isPresent()) {
+                            StringBuilder sb = new StringBuilder();
+                            translateAmenityCategory(category.get(), sb);
+                            apartmentData.put(fieldName.replace("-", "."), sb.toString());
+                        }
+
+                    } else {
+                        Field field = Apartment.class.getDeclaredField(fieldName);
+                        field.setAccessible(true);
+                        Object value = field.get(apartment);
+                        apartmentData.put(fieldName, value);
+                    }
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    apartmentData.put(fieldName, null); // Handle missing fields
+                }
+            }
+            result.add(apartmentData);
+        }
+        return result;
+    }
+
+    public String apartmentFieldDataToString(List<Map<String, Object>> apartmentDataList) {
+        if (apartmentDataList == null || apartmentDataList.isEmpty()) {
+            return "";
+        }
+
+        return apartmentDataList.stream()
+                .map(map -> map.entrySet().stream()
+                        .map(entry -> messageSource.getMessage("listing." + entry.getKey(), null, localeUtils.getCurrentLocale()) + ": " + entry.getValue())
+                        .collect(Collectors.joining(", ")))
+                .collect(Collectors.joining("\n"));
     }
 
 }

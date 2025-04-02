@@ -87,19 +87,19 @@ public class SearchListingsHandler implements ApiChatCallHandler {
             final String conversationId = conversationSession.getConversationId();
             final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser().get();
 
+            // we do this clearing because we want our chat memory to contain only the latest listing results, on which
+            // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
+            // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
+
+//            conversationSession.clearChatMemory();    // todo this line i think can be removed..as it does the same thing as the line from below
+            conversationService.deleteUserConversation(conversationId);
+
             var propertyType = conversationSession.getRentOrSale();
             var city = SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
             var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
             var descriptionWithBudgetInfo = description + budgetInfo;
 
             conversationService.addContentToConversation(descriptionWithBudgetInfo, conversationId);
-
-            // we do this clearing because we want our chat memory to contain only the latest listing results, on which
-            // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
-            // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
-            var convId = conversationSession.getConversationId();
-            conversationSession.clearChatMemory();
-            conversationService.deleteUserConversation(convId);
 
             ResultsResponse response = new ResultsResponse("");
 
@@ -210,9 +210,9 @@ public class SearchListingsHandler implements ApiChatCallHandler {
         LOGGER.info("Performance 4 -----------------------");
         LOGGER.info("Found apartment id {}", listingFound.getId());
 
-        var apartmentInfo = listingUtil.getApartmentInfo(listingFound);
+//        var apartmentInfo = listingUtil.getApartmentInfo(listingFound);
         LOGGER.info("Adding apartment info to conversation memory {}", listingFound.getName());
-        conversationService.addContentToConversation(apartmentInfo, conversationId);
+        conversationService.addContentToConversation(listingFound.getIdString(), conversationId);
 
         var isFavourite = listingUtil.isApartmentAlreadyFavourite(listingFound.getId().toString(), immobiliareUser);
         LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
