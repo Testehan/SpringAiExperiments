@@ -99,7 +99,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
             // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
             var convId = conversationSession.getConversationId();
             conversationSession.clearChatMemory();
-            conversationService.deleteConversation(convId);
+            conversationService.deleteUserConversation(convId);
 
             ResultsResponse response = new ResultsResponse("");
 

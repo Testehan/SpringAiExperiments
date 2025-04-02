@@ -82,7 +82,7 @@ public class ConversationSession {
     }
 
     public void clearChatMemory() {
-        conversationService.deleteConversation(getConversationId());
+        conversationService.deleteUserConversation(getConversationId());
     }
 
     private void setUserFieldAndUpdate(Consumer<ImmobiliareUser> userSetter) {

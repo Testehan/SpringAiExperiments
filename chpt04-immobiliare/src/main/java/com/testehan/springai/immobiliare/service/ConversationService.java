@@ -7,6 +7,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,8 +32,12 @@ public class ConversationService {
         return localChatMemory;
     }
 
-    public void deleteConversation(String user){
+    public void deleteUserConversation(String user){
         conversationRepository.deleteUserConversation(user);
+    }
+
+    public void cleanConversationHistoryOlderThan(LocalDateTime date){
+        conversationRepository.cleanConversationHistoryOlderThan(date);
     }
 
     public List<String> getUserConversation(String user){

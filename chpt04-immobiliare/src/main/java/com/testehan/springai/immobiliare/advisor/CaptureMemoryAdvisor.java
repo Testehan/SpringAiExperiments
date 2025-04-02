@@ -1,6 +1,8 @@
 package com.testehan.springai.immobiliare.advisor;
 
+import com.testehan.springai.immobiliare.util.FormattingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -15,7 +17,9 @@ import org.springframework.retry.RetryCallback;
 import org.springframework.retry.support.RetryTemplate;
 import org.springframework.retry.support.RetryTemplateBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -31,15 +35,17 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
     private final ChatModel chatModel;
     private final Executor executor;
     private final ChatClient chatClient;
+    private final FormattingUtil formattingUtil;
 
     private RetryTemplate retryTemplate  = new RetryTemplateBuilder().maxAttempts(MAX_ATTEMPTS).fixedBackoff(1000).build();
     private MemoryBasisExtractor lastMessageMemoryBasisExtractor
             = (AdvisedRequest request) -> Collections.singletonList(new UserMessage(request.userText()));
 
-    public CaptureMemoryAdvisor(VectorStore vectorStore, ChatModel chatModel, Executor executor, LocaleUtils localeUtils) {
+    public CaptureMemoryAdvisor(VectorStore vectorStore, ChatModel chatModel, Executor executor, LocaleUtils localeUtils, FormattingUtil formattingUtil) {
         this.vectorStore = vectorStore;
         this.chatModel = chatModel;
         this.executor = executor;
+        this.formattingUtil = formattingUtil;
         var captureMemoryPrompt = localeUtils.getLocalizedPrompt("capture_memory");
         this.chatClient = ChatClient
                 .builder(chatModel)
@@ -78,9 +84,11 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
 
             if (memoryResponse.worthKeeping()) {
                 logger.info("Adding memory to vector store: {}", memoryResponse);
+                Map<String, Object> metadata = createMetadata(adviseContext);
+
 
                 List<Document> docs = List.of(
-                        new Document(memoryResponse.content(), Map.of("user", adviseContext.get(CHAT_MEMORY_CONVERSATION_ID_KEY))));
+                        new Document(memoryResponse.content(), metadata));
                 vectorStore.add(docs);
                 return true;
             }
@@ -91,6 +99,18 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
             logger.error("Something went wrong when trying to extract a memory : {}", e );
             return false;
         }
+    }
+
+    @NotNull
+    private Map<String, Object> createMetadata(Map<String, Object> adviseContext) {
+        LocalDateTime now = LocalDateTime.now();
+        String formattedDateCustom = formattingUtil.getFormattedDateCustom(now);
+
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("user", adviseContext.get(CHAT_MEMORY_CONVERSATION_ID_KEY));
+        metadata.put("creationDateTime", formattedDateCustom);
+
+        return metadata;
     }
 
     // Advisors with lower order values are executed first

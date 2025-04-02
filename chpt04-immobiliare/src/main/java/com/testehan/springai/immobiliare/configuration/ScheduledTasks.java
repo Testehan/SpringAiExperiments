@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.configuration;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentCrudService;
+import com.testehan.springai.immobiliare.service.ConversationService;
 import com.testehan.springai.immobiliare.service.EmailService;
 import com.testehan.springai.immobiliare.service.SmsService;
 import com.testehan.springai.immobiliare.util.ContactValidator;
@@ -19,22 +20,24 @@ import java.time.temporal.ChronoUnit;
 
 @Component
 public class ScheduledTasks {
-    private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ScheduledTasks.class);
 
     @Value("${app.url}")
     private String appUrl;
 
     private final UserService userService;
     private final ApartmentCrudService apartmentCrudService;
+    private final ConversationService conversationService;
     private final EmailService emailService;
     private final SmsService smsService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, EmailService emailService, SmsService smsService, MessageSource messageSource,
+    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, ConversationService conversationService, EmailService emailService, SmsService smsService, MessageSource messageSource,
                           LocaleUtils localeUtils){
         this.userService = userService;
         this.apartmentCrudService = apartmentCrudService;
+        this.conversationService = conversationService;
         this.emailService = emailService;
         this.smsService = smsService;
         this.messageSource = messageSource;
@@ -44,20 +47,28 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 2 * * ?")         // Code to run at 2 am every day
     public void resetSearchesAvailableForNonAdminUsers() {
         userService.resetSearchesAvailable();
-        log.info("Scheduled Task - The user available searches number was reset");
+        LOGGER.info("Scheduled Task - The user available searches number was reset");
     }
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
     public void deactivatedListingsLastUpdatedMoreThan2WeeksAgo() {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
         apartmentCrudService.deactivateApartments(twoWeeksAgo);
-        log.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
+        LOGGER.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
     }
 
     @Scheduled(cron = "0 0 4 * * ?")        // Code to run at 4 AM every day
     public void deleteDeletedUsersMoreThan1DayAgo() {
         LocalDateTime oneDayAgo = LocalDateTime.now().minus(1, ChronoUnit.DAYS);
         userService.deleteDeletedUsers(oneDayAgo);
-        log.info("Scheduled Task - The deleted users were removed.", oneDayAgo);
+        LOGGER.info("Scheduled Task - The deleted users before {} were removed.", oneDayAgo);
+    }
+
+    @Scheduled(cron = "0 0 4 * * ?")        // Code to run at 4 AM every day
+    public void deleteConversationHistoryOlderThan1Week() {
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minus(1, ChronoUnit.WEEKS);
+        conversationService.cleanConversationHistoryOlderThan(oneWeekAgo);
+
+        LOGGER.info("Scheduled Task - The conversation history before {} was cleaned.", oneWeekAgo);
     }
 
 
@@ -66,12 +77,12 @@ public class ScheduledTasks {
     public void sendReactivationEmail() {
 
         LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
-        log.info("Scheduled Task - Reactivation emails will be send to owners.");
+        LOGGER.info("Scheduled Task - Reactivation emails will be send to owners.");
 
         var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
 
         for (Apartment listing : listings){
-            log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
+            LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
             var contact = listing.getContactEmail();
             var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
 
@@ -88,19 +99,19 @@ public class ScheduledTasks {
     public void sendReactivationSMS() {
 
         LocalDateTime thirteenDaysAgo = LocalDateTime.now().minus(13, ChronoUnit.DAYS);
-        log.info("Scheduled Task - Reactivation sms will be send to owners.");
+        LOGGER.info("Scheduled Task - Reactivation sms will be send to owners.");
 
         var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(thirteenDaysAgo);
 
         for (Apartment listing : listings){
-            log.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
+            LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
             var contact = listing.getContact();
             var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
 
             if (ContactValidator.isValidPhoneNumber(contact,"RO")){
                 var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
                 if (phoneWithPrefix.isEmpty()){
-                    log.error("Can't send SMS for {} of listing named {}", contact , listing.getName());
+                    LOGGER.error("Can't send SMS for {} of listing named {}", contact , listing.getName());
                 } else {
                     var smsMessage = messageSource.getMessage("sms.keep.active", null,localeUtils.getCurrentLocale()) + " " + reactivateLink;
 // TODO when you will use your domain, you can test this out, as right now the sms length exceeds the allowed number of chars, because of the currently long domain name..
