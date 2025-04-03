@@ -33,6 +33,7 @@
     const M03_BUDGET = "[[${M03_BUDGET}]]";
     const M04_DETAILS_PART_2 = "[[${M04_DETAILS_PART_2}]]";
     const M05_APARTMENTS_FOUND_START = "[[${M05_APARTMENTS_FOUND_START}]]";
+    const M05_APARTMENTS_FOUND_END = "[[${M05_APARTMENTS_FOUND_END}]]";
     const GOOGLE_MAPS_API_KEY = "[[${googleMapsApiKey}]]";
     const SHARE_ERROR = "[[${listingShareError}]]";
 
@@ -49,9 +50,9 @@
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script th:src="@{/js/swiper.js}"></script>
 
+<script th:src="@{/js/chat_scrolling.js}"></script>
 <script th:src="@{/js/chat_history.js}"></script>
 <script th:src="@{/js/chat_general.js}"></script>
-<script th:src="@{/js/chat_scrolling.js}"></script>
 <script th:src="@{/js/property_map.js}"></script>
 <script th:src="@{/js/property_general.js}"></script>
 
@@ -61,7 +62,7 @@
 
 <div th:replace="~{fragments :: gdpr}" />
 
-<div id="mainContainer" class="flex h-[99%] pt-16">
+<div id="mainContainer" class="flex h-[99%] pt-16 ">
 
     <!-- Main Content -->
     <main class="flex flex-col bg-white p-4 w-full max-w-full">

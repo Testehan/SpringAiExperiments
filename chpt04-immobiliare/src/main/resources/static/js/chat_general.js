@@ -44,6 +44,7 @@ $(document).ready(function(){
         $("#message").val(suggestionText); // Populate input box
         $('#spinner').show();
         $("#sendMessageButton").click();
+        enableScrollTracking();
     });
 
     setUpAudioRecording();

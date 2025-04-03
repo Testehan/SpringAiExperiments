@@ -1,21 +1,18 @@
 let isUserScrolling = false;
+let hasUserScrolledRecently = false;
+let isAutoScrolling = false;                // flag that tells if scrolling is done automatically
+
 let scrollTimeout;
+// Define in one JS file (e.g., globals.js)
+window.isScrollTrackingEnabled = true;
 
 $(document).ready(function(){
 
     setUpScrollingToLastUserMessage();
 
-    $(window).on('scroll', function () {
-        isUserScrolling = true;
-
-        // Set a timeout to reset `isUserScrolling` after the user stops scrolling
-        clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(() => {
-            console.log("isUserScrolling " + isUserScrolling);
-            isUserScrolling = false;
-        }, 3000); // 1 second delay after scrolling stops
-    });
-
+   // Attach event listener
+   $(window).on('scroll', handleScroll);
+   $('#response-container').on('scroll', handleScroll);
 
 });
 
@@ -39,22 +36,38 @@ function setUpScrollingToLastUserMessage(){
                         setCurrentStep();
                         if (node.childNodes[1].innerText === M05_APARTMENTS_FOUND_START){
                             $('#suggestions').hide(); // at this point we don't care about suggestions anymore because the user enters his description
+
                         }
+                        if (isUserScrolling){
+                            console.log(isUserScrolling);
+                            hasUserScrolledRecently = true;
+                            disableScrollTracking();
+                        }
+
+//                        if (node.childNodes[1].innerText === decodeHtmlEntities(M05_APARTMENTS_FOUND_END)){
+//                            console.log("Enabling scroll tracking");
+//                            enableScrollTracking();
+//                        }
                     }
 
                     if (node.nodeType === Node.ELEMENT_NODE && ( node.childNodes[1].classList.contains('assistantResponse') ||
                         node.childNodes[1].classList.contains('userMessage')))
                     {
-                        if (!isUserScrolling && lastElement && container.has(lastElement).length) {
+                        if (!hasUserScrolledRecently && lastElement && container.has(lastElement).length) {
                             const lastElementRect = $(lastElement)[0].getBoundingClientRect();
                             const containerRect = container[0].getBoundingClientRect();
 
-                            console.log("this should be true cause it will scroll isUserScrolling " + isUserScrolling);
+                            console.log("this should be false cause it will scroll isUserScrolling " + isUserScrolling);
 
                             // Calculate the new scroll position to bring the target element to the top of the container
                             const scrollOffset = container.scrollTop() + (lastElementRect.top - containerRect.top);
+
+                             isAutoScrolling = true;
                             // Scroll the container to the calculated position
-                            container.animate({ scrollTop: scrollOffset }, 'smooth');
+                            container.animate({ scrollTop: scrollOffset }, 'smooth', () => {
+                                // **After auto-scroll completes, reset flag**
+                                isAutoScrolling = false;
+                            });
                         }
                     }
 
@@ -71,4 +84,46 @@ function setUpScrollingToLastUserMessage(){
         console.error("Container not found");
     }
 
+}
+
+function handleScroll() {
+    if (!window.isScrollTrackingEnabled || isAutoScrolling) return; // Disable effect if condition is met
+
+    isUserScrolling = true;
+
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(() => {
+        console.log("Timeout occured so userScrolling is false");
+        isUserScrolling = false;
+    }, 5000); // Reset after 5 seconds of no scrolling
+}
+
+// Function to disable scrolling behavior
+function disableScrollTracking() {
+    console.log("Disabling scroll tracking...");
+    window.isScrollTrackingEnabled = false;
+
+    $(window).off('scroll', handleScroll); // Detach event listener
+    $('#response-container').off('scroll', handleScroll);
+    window.isScrollListenerAttached = false
+}
+
+// Function to enable scrolling behavior
+function enableScrollTracking() {
+     console.log("Re-enabling scroll tracking...");
+     window.isScrollTrackingEnabled = true;
+     hasUserScrolledRecently = false;
+
+     // Ensure the scroll event is reattached if necessary
+     if (!window.isScrollListenerAttached) {
+         $(window).on('scroll', handleScroll);
+          $('#response-container').on('scroll', handleScroll);
+         window.isScrollListenerAttached = true;
+     }
+}
+
+function decodeHtmlEntities(encodedString) {
+    const parser = new DOMParser();
+    const decodedString = parser.parseFromString(encodedString, "text/html").body.textContent;
+    return decodedString;
 }

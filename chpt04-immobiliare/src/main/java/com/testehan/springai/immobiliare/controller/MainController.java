@@ -93,6 +93,7 @@ public class MainController {
 		model.addAttribute("M03_BUDGET", messageSource.getMessage("M03_BUDGET",null,locale));
 		model.addAttribute("M04_DETAILS_PART_2", messageSource.getMessage("M04_DETAILS_PART_2",  null,locale));
 		model.addAttribute("M05_APARTMENTS_FOUND_START", messageSource.getMessage("M05_APARTMENTS_FOUND_START",  null,locale));
+		model.addAttribute("M05_APARTMENTS_FOUND_END", messageSource.getMessage("M05_APARTMENTS_FOUND_END",  null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
 
 		model.addAttribute("toastifyConnected", messageSource.getMessage("toastify.connected",  null,locale));

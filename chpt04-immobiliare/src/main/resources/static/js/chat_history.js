@@ -17,6 +17,7 @@ $(document).ready(function () {
     var messageInput = $("#message");
     $('#sendMessageButton').click(function() {
         $('#spinner').show();
+        enableScrollTracking();
         storeInputInHistory(messageInput[0].value);
     });
 
