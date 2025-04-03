@@ -1,6 +1,6 @@
 #FROM google/cloud-sdk:slim
 
-FROM openjdk:17
+FROM openjdk:21
 
 # Add the application's JAR to the container
 COPY target/chpt04-immobiliare-0.0.1-SNAPSHOT.jar app.jar
