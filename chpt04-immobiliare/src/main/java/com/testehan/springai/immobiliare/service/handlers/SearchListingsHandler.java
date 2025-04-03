@@ -111,7 +111,8 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                 String[] listingIds = cachedResponse.get().split("\\,");
                 sendResultsFoundResponse(session);
 
-                var listingsFound = apartmentCrudService.findApartmentsByIds(List.of(listingIds));
+                var listingsFound = apartmentCrudService.findApartmentsByIds(List.of(listingIds))
+                        .stream().filter(listing -> listing.isActive()).collect(Collectors.toList());
                 listingUtil.setIsMostFavouriteAndContacted(listingsFound);
                 for (Apartment listing : listingsFound){
                     sendListing(session.getId(), listing, conversationId, immobiliareUser);
