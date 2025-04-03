@@ -10,6 +10,7 @@ import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.util.ContactValidator;
 import com.testehan.springai.immobiliare.util.FormattingUtil;
 import com.testehan.springai.immobiliare.util.ListingUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -91,6 +92,8 @@ public class ApartmentService {
                 } else {
                     apartment.setNearbyAmenities(apartmentCurrentlySaved.getNearbyAmenities());
                 }
+
+                apartment.setImagesGeneratedDescription(apartmentCurrentlySaved.getImagesGeneratedDescription());
             }
         }
 
@@ -130,7 +133,7 @@ public class ApartmentService {
     private void saveImagesAndMetadata(Apartment apartment, List<ApartmentImage> apartmentImages) throws IOException {
         var imagesWereUploaded = listingImageService.saveUploadedImages(apartment, apartmentImages);
         var imagesWereDeleted = listingImageService.deleteUploadedImages(apartment);
-        if (imagesWereUploaded || imagesWereDeleted) {
+        if (imagesWereUploaded || imagesWereDeleted || StringUtils.isEmpty(apartment.getImagesGeneratedDescription())) {
             listingImageService.generateImageMetadata(apartment);
         }
     }
