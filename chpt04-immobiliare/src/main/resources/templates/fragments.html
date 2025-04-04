@@ -69,7 +69,7 @@
         <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) <= 250}" th:text="${apartment.shortDescription}"></p>
         <p class="text-gray-600 mt-2" th:if="${#strings.length(apartment.shortDescription) > 250}">
             <span th:text="${#strings.substring(apartment.shortDescription, 0, 250)} + '...'"></span>
-            <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{{appUrl}/view/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}">See Full Description</a>
+            <a class="text-base font-normal text-gray-500 list-none hover:text-gray-900" target="_blank" th:href="@{{appUrl}/view/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}">[[#{listing.see.full.description}]]</a>
         </p>
         <p class="text-gray-600 mt-2">
             <b th:text="#{listing.surface} + ': '" />[[${apartment.surface} + ' ' + #{listing.surface.measured.in}]]
