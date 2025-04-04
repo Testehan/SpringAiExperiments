@@ -357,14 +357,19 @@ function askForResponse() {
         showToast(TOASTIFY_REQUEST_TAKING_LONGER, -1, "warn");
     }, 15000);
 
-    if (suggestionsStep < 5){
-        userMessage =  lastHelperMessage.trim() + " " +userMessage;
-    }
+//    if (suggestionsStep < 5){
+//        userMessage =  lastHelperMessage.trim() + " " +userMessage;
+//    }
 
     htmx.ajax('POST', '/respond', {
         target: '#response-container',
         swap: 'beforeend',
         values: {message: userMessage}
+    });
+
+         // Listen for the HTMX response and clear timeout if successful
+    $(document).on('htmx:afterRequest', function(event) {
+        clearChatRequestTimeout();
     });
 
 }
