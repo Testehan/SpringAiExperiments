@@ -6,11 +6,11 @@ Available APIs:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If text contains "Which city are you interested in ?" and a city name is mentioned this API should be called.
+2. **City of the apartment API**: Determines the city which the user is interested in buying or renting an apartment. If text contains a city name this API should be called.
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-2. **Budget API**: Determines the budget the user has. If the text contains "What’s your budget?" and an answer, this API should be used
+2. **Budget API**: Determines the budget the user has. If the text contains a monetary value, this API should be used
    - **Endpoint**: `/setBudget`
    - **Parameters**: `message` (string)
 

@@ -32,9 +32,9 @@ public class LLMCacheService {
         }
     }
 
-    public void saveToCache(String city, String propertyType, String key, String response) {
-        String hash = listingUtil.hashText(key);
-        CachedResponse cached = new CachedResponse(hash, response, System.currentTimeMillis(), city, propertyType);
+    public void saveToCache(String city, String propertyType, String userInput, String response) {
+        String hash = listingUtil.hashText(userInput);
+        CachedResponse cached = new CachedResponse(hash,userInput, response, System.currentTimeMillis(), city, propertyType);
         cachedResponseRepository.save(cached);
     }
 

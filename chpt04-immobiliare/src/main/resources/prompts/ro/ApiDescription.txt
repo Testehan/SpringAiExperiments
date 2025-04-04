@@ -6,11 +6,11 @@ API-uri disponibile:
    - **Endpoint**: `/setRentOrBuy`
    - **Parameters**: `message` (string)
 
-2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă textul contine "Ce oraș te interesează?" si un nume de oraș, acest API ar trebui apelat.
+2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă textul contine un nume de oraș, acest API ar trebui apelat.
    - **Endpoint**: `/setCity`
    - **Parameters**: `message` (string)
 
-2. **Budget API**: determină bugetul de care dispune utilizatorul. Daca textul contine "Care este bugetul tău?" si un raspuns, acest API trebuie folosit.
+2. **Budget API**: determină bugetul de care dispune utilizatorul. Daca textul contine o valoare monetara, acest API trebuie folosit.
  - **Endpoint**: `/setBudget`
  - **Parameters**: `message` (string)
 

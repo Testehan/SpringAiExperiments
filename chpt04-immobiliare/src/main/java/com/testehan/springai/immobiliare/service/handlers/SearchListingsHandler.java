@@ -104,7 +104,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
             ResultsResponse response = new ResultsResponse("");
 
             // the hash will be for all these items
-            final String llmCacheKey = propertyType + city + descriptionWithBudgetInfo;
+            final String llmCacheKey = city + " " + propertyType + " " + descriptionWithBudgetInfo;
             var cachedResponse = llmCacheService.getCachedResponse(llmCacheKey);
             if (cachedResponse.isPresent()){
                 LOGGER.info("Performance Cache 1 -----------------------");

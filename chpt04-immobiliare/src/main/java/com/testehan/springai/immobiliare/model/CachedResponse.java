@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class CachedResponse {
     @Id
     private String inputHash;
+    private String userInput;
     private String response;
     private long createdAt;
 
