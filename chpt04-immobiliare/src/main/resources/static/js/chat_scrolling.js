@@ -39,7 +39,6 @@ function setUpScrollingToLastUserMessage(){
 
                         }
                         if (isUserScrolling){
-                            console.log(isUserScrolling);
                             hasUserScrolledRecently = true;
                             disableScrollTracking();
                         }
@@ -56,8 +55,6 @@ function setUpScrollingToLastUserMessage(){
                         if (!hasUserScrolledRecently && lastElement && container.has(lastElement).length) {
                             const lastElementRect = $(lastElement)[0].getBoundingClientRect();
                             const containerRect = container[0].getBoundingClientRect();
-
-                            console.log("this should be false cause it will scroll isUserScrolling " + isUserScrolling);
 
                             // Calculate the new scroll position to bring the target element to the top of the container
                             const scrollOffset = container.scrollTop() + (lastElementRect.top - containerRect.top);
@@ -93,14 +90,12 @@ function handleScroll() {
 
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(() => {
-        console.log("Timeout occured so userScrolling is false");
         isUserScrolling = false;
     }, 5000); // Reset after 5 seconds of no scrolling
 }
 
 // Function to disable scrolling behavior
 function disableScrollTracking() {
-    console.log("Disabling scroll tracking...");
     window.isScrollTrackingEnabled = false;
 
     $(window).off('scroll', handleScroll); // Detach event listener

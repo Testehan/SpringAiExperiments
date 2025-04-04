@@ -7,6 +7,8 @@ let lastPingTime = new Date(); // Store the last received ping time
 let pingTimeout;
 let isCheckingInternet = false;
 
+let chatRequestTimeout;
+
 let mediaRecorder;
 let audioChunks = [];
 let recordingTimeout;
@@ -153,6 +155,7 @@ function disableChatInput(){
     $("#recordVoiceButton").prop("disabled", false);
     removeOnClickForRecordAudio();
     $('#spinner').hide();
+    clearChatRequestTimeout();
 }
 
 function enableChatInput(){
@@ -246,6 +249,7 @@ function connectToSSE(sseId) {
                 const container = $('.responseFragmentWithApartments').last()
                 const newFragment = event.data;
                 $('#spinner').hide();
+                clearChatRequestTimeout();
                 container.append(newFragment);
 
                 applyFavouriteButtonStylingDependingOnText($('.favouriteButton').last());
@@ -271,6 +275,7 @@ function connectToSSE(sseId) {
                 const container = $("#response-container").last()
                 const newFragment = event.data;
                 $('#spinner').hide();
+                clearChatRequestTimeout();
                 container.append(newFragment);
             }
 
@@ -348,12 +353,12 @@ function askForResponse() {
     let userMessage = $('#response-container div:last').text();
     $('#message').val('');
 
-    let timeout = setTimeout(() => {
+    chatRequestTimeout = setTimeout(() => {
         showToast(TOASTIFY_REQUEST_TAKING_LONGER, -1, "warn");
     }, 15000);
 
     if (suggestionsStep < 5){
-        userMessage =  lastHelperMessage.trim() + " " +userMessage; //
+        userMessage =  lastHelperMessage.trim() + " " +userMessage;
     }
 
     htmx.ajax('POST', '/respond', {
@@ -362,12 +367,11 @@ function askForResponse() {
         values: {message: userMessage}
     });
 
-     // Listen for the HTMX response and clear timeout if successful
-    $(document).on('htmx:afterRequest', function(event) {
-        clearTimeout(timeout); // Clear the timeout
-        dismissToast();
-    });
+}
 
+function clearChatRequestTimeout(){
+    clearTimeout(chatRequestTimeout); // Clear the timeout
+    dismissToast();
 }
 
 function applyFavouriteButtonStylingDependingOnText(favouriteButton){
