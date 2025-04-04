@@ -212,11 +212,16 @@ public class MainController {
 		var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
 		if (!apartmentOptional.isEmpty()) {
 			var apartment = apartmentOptional.get();
-			var user = conversationSession.getImmobiliareUser().get();
-			var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentId, user);
-			var favouritesText = listingUtil.getFavouritesText(isFavourite);
-			if (favouritesText.equalsIgnoreCase("listing.favourites")){
-				favouritesText = messageSource.getMessage("listing.favourites",null,locale);
+			var user = conversationSession.getImmobiliareUser();
+			String favouritesText;
+			if (user.isPresent()) {
+				var isFavourite = listingUtil.isApartmentAlreadyFavourite(apartmentId, user.get());
+				favouritesText = listingUtil.getFavouritesText(isFavourite);
+			} else {
+				favouritesText = listingUtil.getFavouritesText(false);
+			}
+			if (favouritesText.equalsIgnoreCase("listing.favourites")) {
+				favouritesText = messageSource.getMessage("listing.favourites", null, locale);
 			}
 
 			translateAmenityCategoryName(locale, apartment);

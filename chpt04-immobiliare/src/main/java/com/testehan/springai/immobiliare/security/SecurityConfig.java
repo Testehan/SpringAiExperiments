@@ -53,7 +53,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(req -> req
                 .requestMatchers(SecuredPaths.SECURED_URLS.toArray(new String[0])).authenticated()
                 .requestMatchers("/","/help","/blog","/contact", "/error**", "/error-login", "/login-modal",
-                        "/reactivate","/confirmation","/accept-gdpr","/privacy-policy","/terms").permitAll()
+                        "/reactivate","/confirmation","/accept-gdpr","/privacy-policy","/terms", "/s/**").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
                 .requestMatchers(antMatcher("/webjars/**")).permitAll()

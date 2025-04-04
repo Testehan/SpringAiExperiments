@@ -13,7 +13,7 @@ $(document).ready(function () {
         applyFavouriteStylingFor($(this));
     });
 
-    $('#response-container').on('click', 'button[data-apartment-id]', function() {
+    $('#response-container').on('click', '.contactButton', function() {
         getPhoneNumber($(this));
     });
 
@@ -24,15 +24,21 @@ function getPhoneNumber(showContactButton){
     var apartmentId = $button.data('apartment-id'); // Get the apartment ID
     var ownerName = $button.data('owner-name');
 
-    // Make the AJAX request to get the phone number
-    $.ajax({
-        url: APP_URL + '/api/apartments/contact/' + apartmentId, // Make sure this is the correct endpoint
-        method: 'GET', // Assuming a GET request
-        success: function(response) {
-            var phoneNumber = response;
+    fetch(APP_URL + '/api/apartments/contact/' + apartmentId, { method: "GET" })
+        .then(response => {
+            if (response.redirected) {
+                // If redirected, user is not logged in → Open login modal
+                openLoginModal();
+                throw new Error("Unauthorized - Redirected to login");
+            }
+
+            if (response.ok) {
+                return response.text();  // .text() returns a Promise, so we return it to resolve later
+            }
+        })
+        .then(phoneNumber => {
 
             var $parentSpan = $button.closest('span');
-            // Remove the button
             $button.remove();
 
             var $ownerNameElement = $('<span>').text(ownerName).css('line-height', '32px').addClass('mr-2');
@@ -44,32 +50,48 @@ function getPhoneNumber(showContactButton){
             $parentSpan.append($phoneNumberElement);
 
             if (response !== 'No apartment found!'){
-                // Construct the WhatsApp link
                 var whatsappLink = WHATSAPP_BASE_URL + ROMANIA_COUNTRY_CODE + phoneNumber;
-
-                // Find the corresponding WhatsApp link element and update it
                 var $whatsappLink = $parentSpan.closest('span').find('.whatsapp-link');
-                $whatsappLink.attr('href', whatsappLink).show(); // Set the href and show the link
-
+                $whatsappLink.attr('href', whatsappLink).show();
                 $parentSpan.append($whatsappLink);
             }
-
-        },
-        error: function() {
-            console.error('Failed to get phone number');
-        }
-    });
+        })
+        .catch(error => {
+            if (error.message !== "Unauthorized") {
+                console.error('Failed to get phone number:', error);
+            }
+        });
 }
 
 
 function applyFavouriteStylingFor(favouriteButton){
-    if (favouriteButton.text() === saveFavouritesTranslated) {
-        favouriteButton.html('&hearts;').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700')
-                                        .addClass('text-red-500 text-2xl');
-    } else if (favouriteButton.html() === '♥')  {
-        favouriteButton.text(saveFavouritesTranslated).removeClass('text-red-500 text-2xl')
-                                                  .addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
-    }
+    var $button = favouriteButton; // The button that was clicked
+    var apartmentId = $button.data('apartment-id'); // Get the apartment ID
+
+     fetch(APP_URL + '/api/apartments/favourite/' + apartmentId, { method: "GET" })
+            .then(response => {
+                if (response.redirected) {
+                    // If redirected, user is not logged in → Open login modal
+                    openLoginModal();
+                    throw new Error("Unauthorized - Redirected to login");
+                }
+
+               if (favouriteButton.text() === saveFavouritesTranslated) {
+                    favouriteButton.html('&hearts;').removeClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700')
+                                                   .addClass('text-red-500 text-2xl');
+               } else if (favouriteButton.html() === '♥')  {
+                    favouriteButton.text(saveFavouritesTranslated).removeClass('text-red-500 text-2xl')
+                                                                 .addClass('bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700');
+               }
+
+            })
+            .catch(error => {
+                if (error.message !== "Unauthorized") {
+                    console.error('Failed to set favourite:', error);
+                }
+            });
+
+
 }
 
 function applyInitialFavouriteStylingFor(favouriteButton){

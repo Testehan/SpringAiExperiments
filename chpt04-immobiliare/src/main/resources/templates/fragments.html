@@ -102,7 +102,7 @@
     </div>
 </div>
 
-<div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 shadow-lg rounded-lg mt-10" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 shadow-lg rounded-lg mt-10" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
     <div th:replace="~{fragments :: disabled_listing}"></div>
 
     <div class="bg-white overflow-hidden">
@@ -206,7 +206,7 @@
     <span class="flex justify-between">
         <span class="flex justify-between">
 
-            <button class="bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700 mr-10"
+            <button class="contactButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700 mr-10"
                     th:data-apartment-id="${apartment.id}"
                     th:data-owner-name="${apartment.ownerName}"
                     th:text="#{listing.contact}" />
@@ -220,8 +220,7 @@
         </span>
 
         <button class="favouriteButton bg-blue-500 text-white px-2 rounded w-fit hover:bg-blue-700"
-                th:hx-swap="none"
-                th:hx-post="@{{appUrl}/api/apartments/favourite/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}"
+                th:data-apartment-id="${apartment.id}"
                 th:text="${favouriteButtonStartMessage}">
         </button>
 

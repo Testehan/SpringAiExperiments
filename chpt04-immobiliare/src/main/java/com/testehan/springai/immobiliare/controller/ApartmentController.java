@@ -10,7 +10,6 @@ import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.*;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
-import io.github.wimdeblauwe.htmx.spring.boot.mvc.HxRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,16 +136,23 @@ public class ApartmentController {
     }
 
     @GetMapping("/contact/{apartmentId}")
-    public String contact(@PathVariable(value = "apartmentId") String apartmentId) {
+    public  ResponseEntity<?> contact(@PathVariable(value = "apartmentId") String apartmentId) {
+
+        var user = conversationSession.getImmobiliareUser();
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in");
+        }
+
         var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
             var listing = apartmentOptional.get();
             listing.setNoOfContact(listing.getNoOfContact()+1);
             apartmentCrudService.saveApartment(listing);
-            return apartmentOptional.get().getContact();
+
+            return ResponseEntity.ok(listing.getContact()); // Return phone number
         } else {
             LOGGER.error("No apartment with id {} was found" , apartmentId);
-            return "No apartment found!";
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No apartment found!");
         }
     }
 
@@ -230,25 +236,33 @@ public class ApartmentController {
         return suggestions;
     }
 
-    @PostMapping("/favourite/{apartmentId}")
-    @HxRequest
-    public void favourite(@PathVariable(value = "apartmentId") String apartmentId) {
-        var user = conversationSession.getImmobiliareUser().get();
+    @GetMapping("/favourite/{apartmentId}")
+    public ResponseEntity<?> favourite(@PathVariable(value = "apartmentId") String apartmentId) {
+        var userOptional = conversationSession.getImmobiliareUser();
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("You must be logged in");
+        }
+
         var apartmentOptional = apartmentCrudService.findApartmentById(apartmentId);
         if (!apartmentOptional.isEmpty()) {
             var listing = apartmentOptional.get();
-            if (!user.getFavouriteProperties().contains(apartmentId)) {
+            var immobiliareUser = userOptional.get();
+            if (!immobiliareUser.getFavouriteProperties().contains(apartmentId)) {
                 listing.setNoOfFavourite(listing.getNoOfFavourite() + 1);
-                user.getFavouriteProperties().add(apartmentId);
+                immobiliareUser.getFavouriteProperties().add(apartmentId);
             } else {
                 listing.setNoOfFavourite(listing.getNoOfFavourite() - 1);
-                user.getFavouriteProperties().remove(apartmentId);
+                immobiliareUser.getFavouriteProperties().remove(apartmentId);
             }
 
             apartmentCrudService.saveApartment(listing);
-            userService.updateUser(user);
+            userService.updateUser(immobiliareUser);
+
+            return ResponseEntity.ok("ok");
         } else {
             LOGGER.error("No apartment with id {} was found" , apartmentId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No apartment found!");
         }
     }
 
