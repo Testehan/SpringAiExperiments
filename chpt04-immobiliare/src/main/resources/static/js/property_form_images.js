@@ -197,7 +197,7 @@ function addExtraImageSection(index){
         <div class="col border m-3 p-2" id="divImage${imagesCount}">
            <div id="imageHeader${index}"><label>` + LABEL_IMAGE_NUMBER + ` ${imagesCount}</label></div>
            <div class="">
-               <img id="newImageThumbnail${index}" alt="Image ${imagesCount} preview" class="img-fluid"
+               <img id="newImageThumbnail${index}" alt="Image ${imagesCount} preview" class="max-w-full h-auto"
                     src="${defaultThumbnailImageSrc}" />
            </div>
            <div>
