@@ -25,13 +25,13 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-public class LoginController {
+public class LoginApiController {
 
     private final SpringTemplateEngine templateEngine;
     private final LocaleUtils localeUtils;
     private final UserService userService;
 
-    public LoginController(SpringTemplateEngine templateEngine, LocaleUtils localeUtils, ConversationSession conversationSession, UserService userService){
+    public LoginApiController(SpringTemplateEngine templateEngine, LocaleUtils localeUtils, ConversationSession conversationSession, UserService userService){
         this.templateEngine = templateEngine;
         this.localeUtils = localeUtils;
         this.userService = userService;

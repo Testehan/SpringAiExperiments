@@ -22,4 +22,6 @@ public class CachedResponse {
     private String city;
     private String propertyType;
 
+    private int inaccurateResponseCount = 0;            // how many times this was reported by users for being wrong
+
 }

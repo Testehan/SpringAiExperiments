@@ -29,7 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
-public class MainController {
+public class MainViewController {
 
 	@Value("${app.url}")
 	private String appUrl;
@@ -42,9 +42,9 @@ public class MainController {
 	private final ListingUtil listingUtil;
 	private final LocaleUtils localeUtils;
 
-	public MainController(ApartmentCrudService apartmentCrudService, ConversationSession conversationSession,
-                          UserSseService userSseService, MessageSource messageSource,
-                          BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
+	public MainViewController(ApartmentCrudService apartmentCrudService, ConversationSession conversationSession,
+							  UserSseService userSseService, MessageSource messageSource,
+							  BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
         this.apartmentCrudService = apartmentCrudService;
         this.conversationSession = conversationSession;
 		this.userSseService = userSseService;

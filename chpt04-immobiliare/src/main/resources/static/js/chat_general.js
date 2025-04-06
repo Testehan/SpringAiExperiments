@@ -426,7 +426,7 @@ function setCurrentStep(){
 }
 
 const reportResponseButton = `
-    <button class="absolute top-[0px] right-[-15px] group" id="reportResponse" title="Report problem">
+    <button onclick="reportInaccurateResponse()" class="absolute top-[0px] right-[-15px] group" id="reportResponse" title="Report problem">
         <img class="group-hover:hidden" src="/images/pin-error.svg"/>
         <img class="hidden group-hover:block" src="/images/pin-error-hover.svg"/>
     </button>
@@ -434,8 +434,33 @@ const reportResponseButton = `
 
 function addReportInaccurateResponse(){
     $('#reportResponse').remove();
-    const container = $("#response-container").last();
-    $('#response-container:last div:last').append(reportResponseButton);
+    $('.assistantResponse:last > div:last').append(reportResponseButton);
+}
+
+function reportInaccurateResponse(){
+
+    var $button = $('#reportResponse');
+    // Disable the button
+    $button.prop('disabled', true);
+
+    // Change the image source to the hover image
+    $button.find('img').eq(0).hide(); // Hide the first image
+    $button.find('img').eq(1).removeClass('hidden group-hover:block').show(); // Remove 'hidden' and 'group-hover:block', then show the second image
+
+    const data =  $('.userMessage:last').text();
+
+    $.ajax({
+        url: "/api/chat/report",
+        type: "POST",
+        contentType: "text/plain",
+        data: data,
+        success: function (response) {
+            showToast("Thank you for reporting an issue", 2000, "info");
+        },
+        error: function (xhr) {
+             showToast("Error occurred while reporting the problem", 3000, "error");
+        }
+    })
 
 }
 

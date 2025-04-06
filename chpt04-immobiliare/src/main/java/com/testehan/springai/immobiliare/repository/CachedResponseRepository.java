@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-public interface CachedResponseRepository extends MongoRepository<CachedResponse, String> {
+public interface CachedResponseRepository extends MongoRepository<CachedResponse, String>, CustomCachedResponseRepository {
 
     Optional<CachedResponse> findByInputHash(String inputHash);
 

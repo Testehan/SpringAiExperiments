@@ -17,15 +17,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.io.IOException;
 
 @Controller
-public class UserController {
+public class UserViewController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserViewController.class);
 
     private final UserService userService;
     private final ApartmentCrudService apartmentCrudService;
     private final ConversationSession conversationSession;
 
-    public UserController(UserService userService,ApartmentCrudService apartmentCrudService, ConversationSession conversationSession) {
+    public UserViewController(UserService userService, ApartmentCrudService apartmentCrudService, ConversationSession conversationSession) {
         this.userService = userService;
         this.apartmentCrudService = apartmentCrudService;
         this.conversationSession = conversationSession;

@@ -34,12 +34,16 @@ public class LLMCacheService {
 
     public void saveToCache(String city, String propertyType, String userInput, String response) {
         String hash = listingUtil.hashText(userInput);
-        CachedResponse cached = new CachedResponse(hash,userInput, response, System.currentTimeMillis(), city, propertyType);
+        CachedResponse cached = new CachedResponse(hash,userInput, response, System.currentTimeMillis(), city, propertyType, 0);
         cachedResponseRepository.save(cached);
     }
 
     public void removeCachedEntries(String city, String propertyType) {
         long deletedCount = cachedResponseRepository.deleteByCityAndPropertyType(city, propertyType) ;
         LOGGER.info("Deleted {} cached entries because a new listing was added in {} for {}.", deletedCount ,city, propertyType);
+    }
+
+    public void reportInaccurateResponse(String input){
+        cachedResponseRepository.decreaseFieldByOne(listingUtil.hashText(input), "inaccurateResponseCount");
     }
 }

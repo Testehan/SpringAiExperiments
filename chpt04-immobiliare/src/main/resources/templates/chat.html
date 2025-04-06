@@ -68,10 +68,10 @@
     <main class="flex flex-col bg-white p-4 w-full max-w-full">
         <div id="response-container" class="flex-1 mb-4 p-4 h-full overflow-auto">
             <div class="mb-2">
-                <p class="assistantResponse inline-block bg-slate-50 rounded-lg p-2 ml-auto">
+                <div class="assistantResponse inline-block bg-slate-50 rounded-lg p-2 ml-auto">
                     [[${initialMessage}]]
                     <span th:if="${queriesAvailableMessage!= null}" class="text-red-500">[[${queriesAvailableMessage}]]</span>
-                </p>
+                </div>
             </div>
 
         </div>

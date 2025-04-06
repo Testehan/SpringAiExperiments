@@ -20,9 +20,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @CrossOrigin
-public class ChatController {
+public class ChatViewController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChatController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChatViewController.class);
 
     private final ApiService apiService;
     private final OpenAiService openAiService;
@@ -31,8 +31,8 @@ public class ChatController {
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public ChatController(ApiService apiService, OpenAiService openAiService, ConversationSession conversationSession,
-                          UserService userService, MessageSource messageSource, LocaleUtils localeUtils) {
+    public ChatViewController(ApiService apiService, OpenAiService openAiService, ConversationSession conversationSession,
+                              UserService userService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.apiService = apiService;
         this.openAiService = openAiService;
         this.conversationSession = conversationSession;

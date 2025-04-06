@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 
 @Controller
-public class CustomErrorController implements ErrorController {
+public class CustomErrorViewController implements ErrorController {
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public CustomErrorController(MessageSource messageSource, LocaleUtils localeUtils) {
+    public CustomErrorViewController(MessageSource messageSource, LocaleUtils localeUtils) {
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }

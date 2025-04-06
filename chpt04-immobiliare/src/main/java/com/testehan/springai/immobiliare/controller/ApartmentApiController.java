@@ -30,9 +30,9 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/apartments")
-public class ApartmentController {
+public class ApartmentApiController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentApiController.class);
     private static final String BEST_RESULTS_IMAGE_PATH = "/images/best.png";
     private static final String MOST_FAVOURITE_IMAGE_PATH = "/images/most-favourite.png";
     private static final String TOP_CONTACTED_IMAGE_PATH = "/images/top-contacted.png";
@@ -52,11 +52,11 @@ public class ApartmentController {
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApartmentController(ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
-                               UserService userService, EmbeddingService embeddingService, ApiService apiService,
-                               SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
-                               SessionCleanupListener sessionCleanupListener,
-                               MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
+    public ApartmentApiController(ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
+                                  UserService userService, EmbeddingService embeddingService, ApiService apiService,
+                                  SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
+                                  SessionCleanupListener sessionCleanupListener,
+                                  MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.apartmentService = apartmentService;
         this.apartmentCrudService = apartmentCrudService;

@@ -13,13 +13,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-public class SSEController {
+public class SseApiController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SSEController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SseApiController.class);
 
     private final UserSseService userSseService;
 
-    public SSEController(UserSseService userSseService) {
+    public SseApiController(UserSseService userSseService) {
         this.userSseService = userSseService;
     }
 

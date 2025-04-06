@@ -20,17 +20,17 @@ import java.util.Locale;
 import java.util.Optional;
 
 @RestController
-public class ReactivateController {
+public class ReactivateApiController {
 
     @Value("${app.url}")
     private String appUrl;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReactivateApiController.class);
     private final ApartmentCrudService apartmentCrudService;
     private final MessageSource messageSource;
     private final FormattingUtil formattingUtil;
 
-    public ReactivateController(ApartmentCrudService apartmentCrudService, MessageSource messageSource, FormattingUtil formattingUtil) {
+    public ReactivateApiController(ApartmentCrudService apartmentCrudService, MessageSource messageSource, FormattingUtil formattingUtil) {
         this.apartmentCrudService = apartmentCrudService;
         this.messageSource = messageSource;
         this.formattingUtil = formattingUtil;
