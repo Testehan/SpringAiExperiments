@@ -49,7 +49,7 @@ function getPhoneNumber(showContactButton){
             $parentSpan.append($ownerNameElement);
             $parentSpan.append($phoneNumberElement);
 
-            if (response !== 'No apartment found!'){
+            if (phoneNumber !== 'No apartment found!'){
                 var whatsappLink = WHATSAPP_BASE_URL + ROMANIA_COUNTRY_CODE + phoneNumber;
                 var $whatsappLink = $parentSpan.closest('span').find('.whatsapp-link');
                 $whatsappLink.attr('href', whatsappLink).show();
