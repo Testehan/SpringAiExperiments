@@ -3,7 +3,9 @@ package com.testehan.springai.immobiliare.util;
 import com.testehan.springai.immobiliare.model.Amenity;
 import com.testehan.springai.immobiliare.model.AmenityCategory;
 import com.testehan.springai.immobiliare.model.Apartment;
+import com.testehan.springai.immobiliare.model.ListingStatistics;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.repository.ListingStatisticsRepository;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
@@ -17,10 +19,12 @@ import java.util.stream.Collectors;
 @Component
 public class ListingUtil {
 
+    private final ListingStatisticsRepository listingStatisticsRepository;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public ListingUtil(MessageSource messageSource, LocaleUtils localeUtils) {
+    public ListingUtil(ListingStatisticsRepository listingStatisticsRepository, MessageSource messageSource, LocaleUtils localeUtils) {
+        this.listingStatisticsRepository = listingStatisticsRepository;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }
@@ -98,30 +102,24 @@ public class ListingUtil {
     }
 
     public void setIsMostFavouriteAndContacted(List<Apartment> listings){
-        final int[] maxFavourite = {0};
-        final int[] maxContacted = {0};
-        listings.stream().forEach(listing -> {
-            if (listing.getNoOfFavourite()> maxFavourite[0]){
-                maxFavourite[0] = listing.getNoOfFavourite();
-            }
-            if (listing.getNoOfContact()> maxContacted[0]){
-                maxContacted[0] = listing.getNoOfContact();
-            }
-        });
 
-        listings.stream().forEach(listing -> {
-            if (listing.getNoOfFavourite()==maxFavourite[0]){
-                listing.setMostFavourite(true);
-            } else {
-                listing.setMostFavourite(false);
-            }
+        if (!listings.isEmpty()){
+            var first = listings.get(0);
+            var statisticsList = listingStatisticsRepository.findByCityAndPropertyType(first.getCity(),first.getPropertyType());
 
-            if (listing.getNoOfContact()==maxContacted[0]){
-                listing.setMostContacted(true);
-            } else {
-                listing.setMostContacted(false);
+            for (Apartment listing : listings){
+                for (ListingStatistics statistics : statisticsList.get()){
+                    if (listing.getNoOfRooms() == statistics.getNoOfRooms()) {
+                        if (listing.getNoOfContact() >= statistics.getContactThreshold()) {
+                            listing.setMostContacted(true);
+                        }
+                        if (listing.getNoOfFavourite() >= statistics.getFavoriteThreshold()) {
+                            listing.setMostFavourite(true);
+                        }
+                    }
+                }
             }
-        });
+        }
     }
 
     public List<Map<String, Object>> getListingDataByFields(List<Apartment> listings, List<String> fields) {

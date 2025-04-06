@@ -123,7 +123,6 @@ public class ScheduledTasks {
     }
 
     @Scheduled(cron = "0 0 7 * * ?")        // Code to run at 7 AM every day
-
     public void updateStatistics() {
         LOGGER.info("Scheduled Task - Update statistics");
         statisticsService.computeAndStoreStatistics();
