@@ -455,10 +455,10 @@ function reportInaccurateResponse(){
         contentType: "text/plain",
         data: data,
         success: function (response) {
-            showToast("Thank you for reporting an issue", 2000, "info");
+            showToast(response, 2000, "info");
         },
         error: function (xhr) {
-             showToast("Error occurred while reporting the problem", 3000, "error");
+             showToast("Error", 3000, "error");
         }
     })
 

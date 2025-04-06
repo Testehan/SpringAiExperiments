@@ -92,7 +92,7 @@ public class DetailsHandler implements ApiChatCallHandler {
             LOGGER.info("Performance Cache 2 -----------------------");
         } else {
             detailFields = callLLM(userMessage,"system_detailGetFields");
-            llmCacheService.saveToCache("", "", userMessage, detailFields);
+            llmCacheService.saveToCache("", "", userMessage.trim(), detailFields);
         }
         LOGGER.info("The fields {} were identified to be relevant.",detailFields);
         return detailFields;

@@ -88,7 +88,7 @@ public class ApiServiceImpl implements ApiService{
                 ServiceCall serviceCall = outputParser.convert(response);
 
                 var valueToBeCached = serviceCall.apiCall().toString() + "," + serviceCall.message();
-                llmCacheService.saveToCache("","",message, valueToBeCached);
+                llmCacheService.saveToCache("","",message.trim(), valueToBeCached);
 
                 return serviceCall;
             }
