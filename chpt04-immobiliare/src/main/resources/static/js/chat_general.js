@@ -277,6 +277,7 @@ function connectToSSE(sseId) {
                 $('#spinner').hide();
                 clearChatRequestTimeout();
                 container.append(newFragment);
+                addReportInaccurateResponse();
             }
 
         });
@@ -370,6 +371,7 @@ function askForResponse() {
          // Listen for the HTMX response and clear timeout if successful
     $(document).on('htmx:afterRequest', function(event) {
         clearChatRequestTimeout();
+        addReportInaccurateResponse();
     });
 
 }
@@ -421,6 +423,20 @@ function setCurrentStep(){
         fetchSuggestions();
         $('#suggestions').show();
     }
+}
+
+const reportResponseButton = `
+    <button class="absolute top-[0px] right-[-15px] group" id="reportResponse" title="Report problem">
+        <img class="group-hover:hidden" src="/images/pin-error.svg"/>
+        <img class="hidden group-hover:block" src="/images/pin-error-hover.svg"/>
+    </button>
+`;
+
+function addReportInaccurateResponse(){
+    $('#reportResponse').remove();
+    const container = $("#response-container").last();
+    $('#response-container:last div:last').append(reportResponseButton);
+
 }
 
 function logCallHierarchy() {

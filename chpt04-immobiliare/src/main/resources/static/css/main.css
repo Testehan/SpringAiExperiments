@@ -602,6 +602,10 @@ video {
   right: 1rem;
 }
 
+.right-\[-15px\] {
+  right: -15px;
+}
+
 .top-0 {
   top: 0px;
 }
@@ -612,6 +616,10 @@ video {
 
 .top-4 {
   top: 1rem;
+}
+
+.top-\[0px\] {
+  top: 0px;
 }
 
 .top-\[20\%\] {
@@ -1721,6 +1729,14 @@ video {
 
 .focus\:ring-offset-2:focus {
   --tw-ring-offset-width: 2px;
+}
+
+.group:hover .group-hover\:block {
+  display: block;
+}
+
+.group:hover .group-hover\:hidden {
+  display: none;
 }
 
 @media (min-width: 640px) {

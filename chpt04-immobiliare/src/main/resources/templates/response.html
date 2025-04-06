@@ -8,8 +8,8 @@
 </head>
 <body>
 <div th:fragment="responseFragment" class="mb-2">
-    <div th:unless="${message == null || message.isEmpty()}" class="inline-block bg-sky-200 rounded-lg p-2 ml-auto userMessage" th:text="${message}">Message</div>
-    <div th:unless="${response == null || response.isEmpty()}" class="inline-block bg-slate-50 rounded-lg p-2 ml-auto assistantResponse">
+    <div th:unless="${message == null || message.isEmpty()}" class="relative inline-block bg-sky-200 rounded-lg p-2 ml-auto userMessage" th:text="${message}">Message</div>
+    <div th:unless="${response == null || response.isEmpty()}" class="relative inline-block bg-slate-50 rounded-lg p-2 ml-auto assistantResponse">
         <div th:utext="${response}">
         </div>
         <span th:if="${queriesAvailableMessage!= null}" class="text-red-500">[[${queriesAvailableMessage}]]</span>
