@@ -2,7 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.CachedResponse;
 import com.testehan.springai.immobiliare.repository.CachedResponseRepository;
-import com.testehan.springai.immobiliare.util.ListingUtil;
+import com.testehan.springai.immobiliare.util.HashUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,15 +15,15 @@ public class LLMCacheService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LLMCacheService.class);
 
     private final CachedResponseRepository cachedResponseRepository;
-    private final ListingUtil listingUtil;
+    private final HashUtil hashUtil;
 
-    public LLMCacheService(CachedResponseRepository cachedResponseRepository, ListingUtil listingUtil) {
+    public LLMCacheService(CachedResponseRepository cachedResponseRepository, HashUtil hashUtil) {
         this.cachedResponseRepository = cachedResponseRepository;
-        this.listingUtil = listingUtil;
+        this.hashUtil = hashUtil;
     }
 
     public Optional<String> getCachedResponse(String input) {
-        String hash = listingUtil.hashText(input);
+        String hash = hashUtil.hashText(input);
         Optional<CachedResponse> cached = cachedResponseRepository.findByInputHash(hash);
         if (cached.isPresent()){
             return Optional.ofNullable(cached.get().getResponse());
@@ -33,7 +33,7 @@ public class LLMCacheService {
     }
 
     public void saveToCache(String city, String propertyType, String userInput, String response) {
-        String hash = listingUtil.hashText(userInput);
+        String hash = hashUtil.hashText(userInput);
         CachedResponse cached = new CachedResponse(hash,userInput, response, System.currentTimeMillis(), city, propertyType, 0);
         cachedResponseRepository.save(cached);
     }
@@ -44,6 +44,6 @@ public class LLMCacheService {
     }
 
     public void reportInaccurateResponse(String input){
-        cachedResponseRepository.decreaseFieldByOne(listingUtil.hashText(input), "inaccurateResponseCount");
+        cachedResponseRepository.decreaseFieldByOne(hashUtil.hashText(input), "inaccurateResponseCount");
     }
 }

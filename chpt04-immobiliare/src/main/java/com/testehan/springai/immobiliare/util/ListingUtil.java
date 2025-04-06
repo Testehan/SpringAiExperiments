@@ -8,8 +8,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -97,20 +95,6 @@ public class ListingUtil {
             sb.append(amenity.getName()).append(" ").append(amenity.getDistance()).append(", ");
         }
         sb.append("\n");
-    }
-
-    public String hashText(String text) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] encodedHash = digest.digest(text.getBytes(StandardCharsets.UTF_8));
-            StringBuilder hexString = new StringBuilder(2 * encodedHash.length);
-            for (byte b : encodedHash) {
-                hexString.append(String.format("%02x", b));
-            }
-            return hexString.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Error hashing text", e);
-        }
     }
 
     public void setIsMostFavouriteAndContacted(List<Apartment> listings){

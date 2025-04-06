@@ -2,10 +2,7 @@ package com.testehan.springai.immobiliare.configuration;
 
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.security.UserService;
-import com.testehan.springai.immobiliare.service.ApartmentCrudService;
-import com.testehan.springai.immobiliare.service.ConversationService;
-import com.testehan.springai.immobiliare.service.EmailService;
-import com.testehan.springai.immobiliare.service.SmsService;
+import com.testehan.springai.immobiliare.service.*;
 import com.testehan.springai.immobiliare.util.ContactValidator;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.slf4j.Logger;
@@ -30,16 +27,18 @@ public class ScheduledTasks {
     private final ConversationService conversationService;
     private final EmailService emailService;
     private final SmsService smsService;
+    private final StatisticsService statisticsService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, ConversationService conversationService, EmailService emailService, SmsService smsService, MessageSource messageSource,
+    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, ConversationService conversationService, EmailService emailService, SmsService smsService, StatisticsService statisticsService, MessageSource messageSource,
                           LocaleUtils localeUtils){
         this.userService = userService;
         this.apartmentCrudService = apartmentCrudService;
         this.conversationService = conversationService;
         this.emailService = emailService;
         this.smsService = smsService;
+        this.statisticsService = statisticsService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }
@@ -121,5 +120,12 @@ public class ScheduledTasks {
             }
         }
 
+    }
+
+    @Scheduled(cron = "0 0 7 * * ?")        // Code to run at 7 AM every day
+
+    public void updateStatistics() {
+        LOGGER.info("Scheduled Task - Update statistics");
+        statisticsService.computeAndStoreStatistics();
     }
 }
