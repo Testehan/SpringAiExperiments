@@ -361,7 +361,10 @@ public class MainViewController {
 	}
 
 	@GetMapping("/error-login")
-	public String loginModal() {
+	public String loginModal(Model model) {
+
+		var translatedError = messageSource.getMessage("loginModal.title",  null, localeUtils.getCurrentLocale());
+		model.addAttribute("errorMessage", translatedError);
 		return "error-login";
 	}
 

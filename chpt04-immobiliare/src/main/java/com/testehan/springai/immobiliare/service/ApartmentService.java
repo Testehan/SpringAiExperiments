@@ -94,6 +94,8 @@ public class ApartmentService {
                 }
 
                 apartment.setImagesGeneratedDescription(apartmentCurrentlySaved.getImagesGeneratedDescription());
+                apartment.setSocialId(apartmentCurrentlySaved.getSocialId());
+
             }
         }
 
