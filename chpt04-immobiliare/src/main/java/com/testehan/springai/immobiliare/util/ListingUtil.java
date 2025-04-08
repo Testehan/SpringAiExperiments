@@ -10,10 +10,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
@@ -109,11 +106,11 @@ public class ListingUtil {
 
             for (Apartment listing : listings){
                 for (ListingStatistics statistics : statisticsList.get()){
-                    if (listing.getNoOfRooms() == statistics.getNoOfRooms()) {
-                        if (listing.getNoOfContact() >= statistics.getContactThreshold()) {
+                    if (listing.getNoOfRooms() == statistics.getNoOfRooms() ) {
+                        if (Objects.nonNull(statistics.getContactThreshold()) && listing.getNoOfContact() >= statistics.getContactThreshold()) {
                             listing.setMostContacted(true);
                         }
-                        if (listing.getNoOfFavourite() >= statistics.getFavoriteThreshold()) {
+                        if (Objects.nonNull(statistics.getFavoriteThreshold()) && listing.getNoOfFavourite() >= statistics.getFavoriteThreshold()) {
                             listing.setMostFavourite(true);
                         }
                     }

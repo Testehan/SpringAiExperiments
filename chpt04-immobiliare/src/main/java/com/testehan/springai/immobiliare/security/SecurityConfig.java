@@ -51,13 +51,18 @@ public class SecurityConfig {
 
         http.csrf(CsrfConfigurer::disable);
         http.authorizeHttpRequests(req -> req
-                .requestMatchers(SecuredPaths.SECURED_URLS.toArray(new String[0])).authenticated()
                 .requestMatchers("/","/help","/blog","/contact", "/error**", "/error-login", "/login-modal",
-                        "/reactivate","/confirmation","/accept-gdpr","/privacy-policy","/terms", "/s/**").permitAll()
+                        "/reactivate","/confirmation","/accept-gdpr","/privacy-policy","/terms", "/s/**",
+                        "/actuator/prometheus").permitAll()
                 .requestMatchers(antMatcher("/css/**")).permitAll()
                 .requestMatchers(antMatcher("/js/**")).permitAll()
                 .requestMatchers(antMatcher("/webjars/**")).permitAll()
                 .requestMatchers(antMatcher("/images/**")).permitAll()
+//                .requestMatchers(SecuredPaths.SECURED_URLS.toArray(new String[0])).authenticated()
+
+                                // if this works, we don't need the above SECURED_URLs stuff because all other enpoints,
+                                // except the ones permitted above, must be authenticated
+                 .anyRequest().authenticated()
                 )
             .oauth2Login( oauth2Login -> oauth2Login
                 .loginPage("/login-modal")

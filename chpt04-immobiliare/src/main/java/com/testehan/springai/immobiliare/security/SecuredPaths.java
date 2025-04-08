@@ -14,7 +14,6 @@ public class SecuredPaths {
             "/api/**",
             "/profile",
             "/view/**",
-//            "/s/**",
             "/invite/**"
 
     );
