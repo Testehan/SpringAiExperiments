@@ -147,7 +147,7 @@ public class ListingUtil {
                         String value = translatedFieldName + " : " + field.get(apartment).toString();
                         apartmentData.put(fieldName, value);
                     }
-                } catch (NoSuchFieldException | IllegalAccessException e) {
+                } catch (NoSuchFieldException | IllegalAccessException | NullPointerException e) {
                     apartmentData.put(fieldName, null); // Handle missing fields
                 }
             }
