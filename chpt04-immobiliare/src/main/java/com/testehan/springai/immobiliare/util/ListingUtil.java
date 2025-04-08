@@ -107,10 +107,14 @@ public class ListingUtil {
             for (Apartment listing : listings){
                 for (ListingStatistics statistics : statisticsList.get()){
                     if (listing.getNoOfRooms() == statistics.getNoOfRooms() ) {
-                        if (Objects.nonNull(statistics.getContactThreshold()) && listing.getNoOfContact() >= statistics.getContactThreshold()) {
+                        if (Objects.nonNull(statistics.getContactThreshold())
+                                && statistics.getContactThreshold() > 0
+                                && listing.getNoOfContact() >= statistics.getContactThreshold()) {
                             listing.setMostContacted(true);
                         }
-                        if (Objects.nonNull(statistics.getFavoriteThreshold()) && listing.getNoOfFavourite() >= statistics.getFavoriteThreshold()) {
+                        if (Objects.nonNull(statistics.getFavoriteThreshold())
+                                && statistics.getFavoriteThreshold() > 0
+                                && listing.getNoOfFavourite() >= statistics.getFavoriteThreshold()) {
                             listing.setMostFavourite(true);
                         }
                     }

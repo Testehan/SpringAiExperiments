@@ -102,7 +102,7 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 shadow-lg rounded-lg mt-10" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+<div class="relative grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 shadow-lg rounded-lg mt-10" th:fragment="apartment_view(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
     <div th:replace="~{fragments :: disabled_listing}"></div>
 
     <div class="bg-white overflow-hidden">
