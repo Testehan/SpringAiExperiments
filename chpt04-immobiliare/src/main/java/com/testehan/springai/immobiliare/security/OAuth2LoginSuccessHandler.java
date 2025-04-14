@@ -15,7 +15,11 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,6 +29,8 @@ import java.util.Optional;
 
 @Component
 public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+
+    private final RequestCache requestCache = new HttpSessionRequestCache();
 
     private final UserService userService;
     private final OAuth2AuthorizedClientService authorizedClientService;
@@ -64,9 +70,41 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
 
         handleRegistrationOfDeletedUser(userEmail);
 
+        SavedRequest savedRequest = this.requestCache.getRequest(request, response);
 
-        super.onAuthenticationSuccess(request, response, authentication);
+        if (savedRequest == null) {
+            super.onAuthenticationSuccess(request, response, authentication);
+            return;
+        }
 
+        redirectToAppropiateUrl(request, response, authentication, savedRequest);
+
+    }
+
+    private void redirectToAppropiateUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication, SavedRequest savedRequest) throws IOException, ServletException {
+        String targetUrlParameter = this.getTargetUrlParameter();
+        if (!this.isAlwaysUseDefaultTargetUrl() && (targetUrlParameter == null || !StringUtils.hasText(request.getParameter(targetUrlParameter)))) {
+
+            this.clearAuthenticationAttributes(request);
+            String targetUrl = savedRequest.getRedirectUrl();
+            if (targetUrl.contains("/api/")) {
+                // when the targetURL contains /api it means the user requested some info without being logged in
+                // in which case, we don't want them to be redirected to the result of the api call, but to let
+                // them on the same page after logging them in, so that they can perform the action wanted.
+                // if however the users request a view, like /profile or /favourites then we will redirect them to
+                // the requested view
+                var optionalReferer = savedRequest.getHeaderValues("referer").stream().findFirst();
+                if (optionalReferer.isPresent()) {
+                    targetUrl = optionalReferer.get();
+                } else {
+                    targetUrl = "/";
+                }
+            }
+            this.getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        } else {
+            this.requestCache.removeRequest(request, response);
+            super.onAuthenticationSuccess(request, response, authentication);
+        }
     }
 
     private void handleRegistrationOfDeletedUser(String userEmail) {
