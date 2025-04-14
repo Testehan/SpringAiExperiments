@@ -18,8 +18,10 @@ public class EmailService {
     private String appUrl;
 
     private final SesClient sesClient;
+    private final AppConfigurationsService appConfigurationsService;
 
-    public EmailService(BeanConfig beanConfig) {
+    public EmailService(BeanConfig beanConfig, AppConfigurationsService appConfigurationsService) {
+        this.appConfigurationsService = appConfigurationsService;
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(beanConfig.getAwsAccessKeyId(), beanConfig.getAwsAccessSecret());
 
         sesClient = SesClient.builder()
@@ -44,19 +46,21 @@ public class EmailService {
     }
 
     public void sendWelcomeEmail(String to, String name, Locale locale){
-        var chatUrl = appUrl + "/chat";
-        var addUrl = appUrl + "/add";
+        if (appConfigurationsService.isSendWelcomeEmailEnabled()){
+            var chatUrl = appUrl + "/chat";
+            var addUrl = appUrl + "/add";
 
-        SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
-                .source("CasaMia.ai" +" "+ "<admin@casamia.ai>") // Replace with a verified email
-                .destination(Destination.builder()
-                        .toAddresses(to)
-                        .build())
-                .template(getWelcomeEmailTemplate(locale)) // Template name
-                .templateData("{\"userName\":\""+name+"\", \"chatUrl\":\""+chatUrl+"\", \"addUrl\":\""+addUrl+"\" }") // JSON string to replace placeholders
-                .build();
+            SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
+                    .source("CasaMia.ai" + " " + "<admin@casamia.ai>") // Replace with a verified email
+                    .destination(Destination.builder()
+                            .toAddresses(to)
+                            .build())
+                    .template(getWelcomeEmailTemplate(locale)) // Template name
+                    .templateData("{\"userName\":\"" + name + "\", \"chatUrl\":\"" + chatUrl + "\", \"addUrl\":\"" + addUrl + "\" }") // JSON string to replace placeholders
+                    .build();
 
-        sesClient.sendTemplatedEmail(request);
+            sesClient.sendTemplatedEmail(request);
+        }
     }
 
     public void sendReactivateListingEmail(String to, String name, String listingTitle, String reactivateListingUrl, Locale locale){
@@ -73,19 +77,21 @@ public class EmailService {
     }
 
     public void sendListingAddedEmail(String to, String userName, String listingName, String viewUrl, String editUrl, Locale locale) {
-        SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
-                .source("CasaMia.ai" + " " +"<admin@casamia.ai>") // Replace with a verified email
-                .destination(Destination.builder()
-                        .toAddresses(to)
-                        .build())
-                .template(getListingAddedEmailTemplate(locale)) // Template name
-                .templateData("{\"userName\":\""+userName+"\"," +
-                                "\"listingTitle\":\""+listingName +
-                                "\",\"viewListingUrl\":\""+viewUrl +
-                                "\", \"editListingUrl\":\""+editUrl+"\"}")
-                .build();
+        if (appConfigurationsService.isSendListingAddedEmail()) {
+            SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
+                    .source("CasaMia.ai" + " " + "<admin@casamia.ai>") // Replace with a verified email
+                    .destination(Destination.builder()
+                            .toAddresses(to)
+                            .build())
+                    .template(getListingAddedEmailTemplate(locale)) // Template name
+                    .templateData("{\"userName\":\"" + userName + "\"," +
+                            "\"listingTitle\":\"" + listingName +
+                            "\",\"viewListingUrl\":\"" + viewUrl +
+                            "\", \"editListingUrl\":\"" + editUrl + "\"}")
+                    .build();
 
-        sesClient.sendTemplatedEmail(request);
+            sesClient.sendTemplatedEmail(request);
+        }
     }
 
     private static String getListingAddedEmailTemplate(Locale locale) {

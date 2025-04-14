@@ -30,9 +30,10 @@ public class ScheduledTasks {
     private final StatisticsService statisticsService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
+    private final AppConfigurationsService appConfigurationsService;
 
     public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, ConversationService conversationService, EmailService emailService, SmsService smsService, StatisticsService statisticsService, MessageSource messageSource,
-                          LocaleUtils localeUtils){
+                          LocaleUtils localeUtils, AppConfigurationsService appConfigurationsService){
         this.userService = userService;
         this.apartmentCrudService = apartmentCrudService;
         this.conversationService = conversationService;
@@ -41,18 +42,28 @@ public class ScheduledTasks {
         this.statisticsService = statisticsService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
+        this.appConfigurationsService = appConfigurationsService;
     }
 
     @Scheduled(cron = "0 0 2 * * ?")         // Code to run at 2 am every day
     public void resetSearchesAvailableForNonAdminUsers() {
-        userService.resetSearchesAvailable();
-        LOGGER.info("Scheduled Task - The user available searches number was reset");
+        if (appConfigurationsService.isResetSearchesAvailableEnabled()) {
+            userService.resetSearchesAvailable();
+            LOGGER.info("Scheduled Task - The user available searches number was reset");
+        } else{
+            LOGGER.info("Scheduled Task - resetSearchesAvailable is disabled");
+        }
     }
+
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
     public void deactivatedListingsLastUpdatedMoreThan2WeeksAgo() {
-        LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
-        apartmentCrudService.deactivateApartments(twoWeeksAgo);
-        LOGGER.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
+        if (appConfigurationsService.isDeactivatedOldListingsEnabled()) {
+            LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
+            apartmentCrudService.deactivateApartments(twoWeeksAgo);
+            LOGGER.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
+        } else {
+            LOGGER.info("Scheduled Task - deactivatedOldListings is disabled");
+        }
     }
 
     @Scheduled(cron = "0 0 4 * * ?")        // Code to run at 4 AM every day
@@ -75,20 +86,24 @@ public class ScheduledTasks {
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationEmail() {
 
-        LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
-        LOGGER.info("Scheduled Task - Reactivation emails will be send to owners.");
+        if (!appConfigurationsService.isSendReactivationEmailEnabled()) {
+            LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
+            LOGGER.info("Scheduled Task - Reactivation emails will be send to owners.");
 
-        var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
+            var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
 
-        for (Apartment listing : listings){
-            LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
-            var contact = listing.getContactEmail();
-            var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
+            for (Apartment listing : listings) {
+                LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
+                var contact = listing.getContactEmail();
+                var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
 
-            if (ContactValidator.isValidEmail(contact)){
-                emailService.sendReactivateListingEmail(contact,"",listing.getName(),reactivateLink, localeUtils.getCurrentLocale());
+                if (ContactValidator.isValidEmail(contact)) {
+                    emailService.sendReactivateListingEmail(contact, "", listing.getName(), reactivateLink, localeUtils.getCurrentLocale());
+                }
+
             }
-            
+        } else {
+            LOGGER.info("Scheduled Task - sendReactivationEmail is disabled");
         }
 
     }
@@ -96,28 +111,31 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationSMS() {
+        if (!appConfigurationsService.isSendReactivationSMSEnabled()) {
+            LocalDateTime thirteenDaysAgo = LocalDateTime.now().minus(13, ChronoUnit.DAYS);
+            LOGGER.info("Scheduled Task - Reactivation sms will be send to owners.");
 
-        LocalDateTime thirteenDaysAgo = LocalDateTime.now().minus(13, ChronoUnit.DAYS);
-        LOGGER.info("Scheduled Task - Reactivation sms will be send to owners.");
+            var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(thirteenDaysAgo);
 
-        var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(thirteenDaysAgo);
+            for (Apartment listing : listings) {
+                LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
+                var contact = listing.getContact();
+                var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
 
-        for (Apartment listing : listings){
-            LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
-            var contact = listing.getContact();
-            var reactivateLink = appUrl + "/reactivate?token="+listing.getActivationToken()+"&id=" + listing.getId().toString();
-
-            if (ContactValidator.isValidPhoneNumber(contact,"RO")){
-                var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
-                if (phoneWithPrefix.isEmpty()){
-                    LOGGER.error("Can't send SMS for {} of listing named {}", contact , listing.getName());
-                } else {
-                    var smsMessage = messageSource.getMessage("sms.keep.active", null,localeUtils.getCurrentLocale()) + " " + reactivateLink;
+                if (ContactValidator.isValidPhoneNumber(contact, "RO")) {
+                    var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
+                    if (phoneWithPrefix.isEmpty()) {
+                        LOGGER.error("Can't send SMS for {} of listing named {}", contact, listing.getName());
+                    } else {
+                        var smsMessage = messageSource.getMessage("sms.keep.active", null, localeUtils.getCurrentLocale()) + " " + reactivateLink;
 // TODO when you will use your domain, you can test this out, as right now the sms length exceeds the allowed number of chars, because of the currently long domain name..
-                    //                    smsService.sendSms(phoneWithPrefix.get(), smsMessage);    // "or reply yes" => this is not implemented yet, see notes from SmsService
-                }
+                        //                    smsService.sendSms(phoneWithPrefix.get(), smsMessage);    // "or reply yes" => this is not implemented yet, see notes from SmsService
+                    }
 
+                }
             }
+        } else {
+            LOGGER.info("Scheduled Task - sendReactivationSMS is disabled");
         }
 
     }
