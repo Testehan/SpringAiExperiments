@@ -107,6 +107,28 @@ public class ApartmentApiController {
         }
     }
 
+    @PostMapping("/batchsave")
+    public ResponseEntity<String> batchSaveApartment(Apartment apartment, @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
+
+        var user = conversationSession.getImmobiliareUser().get();
+        if (!user.isAdmin()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only admin can use this endpoint");
+        }
+
+        var isPhoneValid = apartmentService.isPhoneValid(apartment.getContact());
+        if (!isPhoneValid){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Listing with phone " + apartment.getContact() + " already exists. Saving will be skipped for " + apartment.getName());
+        }
+
+        LOGGER.info("Batch save - start");
+        List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
+        apartmentService.saveApartmentAndImages(apartment, processedImages, user);
+        // Return a response to the frontend
+        return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
+
+    }
+
     @PostMapping("/delete/{listingId}")
     public ResponseEntity<String> deleteListing(@PathVariable(value = "listingId") String listingId) {
 
