@@ -266,7 +266,8 @@
                 <!-- Slides -->
                 <div th:each="image : ${apartment.images}" class="swiper-slide">
                     <img th:src="@{${image}}"
-                         th:unless="${#strings.isEmpty(image)}"/>
+                         th:unless="${#strings.isEmpty(image)}"
+                         onclick="openLightbox(this.src)"/>
 
                     <img class="w-full h-full max-h-[20vh] object-contain cursor-pointer"
                          th:if="${#strings.isEmpty(image)}"
