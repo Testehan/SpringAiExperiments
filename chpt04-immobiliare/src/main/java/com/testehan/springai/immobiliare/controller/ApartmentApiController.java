@@ -83,13 +83,13 @@ public class ApartmentApiController {
         if (!isPhoneValid){
             LOGGER.warn("User {} tried to add phone number {} that already exists", user.getEmail(), apartment.getContact());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You can't perform this operation!");
+                    .body(messageSource.getMessage("toastify.add.listing.failure.phone", null,localeUtils.getCurrentLocale()));
         }
 
         if ((apartment.getId() != null && apartment.getId().toString() != null && !user.getListedProperties().contains(apartment.getId().toString())) && !user.isAdmin()){ // make sure that only owners can edit the ap
             LOGGER.warn("User {} tried to edit property with id {} that was not owned", user.getEmail(), apartment.getId());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You can't perform this edit!");
+                    .body(messageSource.getMessage("toastify.add.listing.failure.edit", null,localeUtils.getCurrentLocale()));
         }
 
         if (user.getMaxNumberOfListedProperties() > 0){
@@ -98,12 +98,12 @@ public class ApartmentApiController {
             apartmentService.saveApartmentAndImages(apartment, processedImages, user);
             LOGGER.info("User {} added/edited a property ", user.getEmail());
             // Return a response to the frontend
-            return ResponseEntity.ok("We are processing the information provided. Refresh the page in 1 minute.");
+            return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
 
         } else {
             LOGGER.warn("User {} tried to add more properties than allowed", user.getEmail());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You have reached the maximum number of listed apartments!");
+                    .body(messageSource.getMessage("toastify.add.listing.failure.max", null,localeUtils.getCurrentLocale()));
         }
     }
 
@@ -115,7 +115,7 @@ public class ApartmentApiController {
         if ((listingId != null && !user.getListedProperties().contains(listingId)) && !user.isAdmin()){ // make sure that only owners can delete the ap
             LOGGER.warn("User {} tried to delete property with id {} that was not owned", user.getEmail(), listingId);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You can't perform this deletion!");
+                    .body(messageSource.getMessage("toastify.delete.listing.failure.notowner", null,localeUtils.getCurrentLocale()));
         }
 
         var apartment = apartmentCrudService.findApartmentById(listingId);
@@ -128,10 +128,10 @@ public class ApartmentApiController {
         } else {
             LOGGER.warn("User {} tried to delete property with id {} that does not exist", user.getEmail(), listingId);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("You can't perform this deletion!");
+                    .body(messageSource.getMessage("toastify.delete.listing.failure.notowner", null,localeUtils.getCurrentLocale()));
         }
         // Return a response to the frontend
-        return ResponseEntity.ok("Listing was deleted.");
+        return ResponseEntity.ok(messageSource.getMessage("toastify.delete.listing.success", null,localeUtils.getCurrentLocale()));
 
     }
 
