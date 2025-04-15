@@ -29,11 +29,11 @@
 
 <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3" th:fragment="apartments_list(favouriteButtonStartMessage, pageName)">
     <div th:each="apartment : ${apartments}" >
-        <div th:replace="~{fragments :: apartment(${apartment}, 100, ${favouriteButtonStartMessage}, ${pageName}, '','','')}"></div>
+        <div th:replace="~{fragments :: apartment(${apartment}, 100, ${favouriteButtonStartMessage}, ${pageName}, '','','','')}"></div>
     </div>
 </div>
 
-<div class="relative max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='')">
+<div class="relative max-w-sm mx-auto bg-white shadow-lg rounded-lg overflow-hidden mt-10" th:fragment="apartment(apartment, index, favouriteButtonStartMessage, pageName, bestResultsImagePath='', mostFavouriteImagePath='', topContactedImagePath='',newImagePath='')">
     <div th:replace="~{fragments :: disabled_listing}"></div>
 
     <div th:replace="~{fragments :: listing_images}"></div>
@@ -43,6 +43,10 @@
         <div class="flex justify-between items-center">
             <a class="text-2xl font-bold text-gray-900" target="_blank" th:href="@{{appUrl}/view/{apartmentId}(apartmentId=${apartment.id},appUrl=${appUrl})}">[[${apartment.name}]]</a>
             <img th:if="${index <2 and pageName == 'chat'}" th:src="${bestResultsImagePath}" alt="Best results" title="This is one of the best results.">
+            <img th:if="${index >= 2 and pageName == 'chat' and newImagePath != null and newImagePath != ''}"
+                 th:src="${newImagePath}"
+                 alt="Newly Created Item"
+                 title="This item was created in the last 3 days." />
         </div>
         <div class="flex justify-between mt-2">
             <p class="text-gray-600 mt-2">

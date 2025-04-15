@@ -6,24 +6,32 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ListingStatistics;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.repository.ListingStatisticsRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class ListingUtil {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ListingUtil.class);
+
     private final ListingStatisticsRepository listingStatisticsRepository;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
+    private final FormattingUtil formattingUtil;
 
-    public ListingUtil(ListingStatisticsRepository listingStatisticsRepository, MessageSource messageSource, LocaleUtils localeUtils) {
+    public ListingUtil(ListingStatisticsRepository listingStatisticsRepository, MessageSource messageSource, LocaleUtils localeUtils, FormattingUtil formattingUtil) {
         this.listingStatisticsRepository = listingStatisticsRepository;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
+        this.formattingUtil = formattingUtil;
     }
 
     public boolean isApartmentAlreadyFavourite(final String listingId, final ImmobiliareUser immobiliareUser) {
@@ -170,6 +178,23 @@ public class ListingUtil {
                         .map(entry -> entry.getValue().toString())
                         .collect(Collectors.joining(", ")))
                 .collect(Collectors.joining("\n"));
+    }
+
+    public boolean isListingNew(Apartment apartment){
+        if (apartment.getCreationDateTime() == null || apartment.getCreationDateTime() .isEmpty()) {
+            return false;
+        }
+
+        try {
+            LocalDateTime creationTime = formattingUtil.getFormattedDateCustom(apartment.getCreationDateTime());
+            LocalDateTime threeDaysAgo = LocalDateTime.now().minusDays(3);
+
+            return creationTime.isAfter(threeDaysAgo);
+
+        } catch (DateTimeParseException e) {
+            LOGGER.error("Error parsing date string: {} - {}", apartment.getCreationDateTime(), e.getMessage());
+            return false;
+        }
     }
 
 }
