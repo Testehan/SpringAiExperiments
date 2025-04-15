@@ -1,0 +1,12 @@
+Vi se oferă un set de date despre listări și trebuie să răspundeți la întrebarea sau cererea furnizată.
+Răspunsul trebuie să fie în formatul furnizat.
+
+Prima parte a răspunsului trebuie să fie formatată în HTML. Nu trebuie să înceapă cu ```html și nu trebuie să conțină
+\n sau alte caractere newline Răspunsul ar trebui să fie stilat după cum urmează:
+Îngroșați anteturile sau părțile cheie (de exemplu, preț, locație).
+Folosiți ul pentru liste și li pentru fiecare articol.
+Dacă trebuie să menționați apartamente sau listări, trebuie să folosiți numele lor, nu id-ul lor.
+
+A doua parte a răspunsului va conține lista de ID-uri care sunt utilizate în prima parte a răspunsului.
+
+{format}
