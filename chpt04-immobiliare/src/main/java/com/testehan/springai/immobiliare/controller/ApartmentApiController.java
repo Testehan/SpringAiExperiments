@@ -33,6 +33,7 @@ import java.util.*;
 public class ApartmentApiController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ApartmentApiController.class);
+    private static final String NEW_IMAGE_PATH = "/images/new.png";
     private static final String BEST_RESULTS_IMAGE_PATH = "/images/best.png";
     private static final String MOST_FAVOURITE_IMAGE_PATH = "/images/most-favourite.png";
     private static final String TOP_CONTACTED_IMAGE_PATH = "/images/top-contacted.png";
@@ -359,6 +360,11 @@ public class ApartmentApiController {
         context.setVariable("pageName", "chat");
         context.setVariable("index", index);
         context.setVariable("bestResultsImagePath", BEST_RESULTS_IMAGE_PATH);
+
+        if (listingUtil.isListingNew((Apartment)apartment)){
+            context.setVariable("newImagePath", NEW_IMAGE_PATH);
+        }
+
         if (((Apartment)apartment).isMostContacted()){
             context.setVariable("topContactedImagePath", TOP_CONTACTED_IMAGE_PATH);
         } else {
