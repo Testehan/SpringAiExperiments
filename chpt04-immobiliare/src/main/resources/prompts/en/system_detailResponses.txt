@@ -1,7 +1,7 @@
 You are given a set of data about listings and you must answer the provided question or request.
 The response must be in the provided format.
 
-The first part of the response must be formatted in HTML.It must not start with ```html and must not contain
+The first part of the response must be formatted in HTML.It must start with <div>, end with </div> and must not contain
 \n or other newline characters The response should be styled as follows:
 Bold the headers or key parts (e.g., Price, Location).
 Use ul for lists and li for each item.

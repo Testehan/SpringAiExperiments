@@ -211,7 +211,6 @@ public class SearchListingsHandler implements ApiChatCallHandler {
         LOGGER.info("Performance 4 -----------------------");
         LOGGER.info("Found apartment id {}", listingFound.getId());
 
-//        var apartmentInfo = listingUtil.getApartmentInfo(listingFound);
         LOGGER.info("Adding apartment info to conversation memory {}", listingFound.getName());
         conversationService.addContentToConversation(listingFound.getIdString(), conversationId);
 

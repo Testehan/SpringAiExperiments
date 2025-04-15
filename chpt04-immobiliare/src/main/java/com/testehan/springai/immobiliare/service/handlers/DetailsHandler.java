@@ -3,11 +3,13 @@ package com.testehan.springai.immobiliare.service.handlers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
+import com.testehan.springai.immobiliare.events.ApartmentPayload;
+import com.testehan.springai.immobiliare.events.Event;
+import com.testehan.springai.immobiliare.events.EventPayload;
+import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.*;
-import com.testehan.springai.immobiliare.service.ApartmentCrudService;
-import com.testehan.springai.immobiliare.service.ChatClientService;
-import com.testehan.springai.immobiliare.service.ConversationService;
-import com.testehan.springai.immobiliare.service.LLMCacheService;
+import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
+import com.testehan.springai.immobiliare.service.*;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
@@ -41,6 +43,7 @@ public class DetailsHandler implements ApiChatCallHandler {
     private final LLMCacheService llmCacheService;
 
     private final ChatClientService chatClientService;
+    private final UserSseService userSseService;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
@@ -49,12 +52,13 @@ public class DetailsHandler implements ApiChatCallHandler {
     private final BeanOutputConverter outputParser;
     private final ObjectMapper objectMapper;
 
-    public DetailsHandler(ApartmentCrudService apartmentCrudService, ConversationSession conversationSession, ConversationService conversationService, LLMCacheService llmCacheService, ChatClientService chatClientService, MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil, ObjectMapper objectMapper) {
+    public DetailsHandler(ApartmentCrudService apartmentCrudService, ConversationSession conversationSession, ConversationService conversationService, LLMCacheService llmCacheService, ChatClientService chatClientService, UserSseService userSseService, MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil, ObjectMapper objectMapper) {
         this.apartmentCrudService = apartmentCrudService;
         this.conversationSession = conversationSession;
         this.conversationService = conversationService;
         this.llmCacheService = llmCacheService;
         this.chatClientService = chatClientService;
+        this.userSseService = userSseService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
         this.listingUtil = listingUtil;
@@ -75,7 +79,7 @@ public class DetailsHandler implements ApiChatCallHandler {
                     .stream().filter(message -> ObjectId.isValid(message))
                     .collect(Collectors.toList());
 
-            final String answer = getAnswer(userMessage, detailFields, listingIdsFromChatHistory);
+            final String answer = getAnswer(userMessage, detailFields, listingIdsFromChatHistory, session);
             return new ResultsResponse(answer);
 
         } catch (Exception e) {
@@ -104,17 +108,18 @@ public class DetailsHandler implements ApiChatCallHandler {
         return detailFields;
     }
 
-    private String getAnswer(String userMessage, String commaSeparatedFields, List<String> listingIdsFromChatHistory) {
+    private String getAnswer(String userMessage, String commaSeparatedFields, List<String> listingIdsFromChatHistory, HttpSession session) {
         // we need to append the listing ids, because we want the key to be question + listingIdsFromChatHistory, so that
         // we get the answer that refers to these ids
         final String llmCacheKey = userMessage + concatenateStringsWithComma(listingIdsFromChatHistory);
 
         final String answer;
+        final ResultDetailsResponse response;
 
         var cachedResponse = llmCacheService.getCachedResponse(llmCacheKey);
         if (cachedResponse.isPresent()) {
             LOGGER.info("Performance Cache 1 - Getting details answer -----------------------");
-            ResultDetailsResponse response = (ResultDetailsResponse) outputParser.convert(cachedResponse.get());
+            response = (ResultDetailsResponse) outputParser.convert(cachedResponse.get());
             answer = response.answer();
             LOGGER.info("Performance Cache 2 - Getting details answer -----------------------");
         } else {
@@ -129,7 +134,7 @@ public class DetailsHandler implements ApiChatCallHandler {
             var systemPrompt = getSystemDetailsPrompt();
 
             String answerDirty = callLLM(userPrompt, systemPrompt);
-            ResultDetailsResponse response = (ResultDetailsResponse) outputParser.convert(answerDirty);
+            response = (ResultDetailsResponse) outputParser.convert(answerDirty);
             var answerCleaned = response.answer().replace("```html","").replace("```","");
 
             try {
@@ -142,7 +147,25 @@ public class DetailsHandler implements ApiChatCallHandler {
             answer = answerCleaned;
         }
 
-        return answer;
+
+        if (!response.ids().isEmpty()){
+            emitEvent(session.getId(), "response", new ResponsePayload(answer));
+
+            final String conversationId = conversationSession.getConversationId();
+            final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser().get();
+            conversationService.deleteUserConversation(conversationId);
+
+            var listingsMentionedInResponse = apartmentCrudService.findApartmentsByIds(response.ids());
+            for (Apartment apartment : listingsMentionedInResponse) {
+                sendListing(session.getId(), apartment, conversationId, immobiliareUser);
+            }
+
+            return messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, localeUtils.getCurrentLocale());
+        }
+        else {
+            return answer;
+        }
+
     }
 
     private String getSystemDetailsPrompt() {
@@ -220,6 +243,19 @@ public class DetailsHandler implements ApiChatCallHandler {
 
         return stringList.stream()
                 .collect(Collectors.joining(", "));
+    }
+
+    private void sendListing(String sessionId, Apartment listingFound, String conversationId, ImmobiliareUser immobiliareUser) {
+
+        conversationService.addContentToConversation(listingFound.getIdString(), conversationId);
+
+        var isFavourite = listingUtil.isApartmentAlreadyFavourite(listingFound.getId().toString(), immobiliareUser);
+        LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
+        emitEvent(sessionId, "apartment",new ApartmentPayload(listingFound, isFavourite));
+    }
+
+    private void emitEvent(String sessionId, String eventType, EventPayload eventPayload) {
+        userSseService.getUserSseConnection(sessionId).tryEmitNext(new Event(eventType, eventPayload));
     }
 
 }

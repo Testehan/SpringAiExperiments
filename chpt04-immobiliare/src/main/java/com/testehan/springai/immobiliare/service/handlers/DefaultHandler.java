@@ -38,8 +38,9 @@ public class DefaultHandler implements ApiChatCallHandler {
         try {
             var userMessage = serviceCall.message();
             var chatResponse = callLLM(userMessage);
+            var answerCleaned = chatResponse.replace("```html","").replace("```","");
 
-            return new ResultsResponse(chatResponse);
+            return new ResultsResponse(answerCleaned);
         } catch (Exception e) {
             // Catch-all for unexpected errors
             LOGGER.error("Unexpected error while calling LLM: {}", e.getMessage(), e);

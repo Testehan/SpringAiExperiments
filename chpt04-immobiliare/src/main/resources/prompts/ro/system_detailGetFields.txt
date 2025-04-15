@@ -1,6 +1,7 @@
 Task Description:
 You are given various types of requests or questions about a list of real estate listings. You must answer which of the
 fields of a class Apartment are relevant for the given request. You can choose from the following fields:
+- id    : id of the listing - must be present in all responses
 - name  : name of the listing
 - area  : address or area of the listing
 - shortDescription  : this can contain all sorts of information about the listing
@@ -24,56 +25,56 @@ Examples:
 
 Scenario 1:
 - User Input: "Which of these listings has the highest price?"
-- Result: name,price
+- Result: id,name,price
 
 Scenario 2:
 - User Input: "Which of these listings has floor heating?"
-- Result: name,shortDescription
+- Result: id,name,shortDescription
 
 Scenario 3:
 - User Input: "Which of these has the best natural light?"
-- Result: name,shortDescription,imagesGeneratedDescription
+- Result: id,name,shortDescription,imagesGeneratedDescription
 
 Scenario 4:
 - User Input: "Which of these is available starting from date X ?"
-- Result: name,available.from
+- Result: id,name,available.from
 
 Scenario 5:
 - User Input: "Which of these has a surface of Y?"
-- Result: name,surface
+- Result: id,name,surface
 
 Scenario 6:
 - User Input: "Are any of these apartments located on the first floor?"
-- Result: name,floor
+- Result: id,name,floor
 
 Scenario 7:
 - User Input: "Which of them have 2 rooms?"
-- Result: name,no.rooms
+- Result: id,name,no.rooms
 
 Scenario 8:
 - User Input: "Which of these has good-looking kitchen furniture?"
-- Result: name,shortDescription,imagesGeneratedDescription
+- Result: id,name,shortDescription,imagesGeneratedDescription
 
 Scenario 9:
 - User Input: "Which of these is located in Z neighbourhood ?"
-- Result: name,shortDescription,area
+- Result: id,name,shortDescription,area
 
 Scenario 10:
 - User Input: "Do any of these have a park close by ?"
-- Result: name,nearby.amenities-park
+- Result: id,name,nearby.amenities-park
 
 Scenario 11:
 - User Input: "What are some amenities that these listings have nearby ?"
-- Result: name,nearby.amenities-transit_station,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-university,nearby.amenities-gym,nearby.amenities-park
+- Result: id,name,nearby.amenities-transit_station,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-university,nearby.amenities-gym,nearby.amenities-park
 
 Scenario 12:
 - User Input: "Which of these are suited for a student ?"
-- Result: name,nearby.amenities-transit_station,nearby.amenities-university,nearby.amenities-gym,nearby.amenities-park
+- Result: id,name,nearby.amenities-transit_station,nearby.amenities-university,nearby.amenities-gym,nearby.amenities-park
 
 Scenario 13:
 - User Input: "Which of these are suited for a family with a child?"
-- Result: name,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-park
+- Result: id,name,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-park
 
 Scenario 14:
 - User Input: "Can you compare apartment listing named A with apartment listing named B?"
-- Result: name,area,shortDescription,surface,price,available.from,no.rooms,floor,imagesGeneratedDescription,nearby.amenities-transit_station,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-university,nearby.amenities-park,nearby.amenities-gym
+- Result: id,name,area,shortDescription,surface,price,available.from,no.rooms,floor,imagesGeneratedDescription,nearby.amenities-transit_station,nearby.amenities-grocery_or_supermarket,nearby.amenities-school,nearby.amenities-university,nearby.amenities-park,nearby.amenities-gym
