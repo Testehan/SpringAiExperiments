@@ -1,12 +1,17 @@
 package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.sns.SnsClient;
+import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
+
+import java.util.Map;
 
 // TODO Before releasing the app you need to make sure that the SNS service is not in "sandbox" mode
 // and that you can send sms to anyone. For this follow the steps from AWS web console
@@ -18,6 +23,10 @@ import software.amazon.awssdk.services.sns.model.PublishRequest;
 
 @Service
 public class SmsService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SmsService.class);
+
+    private static final String SENDER_ID = "CASAMIA";
 
     private final SnsClient snsClient;
 
@@ -31,11 +40,22 @@ public class SmsService {
     }
 
     public void sendSms(String phoneNumber, String message) {
-        PublishRequest request = PublishRequest.builder()
-                .message(message)
-                .phoneNumber(phoneNumber)
-                .build();
+        try {
+            PublishRequest request = PublishRequest.builder()
+                    .message(message)
+                    .phoneNumber(phoneNumber)
+                    .messageAttributes(Map.of(
+                            "AWS.SNS.SMS.SenderID",
+                            MessageAttributeValue.builder()
+                                    .stringValue(SENDER_ID)
+                                    .dataType("String")
+                                    .build()
+                    ))
+                    .build();
 
-        snsClient.publish(request);
+            snsClient.publish(request);
+        } catch (Exception e) {
+            LOGGER.error("ERROR sending SMS ", e);
+        }
     }
 }
