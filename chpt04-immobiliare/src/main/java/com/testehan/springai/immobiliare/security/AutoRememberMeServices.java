@@ -53,6 +53,16 @@ public class AutoRememberMeServices extends PersistentTokenBasedRememberMeServic
 
     @Override
     public Authentication autoLogin(HttpServletRequest request, HttpServletResponse response) {
+        boolean isHtmxRequest = "true".equals(request.getHeader("hx-request"));
+        // Skip remember-me update for HTMX requests
+        if (isHtmxRequest) {
+            return null;
+        }
+
+        if (InsecurePaths.INSECURED_URLS.stream().filter(url -> request.getRequestURL().toString().contains(url)).findFirst().isPresent()){
+            return null;
+        }
+
         // Check the remember-me cookie (this is already handled by the parent class)
         Authentication authentication = null;
         try {
