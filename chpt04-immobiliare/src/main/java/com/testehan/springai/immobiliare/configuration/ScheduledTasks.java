@@ -86,7 +86,7 @@ public class ScheduledTasks {
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationEmail() {
 
-        if (!appConfigurationsService.isSendReactivationEmailEnabled()) {
+        if (appConfigurationsService.isSendReactivationEmailEnabled()) {
             LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
             LOGGER.info("Scheduled Task - Reactivation emails will be send to owners.");
 
@@ -111,7 +111,7 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationSMS() {
-        if (!appConfigurationsService.isSendReactivationSMSEnabled()) {
+        if (appConfigurationsService.isSendReactivationSMSEnabled()) {
             LocalDateTime thirteenDaysAgo = LocalDateTime.now().minus(13, ChronoUnit.DAYS);
             LOGGER.info("Scheduled Task - Reactivation sms will be send to owners.");
 
