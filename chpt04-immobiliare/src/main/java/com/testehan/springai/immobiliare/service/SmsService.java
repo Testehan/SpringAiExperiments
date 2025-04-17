@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -54,13 +55,12 @@ public class SmsService {
                 ))
                 .build();
 
-//        var response = snsClient.publish(request);
-//        var messageId = response.messageId();
-//        if (StringUtils.hasText(messageId)){
-//            return Optional.of(messageId);
-//        } else {
-//            return Optional.empty();
-//        }
-        return Optional.of("dummy messageId");
+        var response = snsClient.publish(request);
+        var messageId = response.messageId();
+        if (StringUtils.hasText(messageId)){
+            return Optional.of(messageId);
+        } else {
+            return Optional.empty();
+        }
     }
 }

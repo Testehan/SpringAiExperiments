@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 
 @Component
 public class ScheduledTasks {
@@ -99,7 +98,14 @@ public class ScheduledTasks {
                 var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
 
                 if (ContactValidator.isValidEmail(contact)) {
-                    emailService.sendReactivateListingEmail(contact, "", listing.getName(), reactivateLink, localeUtils.getCurrentLocale());
+                    var messageId = emailService.sendReactivateListingEmail(contact, "", listing.getName(), reactivateLink, localeUtils.getCurrentLocale());
+
+                    if (messageId.isPresent()){
+                        listing.setReactivateMessageId("EMAIL-" + messageId.get());
+                        apartmentCrudService.saveApartment(listing);
+                    } else {
+                        LOGGER.error("Failed to send EMAIL for reactivation of listing {} to email {} ", listing.getName(), contact);
+                    }
                 }
 
             }
@@ -109,14 +115,14 @@ public class ScheduledTasks {
 
     }
 
-//    @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
-    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
+    @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
+//    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationSMS() {
         if (appConfigurationsService.isSendReactivationSMSEnabled()) {
             LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
             LOGGER.info("Scheduled Task - Reactivation sms will be send to owners.");
 
-            var listings = List.of(apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo).get(0));
+            var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
 
             for (Apartment listing : listings) {
                 try {

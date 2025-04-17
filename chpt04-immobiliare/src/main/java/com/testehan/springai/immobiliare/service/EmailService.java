@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.service;
 import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -10,6 +11,7 @@ import software.amazon.awssdk.services.ses.SesClient;
 import software.amazon.awssdk.services.ses.model.*;
 
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
 public class EmailService {
@@ -63,7 +65,7 @@ public class EmailService {
         }
     }
 
-    public void sendReactivateListingEmail(String to, String name, String listingTitle, String reactivateListingUrl, Locale locale){
+    public Optional<String> sendReactivateListingEmail(String to, String name, String listingTitle, String reactivateListingUrl, Locale locale){
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
                 .source("CasaMia.ai" + " " +"<admin@casamia.ai>") // Replace with a verified email
                 .destination(Destination.builder()
@@ -73,7 +75,14 @@ public class EmailService {
                 .templateData("{\"userName\":\""+name+"\",\"listingTitle\":\""+listingTitle+"\",\"reactivateListingUrl\":\""+reactivateListingUrl+"\"}")
                 .build();
 
-        sesClient.sendTemplatedEmail(request);
+        var response = sesClient.sendTemplatedEmail(request);
+
+        var messageId = response.messageId();
+        if (StringUtils.hasText(messageId)){
+            return Optional.of(messageId);
+        } else {
+            return Optional.empty();
+        }
     }
 
     public void sendListingAddedEmail(String to, String userName, String listingName, String viewUrl, String editUrl, Locale locale) {
