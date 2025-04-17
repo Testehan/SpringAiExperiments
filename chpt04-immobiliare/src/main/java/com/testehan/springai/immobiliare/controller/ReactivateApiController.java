@@ -74,6 +74,7 @@ public class ReactivateApiController {
             var lastUpdatedTime = formattingUtil.getFormattedDateCustom(LocalDateTime.now());
             apartment.setLastUpdateDateTime(lastUpdatedTime);
             apartment.setActive(true);
+            apartment.setReactivateMessageId(null);
             apartmentCrudService.saveApartment(apartment);
             return true;
         } catch (Exception e) {
