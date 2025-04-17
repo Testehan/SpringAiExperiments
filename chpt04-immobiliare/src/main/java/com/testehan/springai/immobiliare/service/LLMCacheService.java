@@ -1,6 +1,7 @@
 package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.CachedResponse;
+import com.testehan.springai.immobiliare.observability.CacheMetrics;
 import com.testehan.springai.immobiliare.repository.CachedResponseRepository;
 import com.testehan.springai.immobiliare.util.HashUtil;
 import org.slf4j.Logger;
@@ -14,10 +15,12 @@ public class LLMCacheService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LLMCacheService.class);
 
+    private final CacheMetrics cacheMetrics;
     private final CachedResponseRepository cachedResponseRepository;
     private final HashUtil hashUtil;
 
-    public LLMCacheService(CachedResponseRepository cachedResponseRepository, HashUtil hashUtil) {
+    public LLMCacheService(CacheMetrics cacheMetrics, CachedResponseRepository cachedResponseRepository, HashUtil hashUtil) {
+        this.cacheMetrics = cacheMetrics;
         this.cachedResponseRepository = cachedResponseRepository;
         this.hashUtil = hashUtil;
     }
@@ -26,8 +29,10 @@ public class LLMCacheService {
         String hash = hashUtil.hashText(input);
         Optional<CachedResponse> cached = cachedResponseRepository.findByInputHash(hash);
         if (cached.isPresent()){
+            cacheMetrics.incrementHit();
             return Optional.ofNullable(cached.get().getResponse());
         } else {
+            cacheMetrics.incrementMiss();
             return Optional.empty();
         }
     }
