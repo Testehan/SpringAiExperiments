@@ -39,6 +39,7 @@ public class Apartment {
     private Boolean whatsapp;
     private String contactEmail;
     private String ownerName;
+    private String reactivateMessageId;
 
     private String creationDateTime;
     private String lastUpdateDateTime;

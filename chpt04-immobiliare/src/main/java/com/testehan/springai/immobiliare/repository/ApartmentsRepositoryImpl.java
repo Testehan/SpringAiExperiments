@@ -210,7 +210,15 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         var formattedDateCustom = formattingUtil.getFormattedDateCustom(date);
         Bson condition1 = Filters.lt("lastUpdateDateTime", formattedDateCustom);
         Bson condition2 = eq("active", true);
-        Bson combinedFilter = Filters.and(condition1, condition2);
+
+        // Additional filter for reactivatedMessageId: must be null, empty, or not present
+        Bson condition3 = Filters.or(
+                Filters.eq("reactivateMessageId", null), // check if it's null
+                Filters.eq("reactivateMessageId", ""),  // check if it's an empty string
+                Filters.exists("reactivateMessageId", false)  // check if the field does not exist
+        );
+
+        Bson combinedFilter = Filters.and(condition1, condition2, condition3);
 
         List<Apartment> result = new ArrayList<>();
         listings.find(combinedFilter).forEach(listing -> result.add(listing));

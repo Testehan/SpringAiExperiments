@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Component
 public class ScheduledTasks {
@@ -108,30 +109,39 @@ public class ScheduledTasks {
 
     }
 
-    @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
-//    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
+//    @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
+    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationSMS() {
         if (appConfigurationsService.isSendReactivationSMSEnabled()) {
-            LocalDateTime thirteenDaysAgo = LocalDateTime.now().minus(13, ChronoUnit.DAYS);
+            LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
             LOGGER.info("Scheduled Task - Reactivation sms will be send to owners.");
 
-            var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(thirteenDaysAgo);
+            var listings = List.of(apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo).get(0));
 
             for (Apartment listing : listings) {
-                LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
-                var contact = listing.getContact();
-                var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
+                try {
+                    LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
+                    var contact = listing.getContact();
+                    var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
 
-                if (ContactValidator.isValidPhoneNumber(contact, "RO")) {
-                    var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
-                    if (phoneWithPrefix.isEmpty()) {
-                        LOGGER.error("Can't send SMS for {} of listing named {}", contact, listing.getName());
-                    } else {
-                        var smsMessage = messageSource.getMessage("sms.keep.active", null, localeUtils.getCurrentLocale()) + " " + reactivateLink;
-// TODO when you will use your domain, you can test this out, as right now the sms length exceeds the allowed number of chars, because of the currently long domain name..
-                        //                    smsService.sendSms(phoneWithPrefix.get(), smsMessage);    // "or reply yes" => this is not implemented yet, see notes from SmsService
+                    if (ContactValidator.isValidPhoneNumber(contact, "RO")) {
+                        var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
+                        if (phoneWithPrefix.isEmpty()) {
+                            LOGGER.error("Can't send SMS for {} of listing named {}", contact, listing.getName());
+                        } else {
+                            var smsMessage = messageSource.getMessage("sms.keep.active", null, localeUtils.getCurrentLocale()) + " " + reactivateLink;
+                            var messageId = smsService.sendSms(phoneWithPrefix.get(), smsMessage);    // "or reply yes" => this is not implemented yet, see notes from SmsService
+                            if (messageId.isPresent()){
+                                listing.setReactivateMessageId("SMS-" + messageId.get());
+                                apartmentCrudService.saveApartment(listing);
+                            } else {
+                                LOGGER.error("Failed to send SMS for reactivation of listing {} to phone number {} ", listing.getName(),  phoneWithPrefix);
+                            }
+
+                        }
                     }
-
+                } catch (Exception e) {
+                    LOGGER.error("ERROR sending SMS ", e);
                 }
             }
         } else {

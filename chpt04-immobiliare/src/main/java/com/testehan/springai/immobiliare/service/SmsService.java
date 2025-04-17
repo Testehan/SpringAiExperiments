@@ -12,6 +12,7 @@ import software.amazon.awssdk.services.sns.model.MessageAttributeValue;
 import software.amazon.awssdk.services.sns.model.PublishRequest;
 
 import java.util.Map;
+import java.util.Optional;
 
 // TODO Before releasing the app you need to make sure that the SNS service is not in "sandbox" mode
 // and that you can send sms to anyone. For this follow the steps from AWS web console
@@ -39,23 +40,27 @@ public class SmsService {
                 .build();
     }
 
-    public void sendSms(String phoneNumber, String message) {
-        try {
-            PublishRequest request = PublishRequest.builder()
-                    .message(message)
-                    .phoneNumber(phoneNumber)
-                    .messageAttributes(Map.of(
-                            "AWS.SNS.SMS.SenderID",
-                            MessageAttributeValue.builder()
-                                    .stringValue(SENDER_ID)
-                                    .dataType("String")
-                                    .build()
-                    ))
-                    .build();
+    public Optional<String> sendSms(String phoneNumber, String message) {
 
-            snsClient.publish(request);
-        } catch (Exception e) {
-            LOGGER.error("ERROR sending SMS ", e);
-        }
+        PublishRequest request = PublishRequest.builder()
+                .message(message)
+                .phoneNumber(phoneNumber)
+                .messageAttributes(Map.of(
+                        "AWS.SNS.SMS.SenderID",
+                        MessageAttributeValue.builder()
+                                .stringValue(SENDER_ID)
+                                .dataType("String")
+                                .build()
+                ))
+                .build();
+
+//        var response = snsClient.publish(request);
+//        var messageId = response.messageId();
+//        if (StringUtils.hasText(messageId)){
+//            return Optional.of(messageId);
+//        } else {
+//            return Optional.empty();
+//        }
+        return Optional.of("dummy messageId");
     }
 }
