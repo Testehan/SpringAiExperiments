@@ -22,7 +22,7 @@ API-uri disponibile:
     - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
     - **Parameters**: `message` (string)
 
-5. **Apartments description API**: Afișează o listă de apartamente disponibile pe baza unei descrieri sau a unei liste de criterii sau atribute sau proprietăți furnizate de utilizator pentru căutare. Acesta poate conține și informații de sortare.
+5. **Apartments description API**: Afișează o listă de apartamente garsoniere studiouri disponibile pe baza unei descrieri sau a unei liste de criterii sau atribute sau proprietăți furnizate de utilizator pentru căutare. Acesta poate conține și informații de sortare.
    - **Endpoint**: `/getApartments`
    - **Parameters**: `message` (string)
 
@@ -128,6 +128,10 @@ Exemple:
 - Intrare utilizator: „vreau ceva cu lămpi de noptieră”
   - API Call: `/getApartments`
   - Parameters: `\{"message": "vreau ceva cu lămpi de noptieră"\}`
+
+- Intrare utilizator: „garsoniera”
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "garsoniera"\}`
 
 - Intrare utilizator: "caut un apartament cu 2 camere. Afișați rezultatele sortate după suprafață descendentă"
   - API Call: `/getApartments`

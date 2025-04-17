@@ -16,6 +16,7 @@ public enum ApiCall {
     RESTART_CONVERSATION("/restart"),
     DEFAULT("/default"),
     NOT_SUPPORTED("/notSupported"),
+
     EXCEPTION("/exception");
 
     private final String path;
