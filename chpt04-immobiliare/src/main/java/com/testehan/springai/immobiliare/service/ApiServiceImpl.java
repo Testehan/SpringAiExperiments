@@ -22,6 +22,7 @@ import reactor.core.publisher.Flux;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 
 @Service
@@ -58,7 +59,13 @@ public class ApiServiceImpl implements ApiService{
 
     @Override
     public Flux<Event> getServerSideEventsFlux(HttpSession session) {
-        return  userSseService.getUserSseConnection(session.getId()).asFlux();
+        var userSink = userSseService.getUserSseConnection(session.getId());
+        if (Objects.nonNull(userSink)) {
+            return userSink.asFlux();
+        } else {
+            LOGGER.error("There is no userSink for user with sessionId {}",session.getId());
+            return null;
+        }
     }
 
     private ServiceCall whichApiToCall(final String message) {

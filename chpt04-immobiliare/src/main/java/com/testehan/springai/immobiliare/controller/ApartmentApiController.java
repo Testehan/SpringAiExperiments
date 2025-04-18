@@ -288,10 +288,7 @@ public class ApartmentApiController {
 
     @GetMapping(value = "/stream/{sseId}", produces = "text/event-stream")
     public Flux<ServerSentEvent<String>> streamServerSideEvents(@PathVariable String sseId, HttpSession httpSession, Locale locale) {
-        userSseService.addUserSseId(httpSession.getId());
-
-//        Flux<String> sessionDestroyedFlux = sessionCleanupListener.getSessionDestroyedFlux()
-//                .filter(session -> session.equals(httpSession.getId()));
+        userSseService.registerOrUpdateConnection(httpSession.getId(), sseId);
 
         Flux<ServerSentEvent<String>> responsesStream = apiService.getServerSideEventsFlux(httpSession)
                 .map(event -> renderServerSideEventData(httpSession, event, sseId, locale));
@@ -303,13 +300,8 @@ public class ApartmentApiController {
                         .event("keep-alive")
                         .data("ping")
                         .build());
-//                .takeUntilOther(sessionDestroyedFlux);
 
-        return Flux.merge(responsesStream, heartbeatStream);//.doOnCancel(() -> {
-//            LOGGER.info("Client disconnected: " + sseId);
-//            userSseService.removeUserSseId(httpSession.getId());
-//        });
-
+        return Flux.merge(responsesStream, heartbeatStream);
     }
 
     private ServerSentEvent<String> renderServerSideEventData(HttpSession httpSession, Event event, String sseId, Locale locale){

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api")
@@ -25,7 +26,9 @@ public class SseApiController {
 
     @GetMapping("/sse-id")
     public ResponseEntity<Map<String, String>> getSseId(HttpSession session){
-        var sseId = userSseService.addUserSseId(session.getId());
+//        var sseId = userSseService.addUserSseId(session.getId());
+        // ALWAYS generate a new UUID for the client to use for its connection attempt
+        String sseId = UUID.randomUUID().toString();
         LOGGER.info("Obtained new SSE id {} for session {}", sseId, session.getId());
         return ResponseEntity.ok(Map.of("sseId",sseId));
     }

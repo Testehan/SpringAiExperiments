@@ -23,10 +23,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -234,7 +231,12 @@ public class SearchListingsHandler implements ApiChatCallHandler {
     }
 
     private void emitEvent(String sessionId, String eventType, EventPayload eventPayload) {
-        userSseService.getUserSseConnection(sessionId).tryEmitNext(new Event(eventType, eventPayload));
+        var userSink = userSseService.getUserSseConnection(sessionId);
+        if (Objects.nonNull(userSink)) {
+            userSink.tryEmitNext(new Event(eventType, eventPayload));
+        } else {
+            LOGGER.error("There is no userSink for user with sessionId {}. No event will be sent.",sessionId);
+        }
     }
 
 

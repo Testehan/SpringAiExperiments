@@ -84,8 +84,6 @@ public class MainViewController {
 			model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
 		}
 
-		var userSseId = userSseService.addUserSseId(sessionId);
-		model.addAttribute("sseId", userSseId);
 		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("M01_INITIAL_MESSAGE", messageSource.getMessage("M01_INITIAL_MESSAGE",null,locale));
