@@ -71,7 +71,7 @@ public class ApartmentService {
     }
 
     @Async
-    public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user) throws IOException {
+    public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user, boolean isBatchSave) throws IOException {
         apartment.setShortDescription(apartment.getShortDescription().replace("\n", " ")); // no newlines in description
         if (Objects.isNull(apartment.getContactEmail())) {
             apartment.setContactEmail(user.getEmail());
@@ -107,7 +107,9 @@ public class ApartmentService {
         updateUserPhoneIfChanged(apartment, user);
         if (isPropertyNew) {
             updateUserInfo(apartment, user);
-            listingNotificationService.sendListingAddedEmail(savedListing, user);
+            if(!isBatchSave) {
+                listingNotificationService.sendListingAddedEmail(savedListing, user);
+            }
         }
 
         llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());

@@ -96,7 +96,7 @@ public class ApartmentApiController {
         if (user.getMaxNumberOfListedProperties() > 0){
             LOGGER.info("User {} trying to add/edit a property called {}", user.getEmail(), apartment.getName());
             List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
-            apartmentService.saveApartmentAndImages(apartment, processedImages, user);
+            apartmentService.saveApartmentAndImages(apartment, processedImages, user,false);
             LOGGER.info("User {} added/edited a property ", user.getEmail());
             // Return a response to the frontend
             return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
@@ -124,7 +124,7 @@ public class ApartmentApiController {
 
         LOGGER.info("Batch save - start");
         List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
-        apartmentService.saveApartmentAndImages(apartment, processedImages, user);
+        apartmentService.saveApartmentAndImages(apartment, processedImages, user,true);
         // Return a response to the frontend
         return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
 
