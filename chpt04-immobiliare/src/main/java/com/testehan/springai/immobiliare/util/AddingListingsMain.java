@@ -72,10 +72,10 @@ public class AddingListingsMain {
 
             // Create a RestTemplate instance
             RestTemplate restTemplate = new RestTemplate();
-            String endpoint = "https://casa-mia.fly.dev/api/apartments/batchsave";
-            String sessionId = "F914E940611214276E455582AC1373BF";
+            String endpoint = "https://casamia.ai/api/apartments/batchsave";
+            String sessionId = "0A86BB3047F1E3758C2202BE9B2FD183";
 
-            Root root = objectMapper.readValue(new File("/Users/danteshte/JavaProjects/spring-ai-experiments/chpt04-immobiliare/src/test/resources/data2.json"), Root.class);
+            Root root = objectMapper.readValue(new File("/Users/danteshte/JavaProjects/spring-ai-experiments/chpt04-immobiliare/src/test/resources/data3.json"), Root.class);
             for (Listing listing : root.data) {
                 try {
                     // Prepare the MultipartFile[] for images (if any)

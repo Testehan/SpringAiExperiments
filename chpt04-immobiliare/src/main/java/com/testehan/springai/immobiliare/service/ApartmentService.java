@@ -117,6 +117,15 @@ public class ApartmentService {
         LOGGER.info("Apartment was added with success!");
     }
 
+    public void deleteListingAndImages(Apartment apartment, ImmobiliareUser user){
+        var listingId = apartment.getId().toString();
+        listingImageService.deleteUploadedImages(apartment);
+        apartmentCrudService.deleteApartmentsByIds(List.of(listingId));
+        user.getListedProperties().remove(listingId);
+        userService.updateUser(user);
+        llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
+    }
+
     private void updateUserPhoneIfChanged(Apartment apartment, ImmobiliareUser user) {
         var contact = apartment.getContact();
         if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){

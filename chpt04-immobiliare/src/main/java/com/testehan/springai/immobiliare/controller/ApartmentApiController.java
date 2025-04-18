@@ -143,10 +143,7 @@ public class ApartmentApiController {
 
         var apartment = apartmentCrudService.findApartmentById(listingId);
         if (apartment.isPresent()) {
-            listingImageService.deleteUploadedImages(apartment.get());
-            apartmentCrudService.deleteApartmentsByIds(List.of(listingId));
-            user.getListedProperties().remove(listingId);
-            userService.updateUser(user);
+            apartmentService.deleteListingAndImages(apartment.get(), user);
             LOGGER.info("User {} deleted a property ", user.getEmail());
         } else {
             LOGGER.warn("User {} tried to delete property with id {} that does not exist", user.getEmail(), listingId);
