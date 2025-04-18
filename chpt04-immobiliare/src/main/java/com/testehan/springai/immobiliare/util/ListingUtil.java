@@ -175,7 +175,7 @@ public class ListingUtil {
 
         return apartmentDataList.stream()
                 .map(map -> map.entrySet().stream()
-                        .map(entry -> entry.getValue().toString())
+                        .map(entry -> entry.getValue() != null ? entry.getValue().toString() : "")
                         .collect(Collectors.joining(", ")))
                 .collect(Collectors.joining("\n"));
     }

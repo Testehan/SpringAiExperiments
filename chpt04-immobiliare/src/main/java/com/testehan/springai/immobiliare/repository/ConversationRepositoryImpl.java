@@ -63,13 +63,21 @@ public class ConversationRepositoryImpl implements ConversationRepository{
         List<String> conversation = new ArrayList<>();
         collection.find(new Document("metadata.user", user))
                     .sort(new Document("_id", -1))
-                    .limit(30)      // get last 30 msj. otherwise the context gets too big and will not work
+                    .limit(50)      // get last 50 msj. otherwise the context gets too big and will not work
                     .forEach(document -> conversation.add(document.get("content").toString()));
         return conversation;
     }
 
     @Override
     public void addContentToConversation(String user, String content) {
+
+        List<String> existingConversation = getUserConversation(user);
+
+        // Check if the content is already present
+        if (existingConversation.contains(content)) {
+            return; // Skip adding duplicate content
+        }
+
         LocalDateTime now = LocalDateTime.now();
         String formattedDateCustom = formattingUtil.getFormattedDateCustom(now);
 

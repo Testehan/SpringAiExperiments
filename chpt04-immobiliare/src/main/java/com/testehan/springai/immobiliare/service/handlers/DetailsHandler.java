@@ -153,7 +153,8 @@ public class DetailsHandler implements ApiChatCallHandler {
 
             final String conversationId = conversationSession.getConversationId();
             final ImmobiliareUser immobiliareUser = conversationSession.getImmobiliareUser().get();
-            conversationService.deleteUserConversation(conversationId);
+//            conversationService.deleteUserConversation(conversationId);
+            // no point in deleting the conversation,since now i try to make sure that listing ids are presnt only 1 in the conversation history
 
             var listingsMentionedInResponse = apartmentCrudService.findApartmentsByIds(response.ids());
             for (Apartment apartment : listingsMentionedInResponse) {

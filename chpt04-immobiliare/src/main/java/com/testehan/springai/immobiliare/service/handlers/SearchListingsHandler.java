@@ -88,7 +88,6 @@ public class SearchListingsHandler implements ApiChatCallHandler {
             // the user can ask additional questions. Otherwise, the chatMemory will contain results from previous
             // searches based on apartment descriptions, even from other Cities, and thus the results would be affected
 
-//            conversationSession.clearChatMemory();    // todo this line i think can be removed..as it does the same thing as the line from below
             conversationService.deleteUserConversation(conversationId);
 
             var propertyType = conversationSession.getRentOrSale();
