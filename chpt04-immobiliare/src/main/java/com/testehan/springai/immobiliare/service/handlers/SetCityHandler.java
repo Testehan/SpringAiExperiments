@@ -35,6 +35,7 @@ public class SetCityHandler implements ApiChatCallHandler {
             conversationSession.setCity(serviceCall.message());
             return new ResultsResponse(messageSource.getMessage("M03_BUDGET",  null, localeUtils.getCurrentLocale()));
         } else {
+            conversationSession.setCity(serviceCall.message());
             var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
             return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
         }
