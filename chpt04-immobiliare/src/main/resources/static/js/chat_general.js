@@ -392,14 +392,15 @@ function applyFavouriteButtonStylingDependingOnText(favouriteButton){
 
 function setCurrentStep(){
     lastAssistantMessage = $('.assistantResponse:last').text();
-    if (lastAssistantMessage.trim() === M01_INITIAL_MESSAGE){
+    if (lastAssistantMessage.includes(M01_INITIAL_MESSAGE))
+    {
         lastHelperMessage = M01_INITIAL_MESSAGE;
         suggestionsStep = 1;
         $('#suggestions').empty();
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.trim() === M02_CITY)
+    if (lastAssistantMessage.includes(M02_CITY))
     {
         lastHelperMessage = M02_CITY;
         suggestionsStep = 2;
@@ -407,7 +408,7 @@ function setCurrentStep(){
         fetchSuggestions();
         $('#suggestions').show();
     }
-    if (lastAssistantMessage.trim() === M03_BUDGET)
+    if (lastAssistantMessage.includes(M03_BUDGET))
     {
         lastHelperMessage = M03_BUDGET;
         suggestionsStep = 3;

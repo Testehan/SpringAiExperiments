@@ -65,25 +65,29 @@ public class MainViewController {
 	public String chat(Model model, HttpSession session) {
 		var locale = localeUtils.getCurrentLocale();
 		var user = conversationSession.getImmobiliareUser().get();
-		var sessionId = session.getId();
-
-		if (StringUtils.isEmpty(user.getPropertyType())) {
-			model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
-		} else if (!cityService.isEnabled(user.getCity())) {
-			model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
-		} else if (StringUtils.isEmpty(user.getBudget())){
-			model.addAttribute("initialMessage", messageSource.getMessage("M03_BUDGET", null, locale));
-		} else {
-			var city = user.getCity();
-			var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
-			model.addAttribute("initialMessage",
-					messageSource.getMessage("M04_DETAILS",  new Object[]{propertyType, city, user.getBudget()}, locale) +
-					messageSource.getMessage("M04_DETAILS_PART_2",  null,locale));
-		}
-
 		var searchQueriesAvailable = user.getSearchesAvailable();
-		if (searchQueriesAvailable <= 5){
-			model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
+
+		if (searchQueriesAvailable > 0){
+			if (StringUtils.isEmpty(user.getPropertyType())) {
+				model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
+			} else if (!cityService.isEnabled(user.getCity())) {
+				model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
+			} else if (StringUtils.isEmpty(user.getBudget())){
+				model.addAttribute("initialMessage", messageSource.getMessage("M03_BUDGET", null, locale));
+			} else {
+				var city = user.getCity();
+				var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
+				model.addAttribute("initialMessage",
+						messageSource.getMessage("M04_DETAILS",  new Object[]{propertyType, city, user.getBudget()}, locale) +
+								messageSource.getMessage("M04_DETAILS_PART_2",  null,locale));
+			}
+
+			if (searchQueriesAvailable <= 5){
+				model.addAttribute("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
+			}
+
+		} else {
+			model.addAttribute("initialMessage", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, locale));
 		}
 
 		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());

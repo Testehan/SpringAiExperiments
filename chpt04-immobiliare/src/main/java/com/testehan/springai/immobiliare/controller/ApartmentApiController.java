@@ -323,11 +323,23 @@ public class ApartmentApiController {
     }
 
     private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload, String sseId, Locale locale) {
+        var user = conversationSession.getImmobiliareUser().get();
+        int searchQueriesAvailable = user.getSearchesAvailable() - 1;
+        String payload = (String) eventPayload.getPayload();
+
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("responseFragmentWithApartments");
-        context.setVariable("response", eventPayload.getPayload());
+        context.setVariable("response", payload);
         context.setLocale(locale);
+
+        if (isEndingMessage(payload)) {
+            if (searchQueriesAvailable <= 5 && searchQueriesAvailable > 0) {
+                context.setVariable("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
+            } else if (searchQueriesAvailable <= 0) {
+                context.setVariable("queriesAvailableMessage", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, locale));
+            }
+        }
 
         var data = templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines
@@ -384,5 +396,12 @@ public class ApartmentApiController {
                 .retry(Duration.ofMillis(1000))
                 // Build the Server-Sent Event
                 .build();
+    }
+
+    private boolean isEndingMessage(String payload){
+        var listingsFoundEnd = messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, localeUtils.getCurrentLocale());
+        var noListingsFoundEnd = messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, localeUtils.getCurrentLocale());
+
+        return payload.equalsIgnoreCase(listingsFoundEnd) || payload.equalsIgnoreCase(noListingsFoundEnd);
     }
 }

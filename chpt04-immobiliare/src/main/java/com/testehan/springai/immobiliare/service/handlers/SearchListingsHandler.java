@@ -110,7 +110,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
             // the hash will be for all these items
             final String llmCacheKey = city + " " + propertyType + " " + descriptionWithBudgetInfo;
             var cachedResponse = llmCacheService.getCachedResponse(llmCacheKey);
-            if (cachedResponse.isPresent()){
+            if (cachedResponse.isPresent()) {
                 LOGGER.info("Performance Cache 1 -----------------------");
                 String[] listingIds = cachedResponse.get().split("\\,");
                 sendResultsFoundResponse(session);
@@ -122,7 +122,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                     sendListing(session.getId(), listing, conversationId, immobiliareUser);
                 }
 
-                sendSearchComplete(session.getId());
+                 sendSearchComplete(session.getId());
 
                 LOGGER.info("Performance Cache 2 -----------------------");
                 return response;
@@ -180,8 +180,8 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                                         if (isFirst.get()) {     // this means that we processed stream and we got no match
                                             sendSearchCompletedNoResults(description, session.getId());
                                         } else {
-                                            sendSearchComplete(session.getId());
                                             llmCacheService.saveToCache(city,propertyType,llmCacheKey, resultsToCache.toString());
+                                            sendSearchComplete(session.getId());
                                         }
 
                                     }

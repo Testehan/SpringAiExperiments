@@ -49,9 +49,9 @@ public class ChatViewController {
         var searchQueriesAvailable = user.getSearchesAvailable();
         if (searchQueriesAvailable > 0) {
             var response = apiService.getChatResponse(message, session);
-
+            searchQueriesAvailable = searchQueriesAvailable - 1;
             user  = conversationSession.getImmobiliareUser().get();   // getting the user again, because it might have been updated during the chat call
-            user.setSearchesAvailable(searchQueriesAvailable - 1);
+            user.setSearchesAvailable(searchQueriesAvailable);
             userService.updateUser(user);
 
             if (searchQueriesAvailable <= 5){
