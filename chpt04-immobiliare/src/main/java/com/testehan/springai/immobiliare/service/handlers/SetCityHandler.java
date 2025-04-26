@@ -4,7 +4,7 @@ import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.ApiCall;
 import com.testehan.springai.immobiliare.model.ResultsResponse;
 import com.testehan.springai.immobiliare.model.ServiceCall;
-import com.testehan.springai.immobiliare.model.SupportedCity;
+import com.testehan.springai.immobiliare.service.CityService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.context.MessageSource;
@@ -12,16 +12,16 @@ import org.springframework.stereotype.Component;
 
 import java.util.stream.Collectors;
 
-import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
-
 @Component
 public class SetCityHandler implements ApiChatCallHandler {
 
+    private final CityService cityService;
     private final ConversationSession conversationSession;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public SetCityHandler(ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+    public SetCityHandler(CityService cityService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+        this.cityService = cityService;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
@@ -29,14 +29,14 @@ public class SetCityHandler implements ApiChatCallHandler {
 
     @Override
     public ResultsResponse handle(ServiceCall serviceCall, HttpSession session) {
-        SupportedCity supportedCity = SupportedCity.getByName(serviceCall.message());
+        var cityName = serviceCall.message();
+        conversationSession.setCity(cityName);
 
-        if (supportedCity.compareTo(UNSUPPORTED) != 0) {
-            conversationSession.setCity(serviceCall.message());
+        if (cityService.isEnabled(cityName)) {
             return new ResultsResponse(messageSource.getMessage("M03_BUDGET",  null, localeUtils.getCurrentLocale()));
         } else {
-            conversationSession.setCity(serviceCall.message());
-            var supportedCities = SupportedCity.getSupportedCities().stream().collect(Collectors.joining(", "));
+            cityService.requestCity(cityName);
+            var supportedCities = cityService.getEnabledCityNames().stream().collect(Collectors.joining(", "));
             return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
         }
     }

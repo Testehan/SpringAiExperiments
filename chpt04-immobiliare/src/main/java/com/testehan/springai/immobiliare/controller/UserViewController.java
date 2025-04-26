@@ -1,10 +1,10 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.ApartmentCrudService;
+import com.testehan.springai.immobiliare.service.CityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,19 +22,25 @@ public class UserViewController {
     private static final Logger LOGGER = LoggerFactory.getLogger(UserViewController.class);
 
     private final UserService userService;
+    private final CityService cityService;
     private final ApartmentCrudService apartmentCrudService;
     private final ConversationSession conversationSession;
 
-    public UserViewController(UserService userService, ApartmentCrudService apartmentCrudService, ConversationSession conversationSession) {
+    public UserViewController(UserService userService, CityService cityService, ApartmentCrudService apartmentCrudService, ConversationSession conversationSession) {
         this.userService = userService;
+        this.cityService = cityService;
         this.apartmentCrudService = apartmentCrudService;
         this.conversationSession = conversationSession;
     }
 
     @PostMapping("/api/user/save")
     public String saveUserProfile(UserProfile userProfile)throws IOException {
-        SupportedCity supportedCity = SupportedCity.getByName(userProfile.city());
-        conversationSession.setCity(supportedCity.getName());
+        if (cityService.isEnabled(userProfile.city())){
+            conversationSession.setCity(userProfile.city());
+        } else {
+            LOGGER.error("The user {} tried to save a city profile that is not enabled.", userProfile.email());
+        }
+        conversationSession.setCity(userProfile.city());
         conversationSession.setRentOrSale(userProfile.propertyType());
         conversationSession.setBudget(userProfile.budget());
         conversationSession.setLastPropertyDescription(userProfile.lastPropertyDescription());

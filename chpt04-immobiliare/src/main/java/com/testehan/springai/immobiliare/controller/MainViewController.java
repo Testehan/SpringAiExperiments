@@ -5,10 +5,10 @@ import com.testehan.springai.immobiliare.configuration.BeanConfig;
 import com.testehan.springai.immobiliare.model.Amenity;
 import com.testehan.springai.immobiliare.model.AmenityCategory;
 import com.testehan.springai.immobiliare.model.Apartment;
-import com.testehan.springai.immobiliare.model.SupportedCity;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import com.testehan.springai.immobiliare.model.auth.UserProfile;
 import com.testehan.springai.immobiliare.service.ApartmentCrudService;
+import com.testehan.springai.immobiliare.service.CityService;
 import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
@@ -37,18 +37,20 @@ public class MainViewController {
 	private final ApartmentCrudService apartmentCrudService;
 	private final ConversationSession conversationSession;
 	private final UserSseService userSseService;
+	private final CityService cityService;
 	private final MessageSource messageSource;
 	private final BeanConfig beanConfig;
 	private final ListingUtil listingUtil;
 	private final LocaleUtils localeUtils;
 
 	public MainViewController(ApartmentCrudService apartmentCrudService, ConversationSession conversationSession,
-							  UserSseService userSseService, MessageSource messageSource,
-							  BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
+                              UserSseService userSseService, CityService cityService, MessageSource messageSource,
+                              BeanConfig beanConfig, ListingUtil listingUtil, LocaleUtils localeUtils) {
         this.apartmentCrudService = apartmentCrudService;
         this.conversationSession = conversationSession;
 		this.userSseService = userSseService;
-		this.messageSource = messageSource;
+        this.cityService = cityService;
+        this.messageSource = messageSource;
 		this.beanConfig = beanConfig;
 		this.listingUtil = listingUtil;
 		this.localeUtils = localeUtils;
@@ -67,12 +69,12 @@ public class MainViewController {
 
 		if (StringUtils.isEmpty(user.getPropertyType())) {
 			model.addAttribute("initialMessage", messageSource.getMessage("M01_INITIAL_MESSAGE", null, locale));
-		} else if (StringUtils.isEmpty(user.getCity()) || 0 == SupportedCity.getByName(user.getCity()).compareTo(SupportedCity.UNSUPPORTED)){
+		} else if (!cityService.isEnabled(user.getCity())) {
 			model.addAttribute("initialMessage", messageSource.getMessage("M02_CITY", null, locale));
 		} else if (StringUtils.isEmpty(user.getBudget())){
 			model.addAttribute("initialMessage", messageSource.getMessage("M03_BUDGET", null, locale));
 		} else {
-			var city = SupportedCity.getByName(user.getCity()).getName();
+			var city = user.getCity();
 			var propertyType =  messageSource.getMessage(user.getPropertyType(), null, locale);
 			model.addAttribute("initialMessage",
 					messageSource.getMessage("M04_DETAILS",  new Object[]{propertyType, city, user.getBudget()}, locale) +
@@ -142,7 +144,7 @@ public class MainViewController {
 	public String add(Model model, Locale locale) {
 
 		var apartment = new Apartment();
-		model.addAttribute("listCities",SupportedCity.getSupportedCities());
+		model.addAttribute("listCities",cityService.getEnabledCityNames());
 		model.addAttribute("listPropertyTypes",List.of(messageSource.getMessage("rent", null,locale) ));   //"sale"
 		model.addAttribute("apartment", apartment);
 		model.addAttribute("numberOfExistingImages", 0);
@@ -196,7 +198,7 @@ public class MainViewController {
 			}
 		}
 
-		model.addAttribute("listCities",SupportedCity.getSupportedCities());
+		model.addAttribute("listCities",cityService.getEnabledCityNames());
 		model.addAttribute("listPropertyTypes",List.of(messageSource.getMessage("rent", null,locale))); // "sale"
 
 		List<Apartment> listOfProperties = getListOfProperties(user);;
@@ -298,19 +300,14 @@ public class MainViewController {
 		var user = conversationSession.getImmobiliareUser().get();
 		var inviteUrl = appUrl + "/invite/" + user.getInviteUuid();
 
-		UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.getByName(user.getCity()).getName(),
+		UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), user.getCity(),
 				user.getPropertyType(),user.getBudget(), user.getLastPropertyDescription(),
 				user.getSearchesAvailable(), inviteUrl,
 				user.getMaxNumberOfListedProperties());
 
 		model.addAttribute("user", userProfile);
 
-		model.addAttribute("listCities", List.of(SupportedCity.CLUJ_NAPOCA.getName())); //SupportedCity.getSupportedCities()
-//		if (Objects.isNull(user.getPropertyType()) || StringUtils.isEmpty(user.getPropertyType())) {
-//			model.addAttribute("listPropertyTypes", List.of(messageSource.getMessage("rent", null, locale)));  //, "sale"
-//		} else {
-//			model.addAttribute("listPropertyTypes", List.of());
-//		}
+		model.addAttribute("listCities", cityService.getEnabledCityNames());
 
 		return "profile";
 	}
@@ -319,7 +316,7 @@ public class MainViewController {
 	public String contact(Model model, Principal principal) {
 		if (principal != null) {
 			var user = conversationSession.getImmobiliareUser().get();
-			UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), SupportedCity.getByName(user.getCity()).getName(),
+			UserProfile userProfile = new UserProfile(user.getEmail(), user.getPhoneNumber(), user.getName(), user.getCity(),
 					user.getPropertyType(),user.getBudget(), user.getLastPropertyDescription(),
 					user.getSearchesAvailable(), user.getInviteUuid(), user.getMaxNumberOfListedProperties());
 

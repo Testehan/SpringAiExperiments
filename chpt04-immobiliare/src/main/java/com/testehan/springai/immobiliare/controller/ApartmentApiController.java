@@ -38,6 +38,7 @@ public class ApartmentApiController {
     private static final String MOST_FAVOURITE_IMAGE_PATH = "/images/most-favourite.png";
     private static final String TOP_CONTACTED_IMAGE_PATH = "/images/top-contacted.png";
 
+    private final CityService cityService;
     private final ApartmentService apartmentService;
     private final ApartmentCrudService apartmentCrudService;
     private final ListingImageService listingImageService;
@@ -53,12 +54,13 @@ public class ApartmentApiController {
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public ApartmentApiController(ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
+    public ApartmentApiController(CityService cityService, ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
                                   UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                   SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
                                   SessionCleanupListener sessionCleanupListener,
                                   MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
+        this.cityService = cityService;
         this.apartmentService = apartmentService;
         this.apartmentCrudService = apartmentCrudService;
         this.listingImageService = listingImageService;
@@ -217,9 +219,9 @@ public class ApartmentApiController {
     }
 
     private List<String> getStep2Suggestions() {
-        var suggestions = new ArrayList<String>();
-        suggestions.add("Cluj-Napoca");
-//        suggestions.add("Bucharest");
+        List<String> allEnabledCities = new ArrayList<>(cityService.getEnabledCityNames());
+        Collections.shuffle(allEnabledCities, new Random());
+        var suggestions = allEnabledCities.subList(0, Math.min(2,allEnabledCities.size()));
 
         return suggestions;
     }

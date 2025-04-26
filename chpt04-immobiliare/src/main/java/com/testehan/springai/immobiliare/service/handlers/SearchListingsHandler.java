@@ -30,7 +30,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_RETRIEVE_SIZE_KEY;
 
@@ -40,6 +39,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(SearchListingsHandler.class);
 
     private final ApartmentCrudService apartmentCrudService;
+    private final CityService cityService;
     private final ApartmentService apartmentService;
     private final ChatClientService chatClientService;
     private final EmbeddingService embeddingService;
@@ -55,12 +55,13 @@ public class SearchListingsHandler implements ApiChatCallHandler {
     private final LocaleUtils localeUtils;
     private final ListingUtil listingUtil;
 
-    public SearchListingsHandler(ApartmentCrudService apartmentCrudService, ApartmentService apartmentService,
+    public SearchListingsHandler(ApartmentCrudService apartmentCrudService, CityService cityService, ApartmentService apartmentService,
                                  ChatClientService chatClientService, EmbeddingService embeddingService,
                                  LLMCacheService llmCacheService, ChatClient chatClient, ConversationSession conversationSession,
                                  ConversationService conversationService, UserSseService userSseService, MessageSource messageSource,
                                  LocaleUtils localeUtils, ListingUtil listingUtil) {
         this.apartmentCrudService = apartmentCrudService;
+        this.cityService = cityService;
         this.apartmentService = apartmentService;
         this.chatClientService = chatClientService;
         this.embeddingService = embeddingService;
@@ -90,8 +91,15 @@ public class SearchListingsHandler implements ApiChatCallHandler {
 
             conversationService.deleteUserConversation(conversationId);
 
-            var propertyType = conversationSession.getRentOrSale();
-            var city = SupportedCity.getByName(conversationSession.getCity()) != UNSUPPORTED ? conversationSession.getCity() : UNSUPPORTED.getName();
+            var propertyType = immobiliareUser.getPropertyType();
+            final String city;
+            if (cityService.isEnabled(immobiliareUser.getCity())){
+                city = immobiliareUser.getCity();
+            } else {
+                var supportedCities = cityService.getEnabledCityNames().stream().collect(Collectors.joining(", "));
+                return new ResultsResponse(messageSource.getMessage("M021_SUPPORTED_CITIES",  new Object[]{supportedCities}, localeUtils.getCurrentLocale()));
+            }
+
             var budgetInfo = messageSource.getMessage("prompt.budget", new Object[]{conversationSession.getBudget()}, localeUtils.getCurrentLocale());
             var descriptionWithBudgetInfo = description + budgetInfo;
 
