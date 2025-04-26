@@ -98,10 +98,16 @@ public class ApartmentApiController {
         if (user.getMaxNumberOfListedProperties() > 0){
             LOGGER.info("User {} trying to add/edit a property called {}", user.getEmail(), apartment.getName());
             List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
+            final String responseMessage;
+            if (apartmentService.isPropertyNew(apartment)){
+                responseMessage = messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale());
+            } else {
+                responseMessage = messageSource.getMessage("toastify.edit.listing.success", null,localeUtils.getCurrentLocale());
+            }
             apartmentService.saveApartmentAndImages(apartment, processedImages, user,false);
             LOGGER.info("User {} added/edited a property ", user.getEmail());
             // Return a response to the frontend
-            return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
+            return ResponseEntity.ok(responseMessage);
 
         } else {
             LOGGER.warn("User {} tried to add more properties than allowed", user.getEmail());
@@ -364,7 +370,7 @@ public class ApartmentApiController {
         context.setVariable("index", index);
         context.setVariable("bestResultsImagePath", BEST_RESULTS_IMAGE_PATH);
 
-        if (listingUtil.isListingNew((Apartment)apartment)){
+        if (listingUtil.isListingNewerThan3Days((Apartment)apartment)){
             context.setVariable("newImagePath", NEW_IMAGE_PATH);
         }
 

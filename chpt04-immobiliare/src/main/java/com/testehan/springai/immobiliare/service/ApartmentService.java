@@ -77,10 +77,10 @@ public class ApartmentService {
             apartment.setContactEmail(user.getEmail());
         }
 
+        handleNewOrUpdatedProperty(apartment);
         var isPropertyNew = isPropertyNew(apartment);
         if (isPropertyNew){
-            listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
-            apartmentCrudService.saveApartment(apartment);
+           handleNewProperty(apartment);
         } else {
             var optionalApartment = apartmentCrudService.findApartmentById(apartment.getIdString());
             if (optionalApartment.isPresent()){
@@ -158,19 +158,19 @@ public class ApartmentService {
         userService.updateUser(user);
     }
 
-    private boolean isPropertyNew(Apartment apartment) {
-        LocalDateTime now = LocalDateTime.now();
-        String formattedDateCustom = formattingUtil.getFormattedDateCustom(now);
+    private void handleNewProperty(Apartment apartment) {
+        apartment.setCreationDateTime(formattingUtil.getFormattedDateCustom(LocalDateTime.now()));
+        listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
+        apartmentCrudService.saveApartment(apartment);
+    }
 
-        var isPropertyNew = false;
-        if (Objects.isNull(apartment.getId())) {
-            apartment.setCreationDateTime(formattedDateCustom);
-            isPropertyNew = true;
-        }
-
-        apartment.setLastUpdateDateTime(formattedDateCustom);
+    private void handleNewOrUpdatedProperty(Apartment apartment){
+        apartment.setLastUpdateDateTime(formattingUtil.getFormattedDateCustom(LocalDateTime.now()));
         apartment.setActivationToken(UUID.randomUUID().toString());
+    }
 
-        return isPropertyNew;
+    public boolean isPropertyNew(Apartment apartment) {
+       return Objects.isNull(apartment.getId());
+
     }
 }

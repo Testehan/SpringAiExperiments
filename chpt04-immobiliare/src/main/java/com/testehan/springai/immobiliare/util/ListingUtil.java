@@ -180,7 +180,7 @@ public class ListingUtil {
                 .collect(Collectors.joining("\n"));
     }
 
-    public boolean isListingNew(Apartment apartment){
+    public boolean isListingNewerThan3Days(Apartment apartment){
         if (apartment.getCreationDateTime() == null || apartment.getCreationDateTime() .isEmpty()) {
             return false;
         }

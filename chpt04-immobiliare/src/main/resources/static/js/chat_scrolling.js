@@ -34,7 +34,7 @@ function setUpScrollingToLastUserMessage(){
                     if (node.nodeType === Node.ELEMENT_NODE && node.childNodes[1].classList.contains('assistantResponse')) {
                         $('#spinner').hide();
                         setCurrentStep();
-                        if (node.childNodes[1].innerText === M05_APARTMENTS_FOUND_START){
+                        if (node.childNodes[1].innerText.includes(M05_APARTMENTS_FOUND_START)){
                             $('#suggestions').hide(); // at this point we don't care about suggestions anymore because the user enters his description
 
                         }
