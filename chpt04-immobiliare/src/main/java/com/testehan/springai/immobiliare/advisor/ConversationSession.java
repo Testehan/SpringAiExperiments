@@ -13,8 +13,6 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import static com.testehan.springai.immobiliare.model.SupportedCity.UNSUPPORTED;
-
 @Component
 public class ConversationSession {
 
@@ -76,7 +74,7 @@ public class ConversationSession {
 
     public void clearConversationAndPreferences() {
         setRentOrSale("");
-        setCity(UNSUPPORTED.name());
+        setCity("");
         setBudget("");
         clearChatMemory();
     }
