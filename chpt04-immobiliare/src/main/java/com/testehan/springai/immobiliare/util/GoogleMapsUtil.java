@@ -72,7 +72,7 @@ public class GoogleMapsUtil {
 
     public Optional<LatLng> getCoordinatesOfAddress(final String address){
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey(beanConfig.getGoogleMapsApiKey())
+                .apiKey(beanConfig.getGoogleMapsServerApiKey())
                 .build();
 
         var geocodingApiRequest = GeocodingApi.newRequest(context);
@@ -99,7 +99,7 @@ public class GoogleMapsUtil {
         var result = new HashMap<PlaceType, List<PlacesSearchResult>>();
 
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey(beanConfig.getGoogleMapsApiKey())
+                .apiKey(beanConfig.getGoogleMapsServerApiKey())
                 .build();
         try {
             for (PlaceType placeType : PLACE_TYPES_TO_SEARCH) {
@@ -156,7 +156,7 @@ public class GoogleMapsUtil {
         Optional<String> result;
 
         GeoApiContext context = new GeoApiContext.Builder()
-                .apiKey(beanConfig.getGoogleMapsApiKey())
+                .apiKey(beanConfig.getGoogleMapsServerApiKey())
                 .build();
 
         try {

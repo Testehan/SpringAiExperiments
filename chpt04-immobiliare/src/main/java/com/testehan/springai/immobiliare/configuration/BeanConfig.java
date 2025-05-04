@@ -41,8 +41,10 @@ public class BeanConfig {
     private String awsAccessSecret;
     @Value("${GOOGLE_APPLICATION_CREDENTIALS}")
     private String googleAppCredentials;
-    @Value("${google.maps.api-key}")
-    private String googleMapsApiKey;
+    @Value("${google.maps.client.api-key}")
+    private String googleMapsClientApiKey;
+    @Value("${google.maps.server.api-key}")
+    private String googleMapsServerApiKey;
 
 
     @Bean
@@ -114,7 +116,13 @@ public class BeanConfig {
         return awsAccessSecret;
     }
 
-    public String getGoogleMapsApiKey() {
-        return googleMapsApiKey;
+    public String getGoogleMapsClientApiKey() {
+        return googleMapsClientApiKey;
     }
+
+    public String getGoogleMapsServerApiKey() {
+        return googleMapsServerApiKey;
+    }
+
+
 }

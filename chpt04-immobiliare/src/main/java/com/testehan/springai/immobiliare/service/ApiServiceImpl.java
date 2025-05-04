@@ -98,7 +98,7 @@ public class ApiServiceImpl implements ApiService{
                         .user(trimmedMessage)  // Keep dynamic elements in user messages, as system messages don't require repeating.
                         .call().chatResponse();
 
-                var rawResponse = assistantResponse.getResult().getOutput().getContent();
+                var rawResponse = assistantResponse.getResult().getOutput().getText();
                 LOGGER.info("Raw LLM response: {}", rawResponse);
                 if (!StringUtils.hasText(rawResponse)) {
                     LOGGER.info("LLM returned an empty or null response for message: {}", trimmedMessage);

@@ -90,7 +90,7 @@ public class MainViewController {
 			model.addAttribute("initialMessage", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, locale));
 		}
 
-		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
+		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsClientApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("M01_INITIAL_MESSAGE", messageSource.getMessage("M01_INITIAL_MESSAGE",null,locale));
 		model.addAttribute("M02_CITY", messageSource.getMessage("M02_CITY",null,locale));
@@ -125,7 +125,7 @@ public class MainViewController {
 				.collect(Collectors.toList());
 
 		model.addAttribute("apartments", sortedApartments);
-		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
+		model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsClientApiKey());
 		model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 		model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
 		model.addAttribute("appUrl", appUrl);
@@ -231,7 +231,7 @@ public class MainViewController {
 			translateAmenityCategoryName(locale, apartment);
 
 			model.addAttribute("apartment", apartment);
-			model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsApiKey());
+			model.addAttribute("googleMapsApiKey", beanConfig.getGoogleMapsClientApiKey());
 			model.addAttribute("favouriteButtonStartMessage", favouritesText);
 			model.addAttribute("saveFavouritesTranslated", messageSource.getMessage("listing.favourites",null,locale));
 			model.addAttribute("listingShareError", messageSource.getMessage("listing.share.error",  null,locale));
