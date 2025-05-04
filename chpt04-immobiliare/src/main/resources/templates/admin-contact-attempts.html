@@ -62,10 +62,34 @@
                 <table id="contactAttemptsTable" class="min-w-full bg-white shadow rounded-2xl">
                     <thead class="bg-gray-100">
                     <tr>
-                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(0)">Phone Number</th>
-                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(1)">Status</th>
-                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(2)">Listing URL</th>
-                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(3)">Created At</th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=phoneNumber&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Phone Number
+                                <span th:text="${currentSort == 'phoneNumber' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=status&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Status
+                                <span th:text="${currentSort == 'status' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=listingUrl&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Listing URL
+                                <span th:text="${currentSort == 'listingUrl' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=createdAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Created At
+                                <span th:text="${currentSort == 'createdAt' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -97,6 +121,21 @@
                     </tr>
                     </tbody>
                 </table>
+            </div>
+
+            <div>
+                <ul class="pagination">
+                    <li th:if="${currentPage > 0}">
+                        <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}">Prev</a>
+                    </li>
+                    <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+                        <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
+                           th:text="${pageNum + 1}"></a>
+                    </li>
+                    <li th:if="${currentPage < totalPages - 1}">
+                        <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}">Next</a>
+                    </li>
+                </ul>
             </div>
         </div>
 
