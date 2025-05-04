@@ -6,17 +6,29 @@
 <body class="h-screen bg-gray-100">
 <div class="h-[90%] pt-16">
 
-    <main class="flex flex-col bg-white p-4 w-full max-w-full">
-        <div class="flex justify-center items-center min-h-screen">
-            <!-- Form for Adding a New ContactAttempt -->
-            <form th:action="@{/admin/contact-attempts}" th:object="${newContactAttempt}" method="post" class="space-y-4 p-4 bg-white shadow rounded-2xl">
-                <div>
-                    <label for="phoneNumber" class="block mb-1 font-semibold">Phone Number</label>
+    <main class=" bg-white p-4 w-full max-w-full">
+        <!-- Form for Adding a New ContactAttempt -->
+
+        <form id="contactAttemptForm"
+              th:action="@{/admin/contact-attempts}"
+              th:object="${newContactAttempt}"
+              method="post"
+              class="flex flex-col space-y-4 p-4 bg-white ">
+
+            <!-- Hidden input remains at the top -->
+            <input type="hidden" id="contactAttemptId" th:field="*{id}" />
+
+            <!-- Row for all inputs -->
+            <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
+                <!-- Phone Number Group -->
+                <div class="flex-1 w-full">
+                    <label for="phoneNumber" class="block mb-1 font-semibold text-sm">Phone Number</label>
                     <input type="tel" id="phoneNumber" th:field="*{phoneNumber}" class="w-full p-2 border rounded-xl" required>
                 </div>
 
-                <div>
-                    <label for="status" class="block mb-1 font-semibold">Status</label>
+                <!-- Status Group -->
+                <div class="flex-1 w-full">
+                    <label for="status" class="block mb-1 font-semibold text-sm">Status</label>
                     <select id="status" th:field="*{status}" class="w-full p-2 border rounded-xl" required>
                         <option th:each="status : ${T(com.testehan.springai.immobiliare.model.ContactStatus).values()}"
                                 th:value="${status}"
@@ -25,18 +37,23 @@
                     </select>
                 </div>
 
-                <div>
-                    <label for="listingUrl" class="block mb-1 font-semibold">Listing URL</label>
+                <!-- Listing URL Group -->
+                <div class="flex-1 w-full">
+                    <label for="listingUrl" class="block mb-1 font-semibold text-sm">Listing URL</label>
                     <input type="url" id="listingUrl" th:field="*{listingUrl}" class="w-full p-2 border rounded-xl" required>
                 </div>
+            </div>
 
-                <div class="pt-2">
-                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">Add Contact Attempt</button>
-                </div>
-            </form>
+            <!-- Row for the button -->
+            <!-- Optional: Add flex justify-end to push button to the right -->
+            <div class="pt-2 flex justify-end">
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">Add Contact Attempt</button>
+            </div>
+        </form>
 
+        <div class="p-4">
             <!-- Filter input -->
-            <div class="my-4">
+            <div class="mb-4 mt-4">
                 <input id="filterInput" type="text" placeholder="Filter by phone or URL..." class="w-full p-2 border rounded-xl" onkeyup="filterTable()">
             </div>
 
@@ -46,13 +63,20 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th class="p-3 text-left cursor-pointer" onclick="sortTable(0)">Phone Number</th>
-                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(1)">Listing URL</th>
-                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(2)">Status</th>
+                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(1)">Status</th>
+                        <th class="p-3 text-left cursor-pointer" onclick="sortTable(2)">Listing URL</th>
                         <th class="p-3 text-left cursor-pointer" onclick="sortTable(3)">Created At</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="attempt : ${contactAttempts}">
+                    <tr th:each="attempt : ${contactAttempts}"
+                        class="cursor-pointer hover:bg-gray-100"
+                        th:data-id="${attempt.id}"
+                        th:data-phone="${attempt.phoneNumber}"
+                        th:data-url="${attempt.listingUrl}"
+                        th:data-status="${attempt.status}"
+                        onclick="populateForm(this)">
+
                         <td class="p-3">
                             <a th:href="'https://wa.me/' + ${#strings.replace(attempt.phoneNumber, '+', '')}"
                                target="_blank"
@@ -65,22 +89,37 @@
                                 </span>
                             </a>
                         </td>
+                        <td class="p-3" th:text="${attempt.status}"></td>
                         <td class="p-3">
                             <a th:href="${attempt.listingUrl}" target="_blank" class="text-blue-600 hover:underline" th:text="${attempt.listingUrl}"></a>
                         </td>
-                        <td class="p-3" th:text="${attempt.status}"></td>
                         <td class="p-3" th:text="${#dates.format(attempt.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </div>
+
     </main>
 
 </div>
 
 <!-- Very basic sorting & filtering script -->
 <script>
+    function populateForm(row) {
+        const phone = row.getAttribute('data-phone');
+        const url = row.getAttribute('data-url');
+        const status = row.getAttribute('data-status');
+        const id = row.getAttribute('data-id');
+
+        document.getElementById('phoneNumber').value = phone;
+        document.getElementById('listingUrl').value = url;
+        document.getElementById('status').value = status;
+        document.getElementById('contactAttemptId').value = id;
+
+        document.getElementById('contactAttemptForm').scrollIntoView({ behavior: 'smooth' });
+    }
+
     function sortTable(columnIndex) {
         const table = document.getElementById("contactAttemptsTable");
         const rows = Array.from(table.rows).slice(1);
