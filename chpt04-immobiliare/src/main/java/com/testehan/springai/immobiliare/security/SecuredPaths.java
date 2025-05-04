@@ -4,6 +4,7 @@ import java.util.List;
 
 public class SecuredPaths {
     public static final List<String> SECURED_URLS = List.of(
+            "/admin/**",
             "/chat",
             "/respond",
             "/message",
