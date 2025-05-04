@@ -5,15 +5,22 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @AllArgsConstructor
 @Getter
 @Setter
 public class ResponsePayload implements EventPayload{
 
     private String response;
+    private String conversationId;
 
     @Override
     public Object getPayload() {
-        return response;
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("response", response);
+        payload.put("conversationId", conversationId);
+        return payload;
     }
 }

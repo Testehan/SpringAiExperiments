@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.events.Event;
 import com.testehan.springai.immobiliare.events.EventPayload;
+import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.security.SessionCleanupListener;
@@ -324,28 +325,34 @@ public class ApartmentApiController {
             return getApartmentServerSentEvent(event.getPayload(),index ,sseId, locale);
         } else {
             httpSession.setAttribute("sseIndex", 0);
-            return getResponseServerSideEvent(event.getPayload(),sseId, locale);
+            return getResponseServerSideEvent((ResponsePayload) event.getPayload(),sseId, locale);
         }
     }
 
-    private ServerSentEvent<String> getResponseServerSideEvent(EventPayload eventPayload, String sseId, Locale locale) {
-        var user = conversationSession.getImmobiliareUser().get();
-        int searchQueriesAvailable = user.getSearchesAvailable() - 1;
-        String payload = (String) eventPayload.getPayload();
+    private ServerSentEvent<String> getResponseServerSideEvent(ResponsePayload eventPayload, String sseId, Locale locale) {
+        var response = (String)((Map<String, Object>)eventPayload.getPayload()).get("response");
+        var conversationId = (String)((Map<String, Object>)eventPayload.getPayload()).get("conversationId");
+
+        var userOptional = userService.getImmobiliareUserByEmail(conversationId);
 
         Context context = new Context();
         Set<String> selectors = new HashSet<>();
         selectors.add("responseFragmentWithApartments");
-        context.setVariable("response", payload);
+        context.setVariable("response", response);
         context.setLocale(locale);
 
-        if (isEndingMessage(payload)) {
-            if (searchQueriesAvailable <= 5 && searchQueriesAvailable > 0) {
-                context.setVariable("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
-            } else if (searchQueriesAvailable <= 0) {
-                context.setVariable("queriesAvailableMessage", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, locale));
+        if (userOptional.isPresent()){
+            var user = userOptional.get();
+            int searchQueriesAvailable = user.getSearchesAvailable() - 1;
+            if (isEndingMessage(response)) {
+                if (searchQueriesAvailable <= 5 && searchQueriesAvailable > 0) {
+                    context.setVariable("queriesAvailableMessage", messageSource.getMessage("M00_SEARCH_QUERIES_AVAILABLE", new Object[]{searchQueriesAvailable}, locale));
+                } else if (searchQueriesAvailable <= 0) {
+                    context.setVariable("queriesAvailableMessage", messageSource.getMessage("M00_NO_SEARCH_QUERIES_AVAILABLE", null, locale));
+                }
             }
         }
+
 
         var data = templateEngine.process("response",selectors, context).
                 replaceAll("[\\n\\r]+", "");    // because we don't want our result to contain new lines

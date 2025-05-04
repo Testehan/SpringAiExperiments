@@ -113,7 +113,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
             if (cachedResponse.isPresent()) {
                 LOGGER.info("Performance Cache 1 -----------------------");
                 String[] listingIds = cachedResponse.get().split("\\,");
-                sendResultsFoundResponse(session);
+                sendResultsFoundResponse(session, conversationId);
 
                 var listingsFound = apartmentCrudService.findApartmentsByIds(List.of(listingIds))
                         .stream().filter(listing -> listing.isActive()).collect(Collectors.toList());
@@ -122,7 +122,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                     sendListing(session.getId(), listing, conversationId, immobiliareUser);
                 }
 
-                 sendSearchComplete(session.getId());
+                 sendSearchComplete(session.getId(), conversationId);
 
                 LOGGER.info("Performance Cache 2 -----------------------");
                 return response;
@@ -165,7 +165,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                                                 .findFirst();
                                         if (!apartmentLLM.isEmpty()) {
                                             if (isFirst.getAndSet(false)) {
-                                                sendResultsFoundResponse(session);
+                                                sendResultsFoundResponse(session, conversationId);
                                             }
                                             resultsToCache.append(apartmentLLM.get().getId().toString()).append(",");
                                             sendListing(session.getId(), apartmentLLM.get(), conversationId, immobiliareUser);
@@ -178,10 +178,10 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                                     },
                                     () -> {
                                         if (isFirst.get()) {     // this means that we processed stream and we got no match
-                                            sendSearchCompletedNoResults(description, session.getId());
+                                            sendSearchCompletedNoResults(description, session.getId(),conversationId);
                                         } else {
                                             llmCacheService.saveToCache(city,propertyType,llmCacheKey, resultsToCache.toString());
-                                            sendSearchComplete(session.getId());
+                                            sendSearchComplete(session.getId(), conversationId);
                                         }
 
                                     }
@@ -204,10 +204,10 @@ public class SearchListingsHandler implements ApiChatCallHandler {
         return ApiCall.GET_APARTMENTS;
     }
 
-    private void sendSearchCompletedNoResults(String description, String sessionId) {
+    private void sendSearchCompletedNoResults(String description, String sessionId, String conversationId) {
         LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
         var payload = messageSource.getMessage("M05_NO_APARTMENTS_FOUND", null, localeUtils.getCurrentLocale());
-        emitEvent(sessionId, "response", new ResponsePayload(payload));
+        emitEvent(sessionId, "response", new ResponsePayload(payload, conversationId));
         LOGGER.info("Search completed with no results for description : {}", description);
     }
 
@@ -223,17 +223,17 @@ public class SearchListingsHandler implements ApiChatCallHandler {
         emitEvent(sessionId, "apartment",new ApartmentPayload(listingFound, isFavourite));
     }
 
-    private void sendResultsFoundResponse(HttpSession session) {
+    private void sendResultsFoundResponse(HttpSession session, String conversationId) {
         var sessionId = session.getId();
         LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
         var payload = messageSource.getMessage("M05_APARTMENTS_FOUND_START", null, localeUtils.getCurrentLocale());
-        emitEvent(sessionId, "response", new ResponsePayload(payload));
+        emitEvent(sessionId, "response", new ResponsePayload(payload, conversationId));
     }
 
-    private void sendSearchComplete(String sessionId){
+    private void sendSearchComplete(String sessionId, String conversationId){
         LOGGER.info("Sending SSE TO ----------------------- {}",userSseService.addUserSseId(sessionId));
         var payload = messageSource.getMessage("M05_APARTMENTS_FOUND_END", null, localeUtils.getCurrentLocale());
-        emitEvent(sessionId, "response", new ResponsePayload(payload));
+        emitEvent(sessionId, "response", new ResponsePayload(payload, conversationId));
         LOGGER.info("Search completed");
     }
 

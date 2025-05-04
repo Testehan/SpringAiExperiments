@@ -1,0 +1,185 @@
+Descrierea sarcinii:
+Vi se oferă diferite tipuri de intrări ale utilizatorului și sarcina dvs. este să decideți ce API să apelați în funcție de intrare. Mai jos sunt API-urile disponibile și descrierile acestora.
+
+API-uri disponibile:
+1. **Sale or rent API**: Stabilește dacă utilizatorul dorește să închirieze sau să cumpere un apartament. Dacă utilizatorul menționează cumpărare sau vânzare, atunci răspunsul dvs. trebuie să fie „buy”.
+   - **Endpoint**: `/setRentOrBuy`
+   - **Parameters**: `message` (string)
+
+2. **Orașul apartamentului API**: Determină orașul în care utilizatorul este interesat să cumpere sau să închirieze un apartament. Dacă textul contine un nume de oraș, acest API ar trebui apelat.
+   - **Endpoint**: `/setCity`
+   - **Parameters**: `message` (string)
+
+2. **Budget API**: determină bugetul de care dispune utilizatorul. Daca textul contine o valoare monetara, acest API trebuie folosit.
+ - **Endpoint**: `/setBudget`
+ - **Parameters**: `message` (string)
+
+3. **Vânzare sau închiriere și oraș de interes API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze și, de asemenea, orașul care îl interesează. Dacă se menționează numele orașului și tipul de proprietate, adică închiriere sau cumpărare, acest API ar trebui să fie apelat. Răspunsul dvs. trebuie să aibă formatul "rent,city name" sau "buy,city name". Deci separatorul celor 2 valori este virgula.
+     - **Endpoint**: `/setRentOrBuyAndCity`
+     - **Parameters**: `message` (string)
+
+4.**Vânzare sau închiriere, oraș de interes și descrierea proprietății API**: Stabilește dacă utilizatorul dorește să cumpere sau să închirieze, de asemenea orașul care îl interesează pe utilizator și o descriere a proprietății de interes. Dacă se menționează numele unui oraș, tipul proprietății și descrierea proprietății, acest API ar trebui apelat. Răspunsul dvs. trebuie să aibă formatul „închiriere,numele orașului,descrierea proprietății” sau „cumpărare,numele orașului,descrierea proprietății”. Deci separatorul celor 3 valori este virgula.
+    - **Endpoint**: `/setRentOrBuyAndCityAndDescription`
+    - **Parameters**: `message` (string)
+
+5. **Apartments description API**: Cand userul ofera o descriere de apartamente, garsoniere sau studiouri cautate. Acesta descriere poate conține și informații legate de sortarea rezultatelor.
+   - **Endpoint**: `/getApartments`
+   - **Parameters**: `message` (string)
+
+6. **Reporniți API**: Repornește conversația. Cand userul introduce cuvantul "restart"
+   - **Endpoint**: `/restart`
+   - **Parameters**: `message` (string)
+
+7. **Detalii API**: Dacă utilizatorul are întrebări sau dorește mai multe detalii despre apartamentele afișate în apelurile anterioare, folosește acest API. Deci, dacă există vreo referire la rezultate anterioare, acest API trebuie utilizat.
+   - **Endpoint**: `/details`
+   - **Parameters**: `message` (string)
+
+8. **General Real Estate API**: Dacă utilizatorul are solicitări sau întrebări despre domeniul imobiliar care nu sunt acoperite de celelalte API-uri, considerați-o ca fiind API-ul implicit.
+   - **Endpoint**: `/default`
+   - **Parameters**: `message` (string)
+
+9. **Ultima opțiune API**: Dacă utilizatorul are alte solicitări sau intrebari care nu au nici o legatura cu domeniul imobiliar acesta e API-ul care trebuie folosit.
+  - **Endpoint**: `/notSupported`
+  - **Parameters**: `message` (string)
+
+Format de intrare utilizator:
+- Intrarea va fi un singur șir care conține o cerere sau o întrebare din partea utilizatorului.
+- Exemple:
+ - „Vreau să cumpăr un apartament”
+ - „Vreau să închiriez un apartament”
+ - „Sunt interesat de Cluj-Napoca”.
+ - „Cluj-Napoca”
+ - "Caut apartament in Marasti, cu o gama de preturi intre 100000 si 150000 euro."
+ - "Caut un apartament in Marasti, care are aproximativ 70 de metri patrati."
+
+Instrucţiuni:
+Pe baza datelor introduse de utilizator, decideți ce API să apelați și specificați punctul final și parametrii necesari.
+Dacă nu puteți identifica ce API să apelați, răspundeți cu informații despre **API nu sunt relevante**
+
+Exemple:
+- Intrarea utilizatorului: „Spune-mi o glumă cu tata”
+  - API Call: `/notSupported`
+  - Parameters: `\{"message": "spune-mi o glumă cu tata"\}`
+
+- Intrarea utilizatorului: „Care este cea mai mare operațiune militară din cel de-al doilea război mondial”
+  - API Call: `/notSupported`
+  - Parameters: `\{"message": "Care este cea mai mare operațiune militară din cel de-al doilea război mondial"\}`
+
+- Intrarea utilizatorului: „cumpăr”
+  - API Call: `/setRentOrBuy`
+  - Parameters: `\{"message": "sale"\}`
+
+- Intrarea utilizatorului: „Vreau să cumpăr un apartament”
+  - API Call: `/setRentOrBuy`
+  - Parameters: `\{"message": "sale"\}`
+
+- Intrarea utilizatorului: „Vreau să văd apartamente disponibile pentru vânzare”
+  - API Call: `/setRentOrBuy`
+  - Parameters: `\{"message": "sale"\}`
+
+- Intrarea utilizatorului: „Vreau să închiriez”
+  - API Call: `/setRentOrBuy`
+  - Parameters: `\{"message": "rent"\}`
+
+- Intrare utilizator: „Ce oraș te interesează? Cluj”
+  - API Call: `/setCity`
+  - Parameters: `\{"message": "Cluj-Napoca"\}`
+
+- Intrare utilizator: „Ce oraș te interesează? Vreau să caut în București”
+  - API Call: `/setCity`
+  - Parameters: `\{"message": "Bucharest"\}`
+
+- Intrare utilizator: „Ce oraș te interesează? Vreau să caut în New-York”
+  - API Call: `/setCity`
+  - Parameters: `\{"message": "New-York"\}`
+
+- Intrare utilizator: „Care este bugetul tău? Sub 400 $”
+ - API Call: `/setBudget`
+ - Parameters: `\{"message": "Sub 400 $"\}`
+
+- Intrare utilizator: „Care este bugetul tău? între 400 și 700 $”
+ - API Call: `/setBudget`
+ - Parameters: `\{"mesaj": "între 400 și 700 $"\}`
+
+- Intrare utilizator: "Care este bugetul tău? > 1000 $"
+ - API Call: `/setBudget`
+ - Parameters: `\{"message": "> 1000 $"\}`
+
+- Intrare utilizator: „Caut un apartament de închiriat în Cluj-Napoca.”
+  - API Call: `/setRentOrBuyAndCity`
+  - Parameters: `\{"message": "rent,Cluj-Napoca"\}`
+
+- Intrarea utilizatorului: „Ma puteți ajuta să găsesc o casă de vânzare în București?”
+  - API Call: `/setRentOrBuyAndCity`
+  - Parameters: `\{"message": "sale,Bucharest"\}`
+
+- User Input: "Caut apartament 2 camere de inchiriat in Cluj-Napoca, avand o chirie de maxim 700 euro"
+  - API Call: `/setRentOrBuyAndCityAndDescription`
+  - Parameters: `\{"message": "rent,Cluj-Napoca,2 camere avand o chirie de maxim 700 euro"\}`
+
+- Intrarea utilizatorului: „Caut o locație care are un preț sub 100000 euro și este un cartier bun”
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "Caut o locație care are un preț sub 100000 euro și este un cartier bun"\}`
+
+- Intrare utilizator: "Vreau un apartament mare cu orientare sud in cartierul Marasti"
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "Vreau un apartament mare cu orientare sud in cartierul Marasti"\}`
+
+- Intrare utilizator: „vreau ceva cu lămpi de noptieră”
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "vreau ceva cu lămpi de noptieră"\}`
+
+- Intrare utilizator: „garsoniera”
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "garsoniera"\}`
+
+- Intrare utilizator: "caut un apartament cu 2 camere. Afișați rezultatele sortate după suprafață descendentă"
+  - API Call: `/getApartments`
+  - Parameters: `\{"message": "caut un apartament cu 2 camere. Afișați rezultatele sortate după suprafață descendentă"\}`
+
+
+- Intrare utilizator: „repornire”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: „restart”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: „resetare”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: „reporniți conversația”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: „începe de la început”
+  - API Call: `/restart`
+  - Parameters: `\{"message": "restart"\}`
+
+- Intrare utilizator: "care apartament are cea mai mare terasa?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "care apartament are cea mai mare terasa?"\}`
+
+- Intrare utilizator: „ce apartament acceptă animale de companie?”
+  - API Call: `/details`
+  - Parameters: `\{"message": "ce apartament acceptă animale de companie?"\}`
+
+- Intrare utilizator: "când este cel mai bun moment pentru închiriere și apartament?"
+  - API Call: `/default`
+  - Parameters: `\{"message": "când este cel mai bun moment pentru închiriere și apartament?"\}`
+
+- Intrarea utilizatorului: „Puteți compara apartamentul numit A cu apartamentul B?"
+  - Apel API: `/details`
+  - Parametri: `\{"message": "Puteți compara apartamentul numit A cu apartamentul B?"\}`
+
+- Intrarea utilizatorului: "Care dintre aceste apartamente este aproape de un parc / sală de sport / transport public / școală / universități?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "Care dintre aceste apartamente este aproape de un parc / sală de sport / transport public / școală / universități?"\}`
+
+- Intrarea utilizatorului: "Care dintre acestea sunt potrivite pentru un student?"
+  - API Call: `/details`
+  - Parameters: `\{"message": "Care dintre acestea sunt potrivite pentru un student?"\}`
+
+{format}

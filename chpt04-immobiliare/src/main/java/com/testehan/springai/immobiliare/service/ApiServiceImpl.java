@@ -101,7 +101,7 @@ public class ApiServiceImpl implements ApiService{
                 var rawResponse = assistantResponse.getResult().getOutput().getContent();
                 LOGGER.info("Raw LLM response: {}", rawResponse);
                 if (!StringUtils.hasText(rawResponse)) {
-                    LOGGER.error("LLM returned an empty or null response for message: {}", trimmedMessage);
+                    LOGGER.info("LLM returned an empty or null response for message: {}", trimmedMessage);
                     return new ServiceCall(ApiCall.EXCEPTION, "LLM returned an empty or null response for message " + trimmedMessage);
                 }
 
@@ -110,16 +110,16 @@ public class ApiServiceImpl implements ApiService{
                     var valueToBeCached = serviceCall.apiCall().toString() + "," + serviceCall.message();
                     llmCacheService.saveToCache("","",trimmedMessage, valueToBeCached);
 
-                    LOGGER.debug("Cached LLM response for message: {}", trimmedMessage);
+                    LOGGER.info("Cached LLM response for message: {}", trimmedMessage);
                 } else {
-                    LOGGER.warn("LLM returned an EXCEPTION API type for message '{}'. Not caching.", trimmedMessage);
+                    LOGGER.info("LLM returned an EXCEPTION API type for message '{}'. Not caching.", trimmedMessage);
                 }
 
                 return serviceCall;
             }
         } catch (Exception e) {
             // Catch-all for unexpected errors
-            LOGGER.error("Unexpected error while calling LLM: {}", e.getMessage(), e);
+            LOGGER.info("Unexpected error while calling LLM: {}", e.getMessage(), e);
             return new ServiceCall(ApiCall.EXCEPTION, "Unexpected error while calling LLM: " + e.getMessage());
         }
     }
@@ -131,7 +131,7 @@ public class ApiServiceImpl implements ApiService{
             return new ServiceCall(ApiCall.getByValue(parts[0]), parts[1]);
 
         } catch (Exception e) {
-            LOGGER.error("Error parsing cached data '{}': {}", cachedData, e.getMessage(), e);
+            LOGGER.info("Error parsing cached data '{}': {}", cachedData, e.getMessage(), e);
             return new ServiceCall(ApiCall.EXCEPTION, "Error parsing cached data");
         }
     }
@@ -156,19 +156,19 @@ public class ApiServiceImpl implements ApiService{
             ServiceCall serviceCall = parser.convert(rawResponse);
 
             if (serviceCall == null) {
-                LOGGER.error("LLM response parsed to null object. Raw response: {}", rawResponse);
+                LOGGER.info("LLM response parsed to null object. Raw response: {}", rawResponse);
                 return new ServiceCall(ApiCall.EXCEPTION, "LLM response parsed to null object. Raw response: " + rawResponse);
             }
 
             if (serviceCall.apiCall() == null) {
-                LOGGER.error("LLM response resulted in null API. Raw response: {}", rawResponse);
+                LOGGER.info("LLM response resulted in null API. Raw response: {}", rawResponse);
                 return new ServiceCall(ApiCall.EXCEPTION, "LLM response resulted in null API. Raw response: " + rawResponse);
             }
 
             return serviceCall;
 
         } catch (Exception e) {
-            LOGGER.error("Failed to parse LLM response. Raw response: '{}'. Error: {}", rawResponse, e.getMessage(), e);
+            LOGGER.info("Failed to parse LLM response. Raw response: '{}'. Error: {}", rawResponse, e.getMessage(), e);
             return new ServiceCall(ApiCall.EXCEPTION, "Failed to parse LLM response. Raw response: " + rawResponse + ". Error: " + e.getMessage());
         }
     }
