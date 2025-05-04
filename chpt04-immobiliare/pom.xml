@@ -25,7 +25,7 @@
         <amazon.aws.version>2.21.0</amazon.aws.version>
 
         <!-- added this so that i can use the latest stuff from spring ai  -->
-        <spring-ai.version>1.0.0-M5</spring-ai.version>
+        <spring-ai.version>1.0.0-M7</spring-ai.version>
     </properties>
 
     <repositories>
@@ -83,9 +83,17 @@
 
         <dependency>
             <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-openai</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-openai</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-starter-model-vertex-ai-gemini</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-vertex-ai-gemini</artifactId>
@@ -102,7 +110,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
-            <artifactId>spring-ai-mongodb-atlas-store-spring-boot-starter</artifactId>
+            <artifactId>spring-ai-starter-vector-store-mongodb-atlas</artifactId>
         </dependency>
 
         <dependency>

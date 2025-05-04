@@ -6,8 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.RequestResponseAdvisor;
 import org.springframework.ai.chat.client.advisor.api.AdvisedRequest;
+import org.springframework.ai.chat.client.advisor.api.AdvisedResponse;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisor;
+import org.springframework.ai.chat.client.advisor.api.CallAroundAdvisorChain;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.document.Document;
@@ -26,7 +28,7 @@ import java.util.concurrent.Executor;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
 
-public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
+public class CaptureMemoryAdvisor implements CallAroundAdvisor {
 
     public static final int MAX_ATTEMPTS = 3;
     private Logger logger = LoggerFactory.getLogger(CaptureMemoryAdvisor.class);
@@ -54,13 +56,13 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
     }
 
     @Override
-    public AdvisedRequest adviseRequest(AdvisedRequest request, Map<String, Object> adviseContext) {
+    public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
 
         var backgroundTask = new Runnable() {
             @Override
             public void run() {
                 try {
-                    retryTemplate.execute((RetryCallback<Boolean, Throwable>) context -> extractMemoryIfPossible(request,adviseContext));
+                    retryTemplate.execute((RetryCallback<Boolean, Throwable>) context -> extractMemoryIfPossible(advisedRequest));
 
                 } catch (Throwable t) {
                     logger.error("We several times to extract a memory but something is not working. ", t);
@@ -68,11 +70,13 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
             }
         };
         executor.execute(backgroundTask);
-        
-        return request;
+
+        return chain.nextAroundCall(advisedRequest);
     }
 
-    private boolean extractMemoryIfPossible(AdvisedRequest request,  Map<String, Object> adviseContext) {
+    private boolean extractMemoryIfPossible(AdvisedRequest request) {
+        Map<String, Object> adviseContext = request.adviseContext();
+
         try {
             logger.info("Trying to extract memory for : {}", lastMessageMemoryBasisExtractor.extract(request));
 
@@ -117,6 +121,11 @@ public class CaptureMemoryAdvisor implements RequestResponseAdvisor {
     @Override
     public int getOrder() {
         return Ordered.HIGHEST_PRECEDENCE;
+    }
+
+    @Override
+    public String getName() {
+        return "CaptureMemoryAdvisor";
     }
 
     private record MemoryResponse(String content, boolean useful){

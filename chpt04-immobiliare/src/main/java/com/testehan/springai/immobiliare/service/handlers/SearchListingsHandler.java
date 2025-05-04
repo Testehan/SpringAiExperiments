@@ -334,7 +334,7 @@ public class SearchListingsHandler implements ApiChatCallHandler {
                 .user(prompt.getContents())
                 .call().chatResponse();
 
-        ApartmentDescription apartment = outputParser.convert(assistantResponse.getResult().getOutput().getContent());
+        ApartmentDescription apartment = outputParser.convert(assistantResponse.getResult().getOutput().getText());
         return apartment;
     }
 }

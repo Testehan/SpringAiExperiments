@@ -6,9 +6,10 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.api.OpenAiApi;
+import org.springframework.ai.openai.api.OpenAiAudioApi;
+import org.springframework.ai.vertexai.gemini.VertexAiGeminiChatModel;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
@@ -58,20 +59,25 @@ public class BeanConfig {
     @Bean
     public EmbeddingModel embeddingModel() {
         // Can be any other EmbeddingModel implementation.
-        return new OpenAiEmbeddingModel(new OpenAiApi(OPENAI_API_KEY));
+        return new OpenAiEmbeddingModel(new OpenAiApi.Builder().apiKey(OPENAI_API_KEY).build());
+    }
+
+    @Bean
+    public OpenAiAudioApi openAiAudioApi() {
+        return new OpenAiAudioApi.Builder().apiKey(OPENAI_API_KEY).build();
+    }
+
+    @Bean
+    @Primary
+    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
+        return vertexAiGeminiChatModel;
     }
 
 //    @Bean
 //    @Primary
-//    public ChatModel getGeminiChatModel(VertexAiGeminiChatModel vertexAiGeminiChatModel){
-//        return vertexAiGeminiChatModel;
+//    public ChatModel getOpenAiChatModel(OpenAiChatModel openAiChatModel){
+//        return openAiChatModel;
 //    }
-
-    @Bean
-    @Primary
-    public ChatModel getOpenAiChatModel(OpenAiChatModel openAiChatModel){
-        return openAiChatModel;
-    }
 
     @Qualifier("applicationTaskExecutor")
     @Bean

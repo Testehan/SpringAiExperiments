@@ -30,8 +30,8 @@ public class OpenAiService {
     private OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel;
     private LocaleUtils localeUtils;
 
-    public OpenAiService(OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel, LocaleUtils localeUtils){
-        this.openAiAudioTranscriptionModel = openAiAudioTranscriptionModel;
+    public OpenAiService(OpenAiAudioApi openAiAudioApi, LocaleUtils localeUtils){
+        this.openAiAudioTranscriptionModel = new OpenAiAudioTranscriptionModel(openAiAudioApi);
         this.localeUtils = localeUtils;
     }
 
