@@ -19,6 +19,9 @@ public class ContactAttempt {
     private Long createdAt;
 
     public ContactAttempt() {
+        if (this.id == null) {
+            this.id = new ObjectId(); // Initialize ObjectId if null
+        }
         this.createdAt = System.currentTimeMillis();
     }
 

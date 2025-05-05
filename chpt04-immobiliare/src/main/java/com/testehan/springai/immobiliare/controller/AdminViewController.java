@@ -10,7 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/admin")
@@ -53,7 +55,7 @@ public class AdminViewController {
             Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(Sort.Order.desc(sortBy)) : Sort.by(Sort.Order.asc(sortBy));
 
             // PageRequest with page number and sorting
-            PageRequest pageRequest = PageRequest.of(page, 10, sort);
+            PageRequest pageRequest = PageRequest.of(page, 50, sort);
             Page<ContactAttempt> attempts = contactAttemptRepository.findAll(pageRequest);
 
             model.addAttribute("newContactAttempt", new ContactAttempt());
@@ -70,13 +72,5 @@ public class AdminViewController {
         }
     }
 
-    @PostMapping("/contact-attempts")
-    public String createContactAttempt(@ModelAttribute ContactAttempt contactAttempt) {
-        var user = conversationSession.getImmobiliareUser().get();
-        if (user.isAdmin()) {
-            contactAttemptRepository.save(contactAttempt);
-        }
 
-        return "redirect:/admin/contact-attempts";
-    }
 }

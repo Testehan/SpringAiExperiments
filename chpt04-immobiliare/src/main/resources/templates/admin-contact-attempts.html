@@ -3,6 +3,8 @@
 
 <head th:replace="~{fragments :: page_head('none')}" />
 
+<script th:src="@{/js/admin_contact_attempt.js}"></script>
+
 <body class="h-screen bg-gray-100">
 <div class="h-[90%] pt-16">
 
@@ -128,19 +130,31 @@
                 </table>
             </div>
 
-            <div>
-                <ul class="pagination">
-                    <li th:if="${currentPage > 0}">
-                        <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}">Prev</a>
-                    </li>
-                    <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
-                        <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
-                           th:text="${pageNum + 1}"></a>
-                    </li>
-                    <li th:if="${currentPage < totalPages - 1}">
-                        <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}">Next</a>
-                    </li>
-                </ul>
+            <div class="flex flex-col  justify-center items-center mt-6">
+                <div class="mb-2">
+                    <h1 class="text-lg font-semibold">Pagination</h1>
+                </div>
+                <div>
+                    <ul class="pagination flex space-x-4">
+                        <li th:if="${currentPage > 0}">
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
+                        </li>
+                        <li th:if="${currentPage > 0}">
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
+                        </li>
+                        <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
+                               th:text="${pageNum + 1}"></a>
+                        </li>
+                        <li th:if="${currentPage < totalPages - 1}">
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
+                        </li>
+                        <!-- Last button (Only show if currentPage < totalPages - 1) -->
+                        <li th:if="${currentPage < totalPages - 1}">
+                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -162,15 +176,6 @@
         document.getElementById('contactAttemptId').value = id;
 
         document.getElementById('contactAttemptForm').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function sortTable(columnIndex) {
-        const table = document.getElementById("contactAttemptsTable");
-        const rows = Array.from(table.rows).slice(1);
-        let sorted = rows.sort((a, b) => {
-            return a.cells[columnIndex].innerText.localeCompare(b.cells[columnIndex].innerText);
-        });
-        sorted.forEach(row => table.tBodies[0].appendChild(row));
     }
 
     function filterTable() {
