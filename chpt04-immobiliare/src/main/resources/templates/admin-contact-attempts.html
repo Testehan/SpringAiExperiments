@@ -19,6 +19,7 @@
 
             <!-- Hidden input remains at the top -->
             <input type="hidden" id="contactAttemptId" th:field="*{id}" />
+            <input type="hidden" id="createdAt" th:field="*{createdAt}" />
 
             <!-- Row for all inputs -->
             <div class="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 items-end">
@@ -92,6 +93,13 @@
                                 <span th:text="${currentSort == 'createdAt' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
+                        <th>
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=updatedAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Updated At
+                                <span th:text="${currentSort == 'updatedAt' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
                     </tr>
                     </thead>
                     <tbody>
@@ -101,6 +109,7 @@
                         th:data-phone="${attempt.phoneNumber}"
                         th:data-url="${attempt.listingUrl}"
                         th:data-status="${attempt.status}"
+                        th:data-createdAt="${attempt.createdAt}"
                         onclick="populateForm(this)">
 
                         <td class="p-3">
@@ -125,6 +134,7 @@
                             <a th:href="${attempt.listingUrl}" target="_blank" class="text-blue-600 hover:underline" th:text="${attempt.listingUrl}"></a>
                         </td>
                         <td class="p-3" th:text="${#dates.format(attempt.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+                        <td class="p-3" th:text="${#dates.format(attempt.updatedAt, 'yyyy-MM-dd HH:mm')}"></td>
                     </tr>
                     </tbody>
                 </table>
@@ -169,11 +179,13 @@
         const url = row.getAttribute('data-url');
         const status = row.getAttribute('data-status');
         const id = row.getAttribute('data-id');
+        const createdAt = row.getAttribute('data-createdAt');
 
         document.getElementById('phoneNumber').value = phone;
         document.getElementById('listingUrl').value = url;
         document.getElementById('status').value = status;
         document.getElementById('contactAttemptId').value = id;
+        document.getElementById('createdAt').value = createdAt;
 
         document.getElementById('contactAttemptForm').scrollIntoView({ behavior: 'smooth' });
     }

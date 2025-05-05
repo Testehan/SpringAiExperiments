@@ -44,10 +44,12 @@ public class AdminRestController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                             .body(messageSource.getMessage("toastify.admin.contact.attempt.failure.phone", null, localeUtils.getCurrentLocale()));
                 }
+                contactAttempt.setCreatedAt(System.currentTimeMillis());
                 contactAttemptRepository.save(contactAttempt);
             } else {
                 var contactAttemptByNumber = contactAttemptOptional.get();
                 if (isPhoneUsed && contactAttempt.getId().toString().equalsIgnoreCase(contactAttemptByNumber.getId().toString())){
+                    contactAttempt.setUpdatedAt(System.currentTimeMillis());
                     contactAttemptRepository.save(contactAttempt);
                 } else {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
