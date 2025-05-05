@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@RequestMapping("/admin")
+@RequestMapping("/a")
 public class AdminViewController {
 
     private final ContactAttemptRepository contactAttemptRepository;
@@ -31,7 +31,7 @@ public class AdminViewController {
         this.localeUtils = localeUtils;
     }
 
-    @GetMapping("/")
+    @GetMapping
     public String getMainAdminPage(Model model) {
         var user = conversationSession.getImmobiliareUser().get();
         if (user.isAdmin()) {

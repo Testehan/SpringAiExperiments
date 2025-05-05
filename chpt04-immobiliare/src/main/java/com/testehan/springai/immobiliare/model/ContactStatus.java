@@ -5,5 +5,7 @@ public enum ContactStatus {
     NO_WHATSAPP,
     CONTACTED,
     DECLINED,
-    ACCEPTED
+    ALREADY_RENTED,
+    ACCEPTED,
+    DONE        // after being accepted, a contact attempt moves to done when the listing was handled/published
 }

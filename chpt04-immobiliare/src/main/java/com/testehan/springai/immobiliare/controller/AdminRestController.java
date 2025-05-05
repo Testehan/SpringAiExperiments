@@ -12,8 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
+import java.util.Optional;
+
 @RestController
-@RequestMapping("/admin")
+@RequestMapping("/a")
 public class AdminRestController {
 
     private final ContactAttemptRepository contactAttemptRepository;
@@ -34,13 +37,24 @@ public class AdminRestController {
         var user = conversationSession.getImmobiliareUser().get();
         if (user.isAdmin()) {
 
-            var isPhoneUsed = contactAttemptRepository.findByPhoneNumber(contactAttempt.getPhoneNumber()).isPresent();
-            if (isPhoneUsed){
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(messageSource.getMessage("toastify.admin.contact.attempt.failure.phone", null,localeUtils.getCurrentLocale()));
-            } else {
+            Optional<ContactAttempt> contactAttemptOptional = contactAttemptRepository.findByPhoneNumber(contactAttempt.getPhoneNumber());
+            var isPhoneUsed = contactAttemptOptional.isPresent();
+            if (Objects.isNull(contactAttempt.getId())) {
+                if (isPhoneUsed) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(messageSource.getMessage("toastify.admin.contact.attempt.failure.phone", null, localeUtils.getCurrentLocale()));
+                }
                 contactAttemptRepository.save(contactAttempt);
+            } else {
+                var contactAttemptByNumber = contactAttemptOptional.get();
+                if (isPhoneUsed && contactAttempt.getId().toString().equalsIgnoreCase(contactAttemptByNumber.getId().toString())){
+                    contactAttemptRepository.save(contactAttempt);
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                            .body(messageSource.getMessage("toastify.admin.contact.attempt.failure.phone", null, localeUtils.getCurrentLocale()));
+                }
             }
+
         }
 
         return ResponseEntity.ok("ok");

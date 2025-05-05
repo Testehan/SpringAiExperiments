@@ -12,7 +12,7 @@
         <!-- Form for Adding a New ContactAttempt -->
 
         <form id="contactAttemptForm"
-              th:action="@{/admin/contact-attempts}"
+              th:action="@{/a/contact-attempts}"
               th:object="${newContactAttempt}"
               method="post"
               class="flex flex-col space-y-4 p-4 bg-white ">
@@ -65,28 +65,28 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th>
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=phoneNumber&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=phoneNumber&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Phone Number
                                 <span th:text="${currentSort == 'phoneNumber' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=status&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=status&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Status
                                 <span th:text="${currentSort == 'status' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=listingUrl&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=listingUrl&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Listing URL
                                 <span th:text="${currentSort == 'listingUrl' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=createdAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=createdAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Created At
                                 <span th:text="${currentSort == 'createdAt' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
@@ -137,21 +137,21 @@
                 <div>
                     <ul class="pagination flex space-x-4">
                         <li th:if="${currentPage > 0}">
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
                         </li>
                         <li th:if="${currentPage > 0}">
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
                         </li>
                         <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
                                th:text="${pageNum + 1}"></a>
                         </li>
                         <li th:if="${currentPage < totalPages - 1}">
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
                         </li>
                         <!-- Last button (Only show if currentPage < totalPages - 1) -->
                         <li th:if="${currentPage < totalPages - 1}">
-                            <a href="#" th:href="@{|/admin/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
+                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
                         </li>
                     </ul>
                 </div>
