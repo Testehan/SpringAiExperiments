@@ -4,6 +4,25 @@ $(document).ready(function(){
         handleSubmit(event);
     });
 
+    $('#downloadBtn').on('click', function () {
+        const rawFilterValue = $('#filterInput').val();
+
+        var filterValue = (rawFilterValue && rawFilterValue.trim()) ? rawFilterValue.trim() : null;
+        if (filterValue !== null) {
+            // Create a hidden link to trigger the CSV download
+            const downloadUrl = `/a/contact-attempts/download?value=${encodeURIComponent(filterValue)}`;
+            const link = $('<a>')
+              .attr('href', downloadUrl)
+              .attr('download', 'data.csv') // optional: sets a suggested filename
+              .appendTo('body');
+
+            link[0].click();
+            link.remove();
+        } else {
+             showToast("You must filter by URL to download", 3000, "error");
+        }
+    });
+
 })
 
 async function handleSubmit(event){
@@ -44,14 +63,7 @@ async function handleSubmit(event){
             data: JSON.stringify(formData),
             contentType: "application/json",
             success: function (response) {
-                Toastify({
-                    text: response,
-                    duration: 3000,
-                    style: {
-                      background: "linear-gradient(to right, #007bff, #3a86ff)",
-                      color: "white"
-                    }
-                }).showToast();
+                showToast(response, 3000);
 
                 $("#contactAttemptForm")[0].reset();
                 // Delay a little so the toast can be seen before the reload
@@ -61,19 +73,60 @@ async function handleSubmit(event){
             },
             error: function (xhr) {
                 console.log(xhr);
-
-                Toastify({
-                    text: xhr.responseText,
-                    duration: 5000,
-                    gravity: "top",
-                    position: "right",
-                    style: {
-                      background: "linear-gradient(to right, #fd0713, #ff7675)",
-                      color: "white"
-                    }
-                }).showToast();
+                showToast(xhr.responseText, 5000, "error");
             }
         })
     }
 
+}
+
+function populateForm(row) {
+    const phone = row.getAttribute('data-phone');
+    const url = row.getAttribute('data-url');
+    const status = row.getAttribute('data-status');
+    const id = row.getAttribute('data-id');
+    const createdAt = row.getAttribute('data-createdAt');
+
+    $('#phoneNumber').val(phone);
+    $('#listingUrl').val(url);
+    $('#status').val(status);
+    $('#contactAttemptId').val(id);
+    $('#createdAt').val(createdAt);
+
+    const formElement = $('#contactAttemptForm').get(0);
+    if (formElement) { // Check if the element exists before scrolling
+        formElement.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function filterTable() {
+    const input = document.getElementById("filterInput").value.toLowerCase();
+    const table = document.getElementById("contactAttemptsTable");
+    const rows = Array.from(table.rows).slice(1);
+    rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
+    });
+}
+
+function showToast(message, durationMillis, type = "info") {
+    if ($(".toastify").length === 0) {
+        let bgColor;
+        if (type === "error") {
+            bgColor = "linear-gradient(to right, #fd0713, #ff7675)";
+        } else if (type === "info") {
+            bgColor = "linear-gradient(to right, #7ea82b, #c6e28c)";
+        } else {
+            bgColor = "linear-gradient(to right, #e67e22, #f39c12)"; // Default to "warning"
+        }
+
+        Toastify({
+            text: message,
+            duration: durationMillis, // -1 value Keep it until dismissed
+            backgroundColor: bgColor,
+            gravity: "top", // Position it at the top
+            position: "center", // Center it horizontally
+            close: true
+        }).showToast();
+    }
 }

@@ -2,16 +2,17 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.ContactAttempt;
+import com.testehan.springai.immobiliare.model.ContactStatus;
 import com.testehan.springai.immobiliare.repository.ContactAttemptRepository;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -47,19 +48,32 @@ public class AdminRestController {
                 contactAttempt.setCreatedAt(System.currentTimeMillis());
                 contactAttemptRepository.save(contactAttempt);
             } else {
-                var contactAttemptByNumber = contactAttemptOptional.get();
-                if (isPhoneUsed && contactAttempt.getId().toString().equalsIgnoreCase(contactAttemptByNumber.getId().toString())){
                     contactAttempt.setUpdatedAt(System.currentTimeMillis());
                     contactAttemptRepository.save(contactAttempt);
-                } else {
-                    return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                            .body(messageSource.getMessage("toastify.admin.contact.attempt.failure.phone", null, localeUtils.getCurrentLocale()));
-                }
             }
 
         }
 
         return ResponseEntity.ok("ok");
+    }
+
+    @GetMapping("/contact-attempts/download")
+    public void downloadCsv(@RequestParam String value, HttpServletResponse response) throws IOException {
+        // we want the accepted contacts + ones from a particular url
+        var contactAttempts = contactAttemptRepository.findByListingUrlContainingAndStatus(value, String.valueOf(ContactStatus.ACCEPTED));
+
+        // Set headers for file download
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"data.csv\"");
+
+        // Write CSV to response
+        try (PrintWriter writer = response.getWriter()) {
+            writer.println("\"Origin URL\",\"Property Images Limit\"");// headers
+
+            for (ContactAttempt contactAttempt : contactAttempts){
+                writer.println("\"" + contactAttempt.getListingUrl() + "\", 10");
+            }
+        }
     }
 
 }

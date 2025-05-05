@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.model.ContactAttempt;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ContactAttemptRepository extends MongoRepository<ContactAttempt, ObjectId> {
@@ -13,4 +14,7 @@ public interface ContactAttemptRepository extends MongoRepository<ContactAttempt
     // If you want to find by phoneNumber + listingUrl (optional extra methods)
     Optional<ContactAttempt> findByPhoneNumberAndListingUrl(String phoneNumber, String listingUrl);
 
+    List<ContactAttempt> findByListingUrlContaining(String filterUrlValue);
+
+    List<ContactAttempt> findByListingUrlContainingAndStatus(String filterUrlValue, String statusValue);
 }

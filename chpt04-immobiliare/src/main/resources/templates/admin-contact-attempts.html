@@ -57,6 +57,10 @@
         <div class="p-4">
             <!-- Filter input -->
             <div class="mb-4 mt-4">
+                <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">Download CSV</button>
+            </div>
+
+            <div class="mb-4 mt-4">
                 <input id="filterInput" type="text" placeholder="Filter by phone or URL..." class="w-full p-2 border rounded-xl" onkeyup="filterTable()">
             </div>
 
@@ -171,34 +175,5 @@
     </main>
 
 </div>
-
-<!-- Very basic sorting & filtering script -->
-<script>
-    function populateForm(row) {
-        const phone = row.getAttribute('data-phone');
-        const url = row.getAttribute('data-url');
-        const status = row.getAttribute('data-status');
-        const id = row.getAttribute('data-id');
-        const createdAt = row.getAttribute('data-createdAt');
-
-        document.getElementById('phoneNumber').value = phone;
-        document.getElementById('listingUrl').value = url;
-        document.getElementById('status').value = status;
-        document.getElementById('contactAttemptId').value = id;
-        document.getElementById('createdAt').value = createdAt;
-
-        document.getElementById('contactAttemptForm').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    function filterTable() {
-        const input = document.getElementById("filterInput").value.toLowerCase();
-        const table = document.getElementById("contactAttemptsTable");
-        const rows = Array.from(table.rows).slice(1);
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(input) ? "" : "none";
-        });
-    }
-</script>
 
 </body>
