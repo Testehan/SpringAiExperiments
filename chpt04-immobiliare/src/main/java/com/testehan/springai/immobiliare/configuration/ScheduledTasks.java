@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 
 @Component
 public class ScheduledTasks {
@@ -83,11 +85,11 @@ public class ScheduledTasks {
 
 
     @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
-//    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes
+//    @Scheduled(cron = "0 0/1 * * * ?")          // runs every 3 mins for testing purposes
     public void sendReactivationEmail() {
 
+        LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
         if (appConfigurationsService.isSendReactivationEmailEnabled()) {
-            LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
             LOGGER.info("Scheduled Task - Reactivation emails will be send to owners.");
 
             var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
@@ -112,6 +114,25 @@ public class ScheduledTasks {
         } else {
             LOGGER.info("Scheduled Task - sendReactivationEmail is disabled");
         }
+
+        List<String> contacts = new ArrayList<>();
+        List<String> urls = new ArrayList<>();
+        var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
+        for (Apartment listing : listings){
+            var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
+            urls.add(reactivateLink);
+            var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(listing.getContact(), "RO");
+            if (phoneWithPrefix.isPresent()){
+                contacts.add(phoneWithPrefix.get());
+            } else{
+                contacts.add(listing.getContact());
+            }
+
+            listing.setReactivateMessageId("EMAIL-admin");
+            apartmentCrudService.saveApartment(listing);
+        }
+
+        emailService.sendAdminReactivateListingEmail(urls,contacts,localeUtils.getCurrentLocale());
 
     }
 
