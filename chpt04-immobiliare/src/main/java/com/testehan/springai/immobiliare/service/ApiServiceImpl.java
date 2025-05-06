@@ -83,6 +83,7 @@ public class ApiServiceImpl implements ApiService{
             } else {
 
                 ChatResponse assistantResponse;
+                ServiceCall resultServiceCall = null;
 
                 var outputParser = new BeanOutputConverter<>(ServiceCall.class);
                 String format = outputParser.getFormat();
@@ -93,29 +94,38 @@ public class ApiServiceImpl implements ApiService{
                 promptParameters.put("format", format);
                 Prompt prompt = promptTemplate.create(promptParameters);
 
-                assistantResponse = chatClient.prompt()
-                        .system(prompt.getContents())   //Move large static content to the system message field
-                        .user(trimmedMessage)  // Keep dynamic elements in user messages, as system messages don't require repeating.
-                        .call().chatResponse();
+                int retries = 3;
+                String retryMessage = trimmedMessage;
 
-                var rawResponse = assistantResponse.getResult().getOutput().getText();
-                LOGGER.info("Raw LLM response: {}", rawResponse);
-                if (!StringUtils.hasText(rawResponse)) {
-                    LOGGER.info("LLM returned an empty or null response for message: {}", trimmedMessage);
-                    return new ServiceCall(ApiCall.EXCEPTION, "LLM returned an empty or null response for message " + trimmedMessage);
+                while (retries > 0) {
+                    assistantResponse = chatClient.prompt()
+                            .system(prompt.getContents())   //Move large static content to the system message field
+                            .user(retryMessage)  // Keep dynamic elements in user messages, as system messages don't require repeating.
+                            .call().chatResponse();
+
+                    var rawResponse = assistantResponse.getResult().getOutput().getText();
+                    LOGGER.info("Raw LLM response: {}", rawResponse);
+                    if (!StringUtils.hasText(rawResponse)) {
+                        LOGGER.info("LLM returned an empty or null response for message: {}", trimmedMessage);
+                        return new ServiceCall(ApiCall.EXCEPTION, "LLM returned an empty or null response for message " + trimmedMessage);
+                    }
+
+                    ServiceCall serviceCall = parseLlmResponse(rawResponse, outputParser);
+                    if (serviceCall.apiCall() != ApiCall.EXCEPTION) {
+                        var valueToBeCached = serviceCall.apiCall().toString() + "," + serviceCall.message();
+                        llmCacheService.saveToCache("", "", trimmedMessage, valueToBeCached);
+                        retries = 0;
+                        LOGGER.info("Cached LLM response for message: {}", trimmedMessage);
+                    } else {
+                        retries = retries - 1;
+                        retryMessage = "The answer that you previously provided : " + rawResponse + " is incorrect! Please try again for input " + trimmedMessage;
+                        LOGGER.info("LLM returned an EXCEPTION API type for message '{}'. Not caching.", trimmedMessage);
+                        LOGGER.info("Retrying LLM call for input {}",trimmedMessage);
+                    }
+                    resultServiceCall = serviceCall;
                 }
 
-                ServiceCall serviceCall = parseLlmResponse(rawResponse, outputParser);
-                if (serviceCall.apiCall() != ApiCall.EXCEPTION) {
-                    var valueToBeCached = serviceCall.apiCall().toString() + "," + serviceCall.message();
-                    llmCacheService.saveToCache("","",trimmedMessage, valueToBeCached);
-
-                    LOGGER.info("Cached LLM response for message: {}", trimmedMessage);
-                } else {
-                    LOGGER.info("LLM returned an EXCEPTION API type for message '{}'. Not caching.", trimmedMessage);
-                }
-
-                return serviceCall;
+                return resultServiceCall;
             }
         } catch (Exception e) {
             // Catch-all for unexpected errors
