@@ -12,10 +12,8 @@ import java.util.Objects;
 
 public class EmailTemplateMain {
     public static void main(String[] args) throws IOException {
-
         deleteTemplats();
         createTemplates();
-
     }
 
     private static void deleteTemplate(String templateName){
@@ -43,6 +41,8 @@ public class EmailTemplateMain {
         deleteTemplate("WelcomeEmailTemplate");
         deleteTemplate("ReactivateListingEmailTemplate");
         deleteTemplate("ReactivateListingEmailTemplate_RO");
+        deleteTemplate("AdminReactivateListingEmailTemplate");
+        deleteTemplate("AdminReactivateListingEmailTemplate_RO");
         deleteTemplate("WelcomeEmailTemplate_RO");
         deleteTemplate("ListingAddedEmailTemplate");
         deleteTemplate("ListingAddedEmailTemplate_RO");
@@ -54,6 +54,9 @@ public class EmailTemplateMain {
 
         createTemplate("ReactivateListingEmailTemplate", "Keep the listing active", readFileFromResources("emails/en/listingReactivate.html"));
         createTemplate("ReactivateListingEmailTemplate_RO", "Menține anunțul activ", readFileFromResources("emails/ro/listingReactivate.html"));
+
+        createTemplate("AdminReactivateListingEmailTemplate", "Keep the listing active", readFileFromResources("emails/en/adminListingReactivate.html"));
+        createTemplate("AdminReactivateListingEmailTemplate_RO", "Menține anunțul activ", readFileFromResources("emails/ro/adminListingReactivate.html"));
 
         createTemplate("ListingAddedEmailTemplate", "Listing Added Successfully!", readFileFromResources("emails/en/listingAdded.html"));
         createTemplate("ListingAddedEmailTemplate_RO", "Anunț Adăugat cu Succes!", readFileFromResources("emails/ro/listingAdded.html"));
