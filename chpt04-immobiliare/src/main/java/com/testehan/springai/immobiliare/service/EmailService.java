@@ -185,12 +185,12 @@ public class EmailService {
             String url = urls.get(i);
 
             sb.append("<tr>")
-                    .append("<td><a href=\"https://wa.me/")
+                    .append("<td style=\"border: 1px solid #ccc;\"><a href=\"https://wa.me/")
                     .append(phone.replace("+",""))
                     .append("\" target=\"_blank\">")
                     .append(phone)
                     .append("</a></td>")
-                    .append("<td><a href=\"")
+                    .append("<td style=\"border: 1px solid #ccc;\"><a href=\"")
                     .append(url)
                     .append("\" target=\"_blank\">")
                     .append(url)
