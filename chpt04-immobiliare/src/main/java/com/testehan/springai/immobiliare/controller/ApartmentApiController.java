@@ -49,6 +49,8 @@ public class ApartmentApiController {
     private final UserSseService userSseService;
     private final SessionCleanupListener sessionCleanupListener;
     private final ApiService apiService;
+    private final ContactAttemptService contactAttemptService;
+
     private final SpringWebFluxTemplateEngine templateEngine;
     private final MessageSource messageSource;
 
@@ -58,7 +60,7 @@ public class ApartmentApiController {
     public ApartmentApiController(CityService cityService, ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
                                   UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                   SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
-                                  SessionCleanupListener sessionCleanupListener,
+                                  SessionCleanupListener sessionCleanupListener, ContactAttemptService contactAttemptService,
                                   MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.cityService = cityService;
@@ -72,6 +74,7 @@ public class ApartmentApiController {
         this.sessionCleanupListener = sessionCleanupListener;
         this.userService = userService;
         this.embeddingService = embeddingService;
+        this.contactAttemptService = contactAttemptService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
         this.listingUtil = listingUtil;
@@ -134,6 +137,7 @@ public class ApartmentApiController {
         LOGGER.info("Batch save - start");
         List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
         apartmentService.saveApartmentAndImages(apartment, processedImages, user,true);
+        contactAttemptService.updateContactAttemptStatus(apartment.getContact());
         // Return a response to the frontend
         return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
 
