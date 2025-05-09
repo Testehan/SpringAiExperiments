@@ -1,10 +1,13 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.testehan.springai.immobiliare.model.MessageType;
 import com.testehan.springai.immobiliare.model.webhook.Change;
 import com.testehan.springai.immobiliare.model.webhook.Entry;
 import com.testehan.springai.immobiliare.model.webhook.Message;
 import com.testehan.springai.immobiliare.model.webhook.WhatsAppWebhookPayload;
+import com.testehan.springai.immobiliare.repository.ContactAttemptConversationRepository;
+import com.testehan.springai.immobiliare.service.ContactAttemptConversationService;
 import com.testehan.springai.immobiliare.service.WhatsAppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,11 +23,15 @@ public class WhatsAppWebhookController {
 
     @Value("${whatsapp.api.webhook.token}")
     private String VERIFY_TOKEN;
+    @Value(("${whatsapp.api.phone.id}"))
+    private String PHONE_NUMBER_ID;
 
     private final WhatsAppService whatsAppService;
+    private final ContactAttemptConversationService contactAttemptConversationService;
 
-    public WhatsAppWebhookController(WhatsAppService whatsAppService) {
+    public WhatsAppWebhookController(WhatsAppService whatsAppService, ContactAttemptConversationRepository contactAttemptConversationRepository, ContactAttemptConversationService contactAttemptConversationService) {
         this.whatsAppService = whatsAppService;
+        this.contactAttemptConversationService = contactAttemptConversationService;
     }
 
     // 1. Webhook verification (GET)
@@ -58,14 +65,23 @@ public class WhatsAppWebhookController {
                     for (Change change : entry.getChanges()) {
                         com.testehan.springai.immobiliare.model.webhook.Value value = change.getValue();
 
+                        // Skip messages sent by your app (they'll have the same number as in metadata)
+                        if (PHONE_NUMBER_ID.equals(value.getMetadata().getPhone_number_id())) {
+                            LOGGER.info("Ignoring message sent by our app");
+                            continue;
+                        }
+
                         if (value.getMessages() != null) {
                             for (Message message : value.getMessages()) {
+
                                 if (Message.MESSAGE_TYPE_TEXT.equals(message.getType())) {
                                     String body = message.getText().getBody();
                                     String from = message.getFrom();
                                     LOGGER.info("Text from {} : {}",from, body);
 
                                     // TODO: process the message
+                                    contactAttemptConversationService.saveConversationTextMessage(from, message.getId(), body, MessageType.RECEIVED);
+
 
                                     whatsAppService.markMessageAsRead(message.getId(),value.getMetadata().getPhone_number_id());
                                 } else {
@@ -78,7 +94,6 @@ public class WhatsAppWebhookController {
             }
 
         } catch (Exception e) {
-            // 🔥 Handle unexpected or malformed payloads gracefully
             LOGGER.error("Error !!! parsing webhook payload: {} \n causes {}",rawJson, e.getMessage());
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("invalid_payload");
         }
