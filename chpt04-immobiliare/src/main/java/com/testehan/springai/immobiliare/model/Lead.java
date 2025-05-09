@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @Getter
 @Setter
-@Document(collection = "contact_attempt")
-public class ContactAttempt {
+@Document(collection = "leads")
+public class Lead {
 
     private ObjectId id;
     @Indexed //tells MongoDB to automatically create an index on that field, which makes queries faster
@@ -22,12 +22,5 @@ public class ContactAttempt {
     private ContactStatus status;
     private Long createdAt;
     private Long updatedAt;
-
-//    public ContactAttempt() {
-//        if (this.id == null) {
-//            this.id = new ObjectId(); // Initialize ObjectId if null
-//        }
-
-//    }
 
 }

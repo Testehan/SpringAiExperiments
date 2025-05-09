@@ -29,10 +29,10 @@ public class WhatsAppService {
     @Value(("${whatsapp.api.phone.id}"))
     private String PHONE_NUMBER_ID;
 
-    private final ContactAttemptConversationService contactAttemptConversationService;
+    private final LeadConversationService leadConversationService;
 
-    public WhatsAppService(ContactAttemptConversationService contactAttemptConversationService) {
-        this.contactAttemptConversationService = contactAttemptConversationService;
+    public WhatsAppService(LeadConversationService leadConversationService) {
+        this.leadConversationService = leadConversationService;
     }
 
     public void sendMessage(String to, String messageText) {
@@ -71,7 +71,7 @@ public class WhatsAppService {
             SendMessageResponse sendMessageResponse = mapper.readValue(rawJson, SendMessageResponse.class);
             String waUserId = sendMessageResponse.getContacts().get(0).getWa_id();
             String messageId = sendMessageResponse.getMessages().get(0).getId();
-            contactAttemptConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
+            leadConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
 
         } catch (Exception e) {
             LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());

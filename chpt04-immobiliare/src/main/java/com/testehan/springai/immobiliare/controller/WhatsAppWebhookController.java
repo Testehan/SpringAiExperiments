@@ -6,8 +6,8 @@ import com.testehan.springai.immobiliare.model.webhook.Change;
 import com.testehan.springai.immobiliare.model.webhook.Entry;
 import com.testehan.springai.immobiliare.model.webhook.Message;
 import com.testehan.springai.immobiliare.model.webhook.WhatsAppWebhookPayload;
-import com.testehan.springai.immobiliare.repository.ContactAttemptConversationRepository;
-import com.testehan.springai.immobiliare.service.ContactAttemptConversationService;
+import com.testehan.springai.immobiliare.repository.LeadConversationRepository;
+import com.testehan.springai.immobiliare.service.LeadConversationService;
 import com.testehan.springai.immobiliare.service.WhatsAppService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,11 @@ public class WhatsAppWebhookController {
     private String PHONE_NUMBER_ID;
 
     private final WhatsAppService whatsAppService;
-    private final ContactAttemptConversationService contactAttemptConversationService;
+    private final LeadConversationService leadConversationService;
 
-    public WhatsAppWebhookController(WhatsAppService whatsAppService, ContactAttemptConversationRepository contactAttemptConversationRepository, ContactAttemptConversationService contactAttemptConversationService) {
+    public WhatsAppWebhookController(WhatsAppService whatsAppService, LeadConversationRepository leadConversationRepository, LeadConversationService leadConversationService) {
         this.whatsAppService = whatsAppService;
-        this.contactAttemptConversationService = contactAttemptConversationService;
+        this.leadConversationService = leadConversationService;
     }
 
     // 1. Webhook verification (GET)
@@ -80,7 +80,7 @@ public class WhatsAppWebhookController {
                                     LOGGER.info("Text from {} : {}",from, body);
 
                                     // TODO: process the message
-                                    contactAttemptConversationService.saveConversationTextMessage(from, message.getId(), body, MessageType.RECEIVED);
+                                    leadConversationService.saveConversationTextMessage(from, message.getId(), body, MessageType.RECEIVED);
 
 
                                     whatsAppService.markMessageAsRead(message.getId(),value.getMetadata().getPhone_number_id());

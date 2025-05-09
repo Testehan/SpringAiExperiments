@@ -1,6 +1,6 @@
 $(document).ready(function(){
 
-    $("#contactAttemptForm").submit(function(event) {
+    $("#leadForm").submit(function(event) {
         handleSubmit(event);
     });
 
@@ -10,7 +10,7 @@ $(document).ready(function(){
         var filterValue = (rawFilterValue && rawFilterValue.trim()) ? rawFilterValue.trim() : null;
         if (filterValue !== null) {
             // Create a hidden link to trigger the CSV download
-            const downloadUrl = `/a/contact-attempts/download?value=${encodeURIComponent(filterValue)}`;
+            const downloadUrl = `/a/leads/download?value=${encodeURIComponent(filterValue)}`;
             const link = $('<a>')
               .attr('href', downloadUrl)
               .attr('download', 'data.csv') // optional: sets a suggested filename
@@ -45,12 +45,12 @@ async function handleSubmit(event){
             }
         }
 
-        var rawContactAttemptId = $("#contactAttemptId").val();
-        var contactAttemptId = (rawContactAttemptId && rawContactAttemptId.trim()) ? rawContactAttemptId.trim() : null;
+        var rawLeadId = $("#leadId").val();
+        var LeadId = (rawLeadId && rawLeadId.trim()) ? rawLeadId.trim() : null;
 
         // Collect the form data into an object
         var formData = {
-            id : contactAttemptId,
+            id : LeadId,
             phoneNumber: $("#phoneNumber").val(),
             listingUrl: $("#listingUrl").val(),
             status: $("#status").val(),
@@ -58,14 +58,14 @@ async function handleSubmit(event){
         };
 
         $.ajax({
-            url: "/a/contact-attempts",
+            url: "/a/leads",
             type: "POST",
             data: JSON.stringify(formData),
             contentType: "application/json",
             success: function (response) {
                 showToast(response, 3000);
 
-                $("#contactAttemptForm")[0].reset();
+                $("#leadForm")[0].reset();
                 // Delay a little so the toast can be seen before the reload
                 setTimeout(function () {
                     location.reload();
@@ -90,10 +90,10 @@ function populateForm(row) {
     $('#phoneNumber').val(phone);
     $('#listingUrl').val(url);
     $('#status').val(status);
-    $('#contactAttemptId').val(id);
+    $('#leadId').val(id);
     $('#createdAt').val(createdAt);
 
-    const formElement = $('#contactAttemptForm').get(0);
+    const formElement = $('#leadForm').get(0);
     if (formElement) { // Check if the element exists before scrolling
         formElement.scrollIntoView({ behavior: 'smooth' });
     }
@@ -101,7 +101,7 @@ function populateForm(row) {
 
 function filterTable() {
     const input = document.getElementById("filterInput").value.toLowerCase();
-    const table = document.getElementById("contactAttemptsTable");
+    const table = document.getElementById("leadsTable");
     const rows = Array.from(table.rows).slice(1);
     rows.forEach(row => {
         const text = row.innerText.toLowerCase();

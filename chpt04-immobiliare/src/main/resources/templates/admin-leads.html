@@ -3,22 +3,22 @@
 
 <head th:replace="~{fragments :: page_head('none')}" />
 
-<script th:src="@{/js/admin_contact_attempt.js}"></script>
+<script th:src="@{/js/admin_lead.js}"></script>
 
 <body class="h-screen bg-gray-100">
 <div class="h-[90%] pt-16">
 
     <main class=" bg-white p-4 w-full max-w-full">
-        <!-- Form for Adding a New ContactAttempt -->
+        <!-- Form for Adding a New Lead -->
 
-        <form id="contactAttemptForm"
-              th:action="@{/a/contact-attempts}"
-              th:object="${newContactAttempt}"
+        <form id="leadForm"
+              th:action="@{/a/leads}"
+              th:object="${newLead}"
               method="post"
               class="flex flex-col space-y-4 p-4 bg-white ">
 
             <!-- Hidden input remains at the top -->
-            <input type="hidden" id="contactAttemptId" th:field="*{id}" />
+            <input type="hidden" id="leadId" th:field="*{id}" />
             <input type="hidden" id="createdAt" th:field="*{createdAt}" />
 
             <!-- Row for all inputs -->
@@ -50,7 +50,7 @@
             <!-- Row for the button -->
             <!-- Optional: Add flex justify-end to push button to the right -->
             <div class="pt-2 flex justify-end">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">Add Contact Attempt</button>
+                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">Add Lead</button>
             </div>
         </form>
 
@@ -66,39 +66,39 @@
 
             <!-- Table of existing entries -->
             <div class="overflow-x-auto">
-                <table id="contactAttemptsTable" class="min-w-full bg-white shadow rounded-2xl">
+                <table id="leadsTable" class="min-w-full bg-white shadow rounded-2xl">
                     <thead class="bg-gray-100">
                     <tr>
                         <th>
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=phoneNumber&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/leads?sortBy=phoneNumber&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Phone Number
                                 <span th:text="${currentSort == 'phoneNumber' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=status&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/leads?sortBy=status&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Status
                                 <span th:text="${currentSort == 'status' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=listingUrl&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/leads?sortBy=listingUrl&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Listing URL
                                 <span th:text="${currentSort == 'listingUrl' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=createdAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/leads?sortBy=createdAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Created At
                                 <span th:text="${currentSort == 'createdAt' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=updatedAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/leads?sortBy=updatedAt&direction=${currentDirection == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Updated At
                                 <span th:text="${currentSort == 'updatedAt' ? (currentDirection == 'asc' ? '▲' : '▼') : ''}"></span>
@@ -107,7 +107,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="attempt : ${contactAttempts}"
+                    <tr th:each="attempt : ${leads}"
                         class="cursor-pointer hover:bg-gray-100"
                         th:data-id="${attempt.id}"
                         th:data-phone="${attempt.phoneNumber}"
@@ -151,21 +151,21 @@
                 <div>
                     <ul class="pagination flex space-x-4">
                         <li th:if="${currentPage > 0}">
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
+                            <a href="#" th:href="@{|/a/leads?sortBy=${currentSort}&direction=${currentDirection}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
                         </li>
                         <li th:if="${currentPage > 0}">
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
+                            <a href="#" th:href="@{|/a/leads?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
                         </li>
                         <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
+                            <a href="#" th:href="@{|/a/leads?sortBy=${currentSort}&direction=${currentDirection}&page=${pageNum}|}"
                                th:text="${pageNum + 1}"></a>
                         </li>
                         <li th:if="${currentPage < totalPages - 1}">
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
+                            <a href="#" th:href="@{|/a/leads?sortBy=${currentSort}&direction=${currentDirection}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
                         </li>
                         <!-- Last button (Only show if currentPage < totalPages - 1) -->
                         <li th:if="${currentPage < totalPages - 1}">
-                            <a href="#" th:href="@{|/a/contact-attempts?sortBy=${currentSort}&direction=${currentDirection}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
+                            <a href="#" th:href="@{|/a/leads?sortBy=${currentSort}&direction=${currentDirection}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
                         </li>
                     </ul>
                 </div>

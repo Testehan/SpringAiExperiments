@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Getter
 @Setter
-@Document(collection = "contact_attempt_conversation")
-public class ContactAttemptConversation {
+@Document(collection = "lead_conversation")
+public class LeadConversation {
 
     private ObjectId id;
 

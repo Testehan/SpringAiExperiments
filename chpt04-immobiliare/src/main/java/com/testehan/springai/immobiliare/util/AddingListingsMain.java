@@ -27,10 +27,12 @@ class ListingImage {
     public String taskLink;
     @JsonProperty("Origin URL")
     public String originUrl;
-    @JsonProperty("ListingImages Limit")
+    @JsonProperty("listingImages Limit")
     public String listingImagesLimit;
     @JsonProperty("Position")
     private Integer position;
+
+
 }
 
 class Listing {
@@ -42,7 +44,7 @@ class Listing {
     public String taskLink;
     @JsonProperty("Origin URL")
     public String originURL;
-    @JsonProperty("ListingImages Limit")
+    @JsonProperty("listingImages Limit")
     public int listingImagesLimit;
     @JsonProperty("Phone")
     public String phone;
@@ -54,7 +56,6 @@ class Listing {
     public String floor;
     public String surface;
     public String fullTitle;
-    @JsonProperty("ListingImages")
     public List<ListingImage> listingImages;
 }
 
@@ -74,8 +75,8 @@ public class AddingListingsMain {
 
             // Create a RestTemplate instance
             RestTemplate restTemplate = new RestTemplate();
-            String endpoint = "https://casamia.ai/api/apartments/batchsave";
-            String sessionId = "29976F3139391114BD3E5E16EB6668E2";
+            String endpoint = "https://www.casamia.ai/api/apartments/batchsave";
+            String sessionId = "68FC138AE03C35F2D96A9E90190B4245";
 
             Root root = objectMapper.readValue(new File("/Users/danteshte/JavaProjects/spring-ai-experiments/chpt04-immobiliare/src/test/resources/temp.json"), Root.class);
             for (Listing listing : root.data) {

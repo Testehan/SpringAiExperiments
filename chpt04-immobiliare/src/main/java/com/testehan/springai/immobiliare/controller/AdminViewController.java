@@ -1,8 +1,8 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.model.ContactAttempt;
-import com.testehan.springai.immobiliare.repository.ContactAttemptRepository;
+import com.testehan.springai.immobiliare.model.Lead;
+import com.testehan.springai.immobiliare.repository.LeadRepository;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequestMapping("/a")
 public class AdminViewController {
 
-    private final ContactAttemptRepository contactAttemptRepository;
+    private final LeadRepository leadRepository;
     private final ConversationSession conversationSession;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AdminViewController(ContactAttemptRepository contactAttemptRepository, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
-        this.contactAttemptRepository = contactAttemptRepository;
+    public AdminViewController(LeadRepository leadRepository, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+        this.leadRepository = leadRepository;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
@@ -43,8 +43,8 @@ public class AdminViewController {
     }
 
 
-    @GetMapping("/contact-attempts")
-    public String getContactAttempts(Model model,
+    @GetMapping("/leads")
+    public String getLeads(Model model,
                                      @RequestParam(defaultValue = "createdAt") String sortBy,
                                      @RequestParam(defaultValue = "desc") String direction,
                                      @RequestParam(defaultValue = "0") int page) {
@@ -56,16 +56,16 @@ public class AdminViewController {
 
             // PageRequest with page number and sorting
             PageRequest pageRequest = PageRequest.of(page, 50, sort);
-            Page<ContactAttempt> attempts = contactAttemptRepository.findAll(pageRequest);
+            Page<Lead> attempts = leadRepository.findAll(pageRequest);
 
-            model.addAttribute("newContactAttempt", new ContactAttempt());
+            model.addAttribute("newLead", new Lead());
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", attempts.getTotalPages());
-            model.addAttribute("contactAttempts", attempts.getContent());
+            model.addAttribute("leads", attempts.getContent());
             model.addAttribute("currentSort", sortBy);
             model.addAttribute("currentDirection", direction);
 
-            return "admin-contact-attempts";
+            return "admin-leads";
         } else {
             model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null, localeUtils.getCurrentLocale()));
             return "error-404";

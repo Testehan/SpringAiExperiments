@@ -7,5 +7,5 @@ public enum ContactStatus {
     DECLINED,
     ALREADY_RENTED,
     ACCEPTED,
-    DONE        // after being accepted, a contact attempt moves to done when the listing was handled/published
+    DONE        // after being accepted, a lead moves to done when the listing was handled/published
 }

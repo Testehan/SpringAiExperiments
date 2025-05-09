@@ -1,8 +1,9 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.testehan.springai.immobiliare.service.WhatsAppService;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
-import com.testehan.springai.immobiliare.model.ContactAttempt;
-import com.testehan.springai.immobiliare.service.ContactAttemptService;
+import com.testehan.springai.immobiliare.model.Lead;
+import com.testehan.springai.immobiliare.service.LeadService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.MessageSource;
@@ -15,36 +16,44 @@ import java.util.Optional;
 @RequestMapping("/a")
 public class AdminRestController {
 
-    private final ContactAttemptService contactAttemptService;
+    private final LeadService leadService;
+    private final WhatsAppService whatsAppService;
     private final ConversationSession conversationSession;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AdminRestController(ContactAttemptService contactAttemptService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
-        this.contactAttemptService = contactAttemptService;
+    public AdminRestController(LeadService leadService, WhatsAppService whatsAppService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+        this.leadService = leadService;
+        this.whatsAppService = whatsAppService;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }
 
-    @PostMapping("/contact-attempts")
-    public ResponseEntity<String> createContactAttempt(@RequestBody ContactAttempt contactAttempt) {
+    @PostMapping("/leads")
+    public ResponseEntity<String> createLead(@RequestBody Lead lead) {
         var user = conversationSession.getImmobiliareUser().get();
         if (user.isAdmin()) {
 
-            Optional<ContactAttempt> contactAttemptOptional = contactAttemptService.findContactAttemptByPhoneNumber(contactAttempt.getPhoneNumber());
+            Optional<Lead> leadOptional = leadService.findLeadByPhoneNumber(lead.getPhoneNumber());
 
-            return contactAttemptService.saveOrUpdate(contactAttempt, contactAttemptOptional);
+            return leadService.saveOrUpdate(lead, leadOptional);
 
         }
 
         return ResponseEntity.ok("ok");
     }
 
-    @GetMapping("/contact-attempts/download")
+    @GetMapping("/leads/download")
     public void downloadCsv(@RequestParam String value, HttpServletResponse response) {
-        contactAttemptService.downloadCsv(value, response);
+        leadService.downloadCsv(value, response);
+    }
+
+    // todo this is for testing purposes
+    @GetMapping("/whatsapp")
+    public void whatsapp() {
+        whatsAppService.sendMessage("+40771734054", "Salut din CasaMia");
     }
 
 }
