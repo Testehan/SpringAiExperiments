@@ -101,13 +101,6 @@
 
 
 
-        <!-- not sure if both of the next 2 dependencies are needed or not. Maybe with the first i would need to
-         create new entries in the DB, and use it to persist embeddings while the second has some helpful features
-         that could help with the search functionalities-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-vector-store-mongodb-atlas</artifactId>
