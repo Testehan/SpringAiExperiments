@@ -10,4 +10,6 @@ public class Value {
     private Metadata metadata;
     private List<Contact> contacts;
     private List<Message> messages;
+
+    private List<Status> statuses;
 }
