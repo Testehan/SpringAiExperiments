@@ -1,5 +1,8 @@
 package com.testehan.springai.immobiliare.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.testehan.springai.immobiliare.model.MessageType;
+import com.testehan.springai.immobiliare.model.wa.response.SendMessageResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +28,12 @@ public class WhatsAppService {
     //todo check to see if your phone number was reviewed in meta dev console
     @Value(("${whatsapp.api.phone.id}"))
     private String PHONE_NUMBER_ID;
+
+    private final ContactAttemptConversationService contactAttemptConversationService;
+
+    public WhatsAppService(ContactAttemptConversationService contactAttemptConversationService) {
+        this.contactAttemptConversationService = contactAttemptConversationService;
+    }
 
     public void sendMessage(String to, String messageText) {
         String url = String.format(WHATSAPP_API_22_MESSAGES, PHONE_NUMBER_ID);
@@ -53,7 +62,20 @@ public class WhatsAppService {
         HttpEntity<String> request = new HttpEntity<>(json, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
 
-        System.out.println("Response: " + response.getBody());
+        String rawJson = response.getBody();
+        System.out.println("Response: " + rawJson);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // Try deserializing to your POJO
+            SendMessageResponse sendMessageResponse = mapper.readValue(rawJson, SendMessageResponse.class);
+            String waUserId = sendMessageResponse.getContacts().get(0).getWa_id();
+            String messageId = sendMessageResponse.getMessages().get(0).getId();
+            contactAttemptConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
+
+        } catch (Exception e) {
+            LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());
+        }
     }
 
     public void markMessageAsRead(String messageId, String phoneNumberId) {
