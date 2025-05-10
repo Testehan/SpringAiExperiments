@@ -48,7 +48,7 @@ public class ApiController {
                 .user(prompt.getContents())
                 .call().chatResponse();
 
-        RestCall restCall = outputParser.parse(assistantResponse.getResult().getOutput().getContent());
+        RestCall restCall = outputParser.convert(assistantResponse.getResult().getOutput().getText());
         return restCall;
     }
 

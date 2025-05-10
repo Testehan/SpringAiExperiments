@@ -5,6 +5,7 @@ import com.testehan.springai.immobiliare.model.ContactStatus;
 import com.testehan.springai.immobiliare.repository.LeadRepository;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
@@ -42,6 +43,10 @@ public class LeadService {
 
         return leadRepository.findByPhoneNumber(phoneNumber);
 
+    }
+
+    public Optional<Lead> findLeadById(String leadId){
+        return leadRepository.findById(new ObjectId(leadId));
     }
 
     public void updateLeadStatus(String phoneNumber){
@@ -92,5 +97,9 @@ public class LeadService {
         } catch (IOException e) {
             LOGGER.error("Could not generatethe CSV. {}",e.getMessage());
         }
+    }
+
+    public void deleteLeadById(String leadId) {
+        leadRepository.deleteById(new ObjectId(leadId));
     }
 }
