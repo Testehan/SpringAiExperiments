@@ -53,7 +53,7 @@ public class AdminRestController {
     // todo this is for testing purposes
     @GetMapping("/whatsapp")
     public void whatsapp() {
-        whatsAppService.sendMessage("+40771734054", "Salut din CasaMia");
+        // call whatsAppService.sendMessage
     }
 
 }

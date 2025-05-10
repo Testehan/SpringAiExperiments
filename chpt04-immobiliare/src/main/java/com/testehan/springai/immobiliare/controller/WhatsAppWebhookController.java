@@ -65,12 +65,6 @@ public class WhatsAppWebhookController {
                     for (Change change : entry.getChanges()) {
                         com.testehan.springai.immobiliare.model.webhook.Value value = change.getValue();
 
-                        // Skip messages sent by your app (they'll have the same number as in metadata)
-                        if (PHONE_NUMBER_ID.equals(value.getMetadata().getPhone_number_id())) {
-                            LOGGER.info("Ignoring message sent by our app");
-                            continue;
-                        }
-
                         if (value.getMessages() != null) {
                             for (Message message : value.getMessages()) {
 
@@ -78,6 +72,12 @@ public class WhatsAppWebhookController {
                                     String body = message.getText().getBody();
                                     String from = message.getFrom();
                                     LOGGER.info("Text from {} : {}",from, body);
+
+                                    // Skip messages sent by your app (they'll have the same number as in metadata)
+                                    if (from.equals(value.getMetadata().getPhone_number_id())) {
+                                        LOGGER.info("Ignoring message sent by our app");
+                                        continue;
+                                    }
 
                                     // TODO: process the message
                                     leadConversationService.saveConversationTextMessage(from, message.getId(), body, MessageType.RECEIVED);
