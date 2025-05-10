@@ -92,36 +92,34 @@ public class EmailService {
 
     public Optional<String> sendAdminReactivateListingEmail(List<String> reactivateListingUrl, List<String> contacts, Locale locale) {
 
-        if (reactivateListingUrl.size() > 0 && contacts.size() > 0) {
-
-            var tableRows = buildHtmlTableRows(contacts, reactivateListingUrl);
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, String> data = new HashMap<>();
-            data.put("tableOfPhonesAndUrls", tableRows);
-            String templateData = "";
-            try {
-                // Use ObjectMapper to escape it as a JSON string
-                templateData = mapper.writeValueAsString(data);
-            } catch (Exception e) {
-                LOGGER.error("Failed to escape HTML table for JSON", e);
-            }
-
-            SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
-                    .source("CasaMia.ai" + " " + "<admin@casamia.ai>") // Replace with a verified email
-                    .destination(Destination.builder()
-                            .toAddresses("tdan89@yahoo.com")
-                            .build())
-                    .template(getAdminReactivateListingEmailTemplate(locale)) // Template name
-                    .templateData(templateData)
-                    .build();
-
-            var response = sesClient.sendTemplatedEmail(request);
-
-            var messageId = response.messageId();
-            if (StringUtils.hasText(messageId)) {
-                return Optional.of(messageId);
-            }
+        var tableRows = buildHtmlTableRows(contacts, reactivateListingUrl);
+        ObjectMapper mapper = new ObjectMapper();
+        Map<String, String> data = new HashMap<>();
+        data.put("tableOfPhonesAndUrls", tableRows);
+        String templateData = "";
+        try {
+            // Use ObjectMapper to escape it as a JSON string
+            templateData = mapper.writeValueAsString(data);
+        } catch (Exception e) {
+            LOGGER.error("Failed to escape HTML table for JSON", e);
         }
+
+        SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
+                .source("CasaMia.ai" + " " + "<admin@casamia.ai>") // Replace with a verified email
+                .destination(Destination.builder()
+                        .toAddresses("tdan89@yahoo.com")
+                        .build())
+                .template(getAdminReactivateListingEmailTemplate(locale)) // Template name
+                .templateData(templateData)
+                .build();
+
+        var response = sesClient.sendTemplatedEmail(request);
+
+        var messageId = response.messageId();
+        if (StringUtils.hasText(messageId)) {
+            return Optional.of(messageId);
+        }
+
         return Optional.empty();
     }
 

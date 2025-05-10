@@ -132,7 +132,11 @@ public class ScheduledTasks {
             apartmentCrudService.saveApartment(listing);
         }
 
-        emailService.sendAdminReactivateListingEmail(urls,contacts,localeUtils.getCurrentLocale());
+        if (urls.size() > 0 && contacts.size() > 0) {
+            emailService.sendAdminReactivateListingEmail(urls, contacts, localeUtils.getCurrentLocale());
+        } else {
+            LOGGER.info("Scheduled Task - sendReactivationEmail - no listings that need reactivation were found so no email will be sent");
+        }
 
     }
 
