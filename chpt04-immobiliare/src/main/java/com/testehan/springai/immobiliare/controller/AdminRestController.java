@@ -7,6 +7,7 @@ import com.testehan.springai.immobiliare.service.LeadService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -48,6 +49,19 @@ public class AdminRestController {
     @GetMapping("/leads/download")
     public void downloadCsv(@RequestParam String value, HttpServletResponse response) {
         leadService.downloadCsv(value, response);
+    }
+
+    @PostMapping("/leads/delete/{leadId}")
+    public ResponseEntity<String> deleteLead(@PathVariable(value = "leadId") String leadId) {
+
+        var lead = leadService.findLeadById(leadId);
+        if (lead.isPresent()) {
+            leadService.deleteLeadById(leadId);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(messageSource.getMessage("toastify.delete.listing.failure.notowner", null,localeUtils.getCurrentLocale()));
+        }
+        return ResponseEntity.ok(messageSource.getMessage("toastify.delete.listing.success", null,localeUtils.getCurrentLocale()));
     }
 
     // todo this is for testing purposes

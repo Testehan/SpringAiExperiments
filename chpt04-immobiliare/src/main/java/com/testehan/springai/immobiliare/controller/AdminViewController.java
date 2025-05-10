@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.repository.LeadRepository;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequestMapping("/a")
 public class AdminViewController {
+
+    @Value("${app.url}")
+    private String appUrl;
 
     private final LeadRepository leadRepository;
     private final ConversationSession conversationSession;
@@ -58,6 +62,7 @@ public class AdminViewController {
             PageRequest pageRequest = PageRequest.of(page, 50, sort);
             Page<Lead> attempts = leadRepository.findAll(pageRequest);
 
+            model.addAttribute("appUrl", appUrl);
             model.addAttribute("newLead", new Lead());
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", attempts.getTotalPages());
