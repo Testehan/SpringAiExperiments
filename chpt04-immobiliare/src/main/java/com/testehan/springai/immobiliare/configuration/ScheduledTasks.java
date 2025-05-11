@@ -92,53 +92,73 @@ public class ScheduledTasks {
         if (appConfigurationsService.isSendReactivationEmailEnabled()) {
             LOGGER.info("Scheduled Task - Reactivation emails will be send to owners.");
 
+            var adminEmails = userService.getAdminUsersEmail();
+
             var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
 
             for (Apartment listing : listings) {
-                LOGGER.info(listing.getLastUpdateDateTime() + "       " + listing.getName());
                 var contact = listing.getContactEmail();
-                var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
 
-                if (ContactValidator.isValidEmail(contact)) {
+                if (!adminEmails.contains(contact) && ContactValidator.isValidEmail(contact)) {
+                    var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
                     var messageId = emailService.sendReactivateListingEmail(contact, "", listing.getName(), reactivateLink, localeUtils.getCurrentLocale());
 
-                    if (messageId.isPresent()){
+                    if (messageId.isPresent()) {
                         listing.setReactivateMessageId("EMAIL-" + messageId.get());
                         apartmentCrudService.saveApartment(listing);
                     } else {
                         LOGGER.error("Failed to send EMAIL for reactivation of listing {} to email {} ", listing.getName(), contact);
                     }
                 }
-
             }
         } else {
             LOGGER.info("Scheduled Task - sendReactivationEmail is disabled");
         }
 
-        List<String> contacts = new ArrayList<>();
-        List<String> urls = new ArrayList<>();
+    }
+
+    @Scheduled(cron = "0 0 6 * * ?")        // Code to run at 6 AM every day
+//    @Scheduled(cron = "0 0/2 * * * ?")          // runs every 3 mins for testing purposes
+    public void sendAdminReactivationEmail() {
+        LocalDateTime twelveDaysAgo = LocalDateTime.now().minus(12, ChronoUnit.DAYS);
+
         var listings = apartmentCrudService.findByLastUpdateDateTimeBefore(twelveDaysAgo);
-        for (Apartment listing : listings){
-            var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
-            urls.add(reactivateLink);
-            var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(listing.getContact(), "RO");
-            if (phoneWithPrefix.isPresent()){
-                contacts.add(phoneWithPrefix.get());
-            } else{
-                contacts.add(listing.getContact());
+
+        if (listings.size() > 0) {
+            var adminEmails = userService.getAdminUsersEmail();
+
+            for (String adminEmail : adminEmails){
+                List<String> contacts = new ArrayList<>();
+                List<String> urls = new ArrayList<>();
+
+                for (Apartment listing : listings) {
+                    if (adminEmail.equalsIgnoreCase(listing.getContactEmail())) {
+                        var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
+                        urls.add(reactivateLink);
+                        var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(listing.getContact(), "RO");
+                        if (phoneWithPrefix.isPresent()) {
+                            contacts.add(phoneWithPrefix.get());
+                        } else {
+                            contacts.add(listing.getContact());
+                        }
+
+                        listing.setReactivateMessageId("EMAIL-admin");
+                        apartmentCrudService.saveApartment(listing);
+                    }
+                }
+
+                if (urls.size() > 0 && contacts.size() > 0) {
+                    emailService.sendAdminReactivateListingEmail(adminEmail, urls, contacts, localeUtils.getCurrentLocale());
+                } else {
+                    LOGGER.info("Scheduled Task - sendReactivationEmail - no listings that need reactivation were found so no email will be sent");
+                }
             }
 
-            listing.setReactivateMessageId("EMAIL-admin");
-            apartmentCrudService.saveApartment(listing);
-        }
-
-        if (urls.size() > 0 && contacts.size() > 0) {
-            emailService.sendAdminReactivateListingEmail(urls, contacts, localeUtils.getCurrentLocale());
         } else {
             LOGGER.info("Scheduled Task - sendReactivationEmail - no listings that need reactivation were found so no email will be sent");
         }
-
     }
+
 
     @Scheduled(cron = "0 0 8 * * ?")        // Code to run at 8 AM every day
 //    @Scheduled(cron = "0 0/3 * * * ?")          // runs every 3 mins for testing purposes

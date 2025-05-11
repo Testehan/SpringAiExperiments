@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -77,6 +79,11 @@ public class UserService {
 
     public Optional<ImmobiliareUser> getImmobiliareUserByInviteUuid(String inviteUuid){
         return immobiliareUserRepository.findUserByInviteUuid(inviteUuid);
+    }
+
+    public List<String> getAdminUsersEmail(){
+        var adminUsers = immobiliareUserRepository.findAdminUsers();
+        return adminUsers.stream().map(ImmobiliareUser::getEmail).collect(Collectors.toList());
     }
 
     public void resetSearchesAvailable(){
