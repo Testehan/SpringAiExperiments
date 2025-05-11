@@ -90,7 +90,7 @@ public class EmailService {
         }
     }
 
-    public Optional<String> sendAdminReactivateListingEmail(List<String> reactivateListingUrl, List<String> contacts, Locale locale) {
+    public Optional<String> sendAdminReactivateListingEmail(String adminEmail, List<String> reactivateListingUrl, List<String> contacts, Locale locale) {
 
         var tableRows = buildHtmlTableRows(contacts, reactivateListingUrl);
         ObjectMapper mapper = new ObjectMapper();
@@ -107,7 +107,7 @@ public class EmailService {
         SendTemplatedEmailRequest request = SendTemplatedEmailRequest.builder()
                 .source("CasaMia.ai" + " " + "<admin@casamia.ai>") // Replace with a verified email
                 .destination(Destination.builder()
-                        .toAddresses("tdan89@yahoo.com")
+                        .toAddresses(adminEmail)
                         .build())
                 .template(getAdminReactivateListingEmailTemplate(locale)) // Template name
                 .templateData(templateData)
@@ -183,6 +183,9 @@ public class EmailService {
             String url = urls.get(i);
 
             sb.append("<tr>")
+                    .append("<td style=\"border: 1px solid #ccc;\">")
+                    .append(i+1)
+                    .append("</td>")
                     .append("<td style=\"border: 1px solid #ccc;\"><a href=\"https://wa.me/")
                     .append(phone.replace("+",""))
                     .append("\" target=\"_blank\">")
