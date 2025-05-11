@@ -36,7 +36,7 @@ public class AdminRestController {
     public ResponseEntity<String> createLead(@RequestBody Lead lead) {
         var user = conversationSession.getImmobiliareUser().get();
         if (user.isAdmin()) {
-
+            lead.setPhoneNumber(lead.getPhoneNumber().replace(" ", ""));
             Optional<Lead> leadOptional = leadService.findLeadByPhoneNumber(lead.getPhoneNumber());
 
             return leadService.saveOrUpdate(lead, leadOptional);
