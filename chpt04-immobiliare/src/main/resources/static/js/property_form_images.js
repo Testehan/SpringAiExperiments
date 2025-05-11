@@ -75,6 +75,10 @@ async function handleSubmit(event){
                     }
                 }).showToast();
 
+                setTimeout(function() {
+                    window.location.href = "/add";
+                }, 10000); // 3000 milliseconds = 3 seconds
+
                 $("#addForm")[0].reset();
                 imagesCount = 0;
                 $("#apartmentImages").empty();

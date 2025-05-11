@@ -30,7 +30,7 @@ $(document).ready(function(){
             }).showToast();
 
             setTimeout(function() {
-                window.location.href = "add";
+                window.location.href = "/add";
               }, 3000); // 3000 milliseconds = 3 seconds
           },
           error: function (xhr, status, error) {
