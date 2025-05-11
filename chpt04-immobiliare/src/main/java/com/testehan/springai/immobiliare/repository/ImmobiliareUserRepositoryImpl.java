@@ -81,9 +81,19 @@ public class ImmobiliareUserRepositoryImpl implements ImmobiliareUserRepository{
         }
     }
 
+    @Override
+    public List<ImmobiliareUser> findAdminUsers() {
+        return findUsersByField("isAdmin","true");
+    }
+
     private Optional<ImmobiliareUser> findUserByField(String fieldName, String fieldValue) {
         Query query = new Query(Criteria.where(fieldName).is(fieldValue));
         return Optional.ofNullable(mongoTemplate.findOne(query, ImmobiliareUser.class));
+    }
+
+    private List<ImmobiliareUser> findUsersByField(String fieldName, String fieldValue) {
+        Query query = new Query(Criteria.where(fieldName).is(fieldValue));
+        return mongoTemplate.find(query, ImmobiliareUser.class);
     }
 
     private Query createIdQuery(ObjectId id) {

@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.model.auth.AuthenticationType;
 import com.testehan.springai.immobiliare.model.auth.ImmobiliareUser;
 import org.bson.types.ObjectId;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ImmobiliareUserRepository {
@@ -20,4 +21,6 @@ public interface ImmobiliareUserRepository {
     void deleteById(final ObjectId id);
 
     void resetSearchesAvailable();
+
+    List<ImmobiliareUser> findAdminUsers();
 }
