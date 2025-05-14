@@ -122,6 +122,9 @@ public class ApartmentService {
         listingImageService.deleteUploadedImages(apartment);
         apartmentCrudService.deleteApartmentsByIds(List.of(listingId));
         user.getListedProperties().remove(listingId);
+        if (!user.isAdmin()) {
+            user.setMaxNumberOfListedProperties(1);
+        }
         userService.updateUser(user);
         llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
     }
