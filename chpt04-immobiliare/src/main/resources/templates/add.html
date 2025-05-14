@@ -8,6 +8,8 @@
 
 <script th:src="@{/js/property_form_images.js}"></script>
 <script th:src="@{/js/property_deletion.js}"></script>
+<script th:src="@{/js/property_general.js}"></script>
+
 <script type="text/javascript">
     MAX_FILE_SIZE=5000000       //5 MB
 
@@ -220,7 +222,8 @@
             </div>
 
         </div>
-        <div class="w-1/5 md:w-1/4 p-2 ">
+
+        <div class="w-1/5 md:w-1/4 p-2 " th:if="${not #lists.isEmpty(listOfProperties)}">
             <div class="p-2 bg-white rounded-lg shadow-md">
                 <span class="block text-gray-700 font-bold mb-2" th:text="#{add.title.properties}" />
                 <ol class="list-decimal list-inside">
@@ -230,7 +233,11 @@
                 </ol>
             </div>
 
+            <div class="p-2 bg-white rounded-lg shadow-md mt-4">
+                <div th:replace="~{fragments :: listing_share}"></div>
+            </div>
         </div>
+
     </main>
 </div>
 
