@@ -387,9 +387,11 @@ public class MainViewController {
 		List<Apartment> listOfProperties;
 		if (user.isAdmin()){
 			listOfProperties = apartmentCrudService.findAll();
-		} else{
+		} else {
 			listOfProperties = apartmentCrudService.findApartmentsByIds(user.getListedProperties());
 		}
-		return listOfProperties;
+		return listOfProperties.stream()
+				.sorted(Comparator.comparing(Apartment::isActive).reversed())
+				.collect(Collectors.toList());
 	}
 }
