@@ -13,6 +13,8 @@ import com.testehan.springai.immobiliare.service.UserSseService;
 import com.testehan.springai.immobiliare.util.ListingUtil;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 
 @Controller
 public class MainViewController {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(MainViewController.class);
 
 	@Value("${app.url}")
 	private String appUrl;
@@ -147,29 +151,41 @@ public class MainViewController {
 	@GetMapping("/add")
 	public String add(Model model, Locale locale) {
 
-		var apartment = new Apartment();
-		model.addAttribute("listCities",cityService.getEnabledCityNames());
-		model.addAttribute("listPropertyTypes",List.of(messageSource.getMessage("rent", null,locale) ));   //"sale"
-		model.addAttribute("apartment", apartment);
-		model.addAttribute("numberOfExistingImages", 0);
-		var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
-		var deleteButtonMessage = messageSource.getMessage("add.a.deleteimage", null, locale);
-		var imageNoLabel = messageSource.getMessage("add.label.imagenumber", null, locale);
-		model.addAttribute("buttonMessage", buttonMessage);
-		model.addAttribute("deleteButtonMessage", deleteButtonMessage);
-		model.addAttribute("imageNoLabel", imageNoLabel);
-		model.addAttribute("appUrl", appUrl);
-
 		var user = conversationSession.getImmobiliareUser().get();
 		List<Apartment> listOfProperties = getListOfProperties(user);
-		model.addAttribute("listOfProperties", listOfProperties);
+		if (user.isAdmin() || listOfProperties.size() == 0) {
 
-		apartment.setOwnerName(user.getName());
-		if (Objects.nonNull(user.getPhoneNumber()) && !user.getPhoneNumber().isEmpty()){
-			apartment.setContact(user.getPhoneNumber());		// default contact is the phone number of the user
+			var apartment = new Apartment();
+			model.addAttribute("listCities", cityService.getEnabledCityNames());
+			model.addAttribute("listPropertyTypes", List.of(messageSource.getMessage("rent", null, locale)));   //"sale"
+			model.addAttribute("apartment", apartment);
+			model.addAttribute("numberOfExistingImages", 0);
+			var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
+			var deleteButtonMessage = messageSource.getMessage("add.a.deleteimage", null, locale);
+			var imageNoLabel = messageSource.getMessage("add.label.imagenumber", null, locale);
+			model.addAttribute("buttonMessage", buttonMessage);
+			model.addAttribute("deleteButtonMessage", deleteButtonMessage);
+			model.addAttribute("imageNoLabel", imageNoLabel);
+			model.addAttribute("appUrl", appUrl);
+
+			model.addAttribute("listOfProperties", listOfProperties);
+
+			apartment.setOwnerName(user.getName());
+			if (Objects.nonNull(user.getPhoneNumber()) && !user.getPhoneNumber().isEmpty()) {
+				apartment.setContact(user.getPhoneNumber());        // default contact is the phone number of the user
+			}
+
+			return "add";
+		} else {
+			if (listOfProperties.size() == 1){
+				var listing = listOfProperties.stream().findFirst().get();
+				return "redirect:/edit/" + listing.getIdString();
+			}
 		}
 
-		return "add";
+		LOGGER.error("User {} is not admin and has more than 1 property listed",user.getEmail());
+		model.addAttribute("errorMessage", messageSource.getMessage("error.unknown",null, localeUtils.getCurrentLocale()));
+		return "error";
 	}
 
 	@GetMapping("/edit/{apartmentId}")
