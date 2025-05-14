@@ -233,7 +233,7 @@
                 </ol>
             </div>
 
-            <div class="p-2 bg-white rounded-lg shadow-md mt-4">
+            <div th:if="${apartment.id != null}" class="p-2 bg-white rounded-lg shadow-md mt-4">
                 <div th:replace="~{fragments :: listing_share}"></div>
             </div>
         </div>
