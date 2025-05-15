@@ -46,9 +46,14 @@ public class AdminRestController {
         return ResponseEntity.ok("ok");
     }
 
-    @GetMapping("/leads/download")
-    public void downloadCsv(@RequestParam String value, HttpServletResponse response) {
-        leadService.downloadCsv(value, response);
+    @GetMapping("/leads/download-url")
+    public void downloadCsvContainingLeadURLs(@RequestParam String value, HttpServletResponse response) {
+        leadService.downloadCsvContainingLeadURLs(value, response);
+    }
+
+    @GetMapping("/leads/download-phone")
+    public void downloadCsvContaining(@RequestParam String value, HttpServletResponse response) {
+        leadService.downloadCsvContainingLeadPhones(value, response);
     }
 
     @PostMapping("/leads/delete/{leadId}")

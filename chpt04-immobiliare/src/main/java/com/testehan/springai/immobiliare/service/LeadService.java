@@ -79,7 +79,7 @@ public class LeadService {
         return ResponseEntity.ok("ok");
     }
 
-    public void downloadCsv(String filter, HttpServletResponse response){
+    public void downloadCsvContainingLeadURLs(String filter, HttpServletResponse response){
         // we want the accepted contacts + ones from a particular url
         var leads = leadRepository.findByListingUrlContainingAndStatus(filter, String.valueOf(ContactStatus.ACCEPTED));
 
@@ -95,9 +95,30 @@ public class LeadService {
                 writer.println("\"" + lead.getListingUrl() + "\", 10");
             }
         } catch (IOException e) {
-            LOGGER.error("Could not generatethe CSV. {}",e.getMessage());
+            LOGGER.error("Could not generate the CSV. {}",e.getMessage());
         }
     }
+
+    public void downloadCsvContainingLeadPhones(String filter, HttpServletResponse response){
+        // we want the accepted contacts + ones from a particular url
+        var leads = leadRepository.findByListingUrlContainingAndStatus(filter, String.valueOf(ContactStatus.NOT_CONTACTED));
+
+        // Set headers for file download
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"data.csv\"");
+
+        // Write CSV to response
+        try (PrintWriter writer = response.getWriter()) {
+            writer.println("Lead phone");// headers
+
+            for (Lead lead : leads){
+                writer.println(lead.getPhoneNumber());
+            }
+        } catch (IOException e) {
+            LOGGER.error("Could not generate the CSV. {}",e.getMessage());
+        }
+    }
+
 
     public void deleteLeadById(String leadId) {
         leadRepository.deleteById(new ObjectId(leadId));
