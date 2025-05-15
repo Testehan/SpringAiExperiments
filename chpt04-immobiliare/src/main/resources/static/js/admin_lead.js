@@ -4,16 +4,16 @@ $(document).ready(function(){
         handleSubmit(event);
     });
 
-    $('#downloadBtn').on('click', function () {
+    $('#downloadUrlBtn').on('click', function () {
         const rawFilterValue = $('#filterInput').val();
 
         var filterValue = (rawFilterValue && rawFilterValue.trim()) ? rawFilterValue.trim() : null;
         if (filterValue !== null) {
             // Create a hidden link to trigger the CSV download
-            const downloadUrl = `/a/leads/download?value=${encodeURIComponent(filterValue)}`;
+            const downloadUrl = `/a/leads/download-url?value=${encodeURIComponent(filterValue)}`;
             const link = $('<a>')
               .attr('href', downloadUrl)
-              .attr('download', 'data.csv') // optional: sets a suggested filename
+              .attr('download', 'data.csv')
               .appendTo('body');
 
             link[0].click();
@@ -22,6 +22,25 @@ $(document).ready(function(){
              showToast("You must filter by URL to download", 3000, "error");
         }
     });
+
+    $('#downloadPhoneBtn').on('click', function () {
+            const rawFilterValue = $('#filterInput').val();
+
+            var filterValue = (rawFilterValue && rawFilterValue.trim()) ? rawFilterValue.trim() : null;
+            if (filterValue !== null) {
+                // Create a hidden link to trigger the CSV download
+                const downloadUrl = `/a/leads/download-phone?value=${encodeURIComponent(filterValue)}`;
+                const link = $('<a>')
+                  .attr('href', downloadUrl)
+                  .attr('download', 'data.csv')
+                  .appendTo('body');
+
+                link[0].click();
+                link.remove();
+            } else {
+                 showToast("You must filter by URL to download", 3000, "error");
+            }
+        });
 
 })
 

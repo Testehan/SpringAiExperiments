@@ -60,11 +60,18 @@
             </div>
         </form>
 
+        <div class="flex flex-row space-x-4 p-4">
+            <div class="mb-4 mt-4">
+                <button id="downloadUrlBtn" class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">Download URLS CSV</button>
+            </div>
+
+            <div class="mb-4 mt-4">
+                <button id="downloadPhoneBtn" class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">Download Phone CSV</button>
+            </div>
+        </div>
+
         <div class="p-4">
             <!-- Filter input -->
-            <div class="mb-4 mt-4">
-                <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">Download CSV</button>
-            </div>
 
             <div class="mb-4 mt-4">
                 <input id="filterInput" type="text" placeholder="Filter by phone or URL..." class="w-full p-2 border rounded-xl" onkeyup="filterTable()">
