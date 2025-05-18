@@ -70,12 +70,34 @@
             </div>
         </div>
 
-        <div class="p-4">
-            <!-- Filter input -->
-            <div class="mb-4">
-                <input id="filterInput" type="text" placeholder="Filter by phone or URL..." class="w-full p-2 border rounded-xl" onkeyup="filterTable()">
-            </div>
+        <!-- Filter input -->
+        <div class="mb-4">
+            <form id="leadSearchForm" method="get" action="/a/leads" class="flex items-center bg-white p-4 rounded-xl shadow-sm space-x-4">
+                <!-- Input field that takes up most of the space -->
+                <input type="text" id="searchInput" name="searchText" th:value="${searchText ?: ''}"
+                       placeholder="Filter by phone or URL..."
+                       class="flex-grow p-2 border rounded-xl w-full" />
 
+                <!-- Hidden fields -->
+                <input type="hidden" name="sortBy" th:value="${currentSort ?: 'createdAt'}" />
+                <input type="hidden" name="direction" th:value="${currentDirection ?: 'desc'}" />
+                <input type="hidden" name="page" th:value="${currentPage ?: 0}" />
+
+                <!-- Search button -->
+                <button type="submit"
+                        class="bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition whitespace-nowrap">
+                    Search
+                </button>
+                <button type="button"
+                        id="clearButton"
+                        class="bg-gray-300 text-gray-800 px-4 py-2 rounded-xl hover:bg-gray-400 transition whitespace-nowrap">
+                    Clear
+                </button>
+            </form>
+        </div>
+
+
+        <div class="p-4">
             <!-- Table of existing entries -->
             <div class="overflow-x-auto">
                 <table id="leadsTable" class="min-w-full bg-white shadow rounded-2xl">

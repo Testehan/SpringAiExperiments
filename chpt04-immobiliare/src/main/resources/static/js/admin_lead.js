@@ -42,6 +42,13 @@ $(document).ready(function(){
             }
         });
 
+
+    $('#clearButton').on('click', function () {
+      $('#searchInput').val('');
+      $('#leadSearchForm').submit();
+    });
+
+
 })
 
 async function handleSubmit(event){
@@ -116,16 +123,6 @@ function populateForm(row) {
     if (formElement) { // Check if the element exists before scrolling
         formElement.scrollIntoView({ behavior: 'smooth' });
     }
-}
-
-function filterTable() {
-    const input = document.getElementById("filterInput").value.toLowerCase();
-    const table = document.getElementById("leadsTable");
-    const rows = Array.from(table.rows).slice(1);
-    rows.forEach(row => {
-        const text = row.innerText.toLowerCase();
-        row.style.display = text.includes(input) ? "" : "none";
-    });
 }
 
 function showToast(message, durationMillis, type = "info") {
