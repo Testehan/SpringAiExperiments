@@ -26,11 +26,11 @@ public class WhatsAppLeadAutomation {
     public static void main(String[] args) throws InterruptedException, IOException {
 
         List<String> phoneNumbers = readLeadPhones();
-//        sendFirstMessagesToLeads(phoneNumbers);
+        sendFirstMessagesToLeads(phoneNumbers);
 
 //        readChatConversationsForPhoneNumbers(phoneNumbers);
 
-        selenium_openChatWithUnreadMessages();
+//        selenium_openChatWithUnreadMessages();
     }
 
     public static void readChatConversationsForPhoneNumbers(List<String> phoneNumbers) throws InterruptedException {
@@ -157,11 +157,27 @@ public class WhatsAppLeadAutomation {
 
     private static void sendFirstMessagesToLeads(List<String> phoneNumbers) throws InterruptedException {
 
+//        List<String> messages = new ArrayList<>(List.of(
+//                "Buna! Am vazut anuntul ... voiam sa te intrebam daca e inca valabil ?",
+//                "Buna ziua! Anuntul legat de proprietatea de inchiriat e inca valabil ?",
+//                "Buna! Am vazut anuntul dvs..Voiam sa știu daca se mai poate inchiria.",
+//                "Buna! Anuntul de inchiriat e inca de actualitate?"
+//        ));
         List<String> messages = new ArrayList<>(List.of(
-                "Buna! Am vazut anuntul ... voiam sa te intrebam daca e inca valabil ?",
-                "Buna ziua! Anuntul legat de proprietatea de inchiriat e inca valabil ?",
-                "Buna! Am vazut anuntul dvs..Voiam sa știu daca se mai poate inchiria.",
-                "Buna! Anuntul de inchiriat e inca de actualitate?"
+                "Buna! Am vazut anuntul tau cu proprietatea si voiam sa te intrebam daca ai fi de acord sa-l adaugam (GRATUIT) si pe o platforma noua de cautare de chirii pe care o dezvoltam. \n Se numeste www.casamia.ai si vrem sa ajutam oamenii sa gaseasca chirii mai usor. \n E complet gratuit, doar mai multa vizibilitate pentru apartamentul tau. \n Esti de acord cu asta?",
+                "Bună! Am văzut anunțul tău cu apartamentul și voiam să te întreb dacă ai fi ok să îl adăugăm și pe o platformă nouă de închirieri — gratuit.\n" +
+                        "Se numește www.casamia.ai și vrem să ajutăm lumea să găsească chirii mai ușor.\n" +
+                        "Doar mai multă vizibilitate pentru tine, fără niciun cost. Ce zici?",
+                "Salut! Îți scriem legat de anunțul cu apartamentul. Noi lucrăm la o platformă nouă de închirieri, casamia.ai, și am vrea să-l includem acolo, gratuit.\n" +
+                        "Scopul e să ajutăm chiriașii să găsească mai ușor oferte.\n" +
+                        "Poți avea mai multă vizibilitate fără niciun cost. Te-ar interesa?",
+                "Bună! Am descoperit anunțul tău și voiam să te întreb dacă ai fi deschis(ă) să îl publicăm și pe www.casamia.ai, o platformă nouă pentru închirieri.\n" +
+                        "E complet gratuit – ne dorim doar să creștem vizibilitatea proprietăților disponibile.\n" +
+                        "Te-ar interesa?",
+                "Salut! Am dat de anunțul tău și ne-a plăcut cum e prezentat. Lucrăm la un site nou de chirii – casamia.ai – și oferim listări gratuite.\n" +
+                        "Ai fi de acord să adăugăm și apartamentul tău? E doar pentru expunere în plus. Mulțumim!",
+                "Bună ziua! Îți scriem legat de apartamentul pe care îl ai listat. Noi construim un nou site de chirii (casamia.ai) și oferim listări gratuite proprietarilor.\n" +
+                        "Ne-ar plăcea să includem și oferta ta – complet gratuit, fără obligații. Ce părere ai?"
         ));
 
         ChromeOptions options = getChromeOptions();
