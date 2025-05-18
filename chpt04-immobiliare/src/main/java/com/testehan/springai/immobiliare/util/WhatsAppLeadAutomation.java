@@ -28,10 +28,12 @@ public class WhatsAppLeadAutomation {
         List<String> phoneNumbers = readLeadPhones();
 //        sendFirstMessagesToLeads(phoneNumbers);
 
-        readConversationMessage(phoneNumbers);
+//        readChatConversationsForPhoneNumbers(phoneNumbers);
+
+        selenium_openChatWithUnreadMessages();
     }
 
-    public static void readConversationMessage(List<String> phoneNumbers) throws InterruptedException {
+    public static void readChatConversationsForPhoneNumbers(List<String> phoneNumbers) throws InterruptedException {
         ChromeOptions options = getChromeOptions();
 
         WebDriver driver = new ChromeDriver(options);
@@ -44,68 +46,113 @@ public class WhatsAppLeadAutomation {
 
         for (String number : phoneNumbers) {
 
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
+            selenium_openChatBySearchingForNumber(number, driver);
 
-            try {
-                // Click on the search bar
-                WebElement searchBox = wait.until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("//div[@role='textbox']")
-                ));
-                searchBox.click();
+            selenium_printChatConversation(driver);
+        }
+    }
 
-                // clean searchbox
-                searchBox.sendKeys(Keys.COMMAND + "a");  // Select all text
-                searchBox.sendKeys(Keys.DELETE);         // Delete it
+    private static void selenium_printChatConversation(WebDriver driver) {
+        // Get all message bubbles
+        List<WebElement> allMessages = driver.findElements(By.xpath("//div[@role='row']"));
 
-                // Type phone number
-                searchBox.sendKeys(number);
-                Thread.sleep(2000); // Give time for search results to load
+        for (int i = 0; i < allMessages.size(); i++) {
+            WebElement msg = allMessages.get(i);
 
-                // Click on the chat result
-                WebElement chatResult = wait.until(ExpectedConditions.elementToBeClickable(
-                        By.xpath("//div[@aria-label='Search results.'][@role='grid']//div[@tabindex='-1'][1]")
-                ));
-                chatResult.click();
+            List<WebElement> messageInDivs = msg.findElements(By.className("message-in"));
+            List<WebElement> messageOutDivs = msg.findElements(By.className("message-out"));
 
-                System.out.println("Opened chat for: " + number);
-
-            } catch (Exception e) {
-                System.out.println("Could not open chat for " + number + ": " + e.getMessage());
+            if (!messageInDivs.isEmpty()) {
+                try {
+                    WebElement copyableText = msg.findElement(By.className("copyable-text"));
+                    String text = copyableText.getText();
+                    System.out.println("Lead: " + text);
+                } catch (Exception e) {
+                    System.out.println("Could not extract text: " + e.getMessage());
+                }
             }
 
-
-            Thread.sleep(5000); // Give time to load chat
-
-            // Get all message bubbles
-            List<WebElement> allMessages = driver.findElements(By.xpath("//div[@role='row']"));
-
-            for (int i = 0; i < allMessages.size(); i++) {
-                WebElement msg = allMessages.get(i);
-
-                List<WebElement> messageInDivs = msg.findElements(By.className("message-in"));
-                List<WebElement> messageOutDivs = msg.findElements(By.className("message-out"));
-
-                if (!messageInDivs.isEmpty()) {
-                    try {
-                        WebElement copyableText = msg.findElement(By.className("copyable-text"));
-                        String text = copyableText.getText();
-                        System.out.println("Lead: " + text);
-                    } catch (Exception e) {
-                        System.out.println("Could not extract text: " + e.getMessage());
-                    }
-                }
-
-                if (!messageOutDivs.isEmpty()) {
-                    try {
-                        WebElement copyableText = msg.findElement(By.className("copyable-text"));
-                        String text = copyableText.getText();
-                        System.out.println("CasaMia.ai: " + text);
-                    } catch (Exception e) {
-                        System.out.println("Could not extract text: " + e.getMessage());
-                    }
+            if (!messageOutDivs.isEmpty()) {
+                try {
+                    WebElement copyableText = msg.findElement(By.className("copyable-text"));
+                    String text = copyableText.getText();
+                    System.out.println("CasaMia.ai: " + text);
+                } catch (Exception e) {
+                    System.out.println("Could not extract text: " + e.getMessage());
                 }
             }
         }
+    }
+
+    private static void selenium_openChatBySearchingForNumber(String number, WebDriver driver) throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(25));
+
+        try {
+            // Click on the search bar
+            WebElement searchBox = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[@role='textbox']")
+            ));
+            searchBox.click();
+
+            // clean searchbox
+            searchBox.sendKeys(Keys.COMMAND + "a");  // Select all text
+            searchBox.sendKeys(Keys.DELETE);         // Delete it
+
+            // Type phone number
+            searchBox.sendKeys(number);
+            Thread.sleep(2000); // Give time for search results to load
+
+            // Click on the chat result
+            WebElement chatResult = wait.until(ExpectedConditions.elementToBeClickable(
+                    By.xpath("//div[@aria-label='Search results.'][@role='grid']//div[@tabindex='-1'][1]")
+            ));
+            chatResult.click();
+
+            System.out.println("Opened chat for: " + number);
+
+        } catch (Exception e) {
+            System.out.println("Could not open chat for " + number + ": " + e.getMessage());
+        }
+
+        Thread.sleep(5000); // Give time to load chat
+    }
+
+    private static void selenium_openChatWithUnreadMessages() throws InterruptedException {
+        ChromeOptions options = getChromeOptions();
+
+        WebDriver driver = new ChromeDriver(options);
+        driver.get("https://web.whatsapp.com");
+
+        // Wait for WhatsApp to fully load
+        new WebDriverWait(driver, Duration.ofSeconds(20)).until(
+                ExpectedConditions.visibilityOfElementLocated(By.xpath("//div[@role='textbox']"))
+        );
+
+        WebElement unreadButton = driver.findElement(By.id("unread-filter"));
+        unreadButton.click();
+
+        // Wait for the Chat list container to be visible
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebElement chatList = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector("div[aria-label='Chat list'][role='grid']"))
+        );
+
+        // Get all child elements (individual chats) inside the chat list
+        List<WebElement> chats = chatList.findElements(By.cssSelector("div[role='listitem']"));
+
+        // Click each chat one by one
+        for (WebElement chat : chats) {
+            try {
+                chat.click();
+                Thread.sleep(1000); // Optional: wait for content to load before next click
+
+                selenium_printChatConversation(driver);
+
+            } catch (Exception e) {
+                System.out.println("Failed to click a chat: " + e.getMessage());
+            }
+        }
+
     }
 
     private static void sendFirstMessagesToLeads(List<String> phoneNumbers) throws InterruptedException {
