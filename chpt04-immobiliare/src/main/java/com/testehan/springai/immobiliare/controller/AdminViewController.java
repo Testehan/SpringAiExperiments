@@ -2,7 +2,7 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.Lead;
-import com.testehan.springai.immobiliare.repository.LeadRepository;
+import com.testehan.springai.immobiliare.service.LeadService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.thymeleaf.util.StringUtils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -29,14 +30,14 @@ public class AdminViewController {
     @Value("${app.url}")
     private String appUrl;
 
-    private final LeadRepository leadRepository;
+    private final LeadService leadService;
     private final ConversationSession conversationSession;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AdminViewController(LeadRepository leadRepository, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
-        this.leadRepository = leadRepository;
+    public AdminViewController(LeadService leadService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+        this.leadService = leadService;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
@@ -58,7 +59,8 @@ public class AdminViewController {
     public String getLeads(Model model,
                                      @RequestParam(defaultValue = "createdAt") String sortBy,
                                      @RequestParam(defaultValue = "desc") String direction,
-                                     @RequestParam(defaultValue = "0") int page) {
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(required = false) String searchText) {
 
         var user = conversationSession.getImmobiliareUser().get();
 
@@ -67,7 +69,7 @@ public class AdminViewController {
 
             // PageRequest with page number and sorting
             PageRequest pageRequest = PageRequest.of(page, 50, sort);
-            Page<Lead> leads = leadRepository.findAll(pageRequest);
+            Page<Lead> leads = leadService.findAll(pageRequest,searchText);
 
             model.addAttribute("appUrl", appUrl);
             model.addAttribute("newLead", new Lead());
@@ -77,6 +79,7 @@ public class AdminViewController {
             model.addAttribute("randomInitialMessages", getLeadInitialMessages(leads.getSize()));
             model.addAttribute("currentSort", sortBy);
             model.addAttribute("currentDirection", direction);
+            model.addAttribute("searchText", StringUtils.isEmpty(searchText) ? "" : searchText);
 
             return "admin-leads";
         } else {

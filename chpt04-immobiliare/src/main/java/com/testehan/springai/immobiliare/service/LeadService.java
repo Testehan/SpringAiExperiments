@@ -9,9 +9,12 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -122,5 +125,13 @@ public class LeadService {
 
     public void deleteLeadById(String leadId) {
         leadRepository.deleteById(new ObjectId(leadId));
+    }
+
+    public Page<Lead> findAll(PageRequest pageRequest, String searchText) {
+        if (!StringUtils.isEmpty(searchText)) {
+            return leadRepository.searchLeads(searchText.toLowerCase(), pageRequest);
+        }
+
+        return leadRepository.findAll(pageRequest);
     }
 }
