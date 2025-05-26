@@ -51,11 +51,6 @@ public class AdminRestController {
         leadService.downloadCsvContainingLeadURLs(value, response);
     }
 
-    @GetMapping("/leads/url")
-    public void getJsonContainingLeadURLs(HttpServletResponse response) {
-        leadService.downloadJsonContainingLeadURLs(response);
-    }
-
     @GetMapping("/leads/download-phone")
     public void downloadCsvContaining(@RequestParam String value, HttpServletResponse response) {
         leadService.downloadCsvContainingLeadPhones(value, response);

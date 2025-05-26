@@ -44,10 +44,10 @@ public class BasicAuthConfig {
     @Bean
     public SecurityFilterChain securityFilterChainBasicAuth(HttpSecurity http) throws Exception {
         http
-            .securityMatcher("/actuator/**") // Apply this chain only to /actuator paths
+            .securityMatcher("/actuator/**","/agent/**") // Apply this chain only to /actuator paths
             .authorizeHttpRequests(auth -> auth
-                            .requestMatchers("/actuator/**").hasRole("ADMIN") // Admin role for Prometheus
-                            .requestMatchers("/actuator/**").authenticated()
+                            .requestMatchers("/actuator/**","/agent/**").hasRole("ADMIN") // Admin role for Prometheus and agents
+                            .requestMatchers("/actuator/**","/agent/**").authenticated()
 
             )
             .httpBasic(withDefaults());
