@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -71,10 +72,10 @@ public class ApartmentService {
     }
 
     @Async
-    public void saveApartmentAndImages(Apartment apartment,  List<ApartmentImage> apartmentImages, ImmobiliareUser user, boolean isBatchSave) throws IOException {
+    public void saveApartmentAndImages(Apartment apartment, List<ApartmentImage> apartmentImages, Optional<ImmobiliareUser> userOptional, boolean isBatchSave) throws IOException {
         apartment.setShortDescription(apartment.getShortDescription().replace("\n", " ")); // no newlines in description
-        if (Objects.isNull(apartment.getContactEmail())) {
-            apartment.setContactEmail(user.getEmail());
+        if (Objects.isNull(apartment.getContactEmail()) && userOptional.isPresent()) {
+            apartment.setContactEmail(userOptional.get().getEmail());
         }
 
         handleNewOrUpdatedProperty(apartment);
@@ -104,11 +105,11 @@ public class ApartmentService {
 
         var savedListing = apartmentCrudService.saveApartment(apartment);
 
-        updateUserPhoneIfChanged(apartment, user);
+        updateUserPhoneIfChanged(apartment, userOptional);
         if (isPropertyNew) {
-            updateUserInfo(apartment, user);
-            if(!isBatchSave) {
-                listingNotificationService.sendListingAddedEmail(savedListing, user);
+            updateUserInfo(apartment, userOptional);
+            if(!isBatchSave && userOptional.isPresent()) {
+                listingNotificationService.sendListingAddedEmail(savedListing, userOptional.get());
             }
         }
 
@@ -129,11 +130,14 @@ public class ApartmentService {
         llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
     }
 
-    private void updateUserPhoneIfChanged(Apartment apartment, ImmobiliareUser user) {
+    private void updateUserPhoneIfChanged(Apartment apartment, Optional<ImmobiliareUser> userOptional) {
         var contact = apartment.getContact();
-        if (ContactValidator.isValidPhoneNumber(contact,"RO") && !contact.equalsIgnoreCase(user.getPhoneNumber())){
-            user.setPhoneNumber(contact);
-            userService.updateUser(user);
+        if (ContactValidator.isValidPhoneNumber(contact,"RO") && userOptional.isPresent()) {
+            var user = userOptional.get();
+            if ( !contact.equalsIgnoreCase(user.getPhoneNumber())) {
+                user.setPhoneNumber(contact);
+                userService.updateUser(user);
+            }
         }
     }
 
@@ -155,10 +159,13 @@ public class ApartmentService {
     }
 
 
-    private void updateUserInfo(Apartment apartment, ImmobiliareUser user) {
-        user.getListedProperties().add(apartment.getId().toString());
-        user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
-        userService.updateUser(user);
+    private void updateUserInfo(Apartment apartment, Optional<ImmobiliareUser> userOptional) {
+        if (userOptional.isPresent()) {
+            var user = userOptional.get();
+            user.getListedProperties().add(apartment.getId().toString());
+            user.setMaxNumberOfListedProperties(user.getMaxNumberOfListedProperties() - 1);
+            userService.updateUser(user);
+        }
     }
 
     private void handleNewProperty(Apartment apartment) {
