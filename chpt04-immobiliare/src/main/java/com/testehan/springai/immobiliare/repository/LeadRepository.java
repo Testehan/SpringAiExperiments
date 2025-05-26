@@ -14,6 +14,8 @@ public interface LeadRepository extends MongoRepository<Lead, ObjectId> {
 
     Optional<Lead> findByPhoneNumber(String phoneNumber);
 
+    Optional<Lead> findByListingUrl(String listingUrl);
+
     // If you want to find by phoneNumber + listingUrl (optional extra methods)
     Optional<Lead> findByPhoneNumberAndListingUrl(String phoneNumber, String listingUrl);
 

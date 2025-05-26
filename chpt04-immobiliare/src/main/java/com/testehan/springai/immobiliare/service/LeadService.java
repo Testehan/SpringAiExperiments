@@ -51,6 +51,13 @@ public class LeadService {
 
     }
 
+    public Optional<Lead> findLeadByListingUrl(String listingUrl) {
+        return leadRepository.findByListingUrl(listingUrl);
+
+    }
+
+
+
     public Optional<Lead> findLeadById(String leadId){
         return leadRepository.findById(new ObjectId(leadId));
     }
