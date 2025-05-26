@@ -1,7 +1,8 @@
 package com.testehan.springai.immobiliare.service;
 
-import com.testehan.springai.immobiliare.model.Lead;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testehan.springai.immobiliare.model.ContactStatus;
+import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.repository.LeadRepository;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,8 +19,10 @@ import software.amazon.awssdk.utils.StringUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class LeadService {
@@ -101,6 +104,30 @@ public class LeadService {
             LOGGER.error("Could not generate the CSV. {}",e.getMessage());
         }
     }
+
+    public void downloadJsonContainingLeadURLs(HttpServletResponse response) {
+        // Fetch leads matching the criteria
+        var leads = leadRepository.findByStatus(String.valueOf(ContactStatus.ACCEPTED));
+
+        // Extract listing URLs into a list
+        List<String> urls = leads.stream()
+                .map(Lead::getListingUrl)
+                .collect(Collectors.toList());
+
+        // Set headers for JSON response
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // Use your preferred JSON serializer. Here's one using Jackson:
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(response.getWriter(), urls);
+        } catch (IOException e) {
+            LOGGER.error("Could not generate JSON. {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     public void downloadCsvContainingLeadPhones(String filter, HttpServletResponse response){
         // we want the accepted contacts + ones from a particular url
