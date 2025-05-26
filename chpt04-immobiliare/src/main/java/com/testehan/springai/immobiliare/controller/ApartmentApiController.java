@@ -6,6 +6,7 @@ import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
+import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.security.SessionCleanupListener;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.*;
@@ -121,7 +122,9 @@ public class ApartmentApiController {
     }
 
     @PostMapping("/batchsave")
-    public ResponseEntity<String> batchSaveApartment(Apartment apartment, @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages) throws IOException {
+    public ResponseEntity<String> batchSaveApartment(Apartment apartment,
+                                                     @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages,
+                                                     String listingSourceUrl) throws IOException {
 
 //        var user = conversationSession.getImmobiliareUser().get();
 //        if (!user.isAdmin()){
@@ -135,6 +138,13 @@ public class ApartmentApiController {
 //        }
 
         LOGGER.info("Batch save - start");
+        String phoneNumber = "";
+        Optional<Lead> leadByListingUrl = leadService.findLeadByListingUrl(listingSourceUrl);
+        if (leadByListingUrl.isPresent()){
+            phoneNumber = leadByListingUrl.get().getPhoneNumber().substring(2); // i use substring to eliminate the country prefix part
+        }
+        apartment.setContact(phoneNumber);
+
         List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
         apartmentService.saveApartmentAndImages(apartment, processedImages, Optional.empty(),true);
 //        leadService.updateLeadStatus(apartment.getContact());
