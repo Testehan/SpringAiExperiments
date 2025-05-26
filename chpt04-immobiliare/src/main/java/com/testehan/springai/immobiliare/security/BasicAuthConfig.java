@@ -50,7 +50,8 @@ public class BasicAuthConfig {
                             .requestMatchers("/actuator/**","/agent/**").authenticated()
 
             )
-            .httpBasic(withDefaults());
+            .httpBasic(withDefaults())
+            .csrf(csrf -> csrf.disable());;
         return http.build();
     }
 
