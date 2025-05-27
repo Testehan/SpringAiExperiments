@@ -45,6 +45,11 @@ public class AgentRestController {
         leadService.downloadJsonContainingLeadURLs(response);
     }
 
+    @GetMapping("/leads/phone")
+    public void getJsonContainingLeadPhones(HttpServletResponse response) {
+        leadService.downloadJsonContainingLeadPhones(response);
+    }
+
     @PostMapping("/batchsave")
     public ResponseEntity<String> batchSaveApartment(Apartment apartment,
                                                      @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages,

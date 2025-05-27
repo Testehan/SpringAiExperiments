@@ -135,6 +135,29 @@ public class LeadService {
         }
     }
 
+    public void downloadJsonContainingLeadPhones(HttpServletResponse response) {
+        // Fetch leads matching the criteria
+        var leads = leadRepository.findByStatus(String.valueOf(ContactStatus.NOT_CONTACTED));
+
+        // Extract listing URLs into a list
+        List<String> phoneNumbers = leads.stream()
+                .map(Lead::getPhoneNumber)
+                .collect(Collectors.toList());
+
+        // Set headers for JSON response
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            // Use your preferred JSON serializer. Here's one using Jackson:
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(response.getWriter(), phoneNumbers);
+        } catch (IOException e) {
+            LOGGER.error("Could not generate JSON. {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     public void downloadCsvContainingLeadPhones(String filter, HttpServletResponse response){
         // we want the accepted contacts + ones from a particular url
