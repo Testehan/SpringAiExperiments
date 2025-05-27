@@ -42,7 +42,8 @@ public class LeadConversationService {
         StringBuilder conversation = new StringBuilder();
         for (LeadConversation message : messages) {
             String speaker = message.getDirection() == MessageType.RECEIVED ? "User" : "Agent";
-            conversation.append(speaker)
+            conversation.append(message.getTimestamp() + " ")
+                    .append(speaker)
                     .append(": ")
                     .append(message.getText())
                     .append("\n");
