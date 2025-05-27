@@ -7,6 +7,7 @@ import com.testehan.springai.immobiliare.util.FormattingUtil;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class LeadConversationService {
@@ -30,5 +31,22 @@ public class LeadConversationService {
 
             leadConversationRepository.save(message);
         }
+    }
+
+    public String getConversation(String phoneNumberInInternational){
+        var phoneWithNoPrecedingPlus = phoneNumberInInternational.substring(1);
+        return formatConversation(leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneWithNoPrecedingPlus));
+    }
+
+    public String formatConversation(List<LeadConversation> messages) {
+        StringBuilder conversation = new StringBuilder();
+        for (LeadConversation message : messages) {
+            String speaker = message.getDirection() == MessageType.RECEIVED ? "User" : "Agent";
+            conversation.append(speaker)
+                    .append(": ")
+                    .append(message.getText())
+                    .append("\n");
+        }
+        return conversation.toString();
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface LeadConversationRepository extends MongoRepository<LeadConversation, ObjectId> {
 
-    List<LeadConversation> findByWaUserIdOrderByTimestampDesc(String waUserId);
+    List<LeadConversation> findByWaUserIdOrderByTimestampAsc(String waUserId);
 
     boolean existsByMessageId(String messageId);
 

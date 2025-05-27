@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.service.ApartmentService;
+import com.testehan.springai.immobiliare.service.LeadConversationService;
 import com.testehan.springai.immobiliare.service.LeadService;
 import com.testehan.springai.immobiliare.service.ListingImageService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
@@ -26,14 +27,16 @@ public class AgentRestController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AgentRestController.class);
 
     private final LeadService leadService;
+    private final LeadConversationService leadConversationService;
     private final ApartmentService apartmentService;
     private final ListingImageService listingImageService;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AgentRestController(LeadService leadService, ApartmentService apartmentService, ListingImageService listingImageService, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ListingImageService listingImageService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
+        this.leadConversationService = leadConversationService;
         this.apartmentService = apartmentService;
         this.listingImageService = listingImageService;
         this.messageSource = messageSource;
@@ -48,6 +51,11 @@ public class AgentRestController {
     @GetMapping("/leads/phone")
     public void getJsonContainingLeadPhones(HttpServletResponse response) {
         leadService.downloadJsonContainingLeadPhones(response);
+    }
+
+    @GetMapping("/leads/phone/{waUserId}")
+    public String getConversation(@PathVariable String waUserId) {
+        return leadConversationService.getConversation(waUserId);
     }
 
     @PostMapping("/batchsave")
