@@ -6,7 +6,6 @@ import com.testehan.springai.immobiliare.events.EventPayload;
 import com.testehan.springai.immobiliare.events.ResponsePayload;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
-import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.security.SessionCleanupListener;
 import com.testehan.springai.immobiliare.security.UserService;
 import com.testehan.springai.immobiliare.service.*;
@@ -50,7 +49,6 @@ public class ApartmentApiController {
     private final UserSseService userSseService;
     private final SessionCleanupListener sessionCleanupListener;
     private final ApiService apiService;
-    private final LeadService leadService;
 
     private final SpringWebFluxTemplateEngine templateEngine;
     private final MessageSource messageSource;
@@ -61,7 +59,7 @@ public class ApartmentApiController {
     public ApartmentApiController(CityService cityService, ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, ConversationSession conversationSession,
                                   UserService userService, EmbeddingService embeddingService, ApiService apiService,
                                   SpringWebFluxTemplateEngine templateEngine, UserSseService userSseService,
-                                  SessionCleanupListener sessionCleanupListener, LeadService leadService,
+                                  SessionCleanupListener sessionCleanupListener,
                                   MessageSource messageSource, LocaleUtils localeUtils, ListingUtil listingUtil)
     {
         this.cityService = cityService;
@@ -75,7 +73,6 @@ public class ApartmentApiController {
         this.sessionCleanupListener = sessionCleanupListener;
         this.userService = userService;
         this.embeddingService = embeddingService;
-        this.leadService = leadService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
         this.listingUtil = listingUtil;
@@ -119,38 +116,6 @@ public class ApartmentApiController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(messageSource.getMessage("toastify.add.listing.failure.max", null,localeUtils.getCurrentLocale()));
         }
-    }
-
-    @PostMapping("/batchsave")
-    public ResponseEntity<String> batchSaveApartment(Apartment apartment,
-                                                     @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages,
-                                                     String listingSourceUrl) throws IOException {
-
-//        var user = conversationSession.getImmobiliareUser().get();
-//        if (!user.isAdmin()){
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only admin can use this endpoint");
-//        }
-
-//        var isPhoneValid = apartmentService.isPhoneValid(apartment.getContact());
-//        if (!isPhoneValid){
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-//                    .body("Listing with phone " + apartment.getContact() + " already exists. Saving will be skipped for " + apartment.getName());
-//        }
-
-        LOGGER.info("Batch save - start");
-        String phoneNumber = "";
-        Optional<Lead> leadByListingUrl = leadService.findLeadByListingUrl(listingSourceUrl);
-        if (leadByListingUrl.isPresent()){
-            phoneNumber = leadByListingUrl.get().getPhoneNumber().substring(2); // i use substring to eliminate the country prefix part
-        }
-        apartment.setContact(phoneNumber);
-
-        List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
-        apartmentService.saveApartmentAndImages(apartment, processedImages, Optional.empty(),true);
-//        leadService.updateLeadStatus(apartment.getContact());
-        // Return a response to the frontend
-        return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null,localeUtils.getCurrentLocale()));
-
     }
 
     @PostMapping("/delete/{listingId}")

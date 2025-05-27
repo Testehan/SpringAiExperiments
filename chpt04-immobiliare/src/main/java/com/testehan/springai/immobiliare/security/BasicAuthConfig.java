@@ -47,8 +47,6 @@ public class BasicAuthConfig {
             .securityMatcher("/actuator/**","/agent/**") // Apply this chain only to /actuator paths
             .authorizeHttpRequests(auth -> auth
                             .requestMatchers("/actuator/**","/agent/**").hasRole("ADMIN") // Admin role for Prometheus and agents
-                            .requestMatchers("/actuator/**","/agent/**").authenticated()
-
             )
             .httpBasic(withDefaults())
             .csrf(csrf -> csrf.disable());;
