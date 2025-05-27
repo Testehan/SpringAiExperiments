@@ -23,7 +23,7 @@ public interface LeadRepository extends MongoRepository<Lead, ObjectId> {
 
     List<Lead> findByListingUrlContainingAndStatus(String filterUrlValue, String statusValue);
 
-    List<Lead> findByStatus(String statusValue);
+    List<Lead> findByStatusIn(List<String> statusValues);
 
     @Query("{ '$or': [ " +
             " { 'phoneNumber': { $regex: ?0, $options: 'i' } }, " +
