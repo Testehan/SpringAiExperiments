@@ -1,6 +1,8 @@
 package com.testehan.springai.immobiliare.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testehan.springai.immobiliare.model.MessageType;
+import com.testehan.springai.immobiliare.model.wa.response.SendMessageResponse;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,15 +25,17 @@ public class WhatsAppService {
     public static final String WHATSAPP_API_22_MESSAGES = "https://graph.facebook.com/v22.0/%s/messages";
 
     @Value("${whatsapp.api.access.token}")
-    private String WHATS_APP_ACCESS_TOKEN;
+    private String WHATS_APP_ACCESS_TOKEN;  // TODO when i will have a long term token, and have the meta business verified ..i will not need the WhatsAppTokenService that refreshes a token...
     //todo check to see if your phone number was reviewed in meta dev console
     @Value(("${whatsapp.api.phone.id}"))
     private String PHONE_NUMBER_ID;
 
     private final LeadConversationService leadConversationService;
+    private final WhatsAppTokenService tokenService;
 
-    public WhatsAppService(LeadConversationService leadConversationService) {
+    public WhatsAppService(LeadConversationService leadConversationService, WhatsAppTokenService tokenService) {
         this.leadConversationService = leadConversationService;
+        this.tokenService = tokenService;
     }
 
     public ResponseEntity<String> sendMessage(String to, String messageText, Boolean isFirstMessage) {
@@ -41,7 +45,7 @@ public class WhatsAppService {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(WHATS_APP_ACCESS_TOKEN);
+        headers.setBearerAuth(tokenService.getToken());
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         String jsonMessage = getJsonMessage(to, messageText, isFirstMessage);
@@ -49,29 +53,31 @@ public class WhatsAppService {
         LOGGER.info("Will try to send json '{}' ", jsonMessage);
 
         // TODO below is some temporary code, until i make the whole whatsapp setup work for development environmnet..
-        leadConversationService.saveConversationTextMessage(to.substring(1), "messageId", messageText, MessageType.SENT);
-        return ResponseEntity.ok("Reply sent successfully");
+        // Later edit: right now i remade that setup, but because i have a temporay token, that is valid only for 1 hour,
+        // because
+//        leadConversationService.saveConversationTextMessage(to.substring(1), "messageId", messageText, MessageType.SENT);
+//        return ResponseEntity.ok("Reply sent successfully");
 
 
-//        HttpEntity<String> request = new HttpEntity<>(jsonMessage, headers);
-//        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-//
-//        String rawJson = response.getBody();
-//        System.out.println("Response: " + rawJson);
-//
-//        ObjectMapper mapper = new ObjectMapper();
-//        try {
-//            // Try deserializing to your POJO
-//            SendMessageResponse sendMessageResponse = mapper.readValue(rawJson, SendMessageResponse.class);
-//            String waUserId = sendMessageResponse.getContacts().get(0).getWa_id();
-//            String messageId = sendMessageResponse.getMessages().get(0).getId();
-//            leadConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
-//
-//            return ResponseEntity.ok("Reply sent successfully");
-//        } catch (Exception e) {
-//            LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());
-//            return ResponseEntity.badRequest().body("Something went wrong");
-//        }
+        HttpEntity<String> request = new HttpEntity<>(jsonMessage, headers);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+        String rawJson = response.getBody();
+        System.out.println("Response: " + rawJson);
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            // Try deserializing to your POJO
+            SendMessageResponse sendMessageResponse = mapper.readValue(rawJson, SendMessageResponse.class);
+            String waUserId = sendMessageResponse.getContacts().get(0).getWa_id();
+            String messageId = sendMessageResponse.getMessages().get(0).getId();
+            leadConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
+
+            return ResponseEntity.ok("Reply sent successfully");
+        } catch (Exception e) {
+            LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());
+            return ResponseEntity.badRequest().body("Something went wrong");
+        }
     }
 
     @NotNull
@@ -117,7 +123,7 @@ public class WhatsAppService {
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(WHATS_APP_ACCESS_TOKEN);
+        headers.setBearerAuth(tokenService.getToken());
 
         Map<String, Object> payload = new HashMap<>();
         payload.put("messaging_product", "whatsapp");
