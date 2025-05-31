@@ -31,11 +31,13 @@ public class LeadService {
 
     private final LeadRepository leadRepository;
 
+    private final LeadConversationService leadConversationService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public LeadService(LeadRepository leadRepository, MessageSource messageSource, LocaleUtils localeUtils) {
+    public LeadService(LeadRepository leadRepository, LeadConversationService leadConversationService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadRepository = leadRepository;
+        this.leadConversationService = leadConversationService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }
@@ -56,21 +58,22 @@ public class LeadService {
 
     }
 
-
-
     public Optional<Lead> findLeadById(String leadId){
         return leadRepository.findById(new ObjectId(leadId));
     }
 
-    public void updateLeadStatus(String phoneNumber){
+    public String updateLeadStatus(String phoneNumber, String status){
 
         var leadOptional = findLeadByPhoneNumber(phoneNumber);
         if (leadOptional.isPresent()){
             var lead = leadOptional.get();
-            lead.setStatus(ContactStatus.DONE);
+            lead.setStatus(ContactStatus.valueOf(status.toUpperCase()));
+            lead.setUpdatedAt(System.currentTimeMillis());
             leadRepository.save(lead);
+            return "Lead status updated successfully";
         } else {
             LOGGER.warn("No leads found for {}",phoneNumber);
+            return "No leads found for " + phoneNumber;
         }
 
     }
@@ -114,7 +117,7 @@ public class LeadService {
 
     public void downloadJsonContainingLeadURLs(HttpServletResponse response) {
         // Fetch leads matching the criteria
-        var leads = leadRepository.findByStatus(String.valueOf(ContactStatus.ACCEPTED));
+        var leads = leadRepository.findByStatusIn(List.of(String.valueOf(ContactStatus.ACCEPTED)));
 
         // Extract listing URLs into a list
         List<String> urls = leads.stream()
@@ -137,11 +140,12 @@ public class LeadService {
 
     public void downloadJsonContainingLeadPhones(HttpServletResponse response) {
         // Fetch leads matching the criteria
-        var leads = leadRepository.findByStatus(String.valueOf(ContactStatus.NOT_CONTACTED));
+        var leads = leadRepository.findByStatusIn(List.of(String.valueOf(ContactStatus.NOT_CONTACTED), String.valueOf(ContactStatus.CONTACTED)));
 
         // Extract listing URLs into a list
         List<String> phoneNumbers = leads.stream()
                 .map(Lead::getPhoneNumber)
+                .filter(phone -> leadConversationService.doWeNeedToContinueConversation(phone))
                 .collect(Collectors.toList());
 
         // Set headers for JSON response
