@@ -35,9 +35,10 @@ public class WhatsAppService {
         this.leadConversationService = leadConversationService;
     }
 
-    public void sendMessage(String to, String messageText) {
+    public ResponseEntity<String> sendMessage(String to, String messageText) {
         String url = String.format(WHATSAPP_API_22_MESSAGES, PHONE_NUMBER_ID);
 
+        LOGGER.info("Will try to send message '{}' to {}", messageText, to);
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -45,19 +46,35 @@ public class WhatsAppService {
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // todo change with the other template. this can be done once the template is reviewed
+        // see if template "lead_introduction" was reviewed. That temple will be used for first
+        // messages
+//        String json = String.format("""
+//            {
+//              "messaging_product": "whatsapp",
+//              "to": "%s",
+//              "type": "template",
+//              "template": {
+//                       "name": "hello_world",
+//                       "language": {
+//                         "code": "en_US"
+//                       }
+//                }
+//            }
+//            """, to, messageText);
+
         String json = String.format("""
             {
-              "messaging_product": "whatsapp",
-              "to": "%s",
-              "type": "template",
-              "template": {
-                       "name": "hello_world",   
-                       "language": {
-                         "code": "en_US"
-                       }
+                "messaging_product": "whatsapp",
+                "recipient_type": "individual",
+                "to": "%s",
+                "type": "text",
+                "text": {
+                    "body": "%s"
                 }
             }
             """, to, messageText);
+
+        LOGGER.info("Will try to send json '{}' ", json);
 
         HttpEntity<String> request = new HttpEntity<>(json, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
@@ -73,8 +90,10 @@ public class WhatsAppService {
             String messageId = sendMessageResponse.getMessages().get(0).getId();
             leadConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
 
+            return ResponseEntity.ok("Reply sent successfully");
         } catch (Exception e) {
             LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());
+            return ResponseEntity.badRequest().body("Something went wrong");
         }
     }
 
