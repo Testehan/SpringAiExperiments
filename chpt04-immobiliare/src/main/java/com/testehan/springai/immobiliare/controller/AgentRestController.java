@@ -67,8 +67,8 @@ public class AgentRestController {
     }
 
     @PostMapping("/leads/reply")
-    public ResponseEntity<String> replyToLead(@RequestParam String phoneNumber, @RequestParam String reply) {
-        return whatsAppService.sendMessage(phoneNumber, reply);
+    public ResponseEntity<String> replyToLead(@RequestParam String phoneNumber, @RequestParam String reply, @RequestParam Boolean isFirstMessage) {
+        return whatsAppService.sendMessage(phoneNumber, reply, isFirstMessage);
     }
 
     @PostMapping("/batchsave")

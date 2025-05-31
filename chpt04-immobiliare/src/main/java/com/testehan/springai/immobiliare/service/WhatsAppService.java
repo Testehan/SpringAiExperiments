@@ -1,8 +1,7 @@
 package com.testehan.springai.immobiliare.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testehan.springai.immobiliare.model.MessageType;
-import com.testehan.springai.immobiliare.model.wa.response.SendMessageResponse;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,7 +34,7 @@ public class WhatsAppService {
         this.leadConversationService = leadConversationService;
     }
 
-    public ResponseEntity<String> sendMessage(String to, String messageText) {
+    public ResponseEntity<String> sendMessage(String to, String messageText, Boolean isFirstMessage) {
         String url = String.format(WHATSAPP_API_22_MESSAGES, PHONE_NUMBER_ID);
 
         LOGGER.info("Will try to send message '{}' to {}", messageText, to);
@@ -45,56 +44,71 @@ public class WhatsAppService {
         headers.setBearerAuth(WHATS_APP_ACCESS_TOKEN);
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // todo change with the other template. this can be done once the template is reviewed
-        // see if template "lead_introduction" was reviewed. That temple will be used for first
-        // messages
-//        String json = String.format("""
-//            {
-//              "messaging_product": "whatsapp",
-//              "to": "%s",
-//              "type": "template",
-//              "template": {
-//                       "name": "hello_world",
-//                       "language": {
-//                         "code": "en_US"
-//                       }
-//                }
-//            }
-//            """, to, messageText);
+        String jsonMessage = getJsonMessage(to, messageText, isFirstMessage);
 
-        String json = String.format("""
-            {
-                "messaging_product": "whatsapp",
-                "recipient_type": "individual",
-                "to": "%s",
-                "type": "text",
-                "text": {
-                    "body": "%s"
+        LOGGER.info("Will try to send json '{}' ", jsonMessage);
+
+        // TODO below is some temporary code, until i make the whole whatsapp setup work for development environmnet..
+        leadConversationService.saveConversationTextMessage(to.substring(1), "messageId", messageText, MessageType.SENT);
+        return ResponseEntity.ok("Reply sent successfully");
+
+
+//        HttpEntity<String> request = new HttpEntity<>(jsonMessage, headers);
+//        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+//
+//        String rawJson = response.getBody();
+//        System.out.println("Response: " + rawJson);
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        try {
+//            // Try deserializing to your POJO
+//            SendMessageResponse sendMessageResponse = mapper.readValue(rawJson, SendMessageResponse.class);
+//            String waUserId = sendMessageResponse.getContacts().get(0).getWa_id();
+//            String messageId = sendMessageResponse.getMessages().get(0).getId();
+//            leadConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
+//
+//            return ResponseEntity.ok("Reply sent successfully");
+//        } catch (Exception e) {
+//            LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());
+//            return ResponseEntity.badRequest().body("Something went wrong");
+//        }
+    }
+
+    @NotNull
+    private static String getJsonMessage(String to, String messageText, Boolean isFirstMessage) {
+        String json;
+        if (isFirstMessage) {
+            // todo change with the other template. this can be done once the template is reviewed
+            // see if template "lead_introduction" was reviewed. That temple will be used for first
+            // messages
+            json = String.format("""
+                {
+                  "messaging_product": "whatsapp",
+                  "to": "%s",
+                  "type": "template",
+                  "template": {
+                           "name": "hello_world",
+                           "language": {
+                             "code": "en_US"
+                           }
+                    }
                 }
-            }
-            """, to, messageText);
+                """, to, messageText);
+        } else {
 
-        LOGGER.info("Will try to send json '{}' ", json);
-
-        HttpEntity<String> request = new HttpEntity<>(json, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-
-        String rawJson = response.getBody();
-        System.out.println("Response: " + rawJson);
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            // Try deserializing to your POJO
-            SendMessageResponse sendMessageResponse = mapper.readValue(rawJson, SendMessageResponse.class);
-            String waUserId = sendMessageResponse.getContacts().get(0).getWa_id();
-            String messageId = sendMessageResponse.getMessages().get(0).getId();
-            leadConversationService.saveConversationTextMessage(waUserId, messageId, messageText, MessageType.SENT);
-
-            return ResponseEntity.ok("Reply sent successfully");
-        } catch (Exception e) {
-            LOGGER.error("Error !!! parsing response payload: {} \n causes {}",rawJson, e.getMessage());
-            return ResponseEntity.badRequest().body("Something went wrong");
+             json = String.format("""
+                    {
+                        "messaging_product": "whatsapp",
+                        "recipient_type": "individual",
+                        "to": "%s",
+                        "type": "text",
+                        "text": {
+                            "body": "%s"
+                        }
+                    }
+                    """, to, messageText);
         }
+        return json;
     }
 
     public void markMessageAsRead(String messageId, String phoneNumberId) {
