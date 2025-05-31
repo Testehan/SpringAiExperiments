@@ -2,11 +2,9 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
+import com.testehan.springai.immobiliare.model.ContactStatus;
 import com.testehan.springai.immobiliare.model.Lead;
-import com.testehan.springai.immobiliare.service.ApartmentService;
-import com.testehan.springai.immobiliare.service.LeadConversationService;
-import com.testehan.springai.immobiliare.service.LeadService;
-import com.testehan.springai.immobiliare.service.ListingImageService;
+import com.testehan.springai.immobiliare.service.*;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -30,15 +28,17 @@ public class AgentRestController {
     private final LeadConversationService leadConversationService;
     private final ApartmentService apartmentService;
     private final ListingImageService listingImageService;
+    private final WhatsAppService whatsAppService;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ListingImageService listingImageService, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ListingImageService listingImageService, WhatsAppService whatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
         this.leadConversationService = leadConversationService;
         this.apartmentService = apartmentService;
         this.listingImageService = listingImageService;
+        this.whatsAppService = whatsAppService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }
@@ -58,6 +58,19 @@ public class AgentRestController {
         return leadConversationService.getConversation(waUserId);
     }
 
+    @PatchMapping("/leads/status")
+    public ResponseEntity<String> updateLeadStatusByPhone(@RequestParam String phoneNumber, @RequestParam String status)
+    {
+        var updateStatus = leadService.updateLeadStatus(phoneNumber, status);
+
+        return ResponseEntity.ok(updateStatus);
+    }
+
+    @PostMapping("/leads/reply")
+    public ResponseEntity<String> replyToLead(@RequestParam String phoneNumber, @RequestParam String reply) {
+        return whatsAppService.sendMessage(phoneNumber, reply);
+    }
+
     @PostMapping("/batchsave")
     public ResponseEntity<String> batchSaveApartment(Apartment apartment,
                                                      @RequestParam(value="apartmentImages", required = false) MultipartFile[] apartmentImages,
@@ -74,7 +87,7 @@ public class AgentRestController {
 
         List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
         apartmentService.saveApartmentAndImages(apartment, processedImages, Optional.empty(),true);
-        leadService.updateLeadStatus(apartment.getContact());
+        leadService.updateLeadStatus(apartment.getContact(), ContactStatus.DONE.toString());
 
         return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null, localeUtils.getCurrentLocale()));
 

@@ -69,10 +69,4 @@ public class AdminRestController {
         return ResponseEntity.ok(messageSource.getMessage("toastify.delete.listing.success", null,localeUtils.getCurrentLocale()));
     }
 
-    // todo this is for testing purposes
-    @GetMapping("/whatsapp")
-    public void whatsapp() {
-        // call whatsAppService.sendMessage
-    }
-
 }
