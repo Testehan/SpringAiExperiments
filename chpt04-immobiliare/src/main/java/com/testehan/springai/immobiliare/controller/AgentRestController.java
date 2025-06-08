@@ -29,16 +29,18 @@ public class AgentRestController {
     private final ApartmentService apartmentService;
     private final ListingImageService listingImageService;
     private final WhatsAppService whatsAppService;
+    private final MaytapiWhatsAppService maytapiWhatsAppService;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ListingImageService listingImageService, WhatsAppService whatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ListingImageService listingImageService, WhatsAppService whatsAppService, MaytapiWhatsAppService maytapiWhatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
         this.leadConversationService = leadConversationService;
         this.apartmentService = apartmentService;
         this.listingImageService = listingImageService;
         this.whatsAppService = whatsAppService;
+        this.maytapiWhatsAppService = maytapiWhatsAppService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
     }
@@ -68,7 +70,8 @@ public class AgentRestController {
 
     @PostMapping("/leads/reply")
     public ResponseEntity<String> replyToLead(@RequestParam String phoneNumber, @RequestParam String reply, @RequestParam Boolean isFirstMessage) {
-        return whatsAppService.sendMessage(phoneNumber, reply, isFirstMessage);
+//        return whatsAppService.sendMessage(phoneNumber, reply, isFirstMessage);
+        return maytapiWhatsAppService.sendMessage(phoneNumber, reply, isFirstMessage);
     }
 
     @PostMapping("/batchsave")
