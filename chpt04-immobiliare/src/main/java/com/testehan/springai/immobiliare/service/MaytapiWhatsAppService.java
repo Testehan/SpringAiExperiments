@@ -28,9 +28,11 @@ public class MaytapiWhatsAppService {
     private String PRODUCT_ID;
 
     private final LeadConversationService leadConversationService;
+    private final LeadService leadService;
 
-    public MaytapiWhatsAppService(LeadConversationService leadConversationService) {
+    public MaytapiWhatsAppService(LeadConversationService leadConversationService, LeadService leadService) {
         this.leadConversationService = leadConversationService;
+        this.leadService = leadService;
     }
 
     public ResponseEntity<String> sendMessage(String recipientNumber, String messageText, Boolean isFirstMessage) {
@@ -49,23 +51,21 @@ public class MaytapiWhatsAppService {
                 messageText
         );
 
-        LOGGER.info("Will try to send json '{}' ", requestBody);
-
         HttpEntity<WhatsAppMessageRequest> requestEntity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<String> response = restTemplate.postForEntity(apiUrl, requestEntity, String.class);
-
         String rawJson = response.getBody();
-        LOGGER.info("Response: {} " , rawJson);
-
-        ObjectMapper mapper = new ObjectMapper();
+        LOGGER.info("Response: {} ", rawJson);
         try {
-            MaytapiResponse sendMessageResponse = mapper.readValue(rawJson, MaytapiResponse.class);
-            leadConversationService.saveConversationTextMessage(recipientNumber.replace("+",""), sendMessageResponse.getData().getMsgId(), messageText, MessageType.SENT);
+            ObjectMapper mapper = new ObjectMapper();
 
+            MaytapiResponse sendMessageResponse = mapper.readValue(rawJson, MaytapiResponse.class);
+            leadConversationService.saveConversationTextMessage(recipientNumber.replace("+", ""), sendMessageResponse.getData().getMsgId(), messageText, MessageType.SENT);
             return ResponseEntity.ok("Reply sent successfully");
+
         } catch (Exception e) {
             LOGGER.error("Error !!! parsing response payload: {} \n causes {}", rawJson, e.getMessage());
             return ResponseEntity.badRequest().body("Something went wrong");
+
         }
     }
 
