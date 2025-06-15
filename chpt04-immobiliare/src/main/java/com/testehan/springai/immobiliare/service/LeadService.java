@@ -63,6 +63,9 @@ public class LeadService {
     }
 
     public String updateLeadStatus(String phoneNumber, String status){
+        if (!phoneNumber.startsWith("+")) {
+            phoneNumber = "+" + phoneNumber;
+        }
 
         var leadOptional = findLeadByPhoneNumber(phoneNumber);
         if (leadOptional.isPresent()){

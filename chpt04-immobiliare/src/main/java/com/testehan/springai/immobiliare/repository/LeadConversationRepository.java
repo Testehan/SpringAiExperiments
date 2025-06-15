@@ -12,4 +12,6 @@ public interface LeadConversationRepository extends MongoRepository<LeadConversa
 
     boolean existsByMessageId(String messageId);
 
+    void deleteByWaUserId(String waUserId);
+
 }

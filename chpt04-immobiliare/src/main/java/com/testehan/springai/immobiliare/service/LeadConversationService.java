@@ -89,4 +89,8 @@ public class LeadConversationService {
         // Check if duration is greater than 2 days (48 hours)
         return duration.toHours() > 48;
     }
+
+    public void deleteByWaUserId(String waUserId){
+        leadConversationRepository.deleteByWaUserId(waUserId);
+    }
 }

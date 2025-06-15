@@ -78,7 +78,11 @@ public class MaytapiWhatsAppWebhookController {
     private void handleErrorMessage(ErrorMessage error) {
         var inexistentWhatsAppUserMessage = "The contact cannot be found!";
         if (error.getErrorMessage().equalsIgnoreCase(inexistentWhatsAppUserMessage)){
-            leadService.updateLeadStatus(error.getData().getTo_number().split("@")[0], ContactStatus.NO_WHATSAPP.toString());
+            var phoneNumber = error.getData().getTo_number().split("@")[0];
+            leadService.updateLeadStatus(phoneNumber, ContactStatus.NO_WHATSAPP.toString());
+            // when number is not whatsapp we clean up the conversation history...because the service that sends messages
+            // saves the sent message in the conversation history even if the whatsapp sent failed
+            leadConversationService.deleteByWaUserId(phoneNumber);
         } else {
             LOGGER.error("Don't know how to handle this error {}", error.getErrorMessage());
         }
