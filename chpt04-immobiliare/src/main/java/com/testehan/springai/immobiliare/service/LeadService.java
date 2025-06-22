@@ -20,6 +20,7 @@ import software.amazon.awssdk.utils.StringUtils;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -146,9 +147,12 @@ public class LeadService {
         var leads = leadRepository.findByStatusIn(List.of(String.valueOf(ContactStatus.NOT_CONTACTED), String.valueOf(ContactStatus.CONTACTED)));
 
         // Extract listing URLs into a list
-        List<String> phoneNumbers = leads.stream()
-                .map(Lead::getPhoneNumber)
-                .filter(phone -> leadConversationService.doWeNeedToContinueConversation(phone))
+        List<Map<String, String>> phoneNumbersToURLs = leads.stream()
+                .filter(lead -> leadConversationService.doWeNeedToContinueConversation(lead.getPhoneNumber()))
+                .map(lead -> Map.of(
+                        "phoneNumber", lead.getPhoneNumber(),
+                        "url", lead.getListingUrl()
+                ))
                 .collect(Collectors.toList());
 
         // Set headers for JSON response
@@ -158,7 +162,7 @@ public class LeadService {
         try {
             // Use your preferred JSON serializer. Here's one using Jackson:
             ObjectMapper objectMapper = new ObjectMapper();
-            objectMapper.writeValue(response.getWriter(), phoneNumbers);
+            objectMapper.writeValue(response.getWriter(), phoneNumbersToURLs);
         } catch (IOException e) {
             LOGGER.error("Could not generate JSON. {}", e.getMessage());
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
