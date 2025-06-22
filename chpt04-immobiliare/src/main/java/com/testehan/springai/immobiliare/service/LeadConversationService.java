@@ -55,7 +55,7 @@ public class LeadConversationService {
         } else {
             // if the last message, was 2 days ago, no matter who sent it, we need to reevaluate the conversation and
             // possible send a reminder
-            if (isMoreThanTwoDaysAgo(messages.getLast().getTimestamp())){
+            if (isMoreThanTwoDaysAgo(messages.getLast().getTimestamp()) && !lastTwoMessagesWereSent(messages)){
                 return true;
             }
         }
@@ -88,6 +88,15 @@ public class LeadConversationService {
 
         // Check if duration is greater than 2 days (48 hours)
         return duration.toHours() > 48;
+    }
+
+    private boolean lastTwoMessagesWereSent(List<LeadConversation> messages) {
+        if (messages.size() >= 2){
+            return messages.getLast().getDirection().equals(MessageType.SENT) &&
+                    messages.get(messages.size() - 2).getDirection().equals(MessageType.SENT);
+        } else {
+            return false;
+        }
     }
 
     public void deleteByWaUserId(String waUserId){
