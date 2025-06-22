@@ -35,6 +35,8 @@ public class ApartmentService {
     private final ListingImageService listingImageService;
     private final ListingNotificationService listingNotificationService;
     private final ListingAmenitiesService listingAmenitiesService;
+    private final SequenceGeneratorService sequenceGeneratorService;
+
 
     private final UserService userService;
     private final LLMCacheService llmCacheService;
@@ -44,7 +46,7 @@ public class ApartmentService {
 
     public ApartmentService(ApartmentsRepository apartmentsRepository, ApartmentCrudService apartmentCrudService, ListingEmbeddingService listingEmbeddingService, ListingImageService listingImageService,
                             UserService userService, ListingNotificationService listingNotificationService, LLMCacheService llmCacheService,
-                            ListingAmenitiesService listingAmenitiesService, ListingUtil listingUtil, FormattingUtil formattingUtil) {
+                            ListingAmenitiesService listingAmenitiesService, SequenceGeneratorService sequenceGeneratorService, ListingUtil listingUtil, FormattingUtil formattingUtil) {
         this.apartmentsRepository = apartmentsRepository;
         this.apartmentCrudService = apartmentCrudService;
         this.listingEmbeddingService = listingEmbeddingService;
@@ -53,6 +55,7 @@ public class ApartmentService {
         this.listingNotificationService = listingNotificationService;
         this.llmCacheService = llmCacheService;
         this.listingAmenitiesService = listingAmenitiesService;
+        this.sequenceGeneratorService = sequenceGeneratorService;
         this.listingUtil = listingUtil;
         this.formattingUtil = formattingUtil;
     }
@@ -170,6 +173,7 @@ public class ApartmentService {
 
     private void handleNewProperty(Apartment apartment) {
         apartment.setCreationDateTime(formattingUtil.getFormattedDateCustom(LocalDateTime.now()));
+        apartment.setSocialId(String.valueOf(sequenceGeneratorService.generateSequence(Apartment.class.getSimpleName())));
         listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
         apartmentCrudService.saveApartment(apartment);
     }
