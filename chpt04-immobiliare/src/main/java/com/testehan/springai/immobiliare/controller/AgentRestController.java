@@ -87,10 +87,13 @@ public class AgentRestController {
         }
         apartment.setContact(phoneNumber);
         apartment.setWhatsapp(true);        // right now i assume that all listings that will get here will have whatsapp
+        apartment.setActive(true);
 
         List<ApartmentImage> processedImages = listingImageService.processImages(apartmentImages);
         apartmentService.saveApartmentAndImages(apartment, processedImages, Optional.empty(),true);
-        leadService.updateLeadStatus(apartment.getContact(), ContactStatus.DONE.toString());
+        if (leadByListingUrl.isPresent()) {
+            leadService.updateLeadStatus(leadByListingUrl.get().getPhoneNumber(), ContactStatus.DONE.toString());
+        }
 
         return ResponseEntity.ok(messageSource.getMessage("toastify.add.listing.success", null, localeUtils.getCurrentLocale()));
 
