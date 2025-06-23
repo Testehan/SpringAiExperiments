@@ -30,11 +30,12 @@ public class ScheduledTasks {
     private final EmailService emailService;
     private final SmsService smsService;
     private final StatisticsService statisticsService;
+    private final LeadService leadService;
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
     private final AppConfigurationsService appConfigurationsService;
 
-    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, ConversationService conversationService, EmailService emailService, SmsService smsService, StatisticsService statisticsService, MessageSource messageSource,
+    public ScheduledTasks(UserService userService, ApartmentCrudService apartmentCrudService, ConversationService conversationService, EmailService emailService, SmsService smsService, StatisticsService statisticsService, LeadService leadService, MessageSource messageSource,
                           LocaleUtils localeUtils, AppConfigurationsService appConfigurationsService){
         this.userService = userService;
         this.apartmentCrudService = apartmentCrudService;
@@ -42,6 +43,7 @@ public class ScheduledTasks {
         this.emailService = emailService;
         this.smsService = smsService;
         this.statisticsService = statisticsService;
+        this.leadService = leadService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
         this.appConfigurationsService = appConfigurationsService;
@@ -58,10 +60,14 @@ public class ScheduledTasks {
     }
 
     @Scheduled(cron = "0 0 3 * * ?")        // Code to run at 3 AM every day
+//    @Scheduled(cron = "0 0/1 * * * ?")
     public void deactivatedListingsLastUpdatedMoreThan2WeeksAgo() {
         if (appConfigurationsService.isDeactivatedOldListingsEnabled()) {
             LocalDateTime twoWeeksAgo = LocalDateTime.now().minus(14, ChronoUnit.DAYS);
-            apartmentCrudService.deactivateApartments(twoWeeksAgo);
+            var phoneNumbers = apartmentCrudService.deactivateApartments(twoWeeksAgo);
+            for (String phone : phoneNumbers){
+                leadService.updateLeadStatus(phone, "EXPIRED");
+            }
             LOGGER.info("Scheduled Task - The listings last updated before {} were deactivated.", twoWeeksAgo);
         } else {
             LOGGER.info("Scheduled Task - deactivatedOldListings is disabled");
