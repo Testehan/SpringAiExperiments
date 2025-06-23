@@ -30,8 +30,8 @@ public class ApartmentCrudService {
         return apartmentsRepository.findByLastUpdateDateTimeBefore(date);
     }
 
-    public void deactivateApartments(LocalDateTime date) {
-        apartmentsRepository.deactivateApartments(date);
+    public List<String> deactivateApartments(LocalDateTime date) {
+        return apartmentsRepository.deactivateApartments(date);
     }
 
     public List<Apartment> findAll(){
@@ -40,6 +40,10 @@ public class ApartmentCrudService {
 
     public Optional<Apartment> findApartmentById(String apartmentId) {
         return apartmentsRepository.findApartmentById(apartmentId);
+    }
+
+    public Optional<Apartment> findApartmentByContact(String phoneNumber) {
+        return apartmentsRepository.findApartmentByContact(phoneNumber);
     }
 
     public List<Apartment> findApartmentsByIds(List<String> apartmentIds){

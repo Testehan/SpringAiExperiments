@@ -1,5 +1,6 @@
 package com.testehan.springai.immobiliare.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentImage;
 import com.testehan.springai.immobiliare.model.ContactStatus;
@@ -9,13 +10,16 @@ import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -24,9 +28,13 @@ public class AgentRestController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AgentRestController.class);
 
+    @Value("${app.url}")
+    private String appUrl;
+
     private final LeadService leadService;
     private final LeadConversationService leadConversationService;
     private final ApartmentService apartmentService;
+    private final ApartmentCrudService apartmentCrudService;
     private final ListingImageService listingImageService;
     private final WhatsAppService whatsAppService;
     private final MaytapiWhatsAppService maytapiWhatsAppService;
@@ -34,10 +42,11 @@ public class AgentRestController {
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ListingImageService listingImageService, WhatsAppService whatsAppService, MaytapiWhatsAppService maytapiWhatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, WhatsAppService whatsAppService, MaytapiWhatsAppService maytapiWhatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
         this.leadConversationService = leadConversationService;
         this.apartmentService = apartmentService;
+        this.apartmentCrudService = apartmentCrudService;
         this.listingImageService = listingImageService;
         this.whatsAppService = whatsAppService;
         this.maytapiWhatsAppService = maytapiWhatsAppService;
@@ -66,6 +75,38 @@ public class AgentRestController {
         var updateStatus = leadService.updateLeadStatus(phoneNumber, status);
 
         return ResponseEntity.ok(updateStatus);
+    }
+
+    @GetMapping("/leads/status")
+    public void getLeadsWithStatus(@RequestParam String status, HttpServletResponse response)
+    {
+        List<Map<String,String>> phoneNumbersToReactivationLinks = new ArrayList<>();
+        var phoneNumbers = leadService.getJsonLeadsHavingStatus(status);
+        for (String phone : phoneNumbers){
+            var listingOptional = apartmentCrudService.findApartmentByContact(phone.replaceFirst("^\\+40", "0"));
+            if (listingOptional.isPresent()) {
+                var listing = listingOptional.get();
+                var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
+                phoneNumbersToReactivationLinks.add(Map.of(
+                        "phoneNumber", phone,
+                        "url", reactivateLink));
+
+            }
+        }
+
+        // Set headers for JSON response
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(response.getWriter(), phoneNumbersToReactivationLinks);
+        } catch (IOException e) {
+            LOGGER.error("Could not generate JSON. {}", e.getMessage());
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
+
+
     }
 
     @PostMapping("/leads/reply")

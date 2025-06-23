@@ -64,8 +64,8 @@ public class LeadService {
     }
 
     public String updateLeadStatus(String phoneNumber, String status){
-        if (!phoneNumber.startsWith("+")) {
-            phoneNumber = "+" + phoneNumber;
+        if (!phoneNumber.startsWith("+4")) {
+            phoneNumber = "+4" + phoneNumber;
         }
 
         var leadOptional = findLeadByPhoneNumber(phoneNumber);
@@ -168,6 +168,16 @@ public class LeadService {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public List<String> getJsonLeadsHavingStatus(String leadStatus) {
+        // Fetch leads matching the criteria
+        var leads = leadRepository.findByStatusIn(List.of(leadStatus));
+
+        return leads.stream()
+                .map(lead -> lead.getPhoneNumber())
+                .collect(Collectors.toList());
+    }
+
 
 
     public void downloadCsvContainingLeadPhones(String filter, HttpServletResponse response){
