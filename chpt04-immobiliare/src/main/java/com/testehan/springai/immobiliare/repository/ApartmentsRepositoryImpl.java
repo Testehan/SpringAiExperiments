@@ -4,6 +4,7 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.search.VectorSearchOptions;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
@@ -156,6 +157,25 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
+    public Optional<Apartment> findApartmentByContact(String phoneNumber) {
+        var mongoCollection = mongoDatabase.getCollection("apartments", Apartment.class);
+        Apartment apartment;
+        try {
+            apartment = mongoCollection.find(new Document("contact", phoneNumber)).first();
+        } catch (IllegalArgumentException ex){
+            LOGGER.error("PhoneNumber {} is not valid.", phoneNumber);
+            return Optional.empty();
+        }
+
+        if (apartment != null) {
+            return Optional.of(apartment);
+        } else {
+            LOGGER.error("PhoneNumber {} was not found in apartment list.", phoneNumber);
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Optional<String> findApartmentIdBySocialId(final String socialId) {
 
         var mongoCollection = mongoDatabase.getCollection("apartments");
@@ -232,7 +252,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public void deactivateApartments(LocalDateTime date) {
+    public List<String> deactivateApartments(LocalDateTime date) {
         var listings = mongoDatabase.getCollection("apartments", Apartment.class);
 
         var formattedDateCustom = formattingUtil.getFormattedDateCustom(date);
@@ -241,11 +261,19 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         Bson condition2 = eq("active", true);
         Bson combinedFilter = Filters.and(condition1, condition2);
 
+        // Step 1: Find the listings that will be deactivated
+        List<String> phoneNumbers = listings.find(combinedFilter)
+                .projection(Projections.include("contact")) // only fetch phone numbers
+                .map(listing -> listing.getContact()) // if Apartment.class has a getPhoneNumber()
+                .into(new ArrayList<>());
+
         var listOfUpdates = new ArrayList<Bson>();
         listOfUpdates.add(set("active", false));
         listOfUpdates.add(set("noOfFavourite", 0));
         listOfUpdates.add(set("noOfContact", 0));
         listings.updateMany(combinedFilter, listOfUpdates);
+
+        return phoneNumbers;
     }
 
     @Override
