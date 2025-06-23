@@ -36,13 +36,11 @@ public class LeadConversationService {
     }
 
     public String getConversation(String phoneNumberInInternational){
-        var phoneWithNoPrecedingPlus = phoneNumberInInternational.substring(1);
-        return formatConversation(leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneWithNoPrecedingPlus));
+        return formatConversation(leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneNumberInInternational));
     }
 
     public boolean doWeNeedToContinueConversation(String phoneNumberInInternational){
-        var phoneWithNoPrecedingPlus = phoneNumberInInternational.substring(1);
-        List<LeadConversation> messages = leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneWithNoPrecedingPlus);
+        List<LeadConversation> messages = leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneNumberInInternational);
 
         if (messages == null || messages.size() == 0) {
             //no conversation so far, means that we need to start talking

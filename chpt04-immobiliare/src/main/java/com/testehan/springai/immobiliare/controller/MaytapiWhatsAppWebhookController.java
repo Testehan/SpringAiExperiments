@@ -8,6 +8,7 @@ import com.testehan.springai.immobiliare.model.maytapi.ErrorMessage;
 import com.testehan.springai.immobiliare.model.maytapi.NormalMessage;
 import com.testehan.springai.immobiliare.service.LeadConversationService;
 import com.testehan.springai.immobiliare.service.LeadService;
+import com.testehan.springai.immobiliare.util.ContactValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -79,7 +80,7 @@ public class MaytapiWhatsAppWebhookController {
         var inexistentWhatsAppUserMessage = "The contact cannot be found!";
         if (error.getErrorMessage().equalsIgnoreCase(inexistentWhatsAppUserMessage)){
             var phoneNumber = error.getData().getTo_number().split("@")[0];
-            leadService.updateLeadStatus(phoneNumber, ContactStatus.NO_WHATSAPP.toString());
+            leadService.updateLeadStatus(ContactValidator.internationalizePhoneNumber(phoneNumber), ContactStatus.NO_WHATSAPP.toString());
             // when number is not whatsapp we clean up the conversation history...because the service that sends messages
             // saves the sent message in the conversation history even if the whatsapp sent failed
             leadConversationService.deleteByWaUserId(phoneNumber);
@@ -89,7 +90,7 @@ public class MaytapiWhatsAppWebhookController {
     }
 
     private void handleNormalMessage(NormalMessage normalMessage) {
-        var sender = normalMessage.getUser().getPhone();
+        var sender = ContactValidator.internationalizePhoneNumber(normalMessage.getUser().getPhone());
         var messageText = normalMessage.getMessage().getText();
         var messageId = normalMessage.getMessage().getId();
         var isFromMe = normalMessage.getMessage().isFromMe();
