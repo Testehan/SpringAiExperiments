@@ -4,6 +4,7 @@ import com.testehan.springai.immobiliare.service.WhatsAppService;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.service.LeadService;
+import com.testehan.springai.immobiliare.util.ContactValidator;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.MessageSource;
@@ -37,6 +38,7 @@ public class AdminRestController {
         var user = conversationSession.getImmobiliareUser().get();
         if (user.isAdmin()) {
             lead.setPhoneNumber(lead.getPhoneNumber().replace(" ", ""));
+            lead.setPhoneNumber(ContactValidator.internationalizePhoneNumber(lead.getPhoneNumber()));
             Optional<Lead> leadOptional = leadService.findLeadByPhoneNumber(lead.getPhoneNumber());
 
             return leadService.saveOrUpdate(lead, leadOptional);

@@ -44,12 +44,6 @@ public class LeadService {
     }
 
     public Optional<Lead> findLeadByPhoneNumber(String phoneNumber){
-
-        if (!phoneNumber.startsWith("+4")) {
-            // setting the prefix and then searching to see if another phone with that prefix is present.
-            phoneNumber = "+4" + phoneNumber;
-        }
-
         return leadRepository.findByPhoneNumber(phoneNumber);
 
     }
@@ -64,10 +58,6 @@ public class LeadService {
     }
 
     public String updateLeadStatus(String phoneNumber, String status){
-        if (!phoneNumber.startsWith("+4")) {
-            phoneNumber = "+4" + phoneNumber;
-        }
-
         var leadOptional = findLeadByPhoneNumber(phoneNumber);
         if (leadOptional.isPresent()){
             var lead = leadOptional.get();

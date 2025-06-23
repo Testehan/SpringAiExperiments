@@ -35,7 +35,7 @@ public class MaytapiWhatsAppService {
         this.leadService = leadService;
     }
 
-    public ResponseEntity<String> sendMessage(String recipientNumber, String messageText, Boolean isFirstMessage) {
+    public ResponseEntity<String> sendMessage(String recipientNumber, String messageText) {
         var apiUrl = String.format("https://api.maytapi.com/api/%s/%s/sendMessage", PRODUCT_ID, PHONE_NUMBER_ID);
 
         LOGGER.info("Will try to send message '{}' to {}", messageText, recipientNumber);

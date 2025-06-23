@@ -81,6 +81,8 @@ public class ApartmentService {
             apartment.setContactEmail(userOptional.get().getEmail());
         }
 
+        apartment.setContact(ContactValidator.internationalizePhoneNumber(apartment.getContact()));
+
         handleNewOrUpdatedProperty(apartment);
         var isPropertyNew = isPropertyNew(apartment);
         if (isPropertyNew){
@@ -135,7 +137,7 @@ public class ApartmentService {
 
     private void updateUserPhoneIfChanged(Apartment apartment, Optional<ImmobiliareUser> userOptional) {
         var contact = apartment.getContact();
-        if (ContactValidator.isValidPhoneNumber(contact,"RO") && userOptional.isPresent()) {
+        if (ContactValidator.isValidPhoneNumber(contact,null) && userOptional.isPresent()) {
             var user = userOptional.get();
             if ( !contact.equalsIgnoreCase(user.getPhoneNumber())) {
                 user.setPhoneNumber(contact);

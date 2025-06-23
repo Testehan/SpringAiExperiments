@@ -1,5 +1,4 @@
 const WHATSAPP_BASE_URL = 'https://wa.me/';
-const ROMANIA_COUNTRY_CODE = '4'; // WHATSAPP code for Romania
 
 $(document).ready(function () {
     // initial page setup
@@ -50,7 +49,7 @@ function getPhoneNumber(showContactButton){
             $parentSpan.append($phoneNumberElement);
 
             if (phoneNumber !== 'No apartment found!'){
-                var whatsappLink = WHATSAPP_BASE_URL + ROMANIA_COUNTRY_CODE + phoneNumber;
+                var whatsappLink = WHATSAPP_BASE_URL + phoneNumber;
                 var $whatsappLink = $parentSpan.closest('span').find('.whatsapp-link');
                 $whatsappLink.attr('href', whatsappLink).show();
                 $parentSpan.append($whatsappLink);

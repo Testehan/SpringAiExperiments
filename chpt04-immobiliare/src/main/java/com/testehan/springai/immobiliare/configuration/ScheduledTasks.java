@@ -181,7 +181,7 @@ public class ScheduledTasks {
                     var contact = listing.getContact();
                     var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
 
-                    if (ContactValidator.isValidPhoneNumber(contact, "RO")) {
+                    if (ContactValidator.isValidPhoneNumber(contact, null)) {
                         var phoneWithPrefix = ContactValidator.getPhoneNumberWithPrefix(contact, "RO");
                         if (phoneWithPrefix.isEmpty()) {
                             LOGGER.error("Can't send SMS for {} of listing named {}", contact, listing.getName());
