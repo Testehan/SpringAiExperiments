@@ -36,19 +36,17 @@ public class AgentRestController {
     private final ApartmentService apartmentService;
     private final ApartmentCrudService apartmentCrudService;
     private final ListingImageService listingImageService;
-    private final WhatsAppService whatsAppService;
     private final MaytapiWhatsAppService maytapiWhatsAppService;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, WhatsAppService whatsAppService, MaytapiWhatsAppService maytapiWhatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AgentRestController(LeadService leadService, LeadConversationService leadConversationService, ApartmentService apartmentService, ApartmentCrudService apartmentCrudService, ListingImageService listingImageService, MaytapiWhatsAppService maytapiWhatsAppService, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
         this.leadConversationService = leadConversationService;
         this.apartmentService = apartmentService;
         this.apartmentCrudService = apartmentCrudService;
         this.listingImageService = listingImageService;
-        this.whatsAppService = whatsAppService;
         this.maytapiWhatsAppService = maytapiWhatsAppService;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;

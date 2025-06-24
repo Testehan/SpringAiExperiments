@@ -1,6 +1,5 @@
 package com.testehan.springai.immobiliare.controller;
 
-import com.testehan.springai.immobiliare.service.WhatsAppService;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.Lead;
 import com.testehan.springai.immobiliare.service.LeadService;
@@ -19,15 +18,13 @@ import java.util.Optional;
 public class AdminRestController {
 
     private final LeadService leadService;
-    private final WhatsAppService whatsAppService;
     private final ConversationSession conversationSession;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AdminRestController(LeadService leadService, WhatsAppService whatsAppService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AdminRestController(LeadService leadService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
-        this.whatsAppService = whatsAppService;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
