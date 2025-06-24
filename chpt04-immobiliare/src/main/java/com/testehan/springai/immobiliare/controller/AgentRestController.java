@@ -134,8 +134,6 @@ public class AgentRestController {
         apartmentService.saveApartmentAndImages(apartment, processedImages, Optional.empty(),true);
         if (leadByListingUrl.isPresent()) {
             leadService.updateLeadStatus(leadByListingUrl.get().getPhoneNumber(), ContactStatus.DONE.toString());
-//   TODO      LA momentul asta, poti obtine din apartment socialId ? sau e null ? pt ca saveApartmentAndImages e Async
-//    maytapiWhatsAppService.sendMessage(leadByListingUrl.get().getPhoneNumber(),"Anuntul pe casamia e : TODO LINK catre /s/")
         }
 
 

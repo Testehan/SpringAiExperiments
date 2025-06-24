@@ -13,6 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 @Service
 public class MaytapiWhatsAppService {
 
@@ -26,6 +30,14 @@ public class MaytapiWhatsAppService {
 
     @Value(("${whatsapp.maytapi.api.product.id}"))
     private String PRODUCT_ID;
+
+    private static final List<String> VIEW_LISTING_MESSAGES = new ArrayList<>(List.of(
+            "Anunțul tău este acum publicat. Îl poți vizualiza aici : %s",
+            "Am publicat anunțul tău: %s",
+            "Anunțul tău este vizibil pe casamia.ai. Dă un click pentru a-l vedea : %s",
+            "Anunțul tău a fost listat %s. Îl poți verifica acum și să-l distribui :).",
+            "Anunțul tău este aici : %s . Poți să îl vezi și să-l distribui."
+    ));
 
     private final LeadConversationService leadConversationService;
     private final LeadService leadService;
@@ -69,6 +81,11 @@ public class MaytapiWhatsAppService {
         }
     }
 
+    public void sendSocialListingMessage(String contact, String url) {
+        var formatedMessage = String.format(VIEW_LISTING_MESSAGES.get(new Random().nextInt(VIEW_LISTING_MESSAGES.size())), url);
+        sendMessage(contact, formatedMessage);
+
+    }
 }
 
 // todo move to a separate class

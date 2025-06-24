@@ -12,10 +12,12 @@ public class ListingNotificationService {
     private String appUrl;
 
     private final EmailService emailService;
+    private final MaytapiWhatsAppService maytapiWhatsAppService;
     private final LocaleUtils localeUtils;
 
-    public ListingNotificationService(EmailService emailService, LocaleUtils localeUtils) {
+    public ListingNotificationService(EmailService emailService, MaytapiWhatsAppService maytapiWhatsAppService, LocaleUtils localeUtils) {
         this.emailService = emailService;
+        this.maytapiWhatsAppService = maytapiWhatsAppService;
         this.localeUtils = localeUtils;
     }
 
@@ -24,6 +26,10 @@ public class ListingNotificationService {
         var viewUrl = appUrl + "/view/" + listingId;
         var editUrl = appUrl + "/edit/" + listingId;
         emailService.sendListingAddedEmail(user.getEmail(), user.getName(), listing.getName(), viewUrl, editUrl ,localeUtils.getCurrentLocale());
+    }
+
+    public void sendWhatsAppSocialListingMessage(Apartment listing){
+        maytapiWhatsAppService.sendSocialListingMessage(listing.getContact(), appUrl + "/s/" + listing.getSocialId());
     }
 
 

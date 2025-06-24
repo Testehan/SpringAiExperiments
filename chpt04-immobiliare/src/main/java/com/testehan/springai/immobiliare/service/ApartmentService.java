@@ -116,6 +116,7 @@ public class ApartmentService {
             if(!isBatchSave && userOptional.isPresent()) {
                 listingNotificationService.sendListingAddedEmail(savedListing, userOptional.get());
             }
+            listingNotificationService.sendWhatsAppSocialListingMessage(apartment);
         }
 
         llmCacheService.removeCachedEntries(apartment.getCity(), apartment.getPropertyType());
