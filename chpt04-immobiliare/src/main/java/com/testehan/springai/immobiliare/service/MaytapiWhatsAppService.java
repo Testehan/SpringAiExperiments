@@ -71,7 +71,7 @@ public class MaytapiWhatsAppService {
             ObjectMapper mapper = new ObjectMapper();
 
             MaytapiResponse sendMessageResponse = mapper.readValue(rawJson, MaytapiResponse.class);
-            leadConversationService.saveConversationTextMessage(recipientNumber.replace("+", ""), sendMessageResponse.getData().getMsgId(), messageText, MessageType.SENT);
+            leadConversationService.saveConversationTextMessage(recipientNumber, sendMessageResponse.getData().getMsgId(), messageText, MessageType.SENT);
             return ResponseEntity.ok("Reply sent successfully");
 
         } catch (Exception e) {
