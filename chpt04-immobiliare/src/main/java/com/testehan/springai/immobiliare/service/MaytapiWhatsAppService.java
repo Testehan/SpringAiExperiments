@@ -33,10 +33,11 @@ public class MaytapiWhatsAppService {
 
     private static final List<String> VIEW_LISTING_MESSAGES = new ArrayList<>(List.of(
             "Anunțul tău este acum publicat. Îl poți vizualiza aici : %s",
-            "Am publicat anunțul tău: %s",
-            "Anunțul tău este vizibil pe casamia.ai. Dă un click pentru a-l vedea : %s",
-            "Anunțul tău a fost listat %s. Îl poți verifica acum și să-l distribui :).",
-            "Anunțul tău este aici : %s . Poți să îl vezi și să-l distribui."
+            "Anunțul tău a fost listat 👉 %s. Îl poți verifica acum și să-l distribui.",
+            "Dă share la anunțul tău 👉 %s — șansele de a găsi chiriaș cresc cu 50–200% 🚀",
+            "Un share rapid pe Facebook sau Insta 📲 %s îți poate dubla șansele să închiriezi mai repede 🔥",
+            "Distribuie anunțul %s — proprietarii care o fac găsesc chiriași de până la 3x mai repede 👌",
+            "Ajută anunțul să circule! 🔁 %s — în medie, se închiriază de 2x mai repede 📈"
     ));
 
     private final LeadConversationService leadConversationService;
