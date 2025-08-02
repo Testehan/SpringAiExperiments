@@ -186,12 +186,16 @@
                             <td class="p-3" th:text="${#dates.format(lead.updatedAt, 'yyyy-MM-dd HH:mm')}"></td>
 
                             <td>
-                                <div class="flex items-center justify-center h-full">
+                                <div class="flex items-center h-full">
                                     <button type="button"
                                             class="deleteLead bg-red-500 font-bold text-white px-4 py-2 rounded hover:bg-red-600"
                                             th:data-url="@{{appUrl}/a/leads/delete/{leadId}(leadId=${lead.id},appUrl=${appUrl})}">
                                         Delete
                                     </button>
+                                    <a th:if="${lead.status.name() ne 'NO_WHATSAPP' and lead.status.name() ne 'NOT_CONTACTED'}" th:href="@{{appUrl}/a/leads/conversation/{leadId}(leadId=${lead.phoneNumber},appUrl=${appUrl})}"
+                                        class="ml-4 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">
+                                        Chat
+                                    </a>
                                 </div>
                             </td>
                         </tr>
