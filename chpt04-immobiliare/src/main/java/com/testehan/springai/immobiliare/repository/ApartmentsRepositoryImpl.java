@@ -63,7 +63,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         int numCandidates = 100;  // how many neighbours it will use when doing the nearest neighbour search; it should be
         // higher than the limit we set below...higher numbers of this variable will
         // provide higher accuracy, but it will also give some latency hits..
-        int limit = 50;
+        int limit = 8;
 
 
         // TODO if you want to add more filters, remember that you must modify the existing index in MongoAtlas, and add the
