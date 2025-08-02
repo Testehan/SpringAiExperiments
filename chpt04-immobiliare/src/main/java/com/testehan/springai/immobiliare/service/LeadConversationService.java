@@ -35,8 +35,12 @@ public class LeadConversationService {
         }
     }
 
+    public List<LeadConversation> getLeadConversation(String phoneNumberInInternational){
+        return leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneNumberInInternational);
+    }
+
     public String getConversation(String phoneNumberInInternational){
-        return formatConversation(leadConversationRepository.findByWaUserIdOrderByTimestampAsc(phoneNumberInInternational));
+        return formatConversation(getLeadConversation(phoneNumberInInternational));
     }
 
     public boolean doWeNeedToContinueConversation(String phoneNumberInInternational){

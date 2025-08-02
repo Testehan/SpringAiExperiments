@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.Lead;
+import com.testehan.springai.immobiliare.service.LeadConversationService;
 import com.testehan.springai.immobiliare.service.LeadService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.thymeleaf.util.StringUtils;
@@ -31,13 +33,15 @@ public class AdminViewController {
     private String appUrl;
 
     private final LeadService leadService;
+    private final LeadConversationService leadConversationService;
     private final ConversationSession conversationSession;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AdminViewController(LeadService leadService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AdminViewController(LeadService leadService, LeadConversationService leadConversationService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
+        this.leadConversationService = leadConversationService;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
@@ -86,6 +90,16 @@ public class AdminViewController {
             model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null, localeUtils.getCurrentLocale()));
             return "error-404";
         }
+    }
+
+    @GetMapping("/leads/conversation/{waUserId}")
+    public String getConversation(@PathVariable String waUserId, Model model) {
+        var leadConversation = leadConversationService.getLeadConversation(waUserId);
+
+        model.addAttribute("appUrl", appUrl);
+        model.addAttribute("messages",leadConversation);
+
+        return "admin-leads-conversation";
     }
 
     private List<String> getLeadInitialMessages(int numberOfLeads){
