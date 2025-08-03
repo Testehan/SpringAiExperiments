@@ -20,7 +20,11 @@ public class OllamaController {
 
     @PostMapping(consumes = "text/plain", produces = "application/json", path = "/prompt")
     public String getResponseFromLlm(@RequestBody String input){
-        log.info("Controller message : {}", input);
         return ollamaService.getResponseFromLlm(input);
+    }
+
+    @PostMapping(consumes = "text/plain", produces = "application/json", path = "/format")
+    public String getFormatListing(@RequestBody String input){
+        return ollamaService.getFormatListing(input);
     }
 }

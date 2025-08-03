@@ -1,5 +1,6 @@
 package com.testehan.springai.ollama.chpt05.service;
 
+import com.testehan.springai.ollama.chpt05.config.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,18 @@ public class OllamaService {
         var response = ollamaChatModel.call(input);
 
         log.info("Response from deepseek {}",response);
+        return response;
+    }
+
+    public String getFormatListing(String input) {
+        log.info("Received message {}",input);
+
+        var prompt = Constants.PROMPT_FORMAT_LISTING.formatted(input);
+        log.info("Will send the following prompt to LLM {}",prompt);
+
+        var response = ollamaChatModel.call(prompt);
+
+        log.info("Response from LLM {}",response);
         return response;
     }
 }
