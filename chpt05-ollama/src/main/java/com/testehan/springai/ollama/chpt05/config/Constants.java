@@ -66,42 +66,42 @@ public class Constants {
         }
         """;
 
-    public static final String PROMPT_FORMAT_LISTING = "You are a JSON formatting expert. You will receive raw text %s " +
-            "Do not try to scrape or browse anything. Do not generate data Your only task is to convert the provided text into a valid JSON object that adheres to the provided schema.\n" +
+    public static final String PROMPT_FORMAT_LISTING = """
+        Ești un expert în formatarea JSON. Vei primi un text brut: {rawText}
+        Nu încerca să extragi date de pe internet sau să navighezi. Nu genera date. Singura ta sarcină este să convertești textul furnizat într-un obiect JSON valid care respectă schema furnizată.
+        Foarte important: Textul furnizat ca input este in limba romana. Textul furnizat la final trebuie sa fie tot in limba romana !!!
+        Foarte important: câmpul „city” trebuie să conțină numele unui oraș valid din România. Dacă valoarea este Cluj, acesta nu este un nume de oraș valid. Înlocuiește-l cu Cluj-Napoca.
+    
+        La formatarea câmpului „name”:
+        - Rescrie numele astfel încât să sune profesionist, concis și atractiv.
+        - NU include cuvinte precum „Proprietar”, „PF”, „închiriez” sau „de închiriat”, deoarece platforma mea gestionează doar închirieri de la proprietari.
+        - Evidențiază numărul de camere, suprafața și zona, dacă sunt disponibile.
+        - Păstrează-l sub 70 de caractere.
+        - NU adăuga sau inventa detalii care nu sunt prezente în textul de intrare.
+    
+        La formatarea câmpului „shortDescription”:
+        - Păstrează toate informațiile faptice (suprafață, camere, locație, echipamente, condiții etc.).
+        - Elimină părțile redundante precum „PF”, „persoană fizică”, „dau în chirie” sau „nu colaborez cu agenții”.
+        - Organizează informațiile în 2–3 paragrafe scurte.
+        - Folosește propoziții complete și un ton natural.
+        - NU adăuga sau inventa detalii care nu sunt prezente în textul de intrare.
+        - Nu adauga referinte la platforme imobiliare gen olx publi24 etc
+    
+        La formatarea câmpului „area”:
+        - Extrage din text cele mai precise informații disponibile despre locație.
+        - Poate fi un **nume de stradă**, **cartier**, **piață** sau **punct de reper cunoscut din apropiere** (de ex. universitate, mall, stație de metrou).
+        - Urmează această ordine de prioritate: adresă exactă/stradă > cartier > punct de interes cunoscut din apropiere.
+        - Exemplu: dacă textul menționează „strada Mureșului” și „aproape de Iulius Mall”, returnează „strada Mureșului”.
+        - Dacă nu este dată nicio stradă, dar este menționat un punct de reper, returnează acel punct de reper (de ex. „lângă FSEGA”).
+        - Păstrează-l scurt și natural (evită propozițiile complete, doar numele locului).
+        - NU repeta numele orașului în acest câmp.
+    
+        Iată DEFINIȚIA SCHEMEI PE CARE ȘIRUL TĂU JSON FINAL TREBUIE SĂ O RESPECTE:
+        {format}
+        
+        Bazat *doar* pe conținutul furnizat și pe definiția schemei, generează șirul JSON final.
+        FOARTE IMPORTANT: Răspunsul tău final TREBUIE să fie NUMAI șirul JSON brut. Nu-l încadra în markdown și nu adăuga niciun alt text.
+        """;
 
-            "Very important : the city field must contain the name of a valid city from Romania. If the value is Cluj then that is not" +
-            "a valid city name. Replace it with Cluj-Napoca." +
-
-            "When generating the 'name' field:\n" +
-            "- Rewrite the name to sound professional, concise, and attractive.\n" +
-            "- Do NOT include words like 'Proprietar' or 'PF' or 'inchiriez' or 'de inchiriat' since my platform only handles rentals from owners.\n" +
-            "- Highlight the number of rooms, surface area, and area if available.\n" +
-            "- Keep it under 120 characters.\n" +
-            "- Use natural Romanian phrasing for listings (e.g. '2 camere, 90 mp, ultracentral').\n" +
-
-            "When generating the 'shortDescription' field:\n" +
-            "- Rewrite the text in Romanian to be clean, professional, and easy to read.\n" +
-            "- Keep all factual information (surface, rooms, location, equipment, conditions, etc.).\n" +
-            "- Remove redundant parts like 'PF', 'persoana fizica', 'dau în chirie', or 'nu colaborez cu agenții'.\n" +
-            "- Organize information into 2–3 short paragraphs.\n" +
-            "- Use complete sentences and a natural tone.\n" +
-            "- Do NOT add or invent details not present in the input.\n\n" +
-
-            "When generating the 'area' field:\n" +
-            "- Extract the most precise available location information from the text.\n" +
-            "- It can be a **street name**, **neighborhood**, **square**, or **known nearby landmark** (e.g. university, mall, metro station).\n" +
-            "- Follow this priority order: exact address/street > neighborhood > well-known nearby point of interest.\n" +
-            "- Example: if the text mentions 'strada Mureșului' and 'aproape de Iulius Mall', return 'strada Mureșului'.\n" +
-            "- If no street is given but a landmark is, return that landmark (e.g. 'lângă FSEGA').\n" +
-            "- Keep it short and natural (avoid full sentences, just the place name).\n" +
-            "- Do NOT repeat the city name in this field.\n\n" +
-
-            "HERE IS THE SCHEMA DEFINITION YOUR FINAL JSON STRING MUST ADHERE TO: \n" +
-            "--- SCHEMA START --- \n" +
-            JSON_SCHEMA_LISTING + "\n" +
-            "--- SCHEMA END --- \n\n" +
-
-            "Based *only* on the provided content and the schema definition, generate the final JSON string." +
-            "VERY IMPORTANT : Your final answer MUST be ONLY the raw JSON string. Do not wrap it in markdown or add any other text. Your entire output must start with `{` and end with `}`.";
 
 }
