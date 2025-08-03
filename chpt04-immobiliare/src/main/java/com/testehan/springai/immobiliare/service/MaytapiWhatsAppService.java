@@ -34,7 +34,7 @@ public class MaytapiWhatsAppService {
     private static final List<String> VIEW_LISTING_MESSAGES = new ArrayList<>(List.of(
             "Anunțul tău este acum publicat. Îl poți vizualiza aici : %s",
             "Anunțul tău a fost listat 👉 %s. Îl poți verifica acum și să-l distribui.",
-            "Dă share la anunțul tău 👉 %s — șansele de a găsi chiriaș cresc cu 50–200% 🚀",
+            "Dă share la anunțul tău 👉 %s — șansele de a găsi chiriaș cresc cu 50–200%% 🚀",
             "Un share rapid pe Facebook sau Insta 📲 %s îți poate dubla șansele să închiriezi mai repede 🔥",
             "Distribuie anunțul %s — proprietarii care o fac găsesc chiriași de până la 3x mai repede 👌",
             "Ajută anunțul să circule! 🔁 %s — în medie, se închiriază de 2x mai repede 📈"
