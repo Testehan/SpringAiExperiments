@@ -10,7 +10,7 @@ public class OllamaConfig {
     @Bean
     public ChatClient chatClient(ChatClient.Builder builder){
         return builder
-                .defaultSystem("You are a helpful java assistant")
+                .defaultSystem("You are a helpful assistant")
                 .build();
     }
 }

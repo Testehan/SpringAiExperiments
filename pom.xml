@@ -22,7 +22,7 @@
 		<module>chpt02-MongoDBAtlasVectorSearch</module>
 		<module>chpt03-chat-gpt</module>
 		<module>chpt04-immobiliare</module>
-		<module>chpt05-llama3</module>
+		<module>chpt05-ollama</module>
 		<module>chpt07-chat-streaming</module>
         <module>chpt08-gemini</module>
 	</modules>
