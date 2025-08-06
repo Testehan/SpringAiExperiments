@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: page_head('none')}" />
+
+<script th:src="@{/js/admin_lead.js}"></script>
+<script th:src="@{/js/admin_lead_deletion.js}"></script>
+
+
+<body class="h-screen bg-gray-100">
+
+<div th:replace="~{fragments :: deletion_confirmation}" />
+
+<div class="h-[90%] pt-16">
+
+    <main class=" bg-white p-4 w-full max-w-full">
+        <div class="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6">
+            <h1 class="text-2xl font-bold mb-4">Admin Listings Dashboard</h1>
+
+            <!-- Filter and Search Form -->
+            <form th:action="@{/admin/listings}" method="get" class="mb-6 flex flex-wrap gap-4">
+                <input type="text" th:value="${search}" name="search" placeholder="Search by name, city, or area" class="border p-2 rounded flex-1 min-w-[200px]">
+                <input type="text" th:value="${cityFilter}" name="cityFilter" placeholder="Filter by city" class="border p-2 rounded flex-1 min-w-[200px]">
+                <select name="propertyTypeFilter" class="border p-2 rounded flex-1 min-w-[200px]">
+                    <option value="">All Property Types</option>
+                    <option th:each="type : ${propertyTypes}" th:value="${type}" th:text="${type}" th:selected="${propertyTypeFilter == type}"></option>
+                </select>
+                <input type="number" th:value="${minPrice}" name="minPrice" placeholder="Min Price" class="border p-2 rounded flex-1 min-w-[100px]">
+                <input type="number" th:value="${maxPrice}" name="maxPrice" placeholder="Max Price" class="border p-2 rounded flex-1 min-w-[100px]">
+                <input type="hidden" th:value="${sortBy}" name="sortBy">
+                <input type="hidden" th:value="${sortDir}" name="sortDir">
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded">Apply Filters</button>
+            </form>
+
+            <!-- Table of listings -->
+            <div class="overflow-x-auto">
+                <table id="listingsTable" class="min-w-full bg-white shadow rounded-2xl">
+                    <thead class="bg-gray-100">
+                    <tr>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=name&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Name
+                                <span th:text="${sortBy == 'name' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=city&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                City
+                                <span th:text="${sortBy == 'city' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=area&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Area
+                                <span th:text="${sortBy == 'area' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=price&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Price
+                                <span th:text="${sortBy == 'price' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=propertyType&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Property Type
+                                <span th:text="${sortBy == 'propertyType' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=surface&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Surface
+                                <span th:text="${sortBy == 'surface' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=noOfRooms&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Rooms
+                                <span th:text="${sortBy == 'noOfRooms' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=availableFrom&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Available From
+                                <span th:text="${sortBy == 'availableFrom' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=contact&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Contact
+                                <span th:text="${sortBy == 'contact' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=noOfFavourite&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Favourites
+                                <span th:text="${sortBy == 'noOfFavourite' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=noOfContact&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Contacts
+                                <span th:text="${sortBy == 'noOfContact' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=active&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Active
+                                <span th:text="${sortBy == 'active' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                        <th>
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=creationDateTime&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Created At
+                                <span th:text="${sortBy == 'creationDateTime' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                    <tr th:each="listing : ${listings}" class="hover:bg-gray-100">
+                        <td class="p-3" th:text="${listing.name}"></td>
+                        <td class="p-3" th:text="${listing.city}"></td>
+                        <td class="p-3" th:text="${listing.area}"></td>
+                        <td class="p-3" th:text="${listing.price}"></td>
+                        <td class="p-3" th:text="${listing.propertyType}"></td>
+                        <td class="p-3" th:text="${listing.surface}"></td>
+                        <td class="p-3" th:text="${listing.noOfRooms}"></td>
+                        <td class="p-3" th:text="${listing.availableFrom}"></td>
+                        <td class="p-3">
+                            <span th:if="${listing.whatsapp}">
+                                <a th:href="'https://wa.me/' + ${#strings.replace(listing.contact, '+', '')}" target="_blank" class="text-green-600 hover:underline">
+                                    <span class="flex items-center gap-1">
+                                        <span th:text="${listing.contact}"></span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20" viewBox="0 0 48 48">
+                                            <path fill="#fff" d="M4.868,43.303l2.694-9.835C5.9,30.59,5.026,27.324,5.027,23.979C5.032,13.514,13.548,5,24.014,5c5.079,0.002,9.845,1.979,13.43,5.566c3.584,3.588,5.558,8.356,5.556,13.428c-0.004,10.465-8.522,18.98-18.986,18.98c-0.001,0,0,0,0,0h-0.008c-3.177-0.001-6.3-0.798-9.073-2.311L4.868,43.303z"></path><path fill="#fff" d="M4.868,43.803c-0.132,0-0.26-0.052-0.355-0.148c-0.125-0.127-0.174-0.312-0.127-0.483l2.639-9.636c-1.636-2.906-2.499-6.206-2.497-9.556C4.532,13.238,13.273,4.5,24.014,4.5c5.21,0.002,10.105,2.031,13.784,5.713c3.679,3.683,5.704,8.577,5.702,13.781c-0.004,10.741-8.746,19.48-19.486,19.48c-3.189-0.001-6.344-0.788-9.144-2.277l-9.875,2.589C4.953,43.798,4.911,43.803,4.868,43.803z"></path><path fill="#cfd8dc" d="M24.014,5c5.079,0.002,9.845,1.979,13.43,5.566c3.584,3.588,5.558,8.356,5.556,13.428c-0.004,10.465-8.522,18.98-18.986,18.98h-0.008c-3.177-0.001-6.3-0.798-9.073-2.311L4.868,43.303l2.694-9.835C5.9,30.59,5.026,27.324,5.027,23.979C5.032,13.514,13.548,5,24.014,5 M24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974 M24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974C24.014,42.974,24.014,42.974,24.014,42.974 M24.014,4C24.014,4,24.014,4,24.014,4C12.998,4,4.032,12.962,4.027,23.979c-0.001,3.367,0.849,6.685,2.461,9.622l-2.585,9.439c-0.094,0.345,0.002,0.713,0.254,0.967c0.19,0.192,0.447,0.297,0.711,0.297c0.085,0,0.17-0.011,0.254-0.033l9.687-2.54c2.828,1.468,5.998,2.243,9.197,2.244c11.024,0,19.99-8.963,19.995-19.98c0.002-5.339-2.075-10.359-5.848-14.135C34.378,6.083,29.357,4.002,24.014,4L24.014,4z"></path><path fill="#40c351" d="M35.176,12.832c-2.98-2.982-6.941-4.625-11.157-4.626c-8.704,0-15.783,7.076-15.787,15.774c-0.001,2.981,0.833,5.883,2.413,8.396l0.376,0.597l-1.595,5.821l5.973-1.566l0.577,0.342c2.422,1.438,5.2,2.198,8.032,2.199h0.006c8.698,0,15.777-7.077,15.78-15.776C39.795,19.778,38.156,15.814,35.176,12.832z"></path><path fill="#fff" fill-rule="evenodd" d="M19.268,16.045c-0.355-0.79-0.729-0.806-1.068-0.82c-0.277-0.012-0.593-0.011-0.909-0.011c-0.316,0-0.83,0.119-1.265,0.594c-0.435,0.475-1.661,1.622-1.661,3.956c0,2.334,1.7,4.59,1.937,4.906c0.237,0.316,3.282,5.259,8.104,7.161c4.007,1.58,4.823,1.266,5.693,1.187c0.87-0.079,2.807-1.147,3.202-2.255c0.395-1.108,0.395-2.057,0.277-2.255c-0.119-0.198-0.435-0.316-0.909-0.554s-2.807-1.385-3.242-1.543c-0.435-0.158-0.751-0.237-1.068,0.238c-0.316,0.474-1.225,1.543-1.502,1.859c-0.277,0.317-0.554,0.357-1.028,0.119c-0.474-0.238-2.002-0.738-3.815-2.354c-1.41-1.257-2.362-2.81-2.639-3.285c-0.277-0.474-0.03-0.731,0.208-0.968c0.213-0.213,0.474-0.554,0.712-0.831c0.237-0.277,0.316-0.475,0.474-0.791c0.158-0.317,0.079-0.594-0.04-0.831C20.612,19.329,19.69,16.983,19.268,16.045z" clip-rule="evenodd"></path>
+                                        </svg>
+                                    </span>
+                                </a>
+                            </span>
+                            <span th:unless="${listing.whatsapp}">
+                                <a th:href="'tel:' + ${listing.contact}" class="text-blue-500 hover:underline" th:text="${listing.contact}"></a>
+                            </span>
+                        </td>
+                        <td class="p-3" th:text="${listing.noOfFavourite} + (${listing.isMostFavourite ? ' (Most Fav)' : ''})"></td>
+                        <td class="p-3" th:text="${listing.noOfContact} + (${listing.isMostContacted ? ' (Most Contacted)' : ''})"></td>
+                        <td class="p-3" th:text="${listing.active ? 'Yes' : 'No'}"></td>
+                        <td class="p-3" th:text="${#dates.format(#calendars.create(listing.creationDateTime), 'yyyy-MM-dd HH:mm')}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-col justify-center items-center mt-6">
+                <div class="mb-2">
+                    <h1 class="text-lg font-semibold">Pagination</h1>
+                </div>
+                <div>
+                    <ul class="pagination flex space-x-4">
+                        <li th:if="${currentPage > 0}">
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=${sortBy}&sortDir=${sortDir}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
+                        </li>
+                        <li th:if="${currentPage > 0}">
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=${sortBy}&sortDir=${sortDir}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
+                        </li>
+                        <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=${sortBy}&sortDir=${sortDir}&page=${pageNum}|}"
+                               th:classappend="${pageNum == currentPage ? 'bg-blue-500 text-white' : ''}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200" th:text="${pageNum + 1}"></a>
+                        </li>
+                        <li th:if="${currentPage < totalPages - 1}">
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=${sortBy}&sortDir=${sortDir}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
+                        </li>
+                        <li th:if="${currentPage < totalPages - 1}">
+                            <a href="#" th:href="@{|/admin/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice}&maxPrice=${maxPrice}&sortBy=${sortBy}&sortDir=${sortDir}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
