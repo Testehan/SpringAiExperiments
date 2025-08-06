@@ -118,6 +118,7 @@ public class AdminViewController {
 
             Page<Apartment> listingsPage = apartmentCrudService.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice, sortBy, sortDir, page, size);
 
+            model.addAttribute("appUrl", appUrl);
             model.addAttribute("listings", listingsPage.getContent());
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", listingsPage.getTotalPages());

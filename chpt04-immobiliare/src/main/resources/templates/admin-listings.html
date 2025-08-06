@@ -3,6 +3,7 @@
 
 <head th:replace="~{fragments :: page_head('none')}" />
 
+<script th:src="@{/js/admin_listing.js}"></script>
 
 <body class="h-screen bg-gray-100">
 
@@ -15,28 +16,33 @@
             <h1 class="text-2xl font-bold mb-4">Admin Listings Dashboard</h1>
 
             <!-- Filter and Search Form -->
-            <form th:action="@{/a/listings}" method="get" class="mb-6 flex flex-wrap gap-4">
-                <input type="text" th:value="${search}" name="search" placeholder="Search by name, area" class="border p-2 rounded flex-1 min-w-[200px]">
+            <form id="listingFilterForm" th:action="@{/a/listings}" method="get" class="mb-6 flex flex-wrap gap-4">
+                <input id="listingName" type="text" th:value="${search}" name="search" placeholder="Search by name, area" class="border p-2 rounded flex-1 min-w-[200px]">
 
-                <select name="cityFilter" class="border p-2 rounded flex-1 min-w-[200px]">
+                <select id="listingCity" name="cityFilter" class="border p-2 rounded flex-1 min-w-[200px]">
                     <option value="">All Cities</option>
                     <option th:each="city : ${availableCities}" th:value="${city}" th:text="${city}" th:selected="${cityFilter == city}"></option>
                 </select>
 
-                <select name="propertyTypeFilter" class="border p-2 rounded flex-1 min-w-[200px]">
+                <select id="listingType" name="propertyTypeFilter" class="border p-2 rounded flex-1 min-w-[200px]">
                     <option value="">All Property Types</option>
                     <option th:each="type : ${propertyTypes}" th:value="${type}" th:text="${type}" th:selected="${propertyTypeFilter == type}"></option>
                 </select>
 
-                <input type="number" th:value="${minPrice ?: ''}" name="minPrice" placeholder="Min Price" class="border p-2 rounded flex-1 min-w-[100px]">
+                <input id="listingMinPrice" type="number" th:value="${minPrice ?: ''}" name="minPrice" placeholder="Min Price" class="border p-2 rounded flex-1 min-w-[100px]">
 
-                <input type="number" th:value="${maxPrice ?: ''}" name="maxPrice" placeholder="Max Price" class="border p-2 rounded flex-1 min-w-[100px]">
+                <input id="listingMaxPrice" type="number" th:value="${maxPrice ?: ''}" name="maxPrice" placeholder="Max Price" class="border p-2 rounded flex-1 min-w-[100px]">
 
                 <input type="hidden" th:value="${sortBy}" name="sortBy">
 
                 <input type="hidden" th:value="${sortDir}" name="sortDir">
 
                 <button type="submit" class="bg-blue-500 text-white p-2 rounded">Apply Filters</button>
+                <button type="button"
+                        id="clearButton"
+                        class="bg-gray-300 text-gray-800 px-4 py-2 rounded-xl hover:bg-gray-400 transition whitespace-nowrap">
+                    Clear
+                </button>
             </form>
 
             <!-- Table of listings -->
@@ -139,7 +145,9 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                     <tr th:each="listing : ${listings}" class="hover:bg-gray-100">
-                        <td class="p-3" th:text="${listing.name}"></td>
+                        <td class="p-3">
+                            <a target="_blank" th:href="@{{appUrl}/edit/{apartmentId}(apartmentId=${listing.id},appUrl=${appUrl})}">[[${listing.name}]]</a>
+                        </td>
                         <td class="p-3" th:text="${listing.city}"></td>
                         <td class="p-3" th:text="${listing.area}"></td>
                         <td class="p-3" th:text="${listing.price}"></td>
