@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.controller;
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.Lead;
+import com.testehan.springai.immobiliare.model.PropertyType;
 import com.testehan.springai.immobiliare.service.ApartmentCrudService;
 import com.testehan.springai.immobiliare.service.CityService;
 import com.testehan.springai.immobiliare.service.LeadConversationService;
@@ -99,6 +100,46 @@ public class AdminViewController {
             return "error-404";
         }
     }
+
+    @GetMapping("/listings")
+    public String getListings(Model model,
+                              @RequestParam(defaultValue = "") String search,
+                              @RequestParam(required = false) String cityFilter,
+                              @RequestParam(required = false) String propertyTypeFilter,
+                              @RequestParam(required = false) Integer minPrice,
+                              @RequestParam(required = false) Integer maxPrice,
+                              @RequestParam(defaultValue = "creationDateTime") String sortBy,
+                              @RequestParam(defaultValue = "desc") String sortDir,
+                              @RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "20") int size){
+        var user = conversationSession.getImmobiliareUser().get();
+
+        if (user.isAdmin()) {
+
+            Page<Apartment> listingsPage = apartmentCrudService.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice, sortBy, sortDir, page, size);
+
+            model.addAttribute("listings", listingsPage.getContent());
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", listingsPage.getTotalPages());
+            model.addAttribute("totalItems", listingsPage.getTotalElements());
+            model.addAttribute("search", search);
+            model.addAttribute("cityFilter", cityFilter);
+            model.addAttribute("propertyTypeFilter", propertyTypeFilter);
+            model.addAttribute("minPrice", minPrice);
+            model.addAttribute("maxPrice", maxPrice);
+            model.addAttribute("sortBy", sortBy);
+            model.addAttribute("sortDir", sortDir);
+
+            // Add enums or distinct values for filters if needed (e.g., PropertyType.values())
+            model.addAttribute("propertyTypes", PropertyType.values());
+
+            return "admin-listings";
+        } else {
+            model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null, localeUtils.getCurrentLocale()));
+            return "error-404";
+        }
+    }
+
 
     @GetMapping("/leads/conversation/{waUserId}")
     public String getConversation(@PathVariable String waUserId, Model model) {

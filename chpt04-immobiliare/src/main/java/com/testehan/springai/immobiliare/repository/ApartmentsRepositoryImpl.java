@@ -15,7 +15,10 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.thymeleaf.util.StringUtils;
 
@@ -294,6 +297,57 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         } else {
             LOGGER.warn("No apartments were deleted for Ids {}. Check if the IDs are correct.", apartmentIds.stream().collect(Collectors.joining()));
         }
+    }
+
+    @Override
+    public Page<Apartment> searchApartment(String search, String cityFilter, String propertyTypeFilter, Integer minPrice, Integer maxPrice, String sortBy, String sortDir, int page, int size) {
+        Query query = new Query();
+
+        // Search by name, city, or area (case-insensitive regex)
+        if (search != null && !search.isEmpty()) {
+            String regexPattern = ".*" + search + ".*";
+            Criteria searchCriteria = new Criteria().orOperator(
+                    Criteria.where("name").regex(regexPattern, "i"),
+                    Criteria.where("city").regex(regexPattern, "i"),
+                    Criteria.where("area").regex(regexPattern, "i")
+            );
+            query.addCriteria(searchCriteria);
+        }
+
+        // Filter by city (case-insensitive)
+        if (cityFilter != null && !cityFilter.isEmpty()) {
+            query.addCriteria(Criteria.where("city").regex(cityFilter, "i"));
+        }
+
+        // Filter by propertyType (assuming PropertyType is an enum stored as string)
+        if (propertyTypeFilter != null && !propertyTypeFilter.isEmpty()) {
+            query.addCriteria(Criteria.where("propertyType").is(propertyTypeFilter));
+        }
+
+        // Price range filter
+        if (minPrice != null) {
+            query.addCriteria(Criteria.where("price").gte(minPrice));
+        }
+        if (maxPrice != null) {
+            query.addCriteria(Criteria.where("price").lte(maxPrice));
+        }
+
+        // Only active listings
+        query.addCriteria(Criteria.where("active").is(true));
+
+        // Sorting
+        Sort sort = Sort.by(sortBy != null ? sortBy : "creationDateTime");
+        sort = "asc".equalsIgnoreCase(sortDir) ? sort.ascending() : sort.descending();
+        query.with(sort);
+
+        // Pagination
+        long total = mongoTemplate.count(query, Apartment.class);
+        query.skip((long) page * size).limit(size);
+
+        List<Apartment> apartments = mongoTemplate.find(query, Apartment.class);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return new PageImpl<>(apartments, pageable, total);
+
     }
 
 }

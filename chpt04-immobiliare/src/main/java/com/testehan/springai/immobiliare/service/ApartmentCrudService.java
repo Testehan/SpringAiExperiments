@@ -2,6 +2,7 @@ package com.testehan.springai.immobiliare.service;
 
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.repository.ApartmentsRepository;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -57,4 +58,13 @@ public class ApartmentCrudService {
     public Optional<String> findApartmentIdBySocialId(String socialId) {
         return apartmentsRepository.findApartmentIdBySocialId(socialId);
     }
+
+    public Page<Apartment> searchApartment(String search, String cityFilter, String propertyTypeFilter,
+                                           Integer minPrice, Integer maxPrice, String sortBy,
+                                           String sortDir, int page, int size) {
+
+        return apartmentsRepository.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice, sortBy, sortDir, page, size);
+
+    }
+
 }

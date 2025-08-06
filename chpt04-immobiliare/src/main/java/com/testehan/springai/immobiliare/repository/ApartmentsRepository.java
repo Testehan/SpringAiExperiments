@@ -3,6 +3,7 @@ package com.testehan.springai.immobiliare.repository;
 import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.ApartmentDescription;
 import com.testehan.springai.immobiliare.model.PropertyType;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,4 +28,5 @@ public interface ApartmentsRepository {
 
     void deleteApartmentsByIds(List<String> apartmentIds);
 
+    Page<Apartment> searchApartment(String search, String cityFilter, String propertyTypeFilter, Integer minPrice, Integer maxPrice, String sortBy, String sortDir, int page, int size);
 }
