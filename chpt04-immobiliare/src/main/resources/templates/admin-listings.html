@@ -16,9 +16,12 @@
 
             <!-- Filter and Search Form -->
             <form th:action="@{/a/listings}" method="get" class="mb-6 flex flex-wrap gap-4">
-                <input type="text" th:value="${search}" name="search" placeholder="Search by name, city, or area" class="border p-2 rounded flex-1 min-w-[200px]">
+                <input type="text" th:value="${search}" name="search" placeholder="Search by name, area" class="border p-2 rounded flex-1 min-w-[200px]">
 
-                <input type="text" th:value="${cityFilter}" name="cityFilter" placeholder="Filter by city" class="border p-2 rounded flex-1 min-w-[200px]">
+                <select name="cityFilter" class="border p-2 rounded flex-1 min-w-[200px]">
+                    <option value="">All Cities</option>
+                    <option th:each="city : ${availableCities}" th:value="${city}" th:text="${city}" th:selected="${cityFilter == city}"></option>
+                </select>
 
                 <select name="propertyTypeFilter" class="border p-2 rounded flex-1 min-w-[200px]">
                     <option value="">All Property Types</option>

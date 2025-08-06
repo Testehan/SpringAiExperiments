@@ -308,7 +308,6 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
             String regexPattern = ".*" + search + ".*";
             Criteria searchCriteria = new Criteria().orOperator(
                     Criteria.where("name").regex(regexPattern, "i"),
-                    Criteria.where("city").regex(regexPattern, "i"),
                     Criteria.where("area").regex(regexPattern, "i")
             );
             query.addCriteria(searchCriteria);

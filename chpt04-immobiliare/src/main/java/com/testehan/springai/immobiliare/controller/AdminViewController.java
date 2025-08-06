@@ -132,6 +132,7 @@ public class AdminViewController {
 
             // Add enums or distinct values for filters if needed (e.g., PropertyType.values())
             model.addAttribute("propertyTypes", PropertyType.values());
+            model.addAttribute("availableCities", cityService.getEnabledCityNames());
 
             return "admin-listings";
         } else {
