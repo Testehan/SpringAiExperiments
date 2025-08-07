@@ -144,6 +144,10 @@ public class AdminViewController {
             model.addAttribute("propertyTypes", PropertyType.values());
             model.addAttribute("availableCities", cityService.getEnabledCityNames());
 
+            int offset = page * size;
+
+            model.addAttribute("offset", offset);
+
             return "admin-listings";
         } else {
             model.addAttribute("errorMessage", messageSource.getMessage("error.notfound",null, localeUtils.getCurrentLocale()));

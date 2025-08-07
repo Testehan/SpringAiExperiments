@@ -57,6 +57,9 @@
                 <table id="listingsTable" class="min-w-full bg-white shadow rounded-2xl">
                     <thead class="bg-gray-100">
                     <tr>
+                        <th class="w-[25px]">
+                            Nr.
+                        </th>
                         <th class="w-[250px]">
                             <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=name&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
@@ -151,7 +154,10 @@
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                    <tr th:each="listing : ${listings}" class="hover:bg-gray-100">
+                    <tr th:each="listing, iterStat : ${listings}" class="hover:bg-gray-100">
+                        <td class="p-3">
+                            <span th:text="${iterStat.index + offset + 1}"></span>
+                        </td>
                         <td class="p-3">
                             <a target="_blank" th:href="@{{appUrl}/edit/{apartmentId}(apartmentId=${listing.id},appUrl=${appUrl})}">[[${listing.name}]]</a>
                         </td>
