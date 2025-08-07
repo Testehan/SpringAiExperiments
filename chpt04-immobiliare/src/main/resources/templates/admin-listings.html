@@ -33,6 +33,12 @@
 
                 <input id="listingMaxPrice" type="number" th:value="${maxPrice ?: ''}" name="maxPrice" placeholder="Max Price" class="border p-2 rounded flex-1 min-w-[100px]">
 
+                <div class="flex items-center">
+                    <input type="hidden" name="showOnlyActive" value="false">
+                    <input id="showOnlyActive" type="checkbox" name="showOnlyActive" value="true" th:checked="${showOnlyActive}" class="mr-2">
+                    <label>Show only active listings</label>
+                </div>
+
                 <input type="hidden" th:value="${sortBy}" name="sortBy">
 
                 <input type="hidden" th:value="${sortDir}" name="sortDir">
@@ -51,91 +57,91 @@
                     <thead class="bg-gray-100">
                     <tr>
                         <th class="w-[250px]">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=name&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=name&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Name
                                 <span th:text="${sortBy == 'name' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th class="w-[150px]">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=city&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=city&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 City
                                 <span th:text="${sortBy == 'city' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th class="w-[150px]">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=area&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=area&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Area
                                 <span th:text="${sortBy == 'area' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=price&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=price&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Price
                                 <span th:text="${sortBy == 'price' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=propertyType&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=propertyType&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Type
                                 <span th:text="${sortBy == 'propertyType' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=surface&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=surface&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Surface
                                 <span th:text="${sortBy == 'surface' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=noOfRooms&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=noOfRooms&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Rooms
                                 <span th:text="${sortBy == 'noOfRooms' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=contact&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=contact&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Contact
                                 <span th:text="${sortBy == 'contact' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=noOfFavourite&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=noOfFavourite&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Favourites
                                 <span th:text="${sortBy == 'noOfFavourite' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=noOfContact&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=noOfContact&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Contacts
                                 <span th:text="${sortBy == 'noOfContact' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=active&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=active&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Active
                                 <span th:text="${sortBy == 'active' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=creationDateTime&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=creationDateTime&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Created At
                                 <span th:text="${sortBy == 'creationDateTime' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=lastUpdateDateTime&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=lastUpdateDateTime&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Updated At
                                 <span th:text="${sortBy == 'lastUpdateDateTime' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
@@ -186,20 +192,20 @@
                 <div>
                     <ul class="pagination flex space-x-4">
                         <li th:if="${currentPage > 0}">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=${sortBy}&sortDir=${sortDir}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=${sortBy}&sortDir=${sortDir}&page=0|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">First</a>
                         </li>
                         <li th:if="${currentPage > 0}">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=${sortBy}&sortDir=${sortDir}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=${sortBy}&sortDir=${sortDir}&page=${currentPage - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Prev</a>
                         </li>
                         <li th:each="pageNum : ${#numbers.sequence(0, totalPages - 1)}">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=${sortBy}&sortDir=${sortDir}&page=${pageNum}|}"
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=${sortBy}&sortDir=${sortDir}&page=${pageNum}|}"
                                th:classappend="${pageNum == currentPage ? 'bg-blue-500 text-white' : ''}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200" th:text="${pageNum + 1}"></a>
                         </li>
                         <li th:if="${currentPage < totalPages - 1}">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=${sortBy}&sortDir=${sortDir}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=${sortBy}&sortDir=${sortDir}&page=${currentPage + 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Next</a>
                         </li>
                         <li th:if="${currentPage < totalPages - 1}">
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=${sortBy}&sortDir=${sortDir}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&showOnlyActive=${showOnlyActive}&sortBy=${sortBy}&sortDir=${sortDir}&page=${totalPages - 1}|}" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-200">Last</a>
                         </li>
                     </ul>
                 </div>

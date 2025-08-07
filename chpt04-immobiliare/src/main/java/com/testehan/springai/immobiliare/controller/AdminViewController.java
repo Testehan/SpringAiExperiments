@@ -24,10 +24,7 @@ import org.thymeleaf.util.StringUtils;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -108,6 +105,7 @@ public class AdminViewController {
                               @RequestParam(required = false) String propertyTypeFilter,
                               @RequestParam(required = false) Integer minPrice,
                               @RequestParam(required = false) Integer maxPrice,
+                              @RequestParam(name = "showOnlyActive", required = false) String[] showOnlyActiveParams,
                               @RequestParam(defaultValue = "creationDateTime") String sortBy,
                               @RequestParam(defaultValue = "desc") String sortDir,
                               @RequestParam(defaultValue = "0") int page,
@@ -116,7 +114,18 @@ public class AdminViewController {
 
         if (user.isAdmin()) {
 
-            Page<Apartment> listingsPage = apartmentCrudService.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice, sortBy, sortDir, page, size);
+            // Parse the array to boolean
+            boolean showOnlyActive = false;  // Default to false if no "true"
+            if (showOnlyActiveParams != null) {
+                List<String> paramsList = Arrays.asList(showOnlyActiveParams);
+                if (paramsList.contains("true")) {
+                    showOnlyActive = true;
+                }
+            } else {
+                showOnlyActive = true;  // Fallback default if no param at all
+            }
+
+            Page<Apartment> listingsPage = apartmentCrudService.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice,showOnlyActive, sortBy, sortDir, page, size);
 
             model.addAttribute("appUrl", appUrl);
             model.addAttribute("listings", listingsPage.getContent());
@@ -131,7 +140,7 @@ public class AdminViewController {
             model.addAttribute("sortBy", sortBy);
             model.addAttribute("sortDir", sortDir);
 
-            // Add enums or distinct values for filters if needed (e.g., PropertyType.values())
+            model.addAttribute("showOnlyActive", showOnlyActive);
             model.addAttribute("propertyTypes", PropertyType.values());
             model.addAttribute("availableCities", cityService.getEnabledCityNames());
 

@@ -300,7 +300,7 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
     }
 
     @Override
-    public Page<Apartment> searchApartment(String search, String cityFilter, String propertyTypeFilter, Integer minPrice, Integer maxPrice, String sortBy, String sortDir, int page, int size) {
+    public Page<Apartment> searchApartment(String search, String cityFilter, String propertyTypeFilter, Integer minPrice, Integer maxPrice, boolean showOnlyActive, String sortBy, String sortDir, int page, int size) {
         Query query = new Query();
 
         // Search by name, city, or area (case-insensitive regex)
@@ -331,8 +331,9 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
             query.addCriteria(Criteria.where("price").lte(maxPrice));
         }
 
-        // Only active listings
-        query.addCriteria(Criteria.where("active").is(true));
+        if (showOnlyActive) {
+            query.addCriteria(Criteria.where("active").is(true));
+        }
 
         // Sorting
         Sort sort = Sort.by(sortBy != null ? sortBy : "creationDateTime");

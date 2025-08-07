@@ -6,6 +6,7 @@ $(document).ready(function(){
       $('#listingType').val('');
       $('#listingMinPrice').val('');
       $('#listingMaxPrice').val('');
+      $('#showOnlyActive').prop('checked', true);
       $('#listingFilterForm').submit();
     });
 

@@ -60,10 +60,10 @@ public class ApartmentCrudService {
     }
 
     public Page<Apartment> searchApartment(String search, String cityFilter, String propertyTypeFilter,
-                                           Integer minPrice, Integer maxPrice, String sortBy,
+                                           Integer minPrice, Integer maxPrice, boolean showOnlyActive, String sortBy,
                                            String sortDir, int page, int size) {
 
-        return apartmentsRepository.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice, sortBy, sortDir, page, size);
+        return apartmentsRepository.searchApartment(search, cityFilter, propertyTypeFilter, minPrice, maxPrice,showOnlyActive, sortBy, sortDir, page, size);
 
     }
 
