@@ -324,11 +324,15 @@ public class ApartmentsRepositoryImpl implements ApartmentsRepository{
         }
 
         // Price range filter
-        if (minPrice != null) {
-            query.addCriteria(Criteria.where("price").gte(minPrice));
-        }
-        if (maxPrice != null) {
-            query.addCriteria(Criteria.where("price").lte(maxPrice));
+        if (minPrice != null || maxPrice != null) {
+            Criteria priceCriteria = Criteria.where("price");
+            if (minPrice != null) {
+                priceCriteria.gte(minPrice);
+            }
+            if (maxPrice != null) {
+                priceCriteria.lte(maxPrice);
+            }
+            query.addCriteria(priceCriteria);
         }
 
         if (showOnlyActive) {
