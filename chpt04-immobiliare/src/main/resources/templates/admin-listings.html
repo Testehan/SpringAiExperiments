@@ -12,7 +12,7 @@
 <div class="h-[90%] pt-16">
 
     <main class=" bg-white p-4 w-full max-w-full">
-        <div class="max-w-7xl mx-auto bg-white shadow-md rounded-lg p-6">
+        <div class="mx-auto bg-white shadow-md rounded-lg p-6">
             <h1 class="text-2xl font-bold mb-4">Admin Listings Dashboard</h1>
 
             <!-- Filter and Search Form -->
@@ -50,21 +50,21 @@
                 <table id="listingsTable" class="min-w-full bg-white shadow rounded-2xl">
                     <thead class="bg-gray-100">
                     <tr>
-                        <th>
+                        <th class="w-[250px]">
                             <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=name&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Name
                                 <span th:text="${sortBy == 'name' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
-                        <th>
+                        <th class="w-[150px]">
                             <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=city&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 City
                                 <span th:text="${sortBy == 'city' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
-                        <th>
+                        <th class="w-[150px]">
                             <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=area&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
                                 Area
@@ -81,7 +81,7 @@
                         <th>
                             <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=propertyType&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
                                class="cursor-pointer">
-                                Property Type
+                                Type
                                 <span th:text="${sortBy == 'propertyType' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
@@ -97,13 +97,6 @@
                                class="cursor-pointer">
                                 Rooms
                                 <span th:text="${sortBy == 'noOfRooms' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
-                            </a>
-                        </th>
-                        <th>
-                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=availableFrom&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
-                               class="cursor-pointer">
-                                Available From
-                                <span th:text="${sortBy == 'availableFrom' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
                         <th>
@@ -141,6 +134,13 @@
                                 <span th:text="${sortBy == 'creationDateTime' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
                             </a>
                         </th>
+                        <th>
+                            <a href="#" th:href="@{|/a/listings?search=${search}&cityFilter=${cityFilter}&propertyTypeFilter=${propertyTypeFilter}&minPrice=${minPrice ?: ''}&maxPrice=${maxPrice ?: ''}&sortBy=lastUpdateDateTime&sortDir=${sortDir == 'asc' ? 'desc' : 'asc'}|}"
+                               class="cursor-pointer">
+                                Updated At
+                                <span th:text="${sortBy == 'lastUpdateDateTime' ? (sortDir == 'asc' ? '▲' : '▼') : ''}"></span>
+                            </a>
+                        </th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -154,7 +154,6 @@
                         <td class="p-3" th:text="${listing.propertyType}"></td>
                         <td class="p-3" th:text="${listing.surface}"></td>
                         <td class="p-3" th:text="${listing.noOfRooms}"></td>
-                        <td class="p-3" th:text="${listing.availableFrom}"></td>
                         <td class="p-3">
                             <span th:if="${listing.whatsapp}">
                                 <a th:href="'https://wa.me/' + ${#strings.replace(listing.contact, '+', '')}" target="_blank" class="text-green-600 hover:underline">
@@ -174,6 +173,7 @@
                         <td class="p-3" th:text="${listing.noOfContact} + (${listing.isMostContacted ? ' (Most Contacted)' : ''})"></td>
                         <td class="p-3" th:text="${listing.active ? 'Yes' : 'No'}"></td>
                         <td class="p-3" th:text="${listing.creationDateTime}"></td>
+                        <td class="p-3" th:text="${listing.lastUpdateDateTime}"></td>
                     </tr>
                     </tbody>
                 </table>
