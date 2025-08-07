@@ -5,13 +5,9 @@
 
 
 <body class="h-screen bg-gray-100">
-<div class="h-[90%] pt-16">
 
-    <main class=" bg-white p-4 w-full max-w-full">
-        <a href="/a/leads">Leads</a>
-        <br />
-        <br />
-        <br />
-        <a href="/a/listings">Listings</a>
-    </main>
-</div>
+    <div class="h-[90%]">
+        <div th:replace="~{admin_fragments :: menu}"></div>
+    </div>
+
+</body>

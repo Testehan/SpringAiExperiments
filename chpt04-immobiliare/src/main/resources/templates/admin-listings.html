@@ -9,11 +9,12 @@
 
 <div th:replace="~{fragments :: deletion_confirmation}" />
 
-<div class="h-[90%] pt-16">
+<div class="h-[90%]">
+
+    <div th:replace="~{admin_fragments :: menu}"></div>
 
     <main class=" bg-white p-4 w-full max-w-full">
         <div class="mx-auto bg-white shadow-md rounded-lg p-6">
-            <h1 class="text-2xl font-bold mb-4">Admin Listings Dashboard</h1>
 
             <!-- Filter and Search Form -->
             <form id="listingFilterForm" th:action="@{/a/listings}" method="get" class="mb-6 flex flex-wrap gap-4">
