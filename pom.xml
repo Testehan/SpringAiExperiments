@@ -25,7 +25,8 @@
 		<module>chpt05-ollama</module>
 		<module>chpt07-chat-streaming</module>
         <module>chpt08-gemini</module>
-	</modules>
+        <module>chpt09-gemini-cli</module>
+    </modules>
 	<properties>
 		<java.version>21</java.version>
 		<spring-ai.version>1.0.0-M7</spring-ai.version>

@@ -84,7 +84,7 @@ public class MaytapiWhatsAppService {
 
     public void sendSocialListingMessage(String contact, String url) {
         var formatedMessage = String.format(VIEW_LISTING_MESSAGES.get(new Random().nextInt(VIEW_LISTING_MESSAGES.size())), url);
-        sendMessage(contact, formatedMessage);
+//        sendMessage(contact, formatedMessage);
 
     }
 }

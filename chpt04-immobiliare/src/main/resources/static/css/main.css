@@ -889,6 +889,10 @@ video {
   width: 250px;
 }
 
+.w-\[25px\] {
+  width: 25px;
+}
+
 .w-\[70\%\] {
   width: 70%;
 }
