@@ -105,6 +105,57 @@ public class Constants {
         Răspunsul tău final TREBUIE să fie NUMAI șirul JSON brut. Nu-l încadra în markdown și nu adăuga niciun alt text.
         """;
 
+    public static final String PROMPT_VERIFY_LISTING = """
+        Ești un expert în verificarea consistenței datelor extrase din texte.
+    
+        Primești două intrări:
+        1. Textul original (nestructurat): {rawText}
+    
+        2. Obiectul JSON generat (presupus extragerea ta): {jsonListing}
+    
+        Sarcina ta este să verifici dacă informațiile din JSON sunt:
+        - corect extrase din textul original,
+        - complete (nu lipsesc detalii importante),
+        - fidele (nu au fost modificate sau inventate).
+        
+        Foarte important :
+            - Consideră JSON-ul ca fiind *acceptabil* dacă cel puțin 95% din informații corespund textului.
+            - Raportează doar abaterile semnificative sau erorile evidente.
+    
+        ### Reguli de validare
+    
+        1. **Corectitudine factuală:**
+           - Fiecare valoare din JSON trebuie să apară explicit în textul original sau să poată fi dedusă clar (ex: „2 camere” ↔ „apartament cu 2 camere”).
+           - Dacă o informație din JSON NU apare în text, marcheaz-o drept *inventată*.
+           - Dacă lipsește o informație importantă din text (dar ar fi trebuit extrasă conform contextului), marcheaz-o drept *omisă*.
+           - Dacă valoarea este parțial corectă, dar interpretată greșit (ex: „etaj 4” în loc de „etaj 2/4”), marcheaz-o drept *incorectă*.
+    
+        2. **Completitudine:**
+           - Verifică dacă `shortDescription` include toate detaliile menționate în textul original (suprafață, dotări, etaj, mobilier, condiții etc.).
+           - Nu trebuie să lipsească niciun detaliu clar menționat în text.
+           - Reformulările sunt permise, dar nu omisiunile.
+    
+        3. **Fidelitate:**
+           - JSON-ul nu trebuie să conțină date inventate (ex: an construcție, suprafață, zonă, facilități inexistente în text).
+    
+        4. **Localizare:**
+           - `city` trebuie să provină din text (dacă apare „Cluj”, acceptă „Cluj-Napoca”).
+           - `area` trebuie să corespundă unei locații menționate (stradă, cartier, zonă, reper). Dacă nu apare în text, nu ar trebui să existe în JSON.
+    
+        ### Formatul răspunsului
+    
+        Returnează un obiect JSON care evaluează fiecare câmp în parte, cu următoarea structură: {format}
+        Campul isConsistent trebuie sa fie true dacă cel puțin 95% din informații corespund textului, sau false daca mai putin.
+        
+        Nu reformula și nu corecta JSON-ul. Doar analizează fidelitatea datelor față de textul original și raportează abaterile.
+        """;
 
-
+    public static final String PROMPT_CORRECT_LISTING = """
+        Ai generat un JSON cu probleme de consistență față de textul original.
+        Te rog să îl corectezi conform feedbackului de mai jos, fără să modifici câmpurile care sunt corecte.
+        Feedback: {feedback}
+        JSON original: {originalJson}
+        Text original: {rawText}
+        Returnează DOAR JSON-ul corectat, avand formatul {format}, fără alte explicații. 
+        """;
 }
