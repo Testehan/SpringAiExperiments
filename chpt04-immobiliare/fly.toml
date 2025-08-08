@@ -19,7 +19,7 @@ primary_region = 'otp'
   processes = ['app']
 
 [[vm]]
-  memory = '1GB'
+  memory = '2GB'
   cpu_kind = 'shared'
   cpus = 2
 
