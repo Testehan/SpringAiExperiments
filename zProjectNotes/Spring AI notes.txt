@@ -1,11 +1,292 @@
 ex 06 contains an example with RAG - Retrieval Augmented Generation...see also
-    "02 - retrieval augmented generation.png"
+    "02 - retrieval augmented generation.png"   and more details in this document below
 
 ex 07 contains an example with Stuffing the prompt with data so that the LLM has extra information to know how
     to answer...see also "01 - stuffing the promp with data.png"
 
-TODO    Dr. Mark Pollack, lead of the new Spring AI project
-        https://www.youtube.com/watch?v=0P8UU5vkvI8
+https://platform.openai.com/tokenizer
+    to see how many "tokens" are in a string that you provide.
+!!! the token limits, for ex 4k tokens for GPT3, mean that the request and response text content can have summed up
+    together, at most 4k tokens.
 
-TODO    Spring into the AI Era: A Practical Exploration for Developers (Workshop)
-        https://www.youtube.com/watch?v=QWgiOoB4OOU
+    "A helpful rule of thumb is that one token generally corresponds to ~4 characters of text for common
+    English text. This translates to roughly ¾ of a word (so 100 tokens ~= 75 words)."
+
+
+TODO look on the official website https://docs.spring.io/spring-ai/reference/
+    Such is the importance of this interaction style that the term "Prompt Engineering" has emerged as its
+    own discipline. There is a burgeoning collection of techniques that improve the effectiveness of prompts.
+    Investing time in crafting a prompt can drastically improve the resulting output.
+
+    a recent research paper found that one of the most effective prompts you can use starts with the phrase,
+    “Take a deep breath and work on this step by step.” That should give you an indication of why language is
+    so important
+
+    Perhaps more important is that Tokens = $.
+    In the context of hosted AI models, your charges are determined by the number of tokens used. Both input
+    and output contribute to the overall token count.
+    Also, models are subject to token limits, which restrict the amount of text processed in a single API
+    call. This threshold is often referred to as the 'context window'. The model does not process any text
+    that exceeds this limit.
+
+    For instance, ChatGPT3 has a 4K token limit, while GPT4 offers varying options, such as 8K, 16K, and 32K.
+    Anthropic’s Claude AI model features a 100K token limit, and Meta’s recent research yielded a 1M token
+    limit model.
+
+    Bringing Your Data to the AI model
+        - Prompt Stuffing: A more practical alternative involves embedding your data within the prompt provided
+            to the model. Given a model’s token limits, techniques are required to present relevant data within
+            the model’s context window. This approach is colloquially referred to as “stuffing the prompt.”
+            The Spring AI library helps you implement solutions based on the “stuffing the prompt” technique
+            otherwise known as Retrieval Augmented Generation (RAG).
+
+???     - Function Calling: This technique allows registering custom, user functions that connect the large
+            language models to the APIs of external systems. Spring AI greatly simplifies code you need to
+            write to support function calling.
+
+    Retrieval Augmented Generation
+        A technique termed Retrieval Augmented Generation (RAG) has emerged to address the challenge of
+        incorporating relevant data into prompts for accurate AI model responses.
+
+        The approach involves a batch processing style programming model, where the job reads unstructured
+        data from your documents, transforms it, and then writes it into a vector database. At a high level,
+        this is an ETL (Extract, Transform and Load) pipeline. The vector database is used in the retrieval
+        part of RAG technique.
+
+        The next phase in RAG is processing user input. When a user’s question is to be answered by an AI
+        model, the question and all the “similar” document pieces are placed into the prompt that is sent to
+        the AI model. This is the reason to use a vector database. It is very good at finding similar content.
+
+    Function Calling
+        Large Language Models (LLMs) are frozen after training, leading to stale knowledge and they are
+        unable to access or modify external data.
+        The Function Calling mechanism addresses these shortcomings. It allows you register custom, user,
+        functions that connect the large language models to the APIs of external systems. These systems can
+        provide LLMs with real-time data and perform data processing actions on their behalf.
+        Spring AI greatly simplifies code you need to write to support function invocation. It brokers the
+        function invocation conversation for you. You can provide your function as a @Bean and then provide
+        the bean name of the function in your prompt options to activate that function. You can also define
+        and reference multiple functions in a single prompt.
+
+        Spring AI provides flexible and user-friendly ways to register and call custom functions. In general, the
+        custom functions need to provide a function name, description, and the function call signature (as JSON schema)
+        to let the model know what arguments the function expects. The description helps the model to understand when
+        to call the function.
+        As a developer, you need to implement a functions that takes the function call arguments sent from the AI
+        model, and respond with the result back to the model. Your function can in turn invoke other 3rd party services
+        to provide the results.
+
+
+    Evaluating AI responses
+        This evaluation process involves analyzing whether the generated response aligns with the user’s intent
+        and the context of the query. Metrics such as relevance, coherence, and factual correctness are used
+        to gauge the quality of the AI-generated response.
+        One approach involves presenting both the user’s request and the AI model’s response to the model,
+        querying whether the response aligns with the provided data.
+        Furthermore, leveraging the information stored in the vector database as supplementary data can enhance
+        the evaluation process, aiding in the determination of response relevance.
+        The Spring AI project currently provides some very basic examples of how you can evaluate the responses
+        in the form of prompts to include in a JUnit test.
+
+DONE Commit what you have...and for ex06 imobiliare, try and use something like ChatCompletion so that the LLM
+    knows the previous questions/answers...like in a conversation;  (THIS is a prototype in a serious app one would
+    use https://docs.spring.io/spring-session/reference/samples.html)
+
+
+DONE    1. CREATE a simple mvc app with a text field from which the user sends the text request (this will be
+    later on converted to speech in a later task...the send of the DATA is via REST)
+DONE    2. THE APP replies with some info or a list of apartments with all their data
+
+TODO Imobiliare
+DONE    1. add more dummy data, so that you have both apartments for sale and for rent, in 2 different cities,
+    cluj and bucharest
+DONE    2. make sure that the city is taken into consideration when the search is performed
+DONE    3. have some sort of LLM call that extracts price related information from the description and
+        filters by that price
+
+        4. Think of the MVP functionalities that should be implemented to have a working / usable app
+        ..
+
+
+Backend related
+    Security
+        High priority
+            - social login      TODO Try with facebook...and test google login a bit more
+            - keep logged in user state/conversation in a new DB / REDIS idk
+
+   LLM / Vector store
+        High priority
+DONEish     - try to use spring-ai-mongodb-atlas-store-spring-boot-starter ...as of right now, THIS Is only added in
+            the pom file, but i don't think that it is used. You should use this in order to use as much as
+            possible from the Spring framework, in order to store chat replies etc in the MongoDB vectorstore..
+            use this project that was written in kotlin for this..and see how you can store the chats:
+            https://github.com/johnsonr/instrumented-rag/blob/main/src/main/kotlin/springrod/localrag/ChatService.kt
+
+DONEish  try to use the Apartments.toString value obtained from the getApartments method after the similarity search, in the message
+     that will be sent to the LLM ...so that the data about those apartments will be used by advisors and saved in memory and
+     vectorestore.. Try this even if it means that for some time, the apartment results will not be displayed nice in the
+     UI...i think this is more important to work, and then once this works we can look into how to display data in the UI
+     in a nice way
+
+     DONE   Send images of the apartment to the llm to obtain a description of that image that will also be embedded to obtain
+     more information about the apartment.
+
+     DONE Use the conversation history stored in the DB (if present) to better answer user questions
+
+    DONE make sure that only the owners can edit a property
+
+     DONE when property is edited, make sure that if no photos are added, the embedding is not modified. THe image
+     embedding should run on all images, not only the one from the update..Maybe this needs to be changed so that
+     we first add the images to S3 then we get then from there in order to create the image descriptions
+
+     done when a property is edited, add button so that images can be deleted
+
+    DONE add more properties in a a city For example properties rent in Cluj-Napoca ...and then see how is the performance,
+    how many results are displayed ...etc
+
+    Medium priority
+DONE        - add a button/functionality for sound recording and sending sound file to backend where it would be
+        translated into text again
+
+UI related
+    High priority
+DONE    - add phone number in apartments, and a button to get the phone number from server via rest call when clicked
+        (this means that apartment id also needs to be present in UI, but in a hidden field)
+DONE    - when pressing up or down arrow in the chat, select a previous message that the user sent...(this makes
+        it easier to modify previous prompts etc...) I think that in the first
+DONE    - create a "my profile page", where the use can see information about his account, and current city, property type
+        and last description he searched for (this last field could be used to send him email in a future functionality, when
+        a property matching his description appears.)
+
+DONE add information to a user about the available number of queries left, and the number of properties he can post
+
+DONE The show contact and favourite does not work in the chat window
+
+    Low priority
+DONE        - users will only be allowed to click on this button a fixed number of times per week/month
+DONE    - in case an image is not available, display a default image
+DONEish - have a gallery for the images
+DONE     - clickin on an image opens a modal where you can see the images/gallery in a bigger dialog
+DONE    - IF an apartment was previously favourited, it should appear as favourited in the chat results as well. Right
+        now the button "Save to favourites appears"
+DONE add a referal mechanism that can be used to increase number of queries and the nr of users :)
+
+
+DONE    You can try to use the singlestore.com DB for testing purposes...and see how you can generated embeddings,
+    (meaning that looong vector of random/weird numbers)
+    by calling the open AI api -> https://platform.openai.com/docs/guides/embeddings/what-are-embeddings
+
+    casamia.ai          short simple ...poate fi si pt chirii si vanzari si
+
+
+Mental models:
+Done    Hicks law
+        - the more choices you present, the longer it will take users to decide.
+        - start with a limited set of tailored recommendations... gradually reveal more if users
+        explore further
+
+Done     Availability bias
+        - users are drawn to what is top of mind or visually compelling
+        - prioritize high quality visuals and property photos
+        - display the most relevant recommendations prominently.
+        - show key details upfront, like price location, top amenities
+
+    Loss aversion
+DONE    - users are more motivated to avoid losing out on good opportunities than to gain new ones
+DONE    - highlight urgency "Popular listing. Contact now"
+        - notify users of price drops or new listings matching their criteria
+
+    Social proof
+        - users trust decisions validated by others
+DONE    - highlight popular properties "14 people are interested in this property"
+            (maybe you can count the number of people that click on the show contact ..you can make up these numbers at the beginning.)
+
+    Endownment effect
+        - people value what they feel they already own or are close to aquiring
+DONE    - let users favourite listings..to create a sense of ownership
+        - provide personalized followups like "your favourite listing is still available"
+
+    Scarcity principle
+        - users perceive scarce items as more valuable
+        - notify users when a property they like is about to go off the market
+        
+
+java -jar chpt04-immobiliare-0.0.1-SNAPSHOT.jar  --spring.profiles.active=dev
+    this can be used to start the app with thaver profile you want
+
+The docker app works only with OpenAI LLM, because google has some shit service account functionality
+for accessing the APIS (docker-google-ai-key.json). Now, in the image that gets created, this file is
+copied, and stored as ENV variable, but the problem is that i think that spring AI knows only to
+access google APIs in "development mode", not from a running container...at least i didn't spend tooooo
+much more time on this..Somehow spring or spring AI would need to use that file to access the APIs
+
+for deploying on AWS beanstalk : https://www.youtube.com/watch?v=2BoVhej0QVI
+    AWS is way too complicated ...i switched and managed to deploy to heroku in less than 1 hour
+
+How to deploy on heroku ?
+    1. build app
+    2. make sure docker is running
+    3. make sure you are in the terminal in the project folder
+    4. heroku container:login
+    5. heroku container:push web --app=casamia-ai
+    6. heroku container:release web --app=casamia-ai
+
+
+About using google maps place summary (this is for having for each listing a description of
+close shops, schools, gyms, restaurants, parks.. basically important nearby facilities)
+    - this is an experimental feature..and would have been the best solution, because it would mean
+    just making a call and getting the data...
+        https://developers.google.com/maps/documentation/places/web-service/experimental/places-generative
+    - depending on how important such a functionality would be, one could work on it without waiting for the
+    experimental API mentioned above to become mainstream...how ? see below
+    - 1. this is how you could get the placeId for an address, or the coordinates:
+        https://maps.googleapis.com/maps/api/geocode/json?address=Dorobantilor%20Cluj%20Napoca&key=AIzaSyBR2C78pT5_YSY3bOi7x1zOEHmuGSnc2jE
+    - 2. this is how you could get a list of nearby restaurants based on coordinates:
+        https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=46.7743419,23.6100192&radius=1000&type=pizza_restaurant&key=AIzaSyBR2C78pT5_YSY3bOi7x1zOEHmuGSnc2jE
+    so similarly you could make requests for various facilities like the one from below (below is a top
+    of things people are interested in when looking for a rent), then aggregate them and add the information to the
+    Apartment entities..
+            When using the Google Places API (Nearby Search API), you can use the following place types to match the 10 renter priorities:
+                Public transportation → "transit_station" i will use this one as it is the parent of the following, so it contains them  "bus_station", "subway_station", "train_station",
+                Supermarkets & grocery stores → "grocery_or_supermarket"
+                Schools & universities → "school", "university"
+                Gyms & fitness centers → "gym"
+                Parks & green spaces → "park"
+                Restaurants & cafes → "restaurant", "cafe"
+                Shopping malls & retail stores → "shopping_mall", "department_store", "clothing_store"
+                Hospitals & medical facilities → "hospital", "doctor", "pharmacy"
+                Workplaces & business districts → "point_of_interest", "establishment" (not direct, but can check office areas)
+                Entertainment & nightlife → "bar", "night_club", "movie_theater", "museum", "stadium"
+
+   - 3. distance between points maps :
+        https://maps.googleapis.com/maps/api/distancematrix/json?origins=46.7742869,23.6088346&destinations=46.7765612,23.60683939999999&key=AIzaSyBR2C78pT5_YSY3bOi7x1zOEHmuGSnc2jE
+
+
+    gcloud config set project gen-lang-client-0282334491 &&
+    gcloud auth application-default login dantestehan@gmail.com
+
+How to deploy on fly.io ?
+    - make sure that fly CLI is working : fly version
+    - if not working run to find install location : find /usr/local/bin /opt/homebrew/bin $HOME/.fly/bin -name "flyctl" 2>/dev/null
+    - then use that path and run the next command (here i have the current location "/Users/danteshte/.fly/bin") : export PATH="/Users/danteshte/.fly/bin:$PATH"
+    - make change permanent : echo 'export PATH="/Users/danteshte/.fly/bin:$PATH"' >> ~/.zshrc
+    - reload shell : source ~/.zshrc
+    - run cmd "fly deploy"
+
+Actuator Prometheus and Grafana
+    - locally i installed alloy, which is an agent that captures the metrics from http://localhost:8080/actuator/prometheus
+    and sends them to grafana cloud. In order for this to work, there is a config file at the path below,
+    that you can edit:
+        sudo nano  /usr/local/etc/alloy/config.alloy
+
+    - if you want to restart the agent run the below command. this is needed after modifying the configuration
+     from above:
+        brew services restart alloy
+
+    - when the solution will be deployed in the cloud, you will need to follow the steps mentioned below:
+        - Grafana -> Connections ->
+        Custom Setup Options -> Hosted Collector ... from what i understood this will make grafana request the metrics
+
+    Metrics used from:
+        https://docs.spring.io/spring-ai/reference/observability/index.html
+
