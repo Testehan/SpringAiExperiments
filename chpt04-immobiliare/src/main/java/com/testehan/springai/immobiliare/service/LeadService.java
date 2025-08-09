@@ -162,8 +162,8 @@ public class LeadService {
     public List<String> getJsonLeadsHavingStatus(String leadStatus) {
         // Fetch leads matching the criteria
         var leads = leadRepository.findByStatusIn(List.of(leadStatus));
-
         return leads.stream()
+                .filter(lead -> leadConversationService.doWeNeedToContinueConversation(lead.getPhoneNumber()))
                 .map(lead -> lead.getPhoneNumber())
                 .collect(Collectors.toList());
     }
