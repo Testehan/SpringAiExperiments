@@ -91,7 +91,8 @@ public class ApartmentService {
             var optionalApartment = apartmentCrudService.findApartmentById(apartment.getIdString());
             if (optionalApartment.isPresent()){
                 var apartmentCurrentlySaved = optionalApartment.get();
-                var hasAddressChange = !apartmentCurrentlySaved.getArea().equalsIgnoreCase(apartment.getArea());
+                var hasAddressChange = (!apartmentCurrentlySaved.getArea().equalsIgnoreCase(apartment.getArea())
+                        || !apartmentCurrentlySaved.getCity().equalsIgnoreCase(apartment.getCity()));
                 if (hasAddressChange || apartmentCurrentlySaved.getNearbyAmenities().isEmpty()){
                     // means that address changed and we need to set amenities again
                     listingAmenitiesService.getAmenitiesAndSetInApartment(apartment);
