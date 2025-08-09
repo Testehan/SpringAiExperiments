@@ -196,6 +196,10 @@
                                         class="ml-4 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition">
                                         Chat
                                     </a>
+                                    <a th:if="${lead.status.name() == 'DONE' or lead.status.name() == 'EXPIRED'}" th:href="@{{appUrl}/a/leads/tolisting/{leadId}(leadId=${lead.phoneNumber},appUrl=${appUrl})}"
+                                       class="ml-4 bg-blue-600 text-white px-4 py-2 rounded-xl hover:bg-blue-700 transition">
+                                        Listing
+                                    </a>
                                 </div>
                             </td>
                         </tr>

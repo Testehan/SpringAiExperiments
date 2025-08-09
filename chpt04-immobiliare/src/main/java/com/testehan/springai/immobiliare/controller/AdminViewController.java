@@ -1,7 +1,10 @@
 package com.testehan.springai.immobiliare.controller;
 
 import com.testehan.springai.immobiliare.advisor.ConversationSession;
+import com.testehan.springai.immobiliare.model.Apartment;
 import com.testehan.springai.immobiliare.model.Lead;
+import com.testehan.springai.immobiliare.service.ApartmentCrudService;
+import com.testehan.springai.immobiliare.service.CityService;
 import com.testehan.springai.immobiliare.service.LeadConversationService;
 import com.testehan.springai.immobiliare.service.LeadService;
 import com.testehan.springai.immobiliare.util.LocaleUtils;
@@ -22,6 +25,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -34,14 +38,18 @@ public class AdminViewController {
 
     private final LeadService leadService;
     private final LeadConversationService leadConversationService;
+    private final ApartmentCrudService apartmentCrudService;
+    private final CityService cityService;
     private final ConversationSession conversationSession;
 
     private final MessageSource messageSource;
     private final LocaleUtils localeUtils;
 
-    public AdminViewController(LeadService leadService, LeadConversationService leadConversationService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
+    public AdminViewController(LeadService leadService, LeadConversationService leadConversationService, ApartmentCrudService apartmentCrudService, CityService cityService, ConversationSession conversationSession, MessageSource messageSource, LocaleUtils localeUtils) {
         this.leadService = leadService;
         this.leadConversationService = leadConversationService;
+        this.apartmentCrudService = apartmentCrudService;
+        this.cityService = cityService;
         this.conversationSession = conversationSession;
         this.messageSource = messageSource;
         this.localeUtils = localeUtils;
@@ -100,6 +108,37 @@ public class AdminViewController {
         model.addAttribute("messages",leadConversation);
 
         return "admin-leads-conversation";
+    }
+
+    @GetMapping("/leads/tolisting/{waUserId}")
+    public String getListingOfLead(@PathVariable String waUserId, Model model, Locale locale) {
+
+        model.addAttribute("apartment", new Apartment());
+        model.addAttribute("numberOfExistingImages", 0);
+        var buttonMessage = messageSource.getMessage("add.button.add", null, locale);
+        var deleteButtonMessage = messageSource.getMessage("add.a.deleteimage", null, locale);
+        var imageNoLabel = messageSource.getMessage("add.label.imagenumber", null, locale);
+        model.addAttribute("buttonMessage", buttonMessage);
+        model.addAttribute("deleteButtonMessage", deleteButtonMessage);
+        model.addAttribute("imageNoLabel", imageNoLabel);
+        model.addAttribute("appUrl", appUrl);
+
+        var apartmentOptional = apartmentCrudService.findApartmentByContact(waUserId);
+        if (!apartmentOptional.isEmpty()) {
+            var apartment = apartmentOptional.get();
+            model.addAttribute("apartment", apartment);
+            model.addAttribute("numberOfExistingImages", apartment.getImages().size());
+            buttonMessage = messageSource.getMessage("add.button.update", null, locale);
+            model.addAttribute("buttonMessage", buttonMessage);
+        }
+
+        model.addAttribute("listCities",cityService.getEnabledCityNames());
+        model.addAttribute("listPropertyTypes",List.of(messageSource.getMessage("rent", null,locale))); // "sale"
+
+//        List<Apartment> listOfProperties = getListOfProperties(user);;
+//        model.addAttribute("listOfProperties", listOfProperties);
+
+        return "add";
     }
 
     private List<String> getLeadInitialMessages(int numberOfLeads){
