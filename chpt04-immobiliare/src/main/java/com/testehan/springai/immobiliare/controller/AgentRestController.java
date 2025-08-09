@@ -81,7 +81,7 @@ public class AgentRestController {
         List<Map<String,String>> phoneNumbersToReactivationLinks = new ArrayList<>();
         var phoneNumbers = leadService.getJsonLeadsHavingStatus(status);
         for (String phone : phoneNumbers){
-            var listingOptional = apartmentCrudService.findApartmentByContact(phone.replaceFirst("^\\+40", "0"));
+            var listingOptional = apartmentCrudService.findApartmentByContact(phone);
             if (listingOptional.isPresent()) {
                 var listing = listingOptional.get();
                 var reactivateLink = appUrl + "/reactivate?token=" + listing.getActivationToken() + "&id=" + listing.getId().toString();
