@@ -242,7 +242,7 @@ close shops, schools, gyms, restaurants, parks.. basically important nearby faci
     - 1. this is how you could get the placeId for an address, or the coordinates:
 
     - 2. this is how you could get a list of nearby restaurants based on coordinates:
-        https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=46.7743419,23.6100192&radius=1000&type=pizza_restaurant&key=AIzaSyBR2C78pT5_YSY3bOi7x1zOEHmuGSnc2jE
+
     so similarly you could make requests for various facilities like the one from below (below is a top
     of things people are interested in when looking for a rent), then aggregate them and add the information to the
     Apartment entities..
